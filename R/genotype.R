@@ -66,18 +66,18 @@ findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
   unmut_alleles = rep("", length(allele_calls))
   
   # How many alleles represent perfect matches?
-  n_gl_unmut = sapply(which_min_muts, length)
+  n_gl_unmut = sapply(which_no_muts, length)
   
   one_unmut = which(n_gl_unmut == 1)
   split_names = strsplit(allele_calls, ",")
   if (length(one_unmut) > 0){
-    inds = unlist(which_min_muts[one_unmut])
+    inds = unlist(which_no_muts[one_unmut])
     unmut_alleles[one_unmut] = mapply("[", split_names[one_unmut], inds)
   }
   
   more_unmut = which(n_gl_unmut > 1)
   if (length(more_unmut) > 0){
-    inds = which_min_muts[more_unmut]      
+    inds = which_no_muts[more_unmut]      
     unmut_multi = mapply(function(x,y) x[unlist(y)], split_names[more_unmut],
                          inds, SIMPLIFY = FALSE)
     unmut_alleles[more_unmut] = sapply(unmut_multi, paste, collapse=",")  
@@ -126,6 +126,7 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
   }
   # Make a table to store the resulting genotype
   gene = sortAlleles(as.character(unique(df$gene_calls)))
+  gene = setdiff(gene, "")
   alleles = counts = rep("", length(gene))
   total = as.vector(table(as.character(df$gene_calls))[gene])
   genotype = cbind(gene, alleles,counts,total)
