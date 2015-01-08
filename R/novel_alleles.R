@@ -1,4 +1,35 @@
 
+# constants ---------------------------------------------------------------
+
+v_call_col = "V_CALL"
+v_start_col = "V_GERM_START"
+v_length_col = "V_GAP_LENGTH"
+j_call_col = "J_CALL"
+junc_length_col = "JUNCTION_GAP_LENGTH"
+
+
+# readGermlineDb ----------------------------------------------------------
+
+readGermlineDb <- function(fasta_file, 
+                           strip_down_name = TRUE,
+                           force_caps = TRUE){
+  
+  
+  ## FIRST SEQUENCE IS BEING DELETED
+  
+  all_char = readChar(fasta_file, file.info(fasta_file)$size)
+  split_by_sequence = strsplit(all_char, "[ \t\r\n\v\f]?>")
+  add_name_break = sapply(split_by_sequence, function(x) sub("[\r\n]",">",x))
+  cleaned_up = sapply(add_name_break, function(x) gsub("[ \t\r\n\v\f]", "", x))
+  broken_names = sapply(cleaned_up, strsplit, ">")
+  seqs = sapply(broken_names, "[", 2)
+  seq_names = sapply(broken_names, "[", 1)
+  if(force_caps){ seqs = toupper(seqs) }
+  if(strip_down_name){ seq_names = alakazam::getAllele(seq_names) }
+  names(seqs) = seq_names
+  return(seqs[which(!is.na(seqs))])
+}
+
 
 # sortAlleles -------------------------------------------------------------
 
@@ -27,15 +58,22 @@
 sortAlleles <- function(allele_calls) {  
   
   allele_calls = sort(allele_calls) # This will help align the Ds later.
+  
   segment = gsub(".*(IG[HKL][VDJ]).*", "\\1", allele_calls)
+  
   family = as.numeric(gsub(".*IG[HKL][VDJ]([0-9]*)[^0-9].*", "\\1", allele_calls))
-  gene = gsub("[^-]*-([^-\\*D]*)[-\\*D].*", "\\1", allele_calls)
-  gene = as.numeric(gsub("NL", "99", gene))
-  gene2 = gsub("-", "", gsub("^[^-]*|[^-]*$", "", allele_calls))
-  gene2 = as.numeric(gsub("D","",gene2))
+  
+  gene = gsub("[^-]*-([^-\\*]+).*", "\\1", (alakazam::getGene(allele_calls)))
+  gene = gsub("D","",gene)
+  gene = as.numeric(gsub("NL|a|b|f", "99", gene))
+  
+  gene2 = gsub(".*-.*-|\\*..", "", allele_calls)
+  gene2 = as.numeric(gsub("NL|a|b|f", "99", gene2))
   gene2[is.na(gene2)] = 0
+  
   allele = as.numeric(gsub(".*\\*","",allele_calls))
-  sorted_calls = allele_calls[order(segment, family, gene + gene2, allele)]
+  
+  sorted_calls = allele_calls[order(segment, family, gene + gene2*.01, allele)]
   
   return(sorted_calls)
 }
@@ -217,23 +255,29 @@ summarizeMutations <- function(mut_list, match_list) {
 # trimMutMatrix -----------------------------------------------------------
 #' If there is a problem with the number of sequences, etc., 
 #'           a message will be printed and \code{NULL} will be returned.
-
+#' @examples
+#' mut_summary <- list(matrix(), matrix())
+#' mut_summary <- list(matrix(1:10, 1, 10, dimnames=list(1, 1:10)), 
+#'                     matrix(1:10, 1, 10, dimnames=list(1, 1:10)))
+#' trimMutMatrix(mut_summary, mut_min, mut_max,nt_min,nt_max=1, quiet=FALSE)
 trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
-                          nt_min = 1, nt_max = 312, min_seqs=50){
-  
-  allele = names(germline)
+                          nt_min = 1, nt_max = 312, min_seqs=50, verbose=F){
   
   # Ensure the matrix covers the desired mutational range
   if(sum(!(mut_min:mut_max %in% colnames(mut_summary[[1]]))) > 0) {
-    cat("Insufficient data for ", allele, " within mutation range ",
-        mut_min, " to ", mut_max,"; skipped.\n", sep="")
+    if(verbose){
+      cat("Insufficient data within mutation range ",
+          mut_min, " to ", mut_max,"; skipped.\n", sep="")
+    }
     return(NULL)
   }
   
   # Ensure the matrix covers the desired nucleotide range
   if(sum(!(nt_min:nt_max %in% rownames(mut_summary[[1]]))) > 0) {
-    cat("Insufficient data for ", allele, " within nucleotide range ",
-        nt_min, " to ", nt_max,"; skipped.\n", sep="")
+    if(verbose){
+      cat("Insufficient data within nucleotide range ",
+          nt_min, " to ", nt_max,"; skipped.\n", sep="")
+    }
     return(NULL)
   }
   
@@ -244,14 +288,16 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
                   mut_summary[[2]][nt_range,mut_range])
   
   # Ensure there are actually sequences to work with in the range
+  count_vs_muts = apply(mut_trim[[2]], 2, max, na.rm=TRUE)
   if(sum(count_vs_muts) < min_seqs){
-    cat("Insufficient data for ", allele, " within mutation range ",
-        mut_min, " to ", mut_max,"; skipped.\n", sep="")
+    if(verbose){
+      cat("Insufficient data within mutation range ",
+          mut_min, " to ", mut_max,"; skipped.\n", sep="")
+    }
     return(NULL)
   }
   
   # Find any outliers in the sequence counts.
-  count_vs_muts = apply(mut_trim[[2]], 2, max)
   outs = boxplot(count_vs_muts,plot=F)$out
   big_outs = outs[which(outs > mean(count_vs_muts))]
   start_at = as.numeric(names(which(count_vs_muts == big_outs)))
@@ -259,8 +305,8 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
   if(length(start_at) > 0){
     mut_min = min(5, start_at[1])
     mut_range = as.character(mut_min:mut_max)
-    mut_trim = list(mut_summary[[1]][,mut_range],
-                    mut_summary[[2]][,mut_range])
+    mut_trim = list(mut_trim[[1]][,mut_range],
+                    mut_trim[[2]][,mut_range])
   }
   
   mut_fracs = mut_trim[[1]]/mut_trim[[2]]
@@ -359,16 +405,18 @@ createGermlines <- function(germline, positions, nucleotides){
 # findNovelAlleles --------------------------------------------------------
 
 findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
-                              mut_min=1, mut_max=10, j_max = 0.1){
+                              y_intercept = 1/8, nt_min=1, nt_max=312,
+                              mut_min=1, mut_max=10, j_max = 0.1,
+                              min_seqs = 50, verbose=FALSE){
   # Find the positions of differences and similarities between sequences
   mut_list = getMutatedPositions(samples, germline)
   mut_counts = sapply(mut_list, length)
   match_list = getMutatedPositions(samples, germline, match_instead = TRUE)
-  mut_summary = summarizeMutations(mut_list, match_list, )
-  mut_matrix = trimMutMatrix(mut_summary, mut_min, mut_max)
-  intercepts = findIntercepts(mut_matrix)
+  mut_summary = summarizeMutations(mut_list, match_list)
+  mut_matrix = trimMutMatrix(mut_summary, mut_min, mut_max,nt_min, nt_max, min_seqs, verbose)
+  if (is.null(mut_matrix)){ return(NULL) }
+  intercepts = findIntercepts(mut_matrix,y_intercept)
   polymorphs = as.numeric(names(intercepts))
-  allele_summary = list()
   if (length(polymorphs) > 0) {
     nuc_usage = lapply(polymorphs, findNucletoideUsage, samples, germline,
                        mut_counts, mut_min, mut_max)
@@ -378,146 +426,108 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
     put_mut_locs = lapply(putative, function(x) getMutatedPositions(samples, x))
     perfect_matches = lapply(put_mut_locs, function(x) which(sapply(x,length) == 0))
     j_junc_tables = lapply(perfect_matches, function(x) table(junc_lengths[x], j_genes[x]))
-    pass_test = which(sapply(j_junc_tables, function(x) max(x/sum(x))) < j_max)
-    for(i in 1:length(pass_test)){
-      germ_name = names(pass_test[i])
-      positions = gsub("[A-Z]","",strsplit(germ_name, "_")[[1]][-1]) 
-      allele_summary[[germ_name]] = list(putative[pass_test[i]],
-                                         intercepts[positions],
-                                         mut_matrix,  nuc_usage[positions],
-                                         j_junc_tables[[pass_test[i]]])
+    pass_test = which(sapply(j_junc_tables, function(x) abs(max(x/sum(x)))) < j_max)
+    if(length(pass_test) > 0){
+      allele_summary = list()
+      for(i in 1:length(pass_test)){
+        germ_name = names(pass_test[i])
+        positions = gsub("[A-Z]","",strsplit(germ_name, "_")[[1]][-1]) 
+        allele_summary[[germ_name]] = list(putative[pass_test[i]],
+                                           intercepts[positions],
+                                           mut_matrix,  nuc_usage[positions],
+                                           j_junc_tables[[pass_test[i]]])
+      }
+      return(allele_summary)
     }
   }
-  return(allele_summary)
+  return(NULL)
 }  
 
 
-# old tigger stuff --------------------------------------------------------
+# detectNovelV ------------------------------------------------------------
 
-
-
-
-# script ------------------------------------------------------------------
-
-
-## START SCRIPT
-
-# Constants
-
-v_call_col = "V_CALL"
-v_start_col = "V_GERM_START"
-v_length_col = "V_GERM_LENGTH"
-j_call_col = "J_CALL"
-junc_length_col = "JUNCTION_GAP_LENGTH"
-
-# Parameters you don't change
-mut_min = 1
-mut_max = 10
-
-
-# Your part
-
-# Data 
-
-load("C:/Users/Daniel Gadala-Maria/Documents/Kleinstein/Datasets/Bolen Twins/twinStudy_ClipTab_withFRdata_goodSeqs_deident.Rd")
-Read_fasta <- function(fasta_file, quiet=F){
-  # Reads a fasta file, returning named uppercase strings
-  if(!quiet){ cat("Reading \"", fasta_file, "\"...", sep="") }
-  seqs <- read.fasta(fasta_file, strip.desc=T, as.string=T)
-  seq_names <- sapply(seqs, attr, "Annot")
-  seqs = toupper(seqs)
-  names(seqs) = seq_names
-  if(!quiet){ cat("done.\n") }
-  return(seqs)
-}
-germlines = Read_fasta("C:/Users/Daniel Gadala-Maria/Documents/Kleinstein/Datasets/IMGT/IMGT Ig Sequences 2014-09-29.fasta")
-dat = subset(combSeqData.noID, donor == "Donor_06" | donor == "Donor_09")
-
-# Main
-
-allele_groups = assignAlleleGroups(dat[,v_call_col])
-v_seqs = sapply(dat$SEQUENCE_GAP, substr, 1,
-                as.numeric(dat[,v_start_col]) + as.numeric(dat[,v_length_col]))
-j_genes = alakazam::getGene(dat[,j_call_col], first = F)
-junc_lengths = dat[,junc_length_col]
-
-
-novel=list()
-
-which(sapply(allele_groups, length) > 
-
-for each allele with in size of something
-
-  allele_gp = allele_groups[[2]]
-  samples = v_seqs[]
-  germline = 
-  novel[] = findNovelAlleles(samples, germline, j_genes[allele_groups[[2]]],
-                           junc_lengths[allele_groups[[2]]],
-                           mut_min=1, mut_max=10, j_max = 0.1)
-  
-
-
-
-## END SCRIPT
-
-
-
-  # Find hypothetical polymorphisms, on a per-allele basis
-  
-
-  muts_list = list(); pcts_list = list(); snps_list = list()
-  for (gnam in names(igroups_list)){
-    grp = igroups_list[[gnam]]
-    v_samples = samples[grp]
-    v_germline <- repseqs[gnam]
-    muts_list[[gnam]] = Find_mutated_positions(v_samples, v_germline)
-    pcts_list[[gnam]] = Find_mutation_by_position(muts_list[[gnam]], mmax, allele_cutoff)
-    snps = Find_polymorphisms(v_samples, v_germline, muts_list[[gnam]],
-                              pcts_list[[gnam]], y_intercept = y_i,
-                              inter_alpha=i_a, mmin=mmin, mmax=mmax,
-                              allele_cutoff=allele_cutoff)
-    if(length(snps)>0){ snps_list[[gnam]] = snps }
+detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
+                         germline_db,  y_intercept =1/8, nt_min=1, nt_max = 312,
+                         mut_min=1, mut_max=10, j_max = 0.10, min_seqs = 50,
+                         verbose=FALSE){
+ 
+  novel=list()
+  for (allele_name in names(allele_groups)) {
+    #cat(allele_name,"\n")
+    indicies = allele_groups[[allele_name]]
+    samples = v_sequences[indicies]
+    germline = germline_db[allele_name]
+    if (!is.na(germline)){
+      fna = findNovelAlleles(samples, germline,
+                             j_genes[indicies],
+                             junc_lengths[indicies],
+                             y_intercept =1/8,
+                             nt_min, nt_max,
+                             mut_min, mut_max, j_max, min_seqs, verbose)
+      novel = c(novel, fna)
+    }
   }
-  # sum(sapply(muts_list, function(x) sum(table(unlist(x))/length(x) > 0.3)))3)))
-  if (length(snps_list)>0){
-    snps_table = as.table(Reduce(rbind, snps_list))
-    if(!clean){
-      write.table(snps_table, paste0(run, "/putative_SNPs_list.tab"),
-                  sep="\t", row.names=F, quote=F)
+  return(novel)
+}
+
+
+# plotNovelLines ---------------------------------------------------------------
+plotNovelLines <- function(novel){
+  for(n in novel){
+    plot(NA, xlim = c(0,10), ylim = c(0,1), main = names(n[[1]]), las=1,
+         xlab="Mutation Count (Sequence)",
+         ylab="Mutation Frequency (Position)")
+    apply(n[[3]], 1, function(x) lines(as.numeric(names(x)),x) )
+    for (i in 1:length(n[[2]])){
+      lines(colnames(n[[3]]),n[[3]][as.numeric(names(n[[2]]))[i],], col="red")
     }
-    # Create predicted germlines, adding multipy-SNP'd germlines if >1 SNP found in 1 allele
-    seqs = c(unlist(Create_predicted_germlines(snps_table, repseqs)),
-             unlist(Create_multiple_snp_germlines(snps_table, repseqs)))
-    # Check the J/junction length distribtions
-    jtab_list = list()
-    for (s in names(seqs)){
-      jtab_list[[s]] = Calc_jtab(seqs[s], igroups_list, samples,
-                                 clip_tab[,j_call_col],
-                                 clip_tab[,junc_col])
+    for (i in 1:length(n[[2]])){
+      text(as.numeric(colnames(n[[3]])[1])+1-i,
+           n[[3]][as.numeric(names(n[[2]]))[i],1],
+           labels=names(n[[2]])[i],
+           col="red",adj=c(1,1))
     }
-    # Require 50+ perfect-matching sequences
-    # over50 = which(sapply(jtab_list, function(x) sum(x)) > 50)
-    # Require most common J-junction combinations to be < 10% among perfect sequences
-    under15 = which(sapply(jtab_list, function(x) max(x/sum(x))) < jpct)
-    #   pass = names(jtab_list[intersect(over50,under10)])
-    pass = names(jtab_list[under15])
-    seqs = pseqs = seqs[pass]
-    # Check for/remove SNPd seqs that result in the same sequence as each other
-    if (length(seqs) > 2){ seqs = Remove_duplicated_germlines(seqs, quiet=quiet) }
-    # Merge new repseqs with old repseqs
-    repseqs = c(repseqs, seqs)[ sort(unique(c(names(repseqs), names(seqs)))) ]
-    # Write *unique* putative new alleles to fatsa
-    if(!clean){
-      write.fasta(lapply(repseqs, s2c), names(repseqs),
-                  file.out=paste0(run, "/rep_+_putative.fasta"))
+  }
+}
+
+
+# plotNovelBars -----------------------------------------------------------
+plotNovelBars <- function(novel){
+  for(n in novel){
+    for (p in n[[4]]){
+    barplot(p[4:1,], col = alakazam::NUC_COLORS[rownames(p)], las=1,
+            xlab = "Mutation Count (Sequence)",
+            ylab = "Sequence Count")
+    box()
+    leg_names = paste(rownames(p), c("(germline)","","","(polymorphism)"))
+    legend("topright",
+           legend = leg_names,
+           fill=alakazam::NUC_COLORS[rownames(p)][4:1],
+           bty = "n")
     }
     
   }
-  if (!quiet){
-    cat("done.\n", length(seqs), "novel allele(s) found:\n",
-        paste(names(seqs),collapse="\n "),"\n")
+}
+
+
+# plotJunctionBars --------------------------------------------------------
+plotJunctionBars <- function(novel){
+  for(n in novel){
+    barplot(n[[5]], las=1, col = rainbow(nrow(n[[5]])))
+    legend("topleft", legend = rownames(n[[5]]), ncol = 3,
+           fill = rainbow(nrow(n[[5]])), bty="n")
+    box()
   }
-  
+}
+
+
+
+
+
+
+
+
+
 
 
 
