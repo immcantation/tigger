@@ -121,8 +121,9 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
   
   #If after all that there still gene-ambiguous sequences, just keep the first gene
   stillmulti = grep(",",as.vector(df$gene_calls))
-  df$gene_calls[stillmulti] = sapply(strsplit(as.vector(df$gene_calls[stillmulti]),","),"[",1)
-  
+  if (length(stillmulti) > 0 ){
+    df$gene_calls[stillmulti] = sapply(strsplit(as.vector(df$gene_calls[stillmulti]),","),"[",1)
+  }
   # Make a table to store the resulting genotype
   gene = sortAlleles(as.character(unique(df$gene_calls)))
   alleles = counts = rep("", length(gene))

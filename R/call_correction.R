@@ -45,44 +45,6 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
 }
 
 
-# counts of genes not in the genotype
- table(v_genes[hetero_calls_i])[unique(v_genes[hetero_calls_i])[!(unique(v_genes[hetero_calls_i]) %in% hetero_genes)]]
-
-
-
-
-
-if (!quiet){ cat("Correcting V assignments...") }
-# Note that we already found new seqeunces that might align better than given assignments
-overlap = sapply(lapply(strsplit(v_calls,","), function(x) gsub("Homsap| [^I,]*", "", x)),
-                 function(x) x[x %in% unique(unlist(strsplit(genotype,",")))])
-V_CALL_GENOTYPED = sapply(overlap, paste, collapse=",")
-i_no_overlap = which(sapply(overlap, length) == 0)
-# Mode = matches means we want alignment with highest score not lowest penalty
-mut_mat = Align_to_repertoire(samples[i_no_overlap],quiet=T,mode="matches",
-                              repseqs[unique(unlist(strsplit(genotype,",")))])
-guesses = apply(mut_mat, 1, function(x) paste(names(which(x == max(x))),collapse=","))
-V_CALL_GENOTYPED[i_no_overlap] = guesses
-if (!quiet){ cat("done\n") }
-
-sink(logfile, append=T)
-cat("\nPOST-genotyping reassignment includes the following unique seqs, which realign best to novel alleles:")
-us = grep("_", V_CALL_GENOTYPED)
-print(table(V_CALL_GENOTYPED[intersect(us, i_undup)]))
-sink()
-
-
-
-v_sequences, genotype_fasta
-
-
-s = Sys.time()
-dist_mat = sapply(genotype_fasta, function(x)
-  sapply(getMutatedPositions(v_sequences,x), length))
-print(Sys.time() - s)
-
-
-
 
 getMutCount <- function(samples, allele_calls, germline_db){
   

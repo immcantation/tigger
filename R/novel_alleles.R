@@ -413,7 +413,7 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
   mut_counts = sapply(mut_list, length)
   match_list = getMutatedPositions(samples, germline, match_instead = TRUE)
   mut_summary = summarizeMutations(mut_list, match_list)
-  mut_matrix = trimMutMatrix(mut_summary, mut_min, mut_max,nt_min, nt_max, min_seqs, verbose)
+  mut_matrix = trimMutMatrix(mut_summary, mut_min, mut_max, nt_min, nt_max, min_seqs, verbose)
   if (is.null(mut_matrix)){ return(NULL) }
   intercepts = findIntercepts(mut_matrix,y_intercept)
   polymorphs = as.numeric(names(intercepts))
