@@ -38,7 +38,7 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
     sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=TRUE), length))
   dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
   best_match = apply(dist_mat, 1, function(x) which(x == max(x)))
-  best_alleles = sapply(best_match, function(x) genotype_db[x]) 
+  best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
   new_calls[not_called] = sapply(best_alleles, paste, collapse=",")
   
   return(new_calls)
