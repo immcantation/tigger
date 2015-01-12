@@ -1,4 +1,4 @@
-Package: TIgGER
+Package: tigger
 Title: R tools for inferring new IGHV alleles from Rep-Seq data
 Version: 2.0
 Author: Daniel Gadala-Maria, Jason Anthony Vander Heiden

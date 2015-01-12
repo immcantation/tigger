@@ -261,7 +261,8 @@ summarizeMutations <- function(mut_list, match_list) {
 #'                     matrix(1:10, 1, 10, dimnames=list(1, 1:10)))
 #' trimMutMatrix(mut_summary, mut_min, mut_max,nt_min,nt_max=1, quiet=FALSE)
 trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
-                          nt_min = 1, nt_max = 312, min_seqs=50, verbose=F){
+                          nt_min = 1, nt_max = 312, min_seqs=50, 
+                          min_frac = 1/8, verbose=F){
   
   # Ensure the matrix covers the desired mutational range
   if(sum(!(mut_min:mut_max %in% colnames(mut_summary[[1]]))) > 0) {
@@ -310,6 +311,11 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
   }
   
   mut_fracs = mut_trim[[1]]/mut_trim[[2]]
+  
+  # Ignore positions that are not found in enough sequences
+  position_counts = apply(mut_trim[[2]], 1, sum)
+  insufficient_counts = which(position_counts < min_frac*max(position_counts))
+  mut_fracs[insufficient_counts,] = NaN
   
   return(mut_fracs)
   
@@ -407,7 +413,7 @@ createGermlines <- function(germline, positions, nucleotides){
 findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
                               y_intercept = 1/8, nt_min=1, nt_max=312,
                               mut_min=1, mut_max=10, j_max = 0.1,
-                              min_seqs = 50, verbose=FALSE){
+                              min_seqs = 50, min_frac = 1/8, verbose=FALSE){
   # Find the positions of differences and similarities between sequences
   mut_list = getMutatedPositions(samples, germline)
   mut_counts = sapply(mut_list, length)
@@ -448,7 +454,7 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
 
 detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
                          germline_db,  y_intercept =1/8, nt_min=1, nt_max = 312,
-                         mut_min=1, mut_max=10, j_max = 0.10, min_seqs = 50,
+                         mut_min=1, mut_max=10, j_max = 0.10, min_seqs = 50, min_frac= 1/8,
                          verbose=FALSE){
  
   novel=list()
@@ -463,7 +469,8 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
                              junc_lengths[indicies],
                              y_intercept =1/8,
                              nt_min, nt_max,
-                             mut_min, mut_max, j_max, min_seqs, verbose)
+                             mut_min, mut_max, j_max, min_seqs, min_frac,
+                             verbose)
       novel = c(novel, fna)
     }
   }

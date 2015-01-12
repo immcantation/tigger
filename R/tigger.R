@@ -1,4 +1,4 @@
-# Project documentation for TIgGER
+# Project documentation for tigger
 # 
 # @author     Daniel Gadala-Maria
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved

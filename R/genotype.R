@@ -99,6 +99,7 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
   
   # Find the gene(s) of the allele calls; group duplicates (e.g. 1-69D*) as one
   gene_calls = alakazam::getGene(allele_calls, first = FALSE, collapse = TRUE)
+  gene_calls = gsub("D", "", gene_calls)
   
   # If the sequences are assigned multiple genes, pick the more common gene
   # This should be very rare, since calls should be from unmutated sequences
@@ -117,7 +118,8 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
   if(gene_cutoff < 1){ gene_cutoff = ceiling(length(gene_calls)*gene_cutoff) }
   rare_genes = names(which(table(gene_calls) < gene_cutoff))  
   df = data.frame(cbind(allele_calls,gene_calls),row.names=NULL,stringsAsFactors=F)
-  df = df[-which(gene_calls %in% rare_genes),]
+  exclude = which(gene_calls %in% rare_genes)
+  if (length(exclude > 0)) { df = df[-exclude,] }
   
   #If after all that there still gene-ambiguous sequences, just keep the first gene
   stillmulti = grep(",",as.vector(df$gene_calls))
