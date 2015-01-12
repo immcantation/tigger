@@ -4,6 +4,7 @@
 
 # genotype_db should be personalized to the individual
 # the new v_calls will be limited to the names of the sequences in genotype_db
+#' @export
 reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   
   new_calls = rep("", length(v_calls))
@@ -45,7 +46,7 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
 }
 
 
-
+#' @export
 getMutCount <- function(samples, allele_calls, germline_db){
   
   call_list = strsplit(allele_calls, ",")

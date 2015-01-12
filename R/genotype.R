@@ -1,4 +1,4 @@
-
+#' @export
 updateAlleleNames <- function(allele_calls){
   temporary_names = c("IGHV1-c*",
                       "IGHV1-f*",
@@ -24,7 +24,7 @@ updateAlleleNames <- function(allele_calls){
 }
 
 
-
+#' @export
 getMutCount <- function(samples, allele_calls, germline_db){
   
   call_list = strsplit(allele_calls, ",")
@@ -57,7 +57,7 @@ getMutCount <- function(samples, allele_calls, germline_db){
 
 # only_unmutated - if true, empty allele calls (meaining the sequence had no
 # allele that would represent an unmutated sequence) will be omitted.
-
+#' @export
 findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
   
   # Find which seqs are unmutated and which of the allele calls that represents
@@ -91,6 +91,7 @@ findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
 
 
 # Infer genotypefrom a list of allele calls
+#' @export
 inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
                           fraction_to_explain = 7/8,
                           gene_cutoff = 1e-3 # Can be a no. of seqs or frac < 1
@@ -180,7 +181,7 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
 
 
 #
-
+#' @export
 genotypeFasta <- function(genotype, germline_db){
   g_names = names(germline_db)
   names(g_names) = gsub("D", "", names(germline_db))

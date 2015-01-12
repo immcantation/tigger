@@ -9,7 +9,7 @@ junc_length_col = "JUNCTION_GAP_LENGTH"
 
 
 # readGermlineDb ----------------------------------------------------------
-
+#' @export
 readGermlineDb <- function(fasta_file, 
                            strip_down_name = TRUE,
                            force_caps = TRUE){
@@ -260,6 +260,7 @@ summarizeMutations <- function(mut_list, match_list) {
 #' mut_summary <- list(matrix(1:10, 1, 10, dimnames=list(1, 1:10)), 
 #'                     matrix(1:10, 1, 10, dimnames=list(1, 1:10)))
 #' trimMutMatrix(mut_summary, mut_min, mut_max,nt_min,nt_max=1, quiet=FALSE)
+#' @export
 trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
                           nt_min = 1, nt_max = 312, min_seqs=50, 
                           min_frac = 1/8, verbose=F){
@@ -323,7 +324,7 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
 
 
 # findIntercepts ----------------------------------------------------------
-
+#' @export
 findIntercepts <- function(mut_fracs, y_intercept=1/8, alpha=0.05){
   
   # Clear out any NAs
@@ -341,7 +342,7 @@ findIntercepts <- function(mut_fracs, y_intercept=1/8, alpha=0.05){
 
 # findNucletoideUsage -----------------------------------------------------
 
-
+#' @export
 findNucletoideUsage <- function(position, samples, germline, mut_counts,
                                 mut_min = 1, mut_max = 10){
   # Make everything uppercase
@@ -367,7 +368,7 @@ findNucletoideUsage <- function(position, samples, germline, mut_counts,
 
 # insertPolymorphisms -----------------------------------------------------
 
-
+#' @export
 insertPolymorphisms <- function(sequence, positions, nucleotides){
   
   if(length(positions) != length(nucleotides)){
@@ -385,7 +386,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 
 # createGermlines ---------------------------------------------------------
 #' germline is a nt sequence and should have the allele name as its name
-
+#' @export
 createGermlines <- function(germline, positions, nucleotides){
   allele = names(germline)
   n_pos = length(positions)
@@ -409,7 +410,7 @@ createGermlines <- function(germline, positions, nucleotides){
 
 
 # findNovelAlleles --------------------------------------------------------
-
+#' @export
 findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
                               y_intercept = 1/8, nt_min=1, nt_max=312,
                               mut_min=1, mut_max=10, j_max = 0.1,
@@ -451,7 +452,7 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
 
 
 # detectNovelV ------------------------------------------------------------
-
+#' @export
 detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
                          germline_db,  y_intercept =1/8, nt_min=1, nt_max = 312,
                          mut_min=1, mut_max=10, j_max = 0.10, min_seqs = 50, min_frac= 1/8,
@@ -479,6 +480,7 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
 
 
 # plotNovelLines ---------------------------------------------------------------
+#' @export
 plotNovelLines <- function(novel){
   for(n in novel){
     plot(NA, xlim = c(0,10), ylim = c(0,1), main = names(n[[1]]), las=1,
@@ -499,6 +501,7 @@ plotNovelLines <- function(novel){
 
 
 # plotNovelBars -----------------------------------------------------------
+#' @export
 plotNovelBars <- function(novel){
   for(n in novel){
     for (p in n[[4]]){
@@ -518,6 +521,7 @@ plotNovelBars <- function(novel){
 
 
 # plotJunctionBars --------------------------------------------------------
+#' @export
 plotJunctionBars <- function(novel){
   for(n in novel){
     barplot(n[[5]], las=1, col = rainbow(nrow(n[[5]])))
