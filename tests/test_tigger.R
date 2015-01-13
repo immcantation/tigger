@@ -22,15 +22,16 @@ find_novel = TRUE
 plot_novel = TRUE # will be effictively false if find_novel = FALSE
 find_genotype = TRUE
 correct_calls = TRUE
-v_gap_length = c("V_GERM_LENGTH","V_GAP_LENGTH")[2]
 
 # LOAD YOUR DATA
 
 # clip_tab
-load("C:/Users/Daniel Gadala-Maria/Documents/Kleinstein/Datasets/gmc2.rdata")
-dat = subset(dat.gmc2, TIME %in% c("-1h", "-2d", "-8d") & FUNCTIONAL == "T")
+load("C:/Users/Daniel Gadala-Maria/Documents/Kleinstein/Datasets/Bolen Twins//twinStudy_runs5to17_allSeqs_withFRdata.Rd")
+ddply(combSeqData, "donor", nrow)
+dat = subset(combSeqData, donor == "Twin_147"  & FUNCTIONAL == "TRUE")
+#dat = subset(dat.gmc2, TIME %in% c("-1h", "-2d", "-8d") & FUNCTIONAL == "T")
 dat = dat[which(!duplicated(dat$SEQUENCE_GAP)),] # REMOVE DUPLICATES
-rm(dat.gmc2)
+#rm(dat.gmc2)
 germline_db_file = "C:/Users/Daniel Gadala-Maria/Documents/Kleinstein/Datasets/IMGT/IMGT Variable 2014-12-22.fasta"
 germline_db = readGermlineDb(germline_db_file, strip_down_name = TRUE)
 
@@ -40,7 +41,7 @@ germline_db = readGermlineDb(germline_db_file, strip_down_name = TRUE)
 v_calls = alakazam::getAllele(dat[,v_call_col], first = FALSE)
 v_calls = updateAlleleNames(v_calls)
 # New version of Clip tabs are different, so this depends on the columns names
-if (v_gap_length == "V_GAP_LENGTH"){
+if ("V_GAP_LENGTH" %in% colnames(dat)){
   v_sequences = sapply(dat$SEQUENCE_GAP, substr, 1, dat$V_GAP_LENGTH)
 } else {
   v_sequences = sapply(dat$SEQUENCE_GAP, substr, 1, dat$V_GERM_START + dat$V_GERM_LENGTH)

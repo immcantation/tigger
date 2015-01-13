@@ -315,7 +315,7 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
   
   # Ignore positions that are not found in enough sequences
   position_counts = apply(mut_trim[[2]], 1, sum)
-  insufficient_counts = which(position_counts < min_frac*max(position_counts))
+  insufficient_counts = which(position_counts < (min_frac*max(position_counts)))
   mut_fracs[insufficient_counts,] = NaN
   
   return(mut_fracs)
@@ -420,7 +420,8 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
   mut_counts = sapply(mut_list, length)
   match_list = getMutatedPositions(samples, germline, match_instead = TRUE)
   mut_summary = summarizeMutations(mut_list, match_list)
-  mut_matrix = trimMutMatrix(mut_summary, mut_min, mut_max, nt_min, nt_max, min_seqs, verbose)
+  mut_matrix = trimMutMatrix(mut_summary, mut_min, mut_max, nt_min, nt_max,
+                             min_seqs, min_frac, verbose)
   if (is.null(mut_matrix)){ return(NULL) }
   intercepts = findIntercepts(mut_matrix,y_intercept)
   polymorphs = as.numeric(names(intercepts))
