@@ -414,7 +414,7 @@ createGermlines <- function(germline, positions, nucleotides){
 findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
                               y_intercept = 1/8, nt_min=1, nt_max=312,
                               mut_min=1, mut_max=10, j_max = 0.1,
-                              min_seqs = 50, min_frac = 1/8, verbose=FALSE){
+                              min_seqs = 50, min_frac = 3/4, verbose=FALSE){
   # Find the positions of differences and similarities between sequences
   mut_list = getMutatedPositions(samples, germline)
   mut_counts = sapply(mut_list, length)
@@ -469,7 +469,7 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
       fna = findNovelAlleles(samples, germline,
                              j_genes[indicies],
                              junc_lengths[indicies],
-                             y_intercept =1/8,
+                             y_intercept,
                              nt_min, nt_max,
                              mut_min, mut_max, j_max, min_seqs, min_frac,
                              verbose)

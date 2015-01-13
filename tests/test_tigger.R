@@ -55,8 +55,8 @@ if (find_novel){
   j_genes = alakazam::getGene(dat[,j_call_col], first = F)
   junc_lengths = dat[,junc_length_col]
   novel = detectNovelV(v_sequences, j_genes, junc_lengths, allele_groups,
-                       germline_db,  y_intercept =1/8, nt_min=1, nt_max = 312,
-                       mut_min=1, mut_max=10, j_max = 0.15, min_frac = 1/8, 
+                       germline_db,  y_intercept =1/4, nt_min=1, nt_max = 312,
+                       mut_min=1, mut_max=10, j_max = 0.1, min_frac = 3/4, 
                        verbose=FALSE)
   fasta = unlist(unique(sapply(novel, "[", 1)))
   # In case we found the same allele multiple ways, ditch the duplicate
