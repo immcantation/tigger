@@ -10,7 +10,8 @@ LazyData: true
 Depends:
     R (>= 3.0.0)
 Imports:
-    plyr
+    plyr,
+    alakazam
 Suggests:
     knitr
 VignetteBuilder: knitr

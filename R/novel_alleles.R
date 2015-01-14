@@ -1,6 +1,6 @@
 
 # constants ---------------------------------------------------------------
-
+seq_gap = "SEQUENCE_GAP"
 v_call_col = "V_CALL"
 v_start_col = "V_GERM_START"
 v_length_col = "V_GAP_LENGTH"
@@ -126,16 +126,7 @@ assignAlleleGroups <- function(allele_calls, allele_min=1e-4,
   }
   allele_counts = ldply(alleles_i, length)
   rare_i = allele_counts[,2] < cutoff
-  
-  # Print out some statistics
-  if (sum(rare_i) > 0){
-    cat(sum(rare_i), " alleles excluded due to rarity, representing ",
-        sum(allele_counts[rare_i,2]), " sequences (",
-        100*round(sum(allele_counts[rare_i,2])/sum(allele_counts[,2]),4),
-        "% of input).\n", sep="")
-  }
-  cat(sum(!rare_i), "alleles detected and retained.\n")
-  
+
   return(alleles_i[!rare_i])
 }
 
@@ -434,7 +425,7 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
     put_mut_locs = lapply(putative, function(x) getMutatedPositions(samples, x))
     perfect_matches = lapply(put_mut_locs, function(x) which(sapply(x,length) == 0))
     j_junc_tables = lapply(perfect_matches, function(x) table(junc_lengths[x], j_genes[x]))
-    pass_test = which(sapply(j_junc_tables, function(x) abs(max(x/sum(x)))) < j_max)
+    pass_test = which(sapply(j_junc_tables, function(x) abs(max(x/sum(x),na.rm = T))) < j_max)
     if(length(pass_test) > 0){
       allele_summary = list()
       for(i in 1:length(pass_test)){
@@ -461,7 +452,7 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
  
   novel=list()
   for (allele_name in names(allele_groups)) {
-    #cat(allele_name,"\n")
+    cat(allele_name,"\n")
     indicies = allele_groups[[allele_name]]
     samples = v_sequences[indicies]
     germline = germline_db[allele_name]
