@@ -452,7 +452,6 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
  
   novel=list()
   for (allele_name in names(allele_groups)) {
-    cat(allele_name,"\n")
     indicies = allele_groups[[allele_name]]
     samples = v_sequences[indicies]
     germline = germline_db[allele_name]
