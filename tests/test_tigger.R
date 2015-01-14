@@ -28,7 +28,8 @@ plotNovelLines(result$novel)
 plotNovelBars(result$novel)
 plotJunctionBars(result$novel) 
 print(result$genotype)
-dat = cbind(dat, result$new_calls)
+V_CALL_GENOTYPED = result$new_calls
+dat = cbind(dat, V_CALL_GENOTYPED)
 head(dat)
 
 
