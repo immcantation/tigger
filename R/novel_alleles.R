@@ -1,13 +1,3 @@
-
-# constants ---------------------------------------------------------------
-seq_gap = "SEQUENCE_GAP"
-v_call_col = "V_CALL"
-v_start_col = "V_GERM_START"
-v_length_col = "V_GAP_LENGTH"
-j_call_col = "J_CALL"
-junc_length_col = "JUNCTION_GAP_LENGTH"
-
-
 # readGermlineDb ----------------------------------------------------------
 #' @export
 readGermlineDb <- function(fasta_file, 

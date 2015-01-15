@@ -1,13 +1,36 @@
+# Tool for Immunoglobulin Genotype Elucidation via Rep-Seq
 
-
+#' Sort allele names
+#'
+#' \code{sortAlleles} returns a sorted vector of strings respresenting Ig allele
+#' names. Names are first sorted by gene family, then by gene, then by allele.
+#' Duplicated genes have their alleles are sorted as if they were part of their
+#' non-duplicated counterparts (e.g. IGHV1-69D*01 comes after IGHV1-69*01 but
+#' before IGHV1-69*02), and non-localized genes (e.g. IGHV1-NL1*01) come last
+#' within their gene family.
+#' 
+#' @param    allele_calls  a vector of strings respresenting Ig allele names
+#' @return   a sorted vector of strings respresenting Ig allele names
+#' 
+#' @examples
+#' # Create a list of allele names
+#' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
+#' "IGHV2-5*01","IGHV1-NL1*01","IGHV1-2*02", "IGHV1-69*02")
+#' 
+#' # Sort the alleles
+#' sortAlleles(alleles)
+#' 
+#' @export
 tigger <- function(sample_db, germline_db,
                    find_novel = TRUE, find_genotype = TRUE, correct_calls = TRUE,
                    allele_min = 1e-4, y_intercept = 1/8, nt_min=1, nt_max = 312,
                    mut_min=1, mut_max=10, j_max = 0.1, min_seqs = 50, min_frac = 3/4,
-                   fraction_to_explain = 7/8,
-                   quiet=FALSE){
+                   fraction_to_explain = 7/8,  seq_gap = "SEQUENCE_GAP",
+                   v_call_col = "V_CALL", v_start_col = "V_GERM_START",
+                   v_length_col = "V_GAP_LENGTH", j_call_col = "J_CALL",
+                   junc_length_col = "JUNCTION_GAP_LENGTH", quiet=FALSE){
   
-  result = list(novel="", genotype="", new_calls="")
+  result = list(novel=NULL, genotype=NULL, new_calls=NULL)
   
   # EXTRACT USEFUL PORTIONS OF DB FILES
 
@@ -50,7 +73,7 @@ tigger <- function(sample_db, germline_db,
     if(!quiet){ cat("Finding genotype...") }
     v_calls2 = v_calls
     # Paste novel alleles (if any) to all allele calls before determining dists
-    if (find_novel){
+    if (find_novel & (length(novel) > 0)){
       genes_novel = alakazam::getGene(names(novel))
       genes_groups = alakazam::getGene(names(allele_groups))
       for(i in 1:length(novel)){
@@ -82,20 +105,5 @@ tigger <- function(sample_db, germline_db,
   return(result)
   
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
