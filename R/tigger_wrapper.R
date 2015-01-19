@@ -1,27 +1,57 @@
-# Tool for Immunoglobulin Genotype Elucidation via Rep-Seq
-
-#' Sort allele names
+# readGermlineDb ----------------------------------------------------------
+#' Read a germline database
 #'
-#' \code{sortAlleles} returns a sorted vector of strings respresenting Ig allele
-#' names. Names are first sorted by gene family, then by gene, then by allele.
-#' Duplicated genes have their alleles are sorted as if they were part of their
-#' non-duplicated counterparts (e.g. IGHV1-69D*01 comes after IGHV1-69*01 but
-#' before IGHV1-69*02), and non-localized genes (e.g. IGHV1-NL1*01) come last
-#' within their gene family.
+#' \code{readGermlineDb} reads a fasta-formatted file of immunoglobulin (Ig)
+#' sequences and returns a named vector of those sequences.
 #' 
-#' @param    allele_calls  a vector of strings respresenting Ig allele names
-#' @return   a sorted vector of strings respresenting Ig allele names
-#' 
-#' @examples
-#' # Create a list of allele names
-#' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
-#' "IGHV2-5*01","IGHV1-NL1*01","IGHV1-2*02", "IGHV1-69*02")
-#' 
-#' # Sort the alleles
-#' sortAlleles(alleles)
+#' @param    fasta_file  fasta-formatted file of immunoglobuling sequences
+#' @param    strip_down_name  if \code{TRUE}, will extract only the allele name
+#'           from the strings fasta file's sequence names
+#' @param    force_caps  if \code{TRUE}, will force nucleotides to uppercase
+#' @return   a named vector of strings respresenting Ig alleles
 #' 
 #' @export
-tigger <- function(sample_db, germline_db,
+readGermlineDb <- function(fasta_file, 
+                           strip_down_name = TRUE,
+                           force_caps = TRUE){
+  all_char = readChar(fasta_file, file.info(fasta_file)$size)
+  split_by_sequence = strsplit(all_char, "[ \t\r\n\v\f]?>")
+  add_name_break = sapply(split_by_sequence, function(x) sub("[\r\n]",">",x))
+  cleaned_up = sapply(add_name_break, function(x) gsub("[ \t\r\n\v\f]", "", x))
+  broken_names = sapply(cleaned_up, strsplit, ">")
+  seqs = sapply(broken_names, "[", 2)
+  seq_names = sapply(broken_names, "[", 1)
+  if(force_caps){ seqs = toupper(seqs) }
+  if(strip_down_name){ seq_names = alakazam::getAllele(seq_names) }
+  names(seqs) = seq_names
+  return(seqs[which(!is.na(seqs))])
+}
+
+
+# Tool for Immunoglobulin Genotype Elucidation via Rep-Seq
+
+#' Infer genotype (including novel alleles) and correct V calls
+#'
+#' \code{runTigger} takes a table of sample sequences from a single subject and a
+#' vector of database germline sequences. It then performs the following:
+#' (1) Infers the presence of novel IGHV alleles not in the germline database.
+#' (2) Infers the individuals IGHV genotype.
+#' (3) Corrects the IGHV allele calls of the samples based on the IGHV genotype.
+#' The sample sequences should be in the format returned by Change-o (where each
+#' row is a sequence and each column contains data about that sequence, such as
+#' the IGMT/V-Quest allele calls). The database germlines should be a vector of
+#' sequences with names matching those in the table of sample sequences.
+#' 
+#' @param    sample_db  a table of the kind returned by Change-o
+#' @param    germline_db  a named vector of strings respresenting Ig sequences
+#' @return   a list containing data on new alleles, the inferred genotype, and
+#' the corrected IGHV calls.
+#' 
+#' @examples
+#' # To be added.
+#' 
+#' @export
+runTigger <- function(sample_db, germline_db,
                    find_novel = TRUE, find_genotype = TRUE, correct_calls = TRUE,
                    allele_min = 1e-4, y_intercept = 1/8, nt_min=1, nt_max = 312,
                    mut_min=1, mut_max=10, j_max = 0.1, min_seqs = 50, min_frac = 3/4,
@@ -107,3 +137,79 @@ tigger <- function(sample_db, germline_db,
 }
 
 
+
+novelSummary <- function(tigger_result,
+                         seqs_to_return = c("in genotype", "all")[1]){
+ 
+  r_names = names(which(sapply(tigger_result, length) > 0))
+  
+  if (!("novel" %in% r_names)){ stop("Novel alleles not present in input.") }
+  cat(length(tigger_result$novel), "potential novel alleles were detected.\n")
+  
+  if(seqs_to_return == "in genotype"){
+
+    if(!("genotype" %in% r_names)){ stop("Genotype not present in input.") }
+    splits = strsplit(tigger_result$genotype$alleles, ",")
+    alleles = mapply(paste, tigger_result$genotype$gene, splits, sep="*")
+    novel_in_geno = grep("_", unlist(alleles), value = TRUE)
+    cat(length(novel_in_geno),
+        "novel alleles were common enough to be included in the genotype:\n",
+        paste(novel_in_geno, collapse=", "),"\n")
+    seqs = unlist(sapply(tigger_result$novel[novel_in_geno], "[", 1))
+    names(seqs) = novel_in_geno
+
+  } else if (seqs_to_return == "all") {
+  
+    seqs = unlist(sapply(tigger_result$novel, "[", 1))
+    names(seqs) = names(tigger_result$novel)
+
+  }
+  
+  return(seqs)
+
+}
+
+#
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#          __  _-==-=_,-.
+#         /--`' \_@-@.--<
+#         `--'\ \   <___/.      The wonderful thing about Tiggers,
+#             \ \\   " /        is Tiggers are wonderful things.
+#               >=\\_/`<        Their tops are made out of rubber,
+#   ____       /= |  \_/        their bottoms are made out of springs.
+# _'    `\   _/=== \__/         They're bouncy, trouncy, flouncy, pouncy,
+# `___/ //\./=/~\====\          Fun, fun, fun, fun, fun.
+#     \   // /   | ===:         But the most wonderful thing about Tiggers is,
+#      |  ._/_,__|_ ==:        __  I'm the only one.
+#       \/    \\ \\`--|       / \\
+#        |    _     \\:      /==:-\
+#        `.__' `-____/       |--|==:
+#           \    \ ===\      :==:`-'
+#           _>    \ ===\    /==/
+#          /==\   |  ===\__/--/
+#         <=== \  /  ====\ \\/
+#         _`--  \/  === \/--'
+#        |       \ ==== |
+#         -`------/`--' /
+#                 \___-'

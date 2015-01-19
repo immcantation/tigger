@@ -22,14 +22,16 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   # Now realign the heterozygote sequences to each allele of that gene
   for (het_gene in hetero_genes){
     ind = which(v_genes %in% het_gene)
-    het_alleles = names(geno_genes[which(geno_genes == het_gene)])
-    het_seqs = genotype_db[het_alleles]
-    dists = lapply(het_seqs, function(x)
-      sapply(getMutatedPositions(v_sequences[ind], x, match_instead=TRUE), length))
-    dist_mat = matrix(unlist(dists), ncol = length(het_seqs))
-    best_match = apply(dist_mat, 1, function(x) which(x == max(x)))
-    best_alleles = sapply(best_match, function(x) het_alleles[x])   
-    new_calls[ind] = sapply(best_alleles, paste, collapse=",")
+    if (length(ind) > 0){
+      het_alleles = names(geno_genes[which(geno_genes == het_gene)])
+      het_seqs = genotype_db[het_alleles]
+      dists = lapply(het_seqs, function(x)
+        sapply(getMutatedPositions(v_sequences[ind], x, match_instead=TRUE), length))
+      dist_mat = matrix(unlist(dists), ncol = length(het_seqs))
+      best_match = apply(dist_mat, 1, function(x) which(x == max(x)))
+      best_alleles = sapply(best_match, function(x) het_alleles[x])   
+      new_calls[ind] = sapply(best_alleles, paste, collapse=",")
+    }
   }
   
   # Not realign the gene-not-in-genotype calls to every genotype allele
