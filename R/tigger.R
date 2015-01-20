@@ -3,7 +3,7 @@
 # @author     Daniel Gadala-Maria
 # @copyright  Copyright 2014 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
-# @version    2.0
+# @version    1.0
 # @date       2014.12.1
 
 

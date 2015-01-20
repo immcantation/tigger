@@ -174,7 +174,7 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
 #'           details how many usable nucleotides (i.e., not gaps or Ns) were
 #'           found for each combination of position and sequence-wide mutation
 #'           count.
-#' @seealso \link{getMutatedPositions}
+#' @seealso \code{\link{getMutatedPositions}}
 #' 
 #' @export
 summarizeMutations <- function(mut_list, match_list) { 
@@ -232,7 +232,7 @@ summarizeMutations <- function(mut_list, match_list) {
 #'           function of sequence-wide mutation count (columns) for the desired
 #'           ranges of each. If there is a problem with the number of sequences,
 #'           etc., \code{NULL} will be returned.
-#' @seealso \link{summarizeMutations}
+#' @seealso \code{\link{summarizeMutations}}
 #' 
 #' @export
 trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
@@ -310,7 +310,7 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
 #'          range of values likely to contain the intercept. If the lower-bound
 #'          of this confidence interval is greater than the y-intercept cutoff,
 #'          the position will be returned. This is the key step in
-#'          \link{detectNovelV}.
+#'          \code{\link{detectNovelV}}.
 #' 
 #' @param    mut_fracs  a matrix as returned by \code{trimMutMatrix}
 #' @param    y_intercept the y-intercept above which positions should be
@@ -321,7 +321,7 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
 #'           function of sequence-wide mutation count (columns) for the desired
 #'           ranges of each. If there is a problem with the number of sequences,
 #'           etc., \code{NULL} will be returned.
-#' @seealso \link{trimMutMatrix}, \link{detectNovelV}
+#' @seealso \code{\link{trimMutMatrix}}, \code{\link{detectNovelV}}
 #' 
 #' @export
 findIntercepts <- function(mut_fracs, y_intercept=1/8, alpha=0.05){
@@ -345,15 +345,15 @@ findIntercepts <- function(mut_fracs, y_intercept=1/8, alpha=0.05){
 #' \code{findNucletoideUsage} determines the nucleotide distribution at a given
 #' IMGT-numbered position as a function of sequence-wide mutation counts. 
 #' 
-#' @param    position an integer representing the IMGT-numbered position of
-#'           interest
-#' @param    samples a vector of sample nucleotide sequences
-#' @param    germline a string with the germline nucleotide sequence
+#' @param    position   an integer representing the IMGT-numbered position of
+#'                      interest
+#' @param    samples    a vector of sample nucleotide sequences
+#' @param    germline   a string with the germline nucleotide sequence
 #' @param    mut_counts a vector containing the mutation count of each sample
-#' @param    mut_min the minimum number of sequence-wide mutations for sequences
-#'           that will be included in the returned matrix
-#' @param    mut_max the maximum number of sequence-wide mutations for sequences
-#'           that will be included in the returned matrix
+#' @param    mut_min    the minimum number of sequence-wide mutations for
+#'                      sequences that will be included in the returned matrix
+#' @param    mut_max    the maximum number of sequence-wide mutations for
+#'                      sequences that will be included in the returned matrix
 #' @return   a table of nucleotide usage at a given position as a function of 
 #'           sequence-wide mutation counts, with the germline base on top and
 #'           the most frequent mutated-to base on the bottom
@@ -427,7 +427,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #'                        positions
 #' @return   a sequence with the desired nucleotides in provided locations
 #' 
-#' @seealso  \link{insertPolymorphisms}
+#' @seealso  \code{\link{insertPolymorphisms}}
 #' 
 #' @export
 createGermlines <- function(germline, positions, nucleotides){
@@ -453,18 +453,66 @@ createGermlines <- function(germline, positions, nucleotides){
 
 
 # findNovelAlleles --------------------------------------------------------
-#' #' Find novel alleles from repertoire-sequencing data
+#' Find novel alleles in sequences thought to utilize one particular allele
 #'
-#' \code{findNovelAlleles} ...
+#' \code{findNovelAlleles} analyzes mutation patterns in sequences thought to
+#' align to a particular germline allele in order to determine which positions
+#' might be polymorphic.
 #' 
-#' @details  
+#' @details  Mutations are determined through comparison to the provided
+#' germline and the mutation frequency at each *position* is determined as a
+#' function of *sequence-wide* mutation counts. Polymorphic positions are
+#' expected to exhibit a high mutation frequency despite sequence-wide mutation
+#' count. False positive of potential novel alleles resulting from clonally-
+#' related sequences are guarded against by ensuring that sequences perfectly
+#' matching the potential novel allele utilize a wide range of combinations of J
+#'  gene and junction length.
 #' 
-#' @param    sequence     
-#' @param    positions    
-#' @param    nucleotides  
-#' @return   
+#' @param    samples      a vector of sample V sequences thought to be utilizing
+#'                        the same germline V allele
+#' @param    germline     the germline V sequence utilized by the samples
+#' @param    j_genes      a vector of J gene names utilized by the samples
+#' @param    junc_lengths a vector of the junction lengths of the sample
+#' @param    y_intercept  the y-intercept above which positions should be
+#'                        considered potentially polymorphic, as utilized by
+#'                        \code{\link{findIntercepts}}
+#' @param    nt_min       the first nucleotide position to be considered, as
+#'                        utilized by \code{\link{trimMutMatrix}}
+#' @param    nt_max       the last nucleotide position to be considered, as
+#'                        utilized by \code{\link{trimMutMatrix}}
+#' @param    mut_min      the minimum number of sequence-wide mutations for
+#'                        sequences that will be used in analysis, as utilized
+#'                        by \code{\link{trimMutMatrix}}
+#' @param    mut_max      the maximum number of sequence-wide mutations for
+#'                        sequences that will be used in analysis, as utilized
+#'                        by \code{\link{trimMutMatrix}}
+#' @param    j_max        the maximum fraction of sequences perfectly aligning
+#'                        to a potential novel allele that are allowed to
+#'                        utilize to a particular combination of junction
+#'                        length and J gene
+#' @param    min_seqs     the minimum number of total sequences (within the
+#'                        desired mutational range and nucleotide range)
+#'                        required for the samples to be considered, as utilized
+#'                        by \code{\link{trimMutMatrix}}
+#' @param    min_frac     the minimum fraction of sequences that must have
+#'                        usable nucleotides in a given position for that
+#'                        position to considered, as utilized by
+#'                        \code{\link{trimMutMatrix}}
+#' @param    verbose      if \code{TRUE}, a message will be printed when the
+#'                        samples do not meet the required parameters
+#' @return   for each potential novel allele, a list of length five is returned 
+#'           containing (1) the (named) germline sequence, (2) the y-intercepts
+#'           of the position(s) which passed the y-intercept threshhold (with
+#'           names indicating the positions themselves), (3) a matrix containing
+#'           the fraction of sequences mutated at each nucleotide position
+#'           (columns) as a function of sequence-wide mutation count (rows), (4)
+#'           table(s) indicating the nucletoide usage at each polymorphic
+#'           position as a function of mutation count, and (5) a table detailing
+#'           the number of unmutated versions of the novel allele found to use
+#'           each combination of J gene (columns) and junction length (rows).
 #' 
-#' @seealso  
+#' @seealso  \code{\link{findIntercepts}}, \code{\link{summarizeMutations}},
+#'           \code{\link{trimMutMatrix}}
 #' 
 #' @export
 findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
@@ -509,6 +557,72 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
 
 
 # detectNovelV ------------------------------------------------------------
+#' Find novel alleles from repertoire sequencing data
+#'
+#' \code{detectNovelV} analyzes mutation patterns in sequences thought to
+#' align to each germline allele in order to determine which positions
+#' might be polymorphic.
+#' 
+#' @details  \code{detectNovelV} applies \code{\link{findNovelAlleles}} to each
+#' allele call found in the names of \code{allele_groups}. Mutations are
+#' determined through comparison to the provided germline and the mutation
+#' frequency at each *position* is determined as a function of *sequence-wide*
+#' mutation counts. Polymorphic positions are expected to exhibit a high
+#' mutation frequency despite sequence-wide mutation count. False positive of
+#' potential novel alleles resulting from clonally-related sequences are guarded
+#' against by ensuring that sequences perfectly matching the potential novel
+#' allele utilize a wide range of combinations of J gene and junction length.
+#' 
+#' @param    v_sequences    a vector of sample V sequences
+#' @param    j_genes        a vector of J gene names utilized by the samples
+#' @param    junc_lengths   a vector of the junction lengths of the sample
+#' @param    allele_groups  a list whose names match the alle names in
+#'                          \code{germline_db} and the contents of which are the
+#'                          indicies of \code{v_sequences} that are assigned to
+#'                          those alleles. See \code{\link{assignAlleleGroups}}.
+#' @param    germline_db    a vector of named nucleotide sequences matching the
+#'                          calls detailed in \code{allele_groups}          
+#' @param    y_intercept    the y-intercept above which positions should be
+#'                          considered potentially polymorphic, as utilized by
+#'                          \code{\link{findIntercepts}}
+#' @param    nt_min         the first nucleotide position to be considered, as
+#'                          utilized by \code{\link{trimMutMatrix}}
+#' @param    nt_max         the last nucleotide position to be considered, as
+#'                          utilized by \code{\link{trimMutMatrix}}
+#' @param    mut_min        the minimum number of sequence-wide mutations for
+#'                          sequences that will be used in analysis, as utilized
+#'                          by \code{\link{trimMutMatrix}}
+#' @param    mut_max        the maximum number of sequence-wide mutations for
+#'                          sequences that will be used in analysis, as utilized
+#'                          by \code{\link{trimMutMatrix}}
+#' @param    j_max          the maximum fraction of sequences perfectly aligning
+#'                          to a potential novel allele that are allowed to
+#'                          utilize to a particular combination of junction
+#'                          length and J gene
+#' @param    min_seqs       the minimum number of total sequences (within the
+#'                          desired mutational range and nucleotide range)
+#'                          required for the samples to be considered, as
+#'                          utilized by \code{\link{trimMutMatrix}}
+#' @param    min_frac       the minimum fraction of sequences that must have
+#'                          usable nucleotides in a given position for that
+#'                          position to considered, as utilized by
+#'                          \code{\link{trimMutMatrix}}
+#' @param    verbose        if \code{TRUE}, a message will be printed when the
+#'                          samples do not meet the required parameters
+#' @return   for each potential novel allele, a list of length five is returned 
+#'           containing (1) the (named) germline sequence, (2) the y-intercepts
+#'           of the position(s) which passed the y-intercept threshhold (with
+#'           names indicating the positions themselves), (3) a matrix containing
+#'           the fraction of sequences mutated at each nucleotide position
+#'           (columns) as a function of sequence-wide mutation count (rows), (4)
+#'           table(s) indicating the nucletoide usage at each polymorphic
+#'           position as a function of mutation count, and (5) a table detailing
+#'           the number of unmutated versions of the novel allele found to use
+#'           each combination of J gene (columns) and junction length (rows).
+#' 
+#' @seealso  \code{\link{findNovelAlleles}}, \code{\link{findIntercepts}},
+#'           \code{\link{summarizeMutations}}, \code{\link{trimMutMatrix}}
+#' 
 #' @export
 detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
                          germline_db,  y_intercept =1/8, nt_min=1, nt_max = 312,
@@ -536,6 +650,19 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
 
 
 # plotNovelLines ---------------------------------------------------------------
+#' Visualization of positional mutation frequencies
+#'
+#' \code{plotNovelLines} plots the mutation frequency of nucleotide positions as
+#' a function of sequence-wide mutation count. Potentially polymorphic positions
+#' are highlighted in red.
+#' 
+#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
+#' 
+#' @return   plot(s) the mutation frequency of nucleotide positions as
+#' a function of sequence-wide mutation count.
+#' 
+#' @seealso  \code{\link{detectNovelV}}
+#' 
 #' @export
 plotNovelLines <- function(novel){
   for(n in novel){
@@ -557,6 +684,18 @@ plotNovelLines <- function(novel){
 
 
 # plotNovelBars -----------------------------------------------------------
+#' Visualization of nucleotide usage
+#'
+#' \code{plotNovelBars} shows the nucleotide usage at polymorphic positions as a
+#' function of sequence-wide mutation count.
+#' 
+#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
+#' 
+#' @return   plot(s) of nucleotide usage at polymorphic positions as a
+#' function of sequence-wide mutation count.
+#' 
+#' @seealso  \code{\link{detectNovelV}}
+#' 
 #' @export
 plotNovelBars <- function(novel){
   for(n in novel){
@@ -580,6 +719,19 @@ plotNovelBars <- function(novel){
 
 
 # plotJunctionBars --------------------------------------------------------
+#' Visualization of J gene usage and junction length
+#'
+#' \code{plotJunctionBars} shows the frequency of each combination of J gene
+#' junction length found among sequences representing unmutated versions of
+#' potential novel alleles.
+#' 
+#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
+#' 
+#' @return   plot(s) of the frequency of each combination of J gene and
+#' junction length among sequences using potential novel alleles
+#' 
+#' @seealso  \code{\link{detectNovelV}}
+#' 
 #' @export
 plotJunctionBars <- function(novel){
   for(n in novel){
