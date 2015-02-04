@@ -468,8 +468,8 @@ createGermlines <- function(germline, positions, nucleotides){
 #' matching the potential novel allele utilize a wide range of combinations of J
 #'  gene and junction length.
 #' 
-#' @param    samples      a vector of sample V sequences thought to be utilizing
-#'                        the same germline V allele
+#' @param    samples      a vector of IMGT-gappedsample V sequences thought to
+#'                        be utilizing the same germline V allele
 #' @param    germline     the germline V sequence utilized by the samples
 #' @param    j_genes      a vector of J gene names utilized by the samples
 #' @param    junc_lengths a vector of the junction lengths of the sample
@@ -573,15 +573,15 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
 #' against by ensuring that sequences perfectly matching the potential novel
 #' allele utilize a wide range of combinations of J gene and junction length.
 #' 
-#' @param    v_sequences    a vector of sample V sequences
+#' @param    v_sequences    a vector of IMGT-gapped sample V sequences
 #' @param    j_genes        a vector of J gene names utilized by the samples
 #' @param    junc_lengths   a vector of the junction lengths of the sample
 #' @param    allele_groups  a list whose names match the alle names in
 #'                          \code{germline_db} and the contents of which are the
 #'                          indicies of \code{v_sequences} that are assigned to
 #'                          those alleles. See \code{\link{assignAlleleGroups}}.
-#' @param    germline_db    a vector of named nucleotide sequences matching the
-#'                          calls detailed in \code{allele_groups}          
+#' @param    germline_db    a vector of named nucleotide germline sequences
+#'                          matching the calls detailed in \code{allele_groups}          
 #' @param    y_intercept    the y-intercept above which positions should be
 #'                          considered potentially polymorphic, as utilized by
 #'                          \code{\link{findIntercepts}}
@@ -746,7 +746,8 @@ plotJunctionBars <- function(novel){
 
 
 
-
+extractJ <- function(){
+}
 
 
 

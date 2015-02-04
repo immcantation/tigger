@@ -1,9 +1,24 @@
 
 
 # reassignAlleles ---------------------------------------------------------
-
-# genotype_db should be personalized to the individual
-# the new v_calls will be limited to the names of the sequences in genotype_db
+#' Correct allele calls based on a personalized genotype
+#'
+#' \code{reassignAlleles} uses a subject-specific genotype to correct
+#' correct preliminary allele assignments of a set of sequences derived
+#' from a single subject.
+#' 
+#' @param    v_calls       a vector of strings respresenting Ig allele calls for
+#'                         the sequences in \code{v_sequences}, where multiple
+#'                         calls are separated by a comma
+#' @param    v_sequences   a vector of IMGT-gapped sample V sequences from a
+#'                         single subject
+#' @param    genotype_db   a vector of named nucleotide germline sequences
+#'                         matching the calls detailed in \code{allele_calls}
+#'                         and personalized to the subject
+#' 
+#' @return   a list equal in length to \code{v_calls}, best allele call from
+#'           among the sequences listed in \code{genotype_db}
+#' 
 #' @export
 reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   
@@ -46,37 +61,5 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   
   return(new_calls)
 }
-
-
-#' @export
-getMutCount <- function(samples, allele_calls, germline_db){
-  
-  call_list = strsplit(allele_calls, ",")
-  germline_list = lapply(call_list, function(x) germline_db[x])
-  
-  mut_pos_list = list()
-  mut_count_list = list()
-  # First, find mutations of all sequences with call count of 1
-  call_count = sapply(germline_list, length)
-  cc1 = which(call_count == 1)
-  if (length(cc1) > 0) {
-    mut_pos_list[cc1] = getMutatedPositions(samples[cc1],
-                                            unlist(germline_list[cc1]))
-    mut_count_list[cc1] = lapply(mut_pos_list[cc1], length)
-  }
-  # Then find mutations of all sequences with call count > 1
-  ccm = which(call_count > 1)
-  if (length(ccm) > 0){
-    mut_pos_list[ccm] = mapply(getMutatedPositions,
-                               germline_list[ccm], samples[ccm])
-    mut_count_list[ccm] = lapply(mut_pos_list[ccm],
-                                 function(x) lapply(x,length))
-  }
-  
-  return(mut_count_list)
-}
-
-
-
 
 

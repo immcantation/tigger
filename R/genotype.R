@@ -1,3 +1,18 @@
+# updateAlleleNames -------------------------------------------------------
+#' Update IGHV allele names
+#'
+#' \code{updateAlleleNames} takes a set of IGHV allele calls and replaces any
+#' outdated names (e.g. IGHV1-f) with the new IMGT names.
+#' @details The updated allele names are based on IMGT release 201408-4.
+#' @note    IGMT has removed IGHV2-5*10 and IGHV2-5*07 as it has determined they
+#'          are actually alleles *02 and *04, respectively.
+#' 
+#' @param    allele_calls  a vector of strings respresenting IGHV allele names
+#' 
+#' @return   a vector of strings respresenting updated IGHV allele names
+#' 
+#' @references Xochelli et al. (2014) Immunogenetics.
+#' 
 #' @export
 updateAlleleNames <- function(allele_calls){
   temporary_names = c("IGHV1-c*",
@@ -24,6 +39,24 @@ updateAlleleNames <- function(allele_calls){
 }
 
 
+# getMutCount -------------------------------------------------------------
+#' Determine the mutation counts from allele calls
+#'
+#' \code{getMutCount} takes a set of nucleotide sequences and their allele calls
+#' and determines the distance between that seqeunce and any germline alleles
+#' contained within the call
+#' 
+#' @param    samples       a vector of IMGT-gapped sample V sequences
+#' @param    allele_calls  a vector of strings respresenting Ig allele calls for
+#'                         the sequences in \code{samples}, where multiple
+#'                         calls are separated by a comma
+#' @param    germline_db   a vector of named nucleotide germline sequences
+#'                         matching the calls detailed in \code{allele_calls}
+#' 
+#' @return   a list equal in length to \code{samples}, containing the Hamming
+#'           distance to each germline allele contained within each call within
+#'           each element of \code{samples}
+#' 
 #' @export
 getMutCount <- function(samples, allele_calls, germline_db){
   
@@ -54,9 +87,26 @@ getMutCount <- function(samples, allele_calls, germline_db){
 
 
 
-
-# only_unmutated - if true, empty allele calls (meaining the sequence had no
-# allele that would represent an unmutated sequence) will be omitted.
+# findUnmutatedCalls ------------------------------------------------------
+#' Determine which calls represent an unmutated allele
+#'
+#' \code{findUnmutatedCalls} determines which allele calls would represent a 
+#' perfect match with the germline sequence, given a vector of allele calls and
+#' mutation counts. In the case of multiple alleles being assigned to a
+#' sequence, only the subset that would represent a perfect match is returned.
+#' 
+#' @param    allele_calls   a vector of strings respresenting Ig allele calls,
+#'                          where multiple calls are separated by a comma
+#' @param    mut_counts     a list containing distance to each germline allele
+#'                          call within \code{allele_calls}, as returned by
+#'                          \link{\code{getMutCount}}
+#' @param    only_unmutated if \code{TRUE}, calls where no allele that would
+#'                          represent an unmutated sequence will be omitted from
+#'                          the output
+#' 
+#' @return   a vector of strings containing the members of \code{allele_calls}
+#'           that represent unmutated sequences
+#' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
   
@@ -90,7 +140,42 @@ findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
 }
 
 
-# Infer genotypefrom a list of allele calls
+
+# inferGenotype -----------------------------------------------------------
+#' Infer a subject-specific genotype
+#'
+#' \code{inferGenotype} infers an subject's genotype by finding the minimum
+#' number set of alleles that can explain the majority of each gene's calls. The
+#' most common allele of each gene is included in the genotype first, and the
+#' next most common allele is added until the desired fraction of alleles can be
+#' explained. In this way, mistaken allele calls (resulting from sequences which
+#' by chance have been mutated to look like another allele) can be removed.
+#' 
+#' @details  Allele calls representing cases where multiple alleles have been
+#'           assigned to a single sample sequence are rare among unmutated
+#'           sequences but may result if nucleotides for certain positions are
+#'           not available. Calls containing multiple alleles are treated as
+#'           belonging to all groups until one of those groups is included in
+#'           the genotype.
+#' 
+#' @param    allele_calls         a vector of strings respresenting Ig allele
+#'                                calls of unmutated sequences from a single
+#'                                subject
+#' @param    fraction_to_explain  the portion of each gene that must be
+#'                                explained by the alleles that will be included
+#'                                in the genotype
+#' @param    gene_cutoff          either a number of sequences or a fraction of
+#'                                the length of \code{allele_calls} denoting the
+#'                                minimum number of times a gene must be
+#'                                observed in \code{allele_calls} to be included
+#'                                in the genotype
+#' 
+#' @return   a table of alleles denoting the genotype of the subject
+#' 
+#' @note     This method works best with data derived from blood, where a large
+#'           portion of sequences are expected to be unmutated. Ideally, there
+#'           should be hundreds of allele calls per gene in the input.
+#' 
 #' @export
 inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
                           fraction_to_explain = 7/8,
@@ -177,10 +262,21 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
 
 
 
-
-
-
-#
+# genotypeFasta -----------------------------------------------------------
+#' Return the nucleotide sequences of a genotype
+#'
+#' \code{genotypeFasta} 
+#' 
+#' @param    genotype     a table of alleles denoting a genotype, as returned by
+#'                        \link{\code{inferGenotype}}
+#' @param    germline_db  a vector of named nucleotide germline sequences
+#'                        matching the alleles detailed in \code{genotype} 
+#' 
+#' @return   a named vector of strings containing the germline nucleotide
+#'           sequences of the alleles in the provided genotype
+#' 
+#' @seealso \link{\code{inferGenotype}}
+#' 
 #' @export
 genotypeFasta <- function(genotype, germline_db){
   g_names = names(germline_db)
@@ -194,19 +290,5 @@ genotypeFasta <- function(genotype, germline_db){
   }
   return(seqs)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

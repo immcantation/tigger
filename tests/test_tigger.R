@@ -8,9 +8,14 @@ library(tigger)
 # clip_tab
 load("C:/Users/Daniel Gadala-Maria/Documents/Kleinstein/Datasets/gmc2.rdata")
 #dat = subset(combSeqData, donor == "Twin_147"  & FUNCTIONAL == "TRUE" & gene_identifier == "IGH|IGL|IGK")
-dataset = subset(dat.ib, TIME %in% c("-1h", "-2d", "-8d") & FUNCTIONAL == "T")
-dataset = dat[which(!duplicated(dat$SEQUENCE_GAP)),] # REMOVE DUPLICATES
-rm(dat.ib)
+dataset = subset(dat.gmc2, TIME %in% c("-1h", "-2d", "-8d") & FUNCTIONAL == "T")
+dataset = dataset[which(!duplicated(dataset$SEQUENCE_GAP)),] # REMOVE DUPLICATES
+genes = alakazam::getGene(dataset$V_CALL)
+family = substr(genes, 1, 5)
+dataset = subset(dataset, family %in% c("IGHV1"))
+df = dataset[,colnames(dataset)[1:24]]
+#save(df, file = "C:/Users/Daniel Gadala-Maria/repos/tiggerpackage/inst/extdata/df.rdata")
+
 germline_db_file = "C:/Users/Daniel Gadala-Maria/Documents/Kleinstein/Datasets/IMGT/IMGT Variable 2014-12-22.fasta"
 germline_db = readGermlineDb(germline_db_file, strip_down_name = TRUE)
 

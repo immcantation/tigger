@@ -35,20 +35,84 @@ readGermlineDb <- function(fasta_file,
 #' \code{runTigger} takes a table of sample sequences from a single subject and a
 #' vector of database germline sequences. It then performs the following:
 #' (1) Infers the presence of novel IGHV alleles not in the germline database.
-#' (2) Infers the individuals IGHV genotype.
+#' (2) Infers the individuals V genotype.
 #' (3) Corrects the IGHV allele calls of the samples based on the IGHV genotype.
 #' The sample sequences should be in the format returned by Change-o (where each
 #' row is a sequence and each column contains data about that sequence, such as
 #' the IGMT/V-Quest allele calls). The database germlines should be a vector of
 #' sequences with names matching those in the table of sample sequences.
 #' 
-#' @param    sample_db  a table of the kind returned by Change-o
-#' @param    germline_db  a named vector of strings respresenting Ig sequences
+#' @param    sample_db            a table of the kind returned by Change-o
+#' @param    germline_db          a vector of named nucleotide germline
+#'                                sequences matching the calls in
+#'                                \code{sample_db}
+#' @param    find_novel           logical. Should novel alleles be searched for?
+#' @param    find_genotype        logical. Should the genotype be inferred?
+#' @param    correct_calls        logical. Should the allele calls be corrected?
+#' @param    allele_min           a number < 1 representing the minimum fraction
+#'                                of sequences–or a number >= 1 representing the
+#'                                minimum count for sequences–required for an
+#'                                allele to not be excluded from analysis. See
+#'                                \code{\link{assignAlleleGroups}}.
+#' @param    y_intercept          the y-intercept above which positions should
+#'                                be considered potentially polymorphic. See
+#'                                \code{\link{detectNovelV}}.
+#' @param    nt_min               the first nucleotide position to be considered
+#'                                in intercept calculations. See
+#'                                \code{\link{detectNovelV}}.
+#' @param    nt_max               the last nucleotide position to be considered
+#'                                in intercept calculations. See
+#'                                \code{\link{detectNovelV}}.
+#' @param    mut_min              the minimum number of mutations carried by
+#'                                sequences used in in intercept calculations.
+#'                                See \code{\link{detectNovelV}}.
+#' @param    mut_max              the maximum number of mutations carried by
+#'                                sequences used in in intercept calculations.
+#'                                See \code{\link{detectNovelV}}.
+#' @param    j_max                the maximum fraction of sequences perfectly
+#'                                aligning to a potential novel allele that are
+#'                                allowed to utilize to a particular combination
+#'                                of junction length and J gene. See
+#'                                \code{\link{detectNovelV}}.
+#' @param    min_seqs             the minimum number of total sequences (within
+#'                                the desired mutational range and nucleotide
+#'                                range) required for the samples to be
+#'                                analyzed for polymorphisms. See
+#'                                \code{\link{detectNovelV}}.
+#' @param    min_frac             the maxmium number of total sequences (within
+#'                                the desired mutational range and nucleotide
+#'                                range) required for the samples to be
+#'                                analyzed for polymorphisms. See
+#'                                \code{\link{detectNovelV}}.
+#' @param    fraction_to_explain  the portion of each gene that must be
+#'                                explained by the alleles that will be included
+#'                                in the genotype. See
+#'                                \code{\link{inferGenotype}}.
+#' @param    seq_gap              the name of the column in \code{sample_db}
+#'                                that includes the IMGT-gapped sequence
+#' @param    v_call_col           the name of the column in \code{sample_db}
+#'                                that includes the intial V call
+#' @param    v_start_col          the name of the column in \code{sample_db}
+#'                                that includes where the V nucleotides begin
+#'                                in the column indicated by \code{seq_gap}
+#' @param    v_length_col         the name of the column in \code{sample_db}
+#'                                that includes the length of the V sequence
+#'                                contained within \code{seq_gap}
+#' @param    j_call_col           the name of the column in \code{sample_db}
+#'                                that includes the initial J call
+#' @param    junc_length_col      the name of the column in \code{sample_db}
+#'                                that includes the junction length
+#' @param    quiet                logical indicating if additional diagonostic
+#'                                output will be suppressed
+#' 
 #' @return   a list containing data on new alleles, the inferred genotype, and
 #' the corrected IGHV calls.
 #' 
-#' @examples
-#' # To be added.
+#' @seealso \code{\link{detectNovelV}}, \code{\link{inferGenotype}},
+#'          \code{\link{reassignAlleles}}
+#' 
+#' @references http://clip.med.yale.edu/changeo/ and
+#'             http://clip.med.yale.edu/tigger/
 #' 
 #' @export
 runTigger <- function(sample_db, germline_db,
@@ -138,6 +202,21 @@ runTigger <- function(sample_db, germline_db,
 
 
 
+# novelSummary ------------------------------------------------------------
+#' Return a summary of any novel alleles discovered
+#'
+#' \code{novelSummary} 
+#' 
+#' @param    tigger_result  the output of \link{\code{runTigger}}
+#' @param    seqs_to_return either \code{"in genotype"} or \code{"all"},
+#'                          indicating whether only those potential novel
+#'                          alleles alleles in the genotype should be returned
+#'                          or if all should be returned
+#' @return   a named list of novel allele sequences, as well as text output
+#'           indicating what number were detected versus included in the
+#'           genotype
+#' 
+#' @export
 novelSummary <- function(tigger_result,
                          seqs_to_return = c("in genotype", "all")[1]){
  
