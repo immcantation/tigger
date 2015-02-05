@@ -99,7 +99,7 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #'                          where multiple calls are separated by a comma
 #' @param    mut_counts     a list containing distance to each germline allele
 #'                          call within \code{allele_calls}, as returned by
-#'                          \link{\code{getMutCount}}
+#'                          \code{\link{getMutCount}}
 #' @param    only_unmutated if \code{TRUE}, calls where no allele that would
 #'                          represent an unmutated sequence will be omitted from
 #'                          the output
@@ -269,14 +269,14 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
 #' sequences.
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
-#'                        \link{\code{inferGenotype}}
+#'                        \code{\link{inferGenotype}}
 #' @param    germline_db  a vector of named nucleotide germline sequences
 #'                        matching the alleles detailed in \code{genotype} 
 #' 
 #' @return   a named vector of strings containing the germline nucleotide
 #'           sequences of the alleles in the provided genotype
 #' 
-#' @seealso \link{\code{inferGenotype}}
+#' @seealso \code{\link{inferGenotype}}
 #' 
 #' @export
 genotypeFasta <- function(genotype, germline_db){
