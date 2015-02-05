@@ -746,11 +746,6 @@ plotJunctionBars <- function(novel){
 
 
 
-extractJ <- function(){
-}
-
-
-
 
 
 

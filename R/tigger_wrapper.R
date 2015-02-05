@@ -88,6 +88,10 @@ readGermlineDb <- function(fasta_file,
 #'                                explained by the alleles that will be included
 #'                                in the genotype. See
 #'                                \code{\link{inferGenotype}}.
+#' @param    gene_cutoff          the minimum fraction of the unmutated
+#'                                sequences that must be attributed to a gene
+#'                                in order for it to be included in the
+#'                                genotype. See \code{\link{inferGenotype}}.                               
 #' @param    seq_gap              the name of the column in \code{sample_db}
 #'                                that includes the IMGT-gapped sequence
 #' @param    v_call_col           the name of the column in \code{sample_db}
@@ -119,7 +123,8 @@ runTigger <- function(sample_db, germline_db,
                    find_novel = TRUE, find_genotype = TRUE, correct_calls = TRUE,
                    allele_min = 1e-4, y_intercept = 1/8, nt_min=1, nt_max = 312,
                    mut_min=1, mut_max=10, j_max = 0.1, min_seqs = 50, min_frac = 3/4,
-                   fraction_to_explain = 7/8,  seq_gap = "SEQUENCE_GAP",
+                   fraction_to_explain = 7/8,  gene_cutoff = 0.001,
+                   seq_gap = "SEQUENCE_GAP",
                    v_call_col = "V_CALL", v_start_col = "V_GERM_START",
                    v_length_col = "V_GAP_LENGTH", j_call_col = "J_CALL",
                    junc_length_col = "JUNCTION_GAP_LENGTH", quiet=FALSE){
@@ -179,7 +184,8 @@ runTigger <- function(sample_db, germline_db,
     
     mut_counts = getMutCount(v_sequences, v_calls2, germline_db)
     unmutated_calls = findUnmutatedCalls(v_calls2, mut_counts)
-    genotype = inferGenotype(unmutated_calls, fraction_to_explain)
+    genotype = inferGenotype(unmutated_calls, fraction_to_explain,
+                             gene_cutoff=gene_cutoff)
     genotype_db = genotypeFasta(genotype, germline_db)
     result[["genotype"]] = genotype
     if(!quiet){ cat("done.\n") }
@@ -205,9 +211,11 @@ runTigger <- function(sample_db, germline_db,
 # novelSummary ------------------------------------------------------------
 #' Return a summary of any novel alleles discovered
 #'
-#' \code{novelSummary} 
+#' \code{novelSummary} summaries the output of \code{\link{runTigger}}, stating
+#' which novel alleles were included in the genotype. It returns the nucleotide
+#' sequences of the novel alleles.
 #' 
-#' @param    tigger_result  the output of \link{\code{runTigger}}
+#' @param    tigger_result  the output of \code{\link{runTigger}}
 #' @param    seqs_to_return either \code{"in genotype"} or \code{"all"},
 #'                          indicating whether only those potential novel
 #'                          alleles alleles in the genotype should be returned

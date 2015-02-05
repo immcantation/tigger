@@ -16,16 +16,16 @@ Repertoire-Sequencing (Rep-Seq) data, derived from the cDNA of B cells'
 transcribed immunoglobulin (Ig) genes, is currently the subject of much study.
 A key step in analyzing these data involves assigning the closest known V(D)J 
 germline alleles to the (often somatically mutated) sample sequences using a
-tool such as IMGT/HighV-QUEST[[1]][1].However, if the sample utilizes alleles
+tool such as IMGT/HighV-QUEST[[1]][1]. However, if the sample utilizes alleles
 not in the germline database used for alignment, this step will fail.
-Additionally, this alignment has an associated error rate of ~5%, notably among
-sequences carrying a large number of somatic mutations[[2]][2].
+Additionally, this alignment has an associated error rate of ~5%[[2]][2],
+notably among sequences carrying a large number of somatic mutations.
 
-Here we provide a Tool for Immunoglobulin Genotype Elucidation via Rep-Seq
-(TIgGER). TIgGER addresses these issues by inferring the set of Ig alleles
-carried by an individual (including any novel alleles) and then using this set
-of alleles to correct the initial assignments given to sample sequences by
-existing tools.
+Here we provide a **T**ool for **I**mmuno**g**lobulin **G**enotype
+**E**lucidation via **R**ep-Seq (TIgGER). TIgGER addresses these issues by
+inferring the set of Ig alleles carried by an individual (including any novel
+alleles) and then using this set of alleles to correct the initial assignments
+given to sample sequences by existing tools.
 
 Additional information is available at
 [http://clip.med.yale.edu/tigger/](http://clip.med.yale.edu/tigger/) and a full
@@ -36,8 +36,8 @@ sequencing data reveals a high frequency of novel immunoglobulin V gene
 segment alleles. *PNAS*.
 
 
-Input
---------------------------------------------------------------------------------
+## Input
+
 TIgGER requires two main inputs:
 
 1. Pre-processed Rep-Seq data
@@ -58,7 +58,6 @@ library(tigger)
 
 # Load example Rep-Seq data
 data(pgp1_example)
-
 ```
 
 The database of germline sequences should be provided in FASTA format with
@@ -71,8 +70,8 @@ data(germline_example)
 ```
 
 
-Running TIgGER
---------------------------------------------------------------------------------
+## Running TIgGER
+
 The function most users will wish to use is `runTigger()`. This function takes
 the two inputs discussed above and can perform any combination of the following:
 
@@ -84,12 +83,136 @@ These options are controlled by the logical arguments `find_novel`,
 `find_genotype`, and `correct_calls`, which default to `TRUE`. Note, however,
 that if `find_genotype` is `FALSE`, the provided germline database should
 contain only the alleles carried by the individual from which the Rep-Seq data
-was isolated.
+was isolated. See the help file (`?runTigger`) for a description of all options.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Run tigger on the sample output
 sample_output = runTigger(pgp1_example, germline_example)
 ```
+
+`sample_output` should now be a list of length three with the names `novel`,
+`genotype`, and `new_calls`. Let's take a moment to examine the contents of
+each. (If any of the aforementioned options of `runTigger` were set to `FALSE`,
+the corresponding elements of `sample_output` will simply be empty.)
+
+### Novel Alleles
+Potential novel alleles detected by TIgGER are in the first element of the list.
+Some of these may have been included in the genotype (see below) while others
+may not have been. A summary of which were included will be printed by
+`novelSummary()`, which will also return the named novel nucleotide sequences.
+You may wish to add these to the existing germline database alleles. However,
+you may also set `seqs_to_return` to `"all"` to also return the non-genotype
+potential novel alleles.
+
+```{r, eval=TRUE, warning=FALSE}
+# Summarize the detected novel alleles
+novel_sequences = novelSummary(sample_output, seqs_to_return = "in genotype")
+germline_example = c(germline_example, novel_sequences)
+```
+
+The first part of `r names(novel_sequences)[1]` identifies the nearest database
+allele, and the part after the underscore indicates the polymorphic position(s)
+using the format `[database_nucleotide][position][polymorphic_nucleotide]`.
+
+The TIgGER procedure for identifying novel alleles (see citation above) involves
+taking all seqeunces which align to a particular germline allele and, for each
+position along the aligned sequences, plotting the mutation frequency at that
+postion as a function of the sequence-wide mutation count. While mutational
+hot-spots and cold-spots are both expected to have a *y*-intercept around zero,
+polymorphic positions will have a *y*-intercept larger than zero. The required
+minimum *y*-intercept may be specified in `runTigger()` by `y_intercept`,
+but defaults to `1/8`.
+
+Passing this *y*-intercept threshold is the
+first of three pieces of evidence that support the novel allele. To view the
+plots of positional mutation frequency vs sequence-wide mutation count,
+`plotNovelLines()` may be used. Polymorphic positions are highlighted in red.
+Remember that some or all sequences may not have been included in the final
+genotype.
+
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+# Plot positional mutation frequency versus sequence-wide mutation count
+plotNovelLines(sample_output$novel)
+```
+
+The second piece of evidence supporting novel allele calls is the nucleotide
+usage at the polymorphic positions as a function of sequence-wide mutation
+count. We expect the polymorphic allele to be prevalent at all mutation counts,
+and we expect the mutation count equal to the number of polymorphisms in the
+novel sequence to be the most prevalent. `plotNovelBars()` can be used to view
+the nucleotide usage at polymorphic positions.
+
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+# Plot nucleotide usage at polymorphic positions
+plotNovelBars(sample_output$novel)
+```
+
+Finally, to avoid cases where a clonal expansion might lead to a false positive,
+combinations of J gene and junction length are examined among sequences which
+*perfectly match* the proposed germline allele. A true novel allele
+is expected to utilize a wide range of J genes, and sequences with different
+junction length can be ruled out as not being clonally related. The maximum
+portion of sequences which can consist of a specific combination of J gene and
+junction length may be specified in `runTigger()` by `j_max`.
+`plotNovelJunctions()` can be used to view the distribution of J genes and
+junctions.
+
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+# Plot J and junction usage for sequences perfectly matching the novel allele
+plotJunctionBars(sample_output$novel)
+```
+
+### Genotype
+The second element of the list output by `runTigger()` is the genotype. This is
+the collection of alleles inferred to be carried by the subject. For each gene,
+`runTigger()` finds the sequences which might be interpreted as unmutated 
+(as these should have the least error in their allele assignment) and then 
+identifies the smallest set of alleles that could explain the majority of these
+calls. (This "majority" is set ot `7/8` but may be controlled by modifying
+`fraction_to_explain` in the function `runTigger()`.
+Additionally, genes representing fewere than `0.1%` of sequences are, by
+default, excluded; this can be controlled by the user using `gene_cutoff`.)
+
+The genotype output is designed to be human readable. For each allele, the
+number of sequences which perfectly match the germline are listed int he same
+order as the alleles are listed. The total number of sequences that perfectly
+match any allele of that gene is also given. Note that novel alleles are
+indicated using the same nomenclature as above.
+
+```{r, eval=TRUE, warning=FALSE}
+# View the inferred genotype
+print(sample_output$genotype)
+```
+
+`genotypeFasta()` is useful is you wish to ouput the sequences rather than the
+allele names. Given a genotype and the vector of database germline sequences, it
+will return a vector of germline alleles carried by the individual. Users may
+use `writeFasta()` to save the sequences to a fasta file.
+
+```{r, eval=TRUE, warning=FALSE}
+# Get the nucleotide sequences of all genotype alleles
+genotype_sequences = genotypeFasta(sample_output$genotype, germline_example)
+```
+
+### Corrected Allele Calls
+
+Finally, the original V allele calls have been limited to only those within the
+inferred genotype; the third element of the output list contains a vector of
+allele calls equal in length and ordering to the original allele calls. This can
+be combined to the existing data frame, and used in future analyses as follows.
+
+```{r, eval=TRUE, warning=FALSE}
+# Extract the corrected V allele calls and appened them to the data frame
+V_CALL_GENOTYPED = sample_output$new_calls
+pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+```
+
+
+## References
+
+1. [Alamyar *et al.* (2010)](http://www.imgt.org/IMGTindex/IMGTHighV-QUEST.html)
+2. [Munshaw and Kepler (2010)](http://www.ncbi.nlm.nih.gov/pubmed/20147303)
+3. [Lefranc *et al.* (2003)](http://www.ncbi.nlm.nih.gov/pubmed/12477501)
 
 [1]: http://www.imgt.org/IMGTindex/IMGTHighV-QUEST.html "Alamyar et al. (2010)"
 [2]: http://www.ncbi.nlm.nih.gov/pubmed/20147303 "Munshaw and Kepler (2010)"

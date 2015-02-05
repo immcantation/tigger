@@ -265,7 +265,8 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
 # genotypeFasta -----------------------------------------------------------
 #' Return the nucleotide sequences of a genotype
 #'
-#' \code{genotypeFasta} 
+#' \code{genotypeFasta} converts a genotype table into a vector of nucleotide
+#' sequences.
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
 #'                        \link{\code{inferGenotype}}
@@ -290,5 +291,39 @@ genotypeFasta <- function(genotype, germline_db){
   }
   return(seqs)
 }
+
+
+
+# writeFasta -----------------------------------------------------------
+#' Write nucleotide sequences to a fasta file
+#'
+#' \code{writeFasta} write a vector of nucleotide sequences to a file
+#' 
+#' @param    named_sequences  a vector of nucleotide sequences
+#' @param    file             a character string naming the file to write to
+#' @param    char_per_line    how many characters should be printed per line
+#' 
+#' @return   saves a fasta file containing the sequences of interest
+#' 
+#' @export
+writeFasta <- function(named_sequences, file, char_per_line=60){
+  # Ensure no sequences are too short or too long
+  lens = sapply(named_sequences, nchar)
+  if(min(lens) <= 0) { stop("All sequences must be of length > 0.") }
+  if(max(lens) > 10^4) { stop("No sequences may have length > 10^4.") }
+  # Break up sequences into lines of appropriate length
+  split_seqs = lapply(named_sequences, substring,
+                      seq(1, 10^4, char_per_line),
+                      seq(char_per_line, 10^4, char_per_line))
+  split_seqs = lapply(split_seqs, function(x) x[x!=""])
+  seq_names = paste(">", names(named_sequences), sep="")
+  to_print = as.vector(unlist(mapply(c, seq_names, split_seqs)))
+  write(to_print, file=file)
+}
+
+
+
+
+
 
 
