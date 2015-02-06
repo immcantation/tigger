@@ -50,10 +50,10 @@ readGermlineDb <- function(fasta_file,
 #' @param    find_genotype        logical. Should the genotype be inferred?
 #' @param    correct_calls        logical. Should the allele calls be corrected?
 #' @param    allele_min           a number < 1 representing the minimum fraction
-#'                                of sequences–or a number >= 1 representing the
-#'                                minimum count for sequences–required for an
-#'                                allele to not be excluded from analysis. See
-#'                                \code{\link{assignAlleleGroups}}.
+#'                                of sequences required for an allele to not be
+#'                                excluded from analysis. or a number >= 1
+#'                                representing the minimum count for sequences.
+#'                                See \code{\link{assignAlleleGroups}}.
 #' @param    y_intercept          the y-intercept above which positions should
 #'                                be considered potentially polymorphic. See
 #'                                \code{\link{detectNovelV}}.

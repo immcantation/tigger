@@ -53,8 +53,8 @@ sortAlleles <- function(allele_calls) {
 #' 
 #' @param    allele_calls  a vector of strings respresenting Ig allele calls
 #' @param    allele_min  a number < 1 representing the minimum fraction of
-#'           sequences--or a number >= 1 representing the minimum count for
-#'           sequences--required for an allele to not be excluded.
+#'           sequences required for an allele to not be excluded, or a number
+#'           >= 1 representing the minimum count for sequences
 #' @param    binomial_cutoff a logical indicating if an \code{allele_min} < 1
 #'           should be applied in a binomial manner.
 #' @param    alpha  the alpha cutoff used if \code{binomial_cutoff = TRUE}

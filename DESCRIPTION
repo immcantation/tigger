@@ -1,10 +1,11 @@
 Package: tigger
 Title: R tools for inferring new IGHV alleles from Rep-Seq data
 Version: 2.0
-Author: Daniel Gadala-Maria, Jason Anthony Vander Heiden
+Author: Daniel Gadala-Maria and Jason Anthony Vander Heiden
 Maintainer: Daniel Gadala-Maria <daniel.gadala-maria@yale.edu>
-Description: Diversity calculation, lineage inferrence, and distance-to-nearest
-    components of the Change-O pipeline.
+Description: Infers the IGHV genotype of an individual from Rep-Seq data,
+  including any novel alleles, and uses this information to correct existing
+  IGHV allele calls from among the sample sequences.
 License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
