@@ -14,9 +14,8 @@
 #' 
 #' @name        tigger
 #' @docType     package
-#' @references  pRESTO, Change-O, TIgGER, BASELINe, et al. 
+#' @references  Gadala-Maria et al. (2015) PNAS 
 #' 
-#' @import alakazam
 #' @import plyr
 #' 
 NULL

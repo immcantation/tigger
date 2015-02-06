@@ -4,10 +4,11 @@
 #' \code{readGermlineDb} reads a fasta-formatted file of immunoglobulin (Ig)
 #' sequences and returns a named vector of those sequences.
 #' 
-#' @param    fasta_file  fasta-formatted file of immunoglobuling sequences
+#' @param    fasta_file       fasta-formatted file of immunoglobuling sequences
 #' @param    strip_down_name  if \code{TRUE}, will extract only the allele name
-#'           from the strings fasta file's sequence names
-#' @param    force_caps  if \code{TRUE}, will force nucleotides to uppercase
+#'                            from the strings fasta file's sequence names
+#' @param    force_caps       if \code{TRUE}, will force nucleotides to
+#'                            uppercase
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
 #' @export
@@ -22,7 +23,7 @@ readGermlineDb <- function(fasta_file,
   seqs = sapply(broken_names, "[", 2)
   seq_names = sapply(broken_names, "[", 1)
   if(force_caps){ seqs = toupper(seqs) }
-  if(strip_down_name){ seq_names = alakazam::getAllele(seq_names) }
+  if(strip_down_name){ seq_names = getAllele(seq_names) }
   names(seqs) = seq_names
   return(seqs[which(!is.na(seqs))])
 }
@@ -133,7 +134,7 @@ runTigger <- function(sample_db, germline_db,
   
   # EXTRACT USEFUL PORTIONS OF DB FILES
 
-  v_calls = alakazam::getAllele(sample_db[,v_call_col], first = FALSE)
+  v_calls = getAllele(sample_db[,v_call_col], first = FALSE)
   v_calls = updateAlleleNames(v_calls)
   # New version of sample db files are different, so check the columns names
   seqs = sample_db[,seq_gap]
@@ -149,7 +150,7 @@ runTigger <- function(sample_db, germline_db,
   if (find_novel){
     if(!quiet){ cat("Finding novel alleles...") }
     allele_groups = assignAlleleGroups(v_calls, allele_min)
-    j_genes = alakazam::getGene(sample_db[,j_call_col], first = FALSE)
+    j_genes = getGene(sample_db[,j_call_col], first = FALSE)
     junc_lengths = sample_db[,junc_length_col]
     novel = detectNovelV(v_sequences, j_genes, junc_lengths, allele_groups,
                          germline_db,  y_intercept, nt_min, nt_max,
@@ -173,8 +174,8 @@ runTigger <- function(sample_db, germline_db,
     v_calls2 = v_calls
     # Paste novel alleles (if any) to all allele calls before determining dists
     if (find_novel & (length(novel) > 0)){
-      genes_novel = alakazam::getGene(names(novel))
-      genes_groups = alakazam::getGene(names(allele_groups))
+      genes_novel = getGene(names(novel))
+      genes_groups = getGene(names(allele_groups))
       for(i in 1:length(novel)){
         matching_groups = allele_groups[genes_groups %in% genes_novel[i]]
         indicies = unique(unlist(matching_groups))
@@ -257,8 +258,6 @@ novelSummary <- function(tigger_result,
 }
 
 #
-
-
 
 
 

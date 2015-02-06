@@ -5,14 +5,12 @@ Author: Daniel Gadala-Maria and Jason Anthony Vander Heiden
 Maintainer: Daniel Gadala-Maria <daniel.gadala-maria@yale.edu>
 Description: Infers the IGHV genotype of an individual from Rep-Seq data,
   including any novel alleles, and uses this information to correct existing
-  IGHV allele calls from among the sample sequences.
+  IGHV allele calls from among the sample sequences. Described in Gadala-Maria
+  et al. (2015) PNAS.
 License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
     R (>= 3.0.0)
-Imports:
-    plyr,
-    alakazam
-Suggests:
-    knitr
+Imports: plyr
+Suggests: knitr
 VignetteBuilder: knitr

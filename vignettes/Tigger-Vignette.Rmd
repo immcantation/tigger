@@ -14,12 +14,11 @@ vignette: |
 
 Introduction
 --------------------------------------------------------------------------------
-Repertoire-Sequencing (Rep-Seq) data, derived from the cDNA of B cells'
-transcribed immunoglobulin (Ig) genes, is currently the subject of much study.
-A key step in analyzing these data involves assigning the closest known V(D)J 
-germline alleles to the (often somatically mutated) sample sequences using a
-tool such as IMGT/HighV-QUEST[[1]][1]. However, if the sample utilizes alleles
-not in the germline database used for alignment, this step will fail.
+Immunoglobulin Repertoire-Sequencing (Rep-Seq) data is currently the subject of
+much study. A key step in analyzing these data involves assigning the closest
+known V(D)J germline alleles to the (often somatically mutated) sample sequences
+using a tool such as IMGT/HighV-QUEST[[1]][1]. However, if the sample utilizes
+alleles not in the germline database used for alignment, this step will fail.
 Additionally, this alignment has an associated error rate of ~5%[[2]][2],
 notably among sequences carrying a large number of somatic mutations.
 
@@ -45,15 +44,23 @@ TIgGER requires two main inputs:
 1. Pre-processed Rep-Seq data
 2. Database germline sequences
 
-Rep-seq data input is a tab-delimited table, as is output by Change-O
-[(http://clip.med.yale.edu/changeo/)](http://clip.med.yale.edu/changeo/).
-Each row represents a unique functional sequence in this format, and columns
-hold information including a unique ID, the IMGT-gapped nucleotide sequence, the
-names of the best-aligning V(D)J alleles, the nucleotide length of each of the
-alleles, and the length of the junction. The user should load this data into R
-as a data fram. An example dataset is provided with the `tigger` package. It
-contains unique sequences assigned to IGHV1 family genes isolated from
-individual PGP1 (data used in Gadala-Maria *et al.*).
+Rep-seq data is input as a data frame where each row represents a unique
+observation and and columns represent data about that observation. The preferred
+names of the required columns are provided below along with a description of
+each. 
+
+Column Name           | Description
+----------------------|---------------------------------------------------------
+`SEQUENCE_GAP`        | V(D)J sequence gapped in the IMGT gapped format[[3]][3]
+`V_CALL`              | (Comma separated) name(s) of the nearest V allele(s)
+`V_GERM_START`        | Position in the germline sequence where sample V starts
+`V_GAP_LENGTH`        | Length (including gaps) of V sequence in `SEQUENCE_GAP`
+`J_CALL`              | (Comma separated) name(s) of the nearest J allele(s)
+`JUNCTION_GAP_LENGTH` | Length of the junction region of the V(D)J sample
+
+An example dataset is provided with the `tigger` package. It contains unique
+functional sequences assigned to IGHV1 family genes isolated from individual
+PGP1 (referenced in Gadala-Maria *et al.*).
 
 ```{r, eval=TRUE, warning=FALSE}
 library(tigger)

@@ -23,10 +23,10 @@
 reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   
   new_calls = rep("", length(v_calls))
-  v_genes = alakazam::getGene(v_calls, first = T)
+  v_genes = getGene(v_calls, first = T)
   
   # Find which genotype genes are homozygous and assign those alleles first
-  geno_genes = alakazam::getGene(names(genotype_db))
+  geno_genes = getGene(names(genotype_db))
   names(geno_genes) = names(genotype_db)
   hetero_genes = geno_genes[which(duplicated(geno_genes))]
   homo_genes = geno_genes[!(geno_genes %in% hetero_genes)]

@@ -184,7 +184,7 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
   
   
   # Find the gene(s) of the allele calls; group duplicates (e.g. 1-69D*) as one
-  gene_calls = alakazam::getGene(allele_calls, first = FALSE, collapse = TRUE)
+  gene_calls = getGene(allele_calls, first = FALSE, collapse = TRUE)
   gene_calls = gsub("D", "", gene_calls)
   
   # If the sequences are assigned multiple genes, pick the more common gene
