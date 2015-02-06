@@ -38,12 +38,13 @@ readGermlineDb <- function(fasta_file,
 #' (1) Infers the presence of novel IGHV alleles not in the germline database.
 #' (2) Infers the individuals V genotype.
 #' (3) Corrects the IGHV allele calls of the samples based on the IGHV genotype.
-#' The sample sequences should be in the format returned by Change-o (where each
-#' row is a sequence and each column contains data about that sequence, such as
-#' the IGMT/V-Quest allele calls). The database germlines should be a vector of
-#' sequences with names matching those in the table of sample sequences.
+#' The sample sequences should be a data frame where each row is a sequence and
+#' each column contains data about that sequence. The database germlines should
+#' be a vector of sequences with names matching those in the table of sample
+#' sequences.
 #' 
-#' @param    sample_db            a table of the kind returned by Change-o
+#' @param    sample_db            a data frame with the colums described in
+#'                                Details below.
 #' @param    germline_db          a vector of named nucleotide germline
 #'                                sequences matching the calls in
 #'                                \code{sample_db}
@@ -113,11 +114,21 @@ readGermlineDb <- function(fasta_file,
 #' @return   a list containing data on new alleles, the inferred genotype, and
 #' the corrected IGHV calls.
 #' 
+#' @details  The required columns that must be contained within \code{sample_db}
+#' are detailed below:
+#' \itemize{
+#' \item{\code{SEQUENCE_GAP}: }{V(D)J sequence gapped in the IMGT gapped format}
+#' \item{\code{V_CALL}: }{(Comma separated) name(s) of the nearest V allele(s)}
+#' \item{\code{V_GERM_START}: }{Position in the germline sequence where sample V starts}
+#' \item{\code{V_GAP_LENGTH}: }{Length (including gaps) of V sequence in \code{SEQUENCE_GAP}}
+#' \item{\code{J_CALL}: }{(Comma separated) name(s) of the nearest J allele(s)}
+#' \item{\code{JUNCTION_GAP_LENGTH}: }{Length of the junction region of the V(D)J sample}
+#' }
+#'
 #' @seealso \code{\link{detectNovelV}}, \code{\link{inferGenotype}},
 #'          \code{\link{reassignAlleles}}
 #' 
-#' @references http://clip.med.yale.edu/changeo/ and
-#'             http://clip.med.yale.edu/tigger/
+#' @references http://clip.med.yale.edu/tigger/
 #' 
 #' @export
 runTigger <- function(sample_db, germline_db,

@@ -705,6 +705,9 @@ plotNovelLines <- function(novel){
 #' 
 #' @export
 plotNovelBars <- function(novel){
+  NUC_COLORS = c("#64F73F", "#FFB340", "#EB413C", "#3C88EE")
+  names(NUC_COLORS) = c("A","C","G","T")
+  
   for(n in novel){
     for (j in 1:length(n[[4]])){
       p = n[[4]][[j]]
@@ -774,7 +777,7 @@ plotJunctionBars <- function(novel){
 #' @seealso   Uses \code{\link{str_extract}}.
 #' @references
 #'   \url{http://imgt.org}
-#' @note THese functions authored by Jason Anthony Vander Heiden
+#' @note These functions authored by Jason Anthony Vander Heiden
 #' @examples
 #' kappa_call <- c("Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F", "Homsap IGKJ5*01 F")
 #'
