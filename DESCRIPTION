@@ -5,12 +5,15 @@ Author: Daniel Gadala-Maria and Jason Anthony Vander Heiden
 Maintainer: Daniel Gadala-Maria <daniel.gadala-maria@yale.edu>
 Description: Infers the IGHV genotype of an individual from Rep-Seq data,
   including any novel alleles, and uses this information to correct existing
-  IGHV allele calls from among the sample sequences. Described in Gadala-Maria
-  et al. (2015) PNAS.
+  IGHV allele calls from among the sample sequences. Described in:
+  Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015)
+  Automated analysis of high-throughput B cell sequencing data reveals a high
+  frequency of novel immunoglobulin V gene segment alleles. PNAS:1417683112
 License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
-    R (>= 3.0.0)
+    R (>= 3.0.0),
+    plyr
 Imports: plyr
 Suggests: knitr
 VignetteBuilder: knitr

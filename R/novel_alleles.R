@@ -208,7 +208,7 @@ summarizeMutations <- function(mut_list, match_list) {
 
 
 # trimMutMatrix -----------------------------------------------------------
-#' #' Trim a mutation summary
+#' Trim a mutation summary
 #'
 #' \code{trimMutMatrix} takes a pair of lists as returned by
 #' \code{summarizeMutations} and returns a matrix of mutation frequencies at
@@ -305,7 +305,7 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
 
 
 # findIntercepts ----------------------------------------------------------
-#' #' Find which y-intercepts are above a threshhold
+#' Find which y-intercepts are above a threshhold
 #'
 #' \code{findIntercepts} takes a matrix as returned by \code{trimMutMatrix},
 #' where mutation frequencies at given positions (rows) are calculated as a
@@ -347,7 +347,7 @@ findIntercepts <- function(mut_fracs, y_intercept=1/8, alpha=0.05){
 
 
 # findNucletoideUsage -----------------------------------------------------
-#' #' Determine nucleotide usage at a given position
+#' Determine nucleotide usage at a given position
 #'
 #' \code{findNucletoideUsage} determines the nucleotide distribution at a given
 #' IMGT-numbered position as a function of sequence-wide mutation counts. 
@@ -418,7 +418,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 
 
 # createGermlines ---------------------------------------------------------
-#' #' Create sequences with each combination of polymorphisms
+#' Create sequences with each combination of polymorphisms
 #'
 #' \code{createGermlines} inserts nucleotides in the desired locations of a
 #' provided sequence, for each combination of possible insertions.

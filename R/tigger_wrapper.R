@@ -117,7 +117,7 @@ readGermlineDb <- function(fasta_file,
 #' @details  The required columns that must be contained within \code{sample_db}
 #' are detailed below:
 #' \itemize{
-#' \item{\code{SEQUENCE_GAP}: }{V(D)J sequence gapped in the IMGT gapped format}
+#' \item{\code{SEQUENCE_GAP}: }{V(D)J sequence in the IMGT gapped format}
 #' \item{\code{V_CALL}: }{(Comma separated) name(s) of the nearest V allele(s)}
 #' \item{\code{V_GERM_START}: }{Position in the germline sequence where sample V starts}
 #' \item{\code{V_GAP_LENGTH}: }{Length (including gaps) of V sequence in \code{SEQUENCE_GAP}}
@@ -184,13 +184,13 @@ runTigger <- function(sample_db, germline_db,
     if(!quiet){ cat("Finding genotype...") }
     v_calls2 = v_calls
     # Paste novel alleles (if any) to all allele calls before determining dists
-    if (find_novel & (length(novel) > 0)){
-      genes_novel = getGene(names(novel))
+    if (find_novel & (length(fasta) > 0)){
+      genes_novel = getGene(names(fasta))
       genes_groups = getGene(names(allele_groups))
-      for(i in 1:length(novel)){
+      for(i in 1:length(fasta)){
         matching_groups = allele_groups[genes_groups %in% genes_novel[i]]
         indicies = unique(unlist(matching_groups))
-        v_calls2[indicies] = sapply(v_calls2[indicies], paste, names(novel)[i], sep=",")
+        v_calls2[indicies] = sapply(v_calls2[indicies], paste, names(fasta)[i], sep=",")
       }
     }
     

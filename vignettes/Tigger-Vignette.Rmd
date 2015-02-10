@@ -3,10 +3,10 @@ title: "Tool for Immunoglobulin Genotype Elucidation via Rep-Seq (TIgGER)"
 author: "Daniel Gadala-Maria"
 date: "Last modified `r Sys.Date()`"
 output:
+  word_document: default
   pdf_document: default
   html_document:
     keep_md: yes
-  word_document: default
 vignette: |
   %\VignetteIndexEntry{Vignette Title} %\VignetteEngine{knitr::rmarkdown %\usepackage[utf8]{inputenc}
 ---
@@ -29,12 +29,9 @@ alleles) and then using this set of alleles to correct the initial assignments
 given to sample sequences by existing tools.
 
 Additional information is available at
-[http://clip.med.yale.edu/tigger/](http://clip.med.yale.edu/tigger/) and a full
-description of TIgGER is available in:
+[http://clip.med.yale.edu/tigger/](http://clip.med.yale.edu/tigger/) and in:
 
-> Gadala-Maria *et al*. (2015) Automated analysis of high-throughput B cell
-sequencing data reveals a high frequency of novel immunoglobulin V gene
-segment alleles. *PNAS*.
+[Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles. *PNAS*:1417683112](http://www.pnas.org/content/early/2015/02/05/1417683112).
 
 
 ## Input
@@ -95,14 +92,14 @@ contain only the alleles carried by the individual from which the Rep-Seq data
 was isolated. See the help file (`?runTigger`) for a description of all options.
 
 ```{r, eval=TRUE, warning=FALSE}
-# Run tigger on the sample output
+# Run tigger on the example input
 sample_output = runTigger(pgp1_example, germline_example)
 ```
 
 `sample_output` should now be a list of length three with the names `novel`,
 `genotype`, and `new_calls`. Let's take a moment to examine the contents of
-each. (If any of the aforementioned options of `runTigger` were set to `FALSE`,
-the corresponding elements of `sample_output` will simply be empty.)
+each. (If any of these three options of `runTigger` are set to `FALSE`,
+the some elements of `sample_output` will be empty.)
 
 ### Novel Alleles
 Potential novel alleles detected by TIgGER are in the first element of the list.
@@ -163,7 +160,7 @@ is expected to utilize a wide range of J genes, and sequences with different
 junction length can be ruled out as not being clonally related. The maximum
 portion of sequences which can consist of a specific combination of J gene and
 junction length may be specified in `runTigger()` by `j_max`.
-`plotNovelJunctions()` can be used to view the distribution of J genes and
+`plotJunctionBars()` can be used to view the distribution of J genes and
 junctions.
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
@@ -179,7 +176,7 @@ the collection of alleles inferred to be carried by the subject. For each gene,
 identifies the smallest set of alleles that could explain the majority of these
 calls. (This "majority" is set ot `7/8` but may be controlled by modifying
 `fraction_to_explain` in the function `runTigger()`.
-Additionally, genes representing fewere than `0.1%` of sequences are, by
+Additionally, genes representing fewer than `0.1%` of sequences are, by
 default, excluded; this can be controlled by the user using `gene_cutoff`.)
 
 The genotype output is designed to be human readable. For each allele, the

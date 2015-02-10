@@ -14,7 +14,7 @@
 #' 
 #' @name        tigger
 #' @docType     package
-#' @references  Gadala-Maria et al. (2015) PNAS 
+#' @references  Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles. PNAS:1417683112
 #' 
 #' @import plyr
 #' 
