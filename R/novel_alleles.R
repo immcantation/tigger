@@ -22,15 +22,16 @@
 #' @export
 sortAlleles <- function(allele_calls) {  
   
-  allele_calls = sort(allele_calls) # This will help align the Ds later.
-  
-  segment = gsub(".*(IG[HKL][VDJ]).*", "\\1", allele_calls)
-  
-  family = as.numeric(gsub(".*IG[HKL][VDJ]([0-9]*)[^0-9].*", "\\1", allele_calls))
-  
-  gene = gsub("[^-]*-([^-\\*]+).*", "\\1", (getGene(allele_calls)))
-  gene = gsub("D","",gene)
-  gene = as.numeric(gsub("NL|a|b|f", "99", gene))
+  allele_calls = sort(allele_calls) # This will help sort the Ds later.
+  fam_and_seg = getFamily(allele_calls)
+  segment = substr(fam_and_seg, 1, 4)
+  family = as.numeric(substr(fam_and_seg, 5, 5))
+  gene = getGene(allele_calls) %>%
+    strsplit("-") %>%
+    sapply("[", 2) %>%
+    gsub("D","",.) %>%
+    gsub("NL|a|b|f", "99", .) %>% # This helps to sort the odd letters
+    as.numeric()
   
   gene2 = gsub(".*-.*-|\\*..", "", allele_calls)
   gene2 = suppressWarnings(as.numeric(gsub("NL|a|b|f", "99", gene2)) )
@@ -90,10 +91,8 @@ assignAlleleGroups <- function(allele_calls, allele_min=1e-4,
   } else {
     cutoff = allele_min
   }
-  allele_counts = ldply(alleles_i, length)
-  rare_i = allele_counts[,2] < cutoff
-
-  return(alleles_i[!rare_i])
+  allele_counts = sapply(alleles_i, length)
+  return(alleles_i[allele_counts >= cutoff])
 }
 
 
