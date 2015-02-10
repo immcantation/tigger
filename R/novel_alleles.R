@@ -33,7 +33,7 @@ sortAlleles <- function(allele_calls) {
   gene = as.numeric(gsub("NL|a|b|f", "99", gene))
   
   gene2 = gsub(".*-.*-|\\*..", "", allele_calls)
-  gene2 = as.numeric(gsub("NL|a|b|f", "99", gene2))
+  gene2 = suppressWarnings(as.numeric(gsub("NL|a|b|f", "99", gene2)) )
   gene2[is.na(gene2)] = 0
   
   allele = as.numeric(gsub(".*\\*","",allele_calls))
