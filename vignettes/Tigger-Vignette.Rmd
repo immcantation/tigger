@@ -72,7 +72,7 @@ in the IMGT database (build 201408-4) are provided with this package. You may
 read in your own fasta file using `readGermlineDb()`.
 ```{r, eval=TRUE, warning=FALSE}
 # Load example germline database
-data(germline_example)
+data(germline_ighv)
 ```
 
 
@@ -93,7 +93,7 @@ was isolated. See the help file (`?runTigger`) for a description of all options.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Run tigger on the example input
-sample_output = runTigger(pgp1_example, germline_example)
+sample_output = runTigger(pgp1_example, germline_ighv)
 ```
 
 `sample_output` should now be a list of length three with the names `novel`,
@@ -113,7 +113,7 @@ potential novel alleles.
 ```{r, eval=TRUE, warning=FALSE}
 # Summarize the detected novel alleles
 novel_sequences = novelSummary(sample_output, seqs_to_return = "in genotype")
-germline_example = c(germline_example, novel_sequences)
+germline_ighv = c(germline_ighv, novel_sequences)
 ```
 
 The first part of `r names(novel_sequences)[1]` identifies the nearest database
@@ -197,7 +197,7 @@ use `writeFasta()` to save the sequences to a fasta file.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Get the nucleotide sequences of all genotype alleles
-genotype_sequences = genotypeFasta(sample_output$genotype, germline_example)
+genotype_sequences = genotypeFasta(sample_output$genotype, germline_ighv)
 ```
 
 ### Corrected Allele Calls
