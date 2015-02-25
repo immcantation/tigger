@@ -262,6 +262,81 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
 
 
 
+# compareSepString --------------------------------------------------------
+#' Compare two strings of separated values
+#' 
+#' \code{compareSepString} takes two strings, usually comma-separated, and
+#' returns their intersection or difference in the form of a string using the
+#' same separator.
+#' 
+#' @param    string1  a string of separated values, usually by a comma
+#' @param    string2  a second string of separated values, usually by a comma
+#' @param    value    what values to return. If "both" the intersection of the
+#'                    values will be returned. "only1" and "only2" will return,
+#'                    respectively, the values only in the first string or only
+#'                    in the second string.
+#' @param    sep      the separator that should be used to divide up the strings
+#'                    before comparing the values they hold
+#'                  
+#' @return   a string of values representing the intersection or difference of
+#'           of the input strings, separated in the same manner as the input
+#'           
+#' @export
+compareSepString <- function(string1, string2, value="both", sep=",") {
+  
+  set1 = unlist(strsplit(string1, sep))
+  set2 = unlist(strsplit(string2, sep))
+  
+  if (value == "both") {
+    output = set1[set1 %in% set2]
+  } else if (value == "only1") {
+    output = set1[!(set1 %in% set2)]
+  } else if (value == "only2") {
+    output = set2[!(set2 %in% set1)]
+  } else {
+    output = set1[set1 %in% set2]
+  }
+  
+  return(paste(output, collapse=sep))
+  
+}
+
+
+# compareGenotypes --------------------------------------------------------
+#' Compare two genotypes
+#' 
+#' \code{compareGenotypes} takes two genotypes, binds them together by gene,
+#' and adds columns indicating the alleles only in the first, the alleles only
+#' in the second, and the alleles shared between the two.
+#' 
+#' @param    string1  a string of separated values, usually by a comma
+#' @param    string2  a second string of separated values, usually by a comma
+#' @param    value    what values to return. If "both" the intersection of the
+#'                    values will be returned. "only1" and "only2" will return,
+#'                    respectively, the values only in the first string or only
+#'                    in the second string.
+#' @param    sep      the separator that should be used to divide up the strings
+#'                    before comparing the values they hold
+#'                  
+#' @return   a string of values representing the intersection or difference of
+#'           of the input strings, separated in the same manner as the input
+#'           
+#' @export
+compareGenotypes <- function(genotype1, genotype2){
+  
+  comparison = full_join(genotype1, genotype2, by  = "gene") %>%
+    group_by(gene) %>%
+    mutate(alleles.both = compareSepString(alleles.x, alleles.y)) %>%
+    mutate(alleles.xonly = compareSepString(alleles.x, alleles.y, value="only1")) %>%
+    mutate(alleles.yonly = compareSepString(alleles.x, alleles.y, value="only2"))
+  
+  return(comparison)
+  
+}
+
+
+
+
 # genotypeFasta -----------------------------------------------------------
 #' Return the nucleotide sequences of a genotype
 #'

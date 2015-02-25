@@ -185,6 +185,7 @@ runTigger <- function(sample_db, germline_db,
     v_calls2 = v_calls
     # Paste novel alleles (if any) to all allele calls before determining dists
     if (find_novel & (length(fasta) > 0)){
+      print(fasta); print(names(fasta))
       genes_novel = getGene(names(fasta))
       genes_groups = getGene(names(allele_groups))
       for(i in 1:length(fasta)){
@@ -193,7 +194,6 @@ runTigger <- function(sample_db, germline_db,
         v_calls2[indicies] = sapply(v_calls2[indicies], paste, names(fasta)[i], sep=",")
       }
     }
-    
     mut_counts = getMutCount(v_sequences, v_calls2, germline_db)
     unmutated_calls = findUnmutatedCalls(v_calls2, mut_counts)
     genotype = inferGenotype(unmutated_calls, fraction_to_explain,
