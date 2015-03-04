@@ -22,6 +22,8 @@
 #' @export
 sortAlleles <- function(allele_calls) {  
   
+  # Standardize format, keep only first call
+  allele_calls = getAllele(allele_calls)
   allele_calls = sort(allele_calls) # This will help sort the Ds later.
   fam_and_seg = getFamily(allele_calls)
   segment = substr(fam_and_seg, 1, 4)
@@ -29,15 +31,17 @@ sortAlleles <- function(allele_calls) {
   gene = getGene(allele_calls) %>%
     strsplit("-") %>%
     sapply("[", 2) %>%
-    gsub("D","",.) %>%
+    gsub("([^H])D", "\\1",.) %>%
     gsub("NL|a|b|f", "99", .) %>% # This helps to sort the odd letters
     as.numeric()
   
   gene2 = gsub(".*-.*-|\\*..", "", allele_calls)
+  # The following throws warnings for names that don't meet this criteria
   gene2 = suppressWarnings(as.numeric(gsub("NL|a|b|f", "99", gene2)) )
   gene2[is.na(gene2)] = 0
   
-  allele = as.numeric(gsub(".*\\*","",allele_calls))
+  # The following throws warnings if only gene names are submitted (not alleles)
+  allele = suppressWarnings(as.numeric(gsub(".*\\*","",allele_calls)))
   
   sorted_calls = allele_calls[order(segment, family, gene + gene2*.01, allele)]
   
@@ -61,7 +65,7 @@ sortAlleles <- function(allele_calls) {
 #'                            should be applied in a binomial manner.
 #' @param    alpha            the alpha cutoff used if
 #'                            \code{binomial_cutoff = TRUE}
-#' @return   a list of indicies of calls that contain each unique input allele
+#' @return   A list of indicies of calls that contain each unique input allele
 #' 
 #' @examples
 #' # Create a sample vector of allele calls
@@ -180,6 +184,18 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
 #'           count.
 #' @seealso \code{\link{getMutatedPositions}}
 #' 
+#' @examples
+#' # Create strings to act as a sample sequences and a reference sequence
+#' seqs = c("----GATA","GAGAGAGA","TANA")
+#' ref = "GATAGATA"
+#' 
+#' # Find the differences/similarities between the two
+#' muts = getMutatedPositions(seqs, ref)
+#' matches = getMutatedPositions(seqs, ref, match_instead =TRUE)
+#' 
+#' # Find positional mutation and nucleotide counts
+#' summarizeMutations(muts, matches)
+#' 
 #' @export
 summarizeMutations <- function(mut_list, match_list) { 
   
@@ -239,6 +255,21 @@ summarizeMutations <- function(mut_list, match_list) {
 #'           ranges of each. If there is a problem with the number of sequences,
 #'           etc., \code{NULL} will be returned.
 #' @seealso \code{\link{summarizeMutations}}
+#' 
+#' @examples
+#' # Create strings to act as a sample sequences and a reference sequence
+#' seqs = c("----GATA","GAGAGAGA","GATAGGGA","TANA")
+#' ref = "GATAGATA"
+#' 
+#' # Find the differences/similarities between the two
+#' muts = getMutatedPositions(seqs, ref)
+#' matches = getMutatedPositions(seqs, ref, match_instead =TRUE)
+#' 
+#' # Find positional mutation and nucleotide counts
+#' mut_mat = summarizeMutations(muts, matches)
+#' 
+#' # Summarize the frequency for counts above one
+#' trimMutMatrix(mut_mat, mut_max=2, nt_max=8, min_seqs=0, min_frac=0)
 #' 
 #' @export
 trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
@@ -655,106 +686,6 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
 }
 
 
-# plotNovelLines ---------------------------------------------------------------
-#' Visualization of positional mutation frequencies
-#'
-#' \code{plotNovelLines} plots the mutation frequency of nucleotide positions as
-#' a function of sequence-wide mutation count. Potentially polymorphic positions
-#' are highlighted in red.
-#' 
-#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
-#' 
-#' @return   plot(s) the mutation frequency of nucleotide positions as
-#' a function of sequence-wide mutation count.
-#' 
-#' @seealso  \code{\link{detectNovelV}}
-#' 
-#' @export
-plotNovelLines <- function(novel){
-  for(n in novel){
-    plot(NA, xlim = c(0,10), ylim = c(0,1), main = names(n[[1]]), las=1,
-         xlab="Mutation Count (Sequence)",
-         ylab="Mutation Frequency (Position)")
-    apply(n[[3]], 1, function(x) lines(as.numeric(names(x)),x) )
-    for (i in 1:length(n[[2]])){
-      lines(colnames(n[[3]]),n[[3]][as.numeric(names(n[[2]]))[i],], col="red")
-    }
-    for (i in 1:length(n[[2]])){
-      text(as.numeric(colnames(n[[3]])[1])+1-i,
-           n[[3]][as.numeric(names(n[[2]]))[i],1],
-           labels=names(n[[2]])[i],
-           col="red",adj=c(1,1))
-    }
-  }
-}
-
-
-# plotNovelBars -----------------------------------------------------------
-#' Visualization of nucleotide usage
-#'
-#' \code{plotNovelBars} shows the nucleotide usage at polymorphic positions as a
-#' function of sequence-wide mutation count.
-#' 
-#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
-#' 
-#' @return   plot(s) of nucleotide usage at polymorphic positions as a
-#' function of sequence-wide mutation count.
-#' 
-#' @seealso  \code{\link{detectNovelV}}
-#' 
-#' @export
-plotNovelBars <- function(novel){
-  NUC_COLORS = c("#64F73F", "#FFB340", "#EB413C", "#3C88EE")
-  names(NUC_COLORS) = c("A","C","G","T")
-  
-  for(n in novel){
-    for (j in 1:length(n[[4]])){
-      p = n[[4]][[j]]
-      plot_name = paste(strsplit(names(n[[1]]),"_")[[1]][1])
-      barplot(p[4:1,], col = NUC_COLORS[rownames(p)], las=1,
-              xlab = "Mutation Count (Sequence)",
-              ylab = "Sequence Count",
-              main=plot_name)
-      box()
-      leg_names = paste(rownames(p), c("(germline)","","","(polymorphism)"))
-      legend("topright",
-             title = paste("Nucleotide at Position", names(n[[4]][j])),
-             legend = leg_names,
-             fill=NUC_COLORS[rownames(p)][4:1],
-             bty = "n")
-    }
-  }
-}
-
-
-# plotJunctionBars --------------------------------------------------------
-#' Visualization of J gene usage and junction length
-#'
-#' \code{plotJunctionBars} shows the frequency of each combination of J gene
-#' junction length found among sequences representing unmutated versions of
-#' potential novel alleles.
-#' 
-#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
-#' 
-#' @return   plot(s) of the frequency of each combination of J gene and
-#' junction length among sequences using potential novel alleles
-#' 
-#' @seealso  \code{\link{detectNovelV}}
-#' 
-#' @export
-plotJunctionBars <- function(novel){
-  for(n in novel){
-    barplot(n[[5]], las=1, col = rainbow(nrow(n[[5]])),
-            main = names(n[[1]]))
-    legend("topleft", legend = rownames(n[[5]]), ncol = 3,
-           title = "Junction Length",
-           fill = rainbow(nrow(n[[5]])), bty="n")
-    box()
-  }
-}
-
-
-
 # getAllele ---------------------------------------------------------------
 #' Get Ig segment allele, gene and family names
 #' 
@@ -776,7 +707,6 @@ plotJunctionBars <- function(novel){
 #' @seealso   Uses \code{\link{str_extract}}.
 #' @references
 #'   \url{http://imgt.org}
-#' @note These functions authored by Jason Anthony Vander Heiden
 #' @examples
 #' kappa_call <- c("Homsap IGKV1-39*01 F,Homsap IGKV1D-39*01 F", "Homsap IGKJ5*01 F")
 #'
@@ -834,7 +764,4 @@ getFamily <- function(segment_call, first=TRUE, collapse=TRUE, sep=",") {
   
   return(r)
 }
-
-
-
 

@@ -11,6 +11,15 @@
 #'                            uppercase
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
+#' @examples
+#' \dontrun{ 
+#' ## Not run:
+#' ## Read an imaginary file called "foo.fasta"
+#' foo = readGermlineDb("foo.fasta")
+#'
+#' ## End(Not run)
+#' }
+#' 
 #' @export
 readGermlineDb <- function(fasta_file, 
                            strip_down_name = TRUE,
@@ -130,6 +139,36 @@ readGermlineDb <- function(fasta_file,
 #' 
 #' @references http://clip.med.yale.edu/tigger/
 #' 
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' ## Load example data and run all aspects of TIgGER (takes a few minutes)
+#' data(pgp1_example)
+#' data(germline_ighv)
+#' results = runTigger(pgp1_example, germline_ighv)
+#' 
+#' ## Summarize the detected novel alleles, add them to vector of all alleles
+#' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
+#' germline_ighv = c(germline_ighv, novel_sequences)
+#' ## Plot positional mutation frequency versus sequence-wide mutation count
+#' plotNovelLines(results$novel)
+#' ## Plot nucleotide usage at polymorphic positions
+#' plotNovelBars(results$novel)
+#' ## Plot J and junction usage for sequences perfectly matching novel alleles
+#' plotJunctionBars(results$novel)
+#' 
+#' ## View the inferred genotype
+#' print(results$genotype)
+#' ## Get the nucleotide sequences of all genotype alleles
+#' genotype_sequences = genotypeFasta(results$genotype, germline_ighv)
+#' 
+#' ## Extract the corrected V allele calls and appened them to the data frame
+#' V_CALL_GENOTYPED = results$new_calls
+#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' 
+#' ## End(Not run)
+#' }
+#' 
 #' @export
 runTigger <- function(sample_db, germline_db,
                    find_novel = TRUE, find_genotype = TRUE, correct_calls = TRUE,
@@ -236,6 +275,36 @@ runTigger <- function(sample_db, germline_db,
 #'           indicating what number were detected versus included in the
 #'           genotype
 #' 
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' ## Load example data and run all aspects of TIgGER (takes a few minutes)
+#' data(pgp1_example)
+#' data(germline_ighv)
+#' results = runTigger(pgp1_example, germline_ighv)
+#' 
+#' ## Summarize the detected novel alleles, add them to vector of all alleles
+#' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
+#' germline_ighv = c(germline_ighv, novel_sequences)
+#' ## Plot positional mutation frequency versus sequence-wide mutation count
+#' plotNovelLines(results$novel)
+#' ## Plot nucleotide usage at polymorphic positions
+#' plotNovelBars(results$novel)
+#' ## Plot J and junction usage for sequences perfectly matching novel alleles
+#' plotJunctionBars(results$novel)
+#' 
+#' ## View the inferred genotype
+#' print(results$genotype)
+#' ## Get the nucleotide sequences of all genotype alleles
+#' genotype_sequences = genotypeFasta(results$genotype, germline_ighv)
+#' 
+#' ## Extract the corrected V allele calls and appened them to the data frame
+#' V_CALL_GENOTYPED = results$new_calls
+#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' 
+#' ## End(Not run)
+#' }
+#' 
 #' @export
 novelSummary <- function(tigger_result,
                          seqs_to_return = c("in genotype", "all")[1]){
@@ -268,7 +337,195 @@ novelSummary <- function(tigger_result,
 
 }
 
-#
+
+# plotNovelLines ---------------------------------------------------------------
+#' Visualization of positional mutation frequencies
+#'
+#' \code{plotNovelLines} plots the mutation frequency of nucleotide positions as
+#' a function of sequence-wide mutation count. Potentially polymorphic positions
+#' are highlighted in red.
+#' 
+#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
+#' 
+#' @return   plot(s) the mutation frequency of nucleotide positions as
+#' a function of sequence-wide mutation count.
+#' 
+#' @seealso  \code{\link{detectNovelV}}, \code{\link{runTigger}}
+#' 
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' ## Load example data and run all aspects of TIgGER (takes a few minutes)
+#' data(pgp1_example)
+#' data(germline_ighv)
+#' results = runTigger(pgp1_example, germline_ighv)
+#' 
+#' ## Summarize the detected novel alleles, add them to vector of all alleles
+#' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
+#' germline_ighv = c(germline_ighv, novel_sequences)
+#' ## Plot positional mutation frequency versus sequence-wide mutation count
+#' plotNovelLines(results$novel)
+#' ## Plot nucleotide usage at polymorphic positions
+#' plotNovelBars(results$novel)
+#' ## Plot J and junction usage for sequences perfectly matching novel alleles
+#' plotJunctionBars(results$novel)
+#' 
+#' ## View the inferred genotype
+#' print(results$genotype)
+#' ## Get the nucleotide sequences of all genotype alleles
+#' genotype_sequences = genotypeFasta(results$genotype, germline_ighv)
+#' 
+#' ## Extract the corrected V allele calls and appened them to the data frame
+#' V_CALL_GENOTYPED = results$new_calls
+#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' 
+#' ## End(Not run)
+#' }
+#' 
+#' @export
+plotNovelLines <- function(novel){
+  for(n in novel){
+    plot(NA, xlim = c(0,10), ylim = c(0,1), main = names(n[[1]]), las=1,
+         xlab="Mutation Count (Sequence)",
+         ylab="Mutation Frequency (Position)")
+    apply(n[[3]], 1, function(x) lines(as.numeric(names(x)),x) )
+    for (i in 1:length(n[[2]])){
+      lines(colnames(n[[3]]),n[[3]][as.numeric(names(n[[2]]))[i],], col="red")
+    }
+    for (i in 1:length(n[[2]])){
+      text(as.numeric(colnames(n[[3]])[1])+1-i,
+           n[[3]][as.numeric(names(n[[2]]))[i],1],
+           labels=names(n[[2]])[i],
+           col="red",adj=c(1,1))
+    }
+  }
+}
+
+
+# plotNovelBars -----------------------------------------------------------
+#' Visualization of nucleotide usage
+#'
+#' \code{plotNovelBars} shows the nucleotide usage at polymorphic positions as a
+#' function of sequence-wide mutation count.
+#' 
+#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
+#' 
+#' @return   plot(s) of nucleotide usage at polymorphic positions as a
+#' function of sequence-wide mutation count.
+#' 
+#' @seealso  \code{\link{detectNovelV}}, \code{\link{runTigger}}
+#' 
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' ## Load example data and run all aspects of TIgGER (takes a few minutes)
+#' data(pgp1_example)
+#' data(germline_ighv)
+#' results = runTigger(pgp1_example, germline_ighv)
+#' 
+#' ## Summarize the detected novel alleles, add them to vector of all alleles
+#' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
+#' germline_ighv = c(germline_ighv, novel_sequences)
+#' ## Plot positional mutation frequency versus sequence-wide mutation count
+#' plotNovelLines(results$novel)
+#' ## Plot nucleotide usage at polymorphic positions
+#' plotNovelBars(results$novel)
+#' ## Plot J and junction usage for sequences perfectly matching novel alleles
+#' plotJunctionBars(results$novel)
+#' 
+#' ## View the inferred genotype
+#' print(results$genotype)
+#' ## Get the nucleotide sequences of all genotype alleles
+#' genotype_sequences = genotypeFasta(results$genotype, germline_ighv)
+#' 
+#' ## Extract the corrected V allele calls and appened them to the data frame
+#' V_CALL_GENOTYPED = results$new_calls
+#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' 
+#' ## End(Not run)
+#' }
+#' 
+#' @export
+plotNovelBars <- function(novel){
+  NUC_COLORS = c("#64F73F", "#FFB340", "#EB413C", "#3C88EE")
+  names(NUC_COLORS) = c("A","C","G","T")
+  
+  for(n in novel){
+    for (j in 1:length(n[[4]])){
+      p = n[[4]][[j]]
+      plot_name = paste(strsplit(names(n[[1]]),"_")[[1]][1])
+      barplot(p[4:1,], col = NUC_COLORS[rownames(p)], las=1,
+              xlab = "Mutation Count (Sequence)",
+              ylab = "Sequence Count",
+              main=plot_name)
+      box()
+      leg_names = paste(rownames(p), c("(germline)","","","(polymorphism)"))
+      legend("topright",
+             title = paste("Nucleotide at Position", names(n[[4]][j])),
+             legend = leg_names,
+             fill=NUC_COLORS[rownames(p)][4:1],
+             bty = "n")
+    }
+  }
+}
+
+
+# plotJunctionBars --------------------------------------------------------
+#' Visualization of J gene usage and junction length
+#'
+#' \code{plotJunctionBars} shows the frequency of each combination of J gene
+#' junction length found among sequences representing unmutated versions of
+#' potential novel alleles.
+#' 
+#' @param    novel  a list of the type returned by \code{\link{detectNovelV}}
+#' 
+#' @return   plot(s) of the frequency of each combination of J gene and
+#' junction length among sequences using potential novel alleles
+#' 
+#' @seealso  \code{\link{detectNovelV}}, \code{\link{runTigger}}
+#' 
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' ## Load example data and run all aspects of TIgGER (takes a few minutes)
+#' data(pgp1_example)
+#' data(germline_ighv)
+#' results = runTigger(pgp1_example, germline_ighv)
+#' 
+#' ## Summarize the detected novel alleles, add them to vector of all alleles
+#' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
+#' germline_ighv = c(germline_ighv, novel_sequences)
+#' ## Plot positional mutation frequency versus sequence-wide mutation count
+#' plotNovelLines(results$novel)
+#' ## Plot nucleotide usage at polymorphic positions
+#' plotNovelBars(results$novel)
+#' ## Plot J and junction usage for sequences perfectly matching novel alleles
+#' plotJunctionBars(results$novel)
+#' 
+#' ## View the inferred genotype
+#' print(results$genotype)
+#' ## Get the nucleotide sequences of all genotype alleles
+#' genotype_sequences = genotypeFasta(results$genotype, germline_ighv)
+#' 
+#' ## Extract the corrected V allele calls and appened them to the data frame
+#' V_CALL_GENOTYPED = results$new_calls
+#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' 
+#' ## End(Not run)
+#' }
+#' 
+#' @export
+plotJunctionBars <- function(novel){
+  for(n in novel){
+    barplot(n[[5]], las=1, col = rainbow(nrow(n[[5]])),
+            main = names(n[[1]]))
+    legend("topleft", legend = rownames(n[[5]]), ncol = 3,
+           title = "Junction Length",
+           fill = rainbow(nrow(n[[5]])), bty="n")
+    box()
+  }
+}
+
 
 
 

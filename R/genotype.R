@@ -9,9 +9,16 @@
 #' 
 #' @param    allele_calls  a vector of strings respresenting IGHV allele names
 #' 
-#' @return   a vector of strings respresenting updated IGHV allele names
+#' @return   A vector of strings respresenting updated IGHV allele names
 #' 
 #' @references Xochelli et al. (2014) Immunogenetics.
+#' 
+#' @examples
+#' # Create a vector that uses old gene/allele names.
+#' alleles = c("IGHV1-c*01", "IGHV1-f*02", "IGHV2-5*07")
+#' 
+#' # Update the alleles to the new names
+#' updateAlleleNames(alleles)
 #' 
 #' @export
 updateAlleleNames <- function(allele_calls){
@@ -53,9 +60,26 @@ updateAlleleNames <- function(allele_calls){
 #' @param    germline_db   a vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #' 
-#' @return   a list equal in length to \code{samples}, containing the Hamming
+#' @return   A list equal in length to \code{samples}, containing the Hamming
 #'           distance to each germline allele contained within each call within
 #'           each element of \code{samples}
+#' 
+#' @examples
+#' # Load germline database
+#' data(germline_ighv)
+#' 
+#' # Use createGermlines to insert a mutation into a germline sequence
+#' sample_seqs = c(germline_ighv[2],
+#'                 createGermlines(germline_ighv[1], 103, "G"),
+#'                 createGermlines(germline_ighv[1], 107, "C"))
+#' 
+#' # Pretend that one sample sequence has received an ambiguous allele call
+#' sample_alleles = c(paste(names(germline_ighv[1:2]), collapse=","),
+#'                   names(germline_ighv[2]),
+#'                   names(germline_ighv[1]))
+#' 
+#' # Compare each sequence to its assigned germline(s) to determine the distance
+#' getMutCount(sample_seqs, sample_alleles, germline_ighv)
 #' 
 #' @export
 getMutCount <- function(samples, allele_calls, germline_db){
@@ -76,8 +100,8 @@ getMutCount <- function(samples, allele_calls, germline_db){
   # Then find mutations of all sequences with call count > 1
   ccm = which(call_count > 1)
   if (length(ccm) > 0){
-    mut_pos_list[ccm] = mapply(getMutatedPositions,
-                               germline_list[ccm], samples[ccm])
+    mut_pos_list[[ccm]] = mapply(getMutatedPositions,
+                               unlist(germline_list[ccm]), samples[ccm])
     mut_count_list[ccm] = lapply(mut_pos_list[ccm],
                                  function(x) lapply(x,length))
   }
@@ -104,8 +128,30 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #'                          represent an unmutated sequence will be omitted from
 #'                          the output
 #' 
-#' @return   a vector of strings containing the members of \code{allele_calls}
+#' @return   A vector of strings containing the members of \code{allele_calls}
 #'           that represent unmutated sequences
+#' 
+#' @examples
+#' # Load germline database
+#' data(germline_ighv)
+#' 
+#' # Use createGermlines to insert a mutation into a germline sequence
+#' sample_seqs = c(germline_ighv[2],
+#'                 createGermlines(germline_ighv[1], 103, "G"),
+#'                 germline_ighv[1],
+#'                 germline_ighv[2])
+#' 
+#' # Pretend that one sample sequence has received an ambiguous allele call
+#' sample_alleles = c(paste(names(germline_ighv[1:2]), collapse=","),
+#'                   names(germline_ighv[2]),
+#'                   names(germline_ighv[1]),
+#'                   names(germline_ighv[2]))
+#' 
+#' # Compare the sequence to a subset of the germlines
+#' mut_counts = getMutCount(sample_seqs, sample_alleles, germline_ighv)
+#' 
+#' # Find which of the sample alleles are unmutated
+#' findUnmutatedCalls(sample_alleles, mut_counts)
 #' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
@@ -170,22 +216,33 @@ findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
 #'                                observed in \code{allele_calls} to be included
 #'                                in the genotype
 #' 
-#' @return   a table of alleles denoting the genotype of the subject
+#' @return   A table of alleles denoting the genotype of the subject
 #' 
 #' @note     This method works best with data derived from blood, where a large
 #'           portion of sequences are expected to be unmutated. Ideally, there
 #'           should be hundreds of allele calls per gene in the input.
+#' 
+#' @examples
+#' # Load example data; we'll pretend allele calls are unmutated
+#' data(pgp1_example)
+#' 
+#' # Infer the V genotype
+#' inferGenotype(pgp1_example[,"V_CALL"])
+#' 
+#' # Inger the J genotype
+#' inferGenotype(pgp1_example[,"J_CALL"])
 #' 
 #' @export
 inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
                           fraction_to_explain = 7/8,
                           gene_cutoff = 1e-3 # Can be a no. of seqs or frac < 1
 ){
-  
+  # Standardize allele call names
+  allele_calls = getAllele(allele_calls, first = FALSE)
   
   # Find the gene(s) of the allele calls; group duplicates (e.g. 1-69D*) as one
   gene_calls = getGene(allele_calls, first = FALSE, collapse = TRUE)
-  gene_calls = gsub("D", "", gene_calls)
+  gene_calls = gsub("([^H])D", "\\1", gene_calls)
   
   # If the sequences are assigned multiple genes, pick the more common gene
   # This should be very rare, since calls should be from unmutated sequences
@@ -261,7 +318,6 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
 }
 
 
-
 # compareSepString --------------------------------------------------------
 #' Compare two strings of separated values
 #' 
@@ -278,9 +334,14 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
 #' @param    sep      the separator that should be used to divide up the strings
 #'                    before comparing the values they hold
 #'                  
-#' @return   a string of values representing the intersection or difference of
+#' @return   A string of values representing the intersection or difference of
 #'           of the input strings, separated in the same manner as the input
 #'           
+#' @examples
+#' compareSepString("1,2,5,6", "1,5,7", value="both")
+#' compareSepString("1,2,5,6", "1,5,7", value="only1")
+#' compareSepString("1,2,5,6", "1,5,7", value="only2")
+#' 
 #' @export
 compareSepString <- function(string1, string2, value="both", sep=",") {
   
@@ -309,18 +370,28 @@ compareSepString <- function(string1, string2, value="both", sep=",") {
 #' and adds columns indicating the alleles only in the first, the alleles only
 #' in the second, and the alleles shared between the two.
 #' 
-#' @param    string1  a string of separated values, usually by a comma
-#' @param    string2  a second string of separated values, usually by a comma
-#' @param    value    what values to return. If "both" the intersection of the
-#'                    values will be returned. "only1" and "only2" will return,
-#'                    respectively, the values only in the first string or only
-#'                    in the second string.
-#' @param    sep      the separator that should be used to divide up the strings
-#'                    before comparing the values they hold
+#' @param    genotype1  a genotype of the type returned by
+#'                      \code{\link{inferGenotype}}
+#' @param    genotype2  a genotype of the type returned by
+#'                      \code{\link{inferGenotype}}
 #'                  
-#' @return   a string of values representing the intersection or difference of
-#'           of the input strings, separated in the same manner as the input
+#' @return   A data frame indicating which alleles are unique to each genotype
+#'           or shared between then two
 #'           
+#' @seealso  \code{\link{inferGenotype}}          
+#'           
+#' @examples
+#' # Load example data
+#' data(pgp1_example)
+#' 
+#' # Determine a genotype
+#' geno = geno2 = inferGenotype(pgp1_example[,"V_CALL"])
+#' # Shuffle the gene names to make a different "genotype"
+#' geno2$gene = sample(geno2$gene)
+#' 
+#' # Compare the two genotypes
+#' compareGenotypes(geno, geno2)
+#'                    
 #' @export
 compareGenotypes <- function(genotype1, genotype2){
   
@@ -335,8 +406,6 @@ compareGenotypes <- function(genotype1, genotype2){
 }
 
 
-
-
 # genotypeFasta -----------------------------------------------------------
 #' Return the nucleotide sequences of a genotype
 #'
@@ -348,10 +417,22 @@ compareGenotypes <- function(genotype1, genotype2){
 #' @param    germline_db  a vector of named nucleotide germline sequences
 #'                        matching the alleles detailed in \code{genotype} 
 #' 
-#' @return   a named vector of strings containing the germline nucleotide
+#' @return   A named vector of strings containing the germline nucleotide
 #'           sequences of the alleles in the provided genotype
 #' 
 #' @seealso \code{\link{inferGenotype}}
+#' 
+#' @examples
+#' # Load example data
+#' data(germline_ighv)
+#' data(pgp1_example)
+#' 
+#' # Infer and view a genotype from the sample
+#' geno = inferGenotype(updateAlleleNames(pgp1_example[,"V_CALL"]))
+#' geno
+#' 
+#' # Return the sequences that correspond to the genotype
+#' genotypeFasta(geno, germline_ighv)
 #' 
 #' @export
 genotypeFasta <- function(genotype, germline_db){
@@ -368,7 +449,6 @@ genotypeFasta <- function(genotype, germline_db){
 }
 
 
-
 # writeFasta -----------------------------------------------------------
 #' Write nucleotide sequences to a fasta file
 #'
@@ -378,7 +458,17 @@ genotypeFasta <- function(genotype, germline_db){
 #' @param    file             a character string naming the file to write to
 #' @param    char_per_line    how many characters should be printed per line
 #' 
-#' @return   saves a fasta file containing the sequences of interest
+#' @return   Saves a fasta file containing the sequences of interest
+#' 
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' ## Load example IGHV germlines and write them to a fasta file
+#' data(germline_ighv)
+#' writeFasta(germline_ighv, file="germline_ighv.fasta")
+#' 
+#' ## End(Not run)
+#' }
 #' 
 #' @export
 writeFasta <- function(named_sequences, file, char_per_line=60){

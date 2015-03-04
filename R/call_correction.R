@@ -1,5 +1,3 @@
-
-
 # reassignAlleles ---------------------------------------------------------
 #' Correct allele calls based on a personalized genotype
 #'
@@ -18,6 +16,28 @@
 #' 
 #' @return   a list equal in length to \code{v_calls}, best allele call from
 #'           among the sequences listed in \code{genotype_db}
+#' 
+#' @examples
+#' \dontrun{
+#' ## Not run:
+#' ## Load example data and run all aspects of TIgGER (takes a few minutes)
+#' data(pgp1_example)
+#' data(germline_ighv)
+#' results = runTigger(pgp1_example, germline_ighv)
+#' 
+#' ## Derive the subject-specific Ig sequences
+#' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
+#' germline_ighv = c(germline_ighv, novel_sequences)
+#' genotype_db = genotypeFasta(sample_output$genotype, germline_ighv)
+#' 
+#' ## Extract the appropriate portions of example data
+#' v_seqs = sapply(pgp1_example$SEQUENCE_GAP, substr, 1, 312)
+#' 
+#' ## Derive the vector of corrected calls
+#' corrected_calls = reassignAlleles(pgp1_example$V_CALL, v_seqs, genotype_db)
+#' 
+#' ## End(Not run)
+#' }
 #' 
 #' @export
 reassignAlleles <- function(v_calls, v_sequences, genotype_db){
