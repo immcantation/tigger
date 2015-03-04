@@ -1,0 +1,16 @@
+bibentry(bibtype = "Article",
+         title = "Automated analysis of high-throughput B cell sequencing data
+         reveals a high frequency of novel immunoglobulin V gene segment
+         alleles.",
+         author = c(person("Daniel", "Gadala-Maria"),
+                    person("Gur", "Yaari"),
+                    person("Mohamed", "Uduman"),
+                    person("Steven", "Kleinstein", "H.",
+                           "steven.kleinstein@yale.edu")),
+         
+         year = 2015,
+         journal = "Proceedings of the National Academy of Sciency of the United
+         States of America",
+         number = 122,
+         pages = "E862-70",
+         url = "http://clip.med.yale.edu/tigger/")
