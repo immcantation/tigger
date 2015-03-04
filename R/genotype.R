@@ -462,12 +462,9 @@ genotypeFasta <- function(genotype, germline_db){
 #' 
 #' @examples
 #' \dontrun{
-#' ## Not run:
 #' ## Load example IGHV germlines and write them to a fasta file
 #' data(germline_ighv)
 #' writeFasta(germline_ighv, file="germline_ighv.fasta")
-#' 
-#' ## End(Not run)
 #' }
 #' 
 #' @export

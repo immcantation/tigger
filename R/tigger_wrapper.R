@@ -13,11 +13,8 @@
 #' 
 #' @examples
 #' \dontrun{ 
-#' ## Not run:
 #' ## Read an imaginary file called "foo.fasta"
 #' foo = readGermlineDb("foo.fasta")
-#'
-#' ## End(Not run)
 #' }
 #' 
 #' @export
@@ -141,7 +138,6 @@ readGermlineDb <- function(fasta_file,
 #' 
 #' @examples
 #' \dontrun{
-#' ## Not run:
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
 #' data(pgp1_example)
 #' data(germline_ighv)
@@ -165,8 +161,6 @@ readGermlineDb <- function(fasta_file,
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
 #' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
-#' 
-#' ## End(Not run)
 #' }
 #' 
 #' @export
@@ -277,7 +271,6 @@ runTigger <- function(sample_db, germline_db,
 #' 
 #' @examples
 #' \dontrun{
-#' ## Not run:
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
 #' data(pgp1_example)
 #' data(germline_ighv)
@@ -301,8 +294,6 @@ runTigger <- function(sample_db, germline_db,
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
 #' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
-#' 
-#' ## End(Not run)
 #' }
 #' 
 #' @export
@@ -354,7 +345,6 @@ novelSummary <- function(tigger_result,
 #' 
 #' @examples
 #' \dontrun{
-#' ## Not run:
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
 #' data(pgp1_example)
 #' data(germline_ighv)
@@ -378,8 +368,6 @@ novelSummary <- function(tigger_result,
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
 #' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
-#' 
-#' ## End(Not run)
 #' }
 #' 
 #' @export
@@ -417,7 +405,6 @@ plotNovelLines <- function(novel){
 #' 
 #' @examples
 #' \dontrun{
-#' ## Not run:
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
 #' data(pgp1_example)
 #' data(germline_ighv)
@@ -441,8 +428,6 @@ plotNovelLines <- function(novel){
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
 #' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
-#' 
-#' ## End(Not run)
 #' }
 #' 
 #' @export
@@ -486,7 +471,6 @@ plotNovelBars <- function(novel){
 #' 
 #' @examples
 #' \dontrun{
-#' ## Not run:
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
 #' data(pgp1_example)
 #' data(germline_ighv)
@@ -510,8 +494,6 @@ plotNovelBars <- function(novel){
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
 #' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
-#' 
-#' ## End(Not run)
 #' }
 #' 
 #' @export

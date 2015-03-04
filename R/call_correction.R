@@ -19,7 +19,6 @@
 #' 
 #' @examples
 #' \dontrun{
-#' ## Not run:
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
 #' data(pgp1_example)
 #' data(germline_ighv)
@@ -35,8 +34,6 @@
 #' 
 #' ## Derive the vector of corrected calls
 #' corrected_calls = reassignAlleles(pgp1_example$V_CALL, v_seqs, genotype_db)
-#' 
-#' ## End(Not run)
 #' }
 #' 
 #' @export
