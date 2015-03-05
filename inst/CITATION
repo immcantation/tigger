@@ -5,7 +5,7 @@ bibentry(bibtype = "Article",
          author = c(person("Daniel", "Gadala-Maria"),
                     person("Gur", "Yaari"),
                     person("Mohamed", "Uduman"),
-                    person("Steven", "Kleinstein", "H.",
+                    person("Steven H.", "Kleinstein",
                            "steven.kleinstein@yale.edu")),
          
          year = 2015,
