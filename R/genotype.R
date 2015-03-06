@@ -100,8 +100,9 @@ getMutCount <- function(samples, allele_calls, germline_db){
   # Then find mutations of all sequences with call count > 1
   ccm = which(call_count > 1)
   if (length(ccm) > 0){
-    mut_pos_list[[ccm]] = mapply(getMutatedPositions,
-                               unlist(germline_list[ccm]), samples[ccm])
+    mut_pos_list[ccm] = mapply(getMutatedPositions,
+                               germline_list[ccm], samples[ccm],
+                               SIMPLIFY=FALSE)
     mut_count_list[ccm] = lapply(mut_pos_list[ccm],
                                  function(x) lapply(x,length))
   }

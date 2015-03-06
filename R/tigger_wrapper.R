@@ -218,7 +218,6 @@ runTigger <- function(sample_db, germline_db,
     v_calls2 = v_calls
     # Paste novel alleles (if any) to all allele calls before determining dists
     if (find_novel & (length(fasta) > 0)){
-      print(fasta); print(names(fasta))
       genes_novel = getGene(names(fasta))
       genes_groups = getGene(names(allele_groups))
       for(i in 1:length(fasta)){
