@@ -184,13 +184,13 @@ runTigger <- function(sample_db, germline_db,
   v_calls = updateAlleleNames(v_calls)
   # New version of sample db files are different, so check the columns names
   seqs = sample_db[,seq_gap]
-  if ("V_GAP_LENGTH" %in% colnames(sample_db)){
-    v_sequences = sapply(seqs, substr, 1, sample_db$V_GAP_LENGTH)
+  if ("V_GAP_LENGTH" %in% colnames(sample_db) ){
+    v_sequences = sapply(seqs, substr, 1, 312)
   } else {
-    v_sequences = sapply(seqs, substr, 1, sample_db$V_GERM_START + sample_db$V_GERM_LENGTH)
+    v_sequences = sapply(seqs, substr, 1, 312)
   }
   
-  
+
   # FIND NOVEL ALLELES
 
   if (find_novel){

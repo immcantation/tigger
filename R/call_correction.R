@@ -58,9 +58,9 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
       het_alleles = names(geno_genes[which(geno_genes == het_gene)])
       het_seqs = genotype_db[het_alleles]
       dists = lapply(het_seqs, function(x)
-        sapply(getMutatedPositions(v_sequences[ind], x, match_instead=FALSE), length))
+        sapply(getMutatedPositions(v_sequences[ind], x, match_instead=TRUE), length))
       dist_mat = matrix(unlist(dists), ncol = length(het_seqs))
-      best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
+      best_match = apply(dist_mat, 1, function(x) which(x == max(x)))
       best_alleles = sapply(best_match, function(x) het_alleles[x])   
       new_calls[ind] = sapply(best_alleles, paste, collapse=",")
     }
@@ -70,9 +70,9 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   hetero_calls_i = which(v_genes %in% hetero_genes)
   not_called = setdiff(1:length(v_genes), c(homo_calls_i, hetero_calls_i))
   dists = lapply(genotype_db, function(x)
-    sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=FALSE), length))
+    sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=TRUE), length))
   dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
-  best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
+  best_match = apply(dist_mat, 1, function(x) which(x == max(x)))
   best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
   new_calls[not_called] = sapply(best_alleles, paste, collapse=",")
   
