@@ -134,7 +134,9 @@ readGermlineDb <- function(fasta_file,
 #' @seealso \code{\link{detectNovelV}}, \code{\link{inferGenotype}},
 #'          \code{\link{reassignAlleles}}
 #' 
-#' @references http://clip.med.yale.edu/tigger/
+#' @references Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated
+#' analysis of high-throughput B cell sequencing data reveals a high frequency
+#' of novel immunoglobulin V gene segment alleles. PNAS. 112(8):E862-70
 #' 
 #' @examples
 #' \dontrun{
@@ -310,11 +312,14 @@ novelSummary <- function(tigger_result,
     splits = strsplit(tigger_result$genotype$alleles, ",")
     alleles = mapply(paste, tigger_result$genotype$gene, splits, sep="*")
     novel_in_geno = grep("_", unlist(alleles), value = TRUE)
-    cat(length(novel_in_geno),
+    all_seqs = unlist(sapply(tigger_result$novel, "[", 1))
+    all_names = names(tigger_result$novel)
+    which_in_geno = which(gsub("D", "", all_names) %in% novel_in_geno)
+    cat(length(which_in_geno),
         "novel alleles were common enough to be included in the genotype:\n",
-        paste(novel_in_geno, collapse=", "),"\n")
-    seqs = unlist(sapply(tigger_result$novel[novel_in_geno], "[", 1))
-    names(seqs) = novel_in_geno
+        paste(all_names[which_in_geno], collapse=", "),"\n")
+    seqs = all_seqs[which_in_geno]
+    names(seqs) = all_names[which_in_geno]
 
   } else if (seqs_to_return == "all") {
   

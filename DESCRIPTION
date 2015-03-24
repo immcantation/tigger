@@ -1,19 +1,18 @@
 Package: tigger
 Title: R tools for inferring new IGHV alleles from Rep-Seq data
-Version: 2.0
+Version: 2.1
 Author: Daniel Gadala-Maria and Jason Anthony Vander Heiden
 Maintainer: Daniel Gadala-Maria <daniel.gadala-maria@yale.edu>
 Description: Infers the IGHV genotype of an individual from Rep-Seq data,
   including any novel alleles, and uses this information to correct existing
   IGHV allele calls from among the sample sequences. Described in:
-  Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015)
+  Gadala-Maria et al. (2015)
   Automated analysis of high-throughput B cell sequencing data reveals a high
-  frequency of novel immunoglobulin V gene segment alleles. PNAS:1417683112
+  frequency of novel immunoglobulin V gene segment alleles. PNAS. 112(8):E862-70
 License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
     R (>= 3.0.0),
     dplyr
-Imports: dplyr
 Suggests: knitr
 VignetteBuilder: knitr

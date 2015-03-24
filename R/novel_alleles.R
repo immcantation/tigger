@@ -52,20 +52,23 @@ sortAlleles <- function(allele_calls) {
 # assignAlleleGroups ------------------------------------------------------
 #' Find indicies of allele calls
 #'
-#' \code{assignAlleleGroups} takes a vector of allele calls (a call may consist
-#' of multiple comma-separated alleles). It returns a list, named for the unique
-#' alleles in the input vector, of indicies of the calls containing the alleles. 
+#' \code{assignAlleleGroups} determines the locations of unique alleles within a
+#' mixed group. 
 #' 
-#' @param    allele_calls     a vector of strings respresenting Ig allele calls
-#' @param    allele_min       a number < 1 representing the minimum fraction of
-#'                            sequences required for an allele to not be
-#'                            excluded, or a number >= 1 representing the
-#'                            minimum count for sequences
-#' @param    binomial_cutoff  a logical indicating if an \code{allele_min} < 1
-#'                            should be applied in a binomial manner.
-#' @param    alpha            the alpha cutoff used if
-#'                            \code{binomial_cutoff = TRUE}
-#' @return   A list of indicies of calls that contain each unique input allele
+#' @param    allele_calls     \code{character} vector respresenting Ig allele
+#'                            calls. Calls may consist of multiple
+#'                            comma-separated alleles.
+#' @param    allele_min       \code{numeric} indicating the minimum fraction of
+#'                            \code{allele_calls} that must contain an allele
+#'                            for it to be retained. Integers of 1 or greater
+#'                            are interprted as a minumum sequence count.
+#' @param    binomial_cutoff  \code{logical} indicating if an \code{allele_min}
+#'                            cutoff < 1 should be applied in a binomial manner.
+#' @param    alpha            \code{numeric} indicating the alpha cutoff used
+#'                            when applying a binomial cutoff of
+#'                            \code{allele_min}.
+#' @return   \code{list} of indicies in \code{allele_calls} where each unique
+#' input allele can be found.
 #' 
 #' @examples
 #' # Create a sample vector of allele calls

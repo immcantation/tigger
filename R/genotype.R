@@ -7,11 +7,13 @@
 #' @note    IGMT has removed IGHV2-5*10 and IGHV2-5*07 as it has determined they
 #'          are actually alleles *02 and *04, respectively.
 #' 
-#' @param    allele_calls  a vector of strings respresenting IGHV allele names
+#' @param    allele_calls  vector of strings respresenting IGHV allele names.
 #' 
-#' @return   A vector of strings respresenting updated IGHV allele names
+#' @return   vector of strings respresenting updated IGHV allele names
 #' 
-#' @references Xochelli et al. (2014) Immunogenetics.
+#' @references Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
+#' and alleles: new entities, new names and implications for research and
+#' prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
 #' 
 #' @examples
 #' # Create a vector that uses old gene/allele names.
