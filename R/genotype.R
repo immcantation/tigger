@@ -227,13 +227,13 @@ findUnmutatedCalls <- function(allele_calls, mut_counts, only_unmutated = TRUE){
 #' 
 #' @examples
 #' # Load example data; we'll pretend allele calls are unmutated
-#' data(pgp1_example)
+#' data(sample_db)
 #' 
 #' # Infer the V genotype
-#' inferGenotype(pgp1_example[,"V_CALL"])
+#' inferGenotype(sample_db[,"V_CALL"])
 #' 
 #' # Inger the J genotype
-#' inferGenotype(pgp1_example[,"J_CALL"])
+#' inferGenotype(sample_db[,"J_CALL"])
 #' 
 #' @export
 inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
@@ -385,10 +385,10 @@ compareSepString <- function(string1, string2, value="both", sep=",") {
 #'           
 #' @examples
 #' # Load example data
-#' data(pgp1_example)
+#' data(sample_db)
 #' 
 #' # Determine a genotype
-#' geno = geno2 = inferGenotype(pgp1_example[,"V_CALL"])
+#' geno = geno2 = inferGenotype(sample_db[,"V_CALL"])
 #' # Shuffle the gene names to make a different "genotype"
 #' geno2$gene = sample(geno2$gene)
 #' 
@@ -428,10 +428,10 @@ compareGenotypes <- function(genotype1, genotype2){
 #' @examples
 #' # Load example data
 #' data(germline_ighv)
-#' data(pgp1_example)
+#' data(sample_db)
 #' 
 #' # Infer and view a genotype from the sample
-#' geno = inferGenotype(updateAlleleNames(pgp1_example[,"V_CALL"]))
+#' geno = inferGenotype(updateAlleleNames(sample_db[,"V_CALL"]))
 #' geno
 #' 
 #' # Return the sequences that correspond to the genotype
