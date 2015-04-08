@@ -20,9 +20,9 @@
 #' @examples
 #' \dontrun{
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
-#' results = runTigger(pgp1_example, germline_ighv)
+#' results = runTigger(sample_db, germline_ighv)
 #' 
 #' ## Derive the subject-specific Ig sequences
 #' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
@@ -30,10 +30,10 @@
 #' genotype_db = genotypeFasta(sample_output$genotype, germline_ighv)
 #' 
 #' ## Extract the appropriate portions of example data
-#' v_seqs = sapply(pgp1_example$SEQUENCE_GAP, substr, 1, 312)
+#' v_seqs = sapply(sample_db$SEQUENCE_IMGT, substr, 1, 312)
 #' 
 #' ## Derive the vector of corrected calls
-#' corrected_calls = reassignAlleles(pgp1_example$V_CALL, v_seqs, genotype_db)
+#' corrected_calls = reassignAlleles(sample_db$V_CALL, v_seqs, genotype_db)
 #' }
 #' 
 #' @export
@@ -58,9 +58,9 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
       het_alleles = names(geno_genes[which(geno_genes == het_gene)])
       het_seqs = genotype_db[het_alleles]
       dists = lapply(het_seqs, function(x)
-        sapply(getMutatedPositions(v_sequences[ind], x, match_instead=TRUE), length))
+        sapply(getMutatedPositions(v_sequences[ind], x, match_instead=FALSE), length))
       dist_mat = matrix(unlist(dists), ncol = length(het_seqs))
-      best_match = apply(dist_mat, 1, function(x) which(x == max(x)))
+      best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
       best_alleles = sapply(best_match, function(x) het_alleles[x])   
       new_calls[ind] = sapply(best_alleles, paste, collapse=",")
     }
@@ -70,9 +70,9 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   hetero_calls_i = which(v_genes %in% hetero_genes)
   not_called = setdiff(1:length(v_genes), c(homo_calls_i, hetero_calls_i))
   dists = lapply(genotype_db, function(x)
-    sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=TRUE), length))
+    sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=FALSE), length))
   dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
-  best_match = apply(dist_mat, 1, function(x) which(x == max(x)))
+  best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
   best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
   new_calls[not_called] = sapply(best_alleles, paste, collapse=",")
   

@@ -31,7 +31,7 @@ given to sample sequences by existing tools.
 Additional information is available at
 [http://clip.med.yale.edu/tigger/](http://clip.med.yale.edu/tigger/) and in:
 
-[Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles. *PNAS*:1417683112](http://www.pnas.org/content/early/2015/02/05/1417683112).
+[Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles. *PNAS* 112(8):E862-70](http://www.pnas.org/content/early/2015/02/05/1417683112).
 
 
 ## Input
@@ -48,12 +48,10 @@ each.
 
 Column Name           | Description
 ----------------------|---------------------------------------------------------
-`SEQUENCE_GAP`        | V(D)J sequence gapped in the IMGT gapped format[[3]][3]
+`SEQUENCE_IMGT`       | V(D)J sequence gapped in the IMGT gapped format[[3]][3]
 `V_CALL`              | (Comma separated) name(s) of the nearest V allele(s)
-`V_GERM_START`        | Position in the germline sequence where sample V starts
-`V_GAP_LENGTH`        | Length (including gaps) of V sequence in `SEQUENCE_GAP`
 `J_CALL`              | (Comma separated) name(s) of the nearest J allele(s)
-`JUNCTION_GAP_LENGTH` | Length of the junction region of the V(D)J sample
+`JUNCTION_LENGTH`     | Length of the junction region of the V(D)J sample
 
 An example dataset is provided with the `tigger` package. It contains unique
 functional sequences assigned to IGHV1 family genes isolated from individual
@@ -63,7 +61,7 @@ PGP1 (referenced in Gadala-Maria *et al.*).
 library(tigger)
 
 # Load example Rep-Seq data
-data(pgp1_example)
+data(sample_db)
 ```
 
 The database of germline sequences should be provided in FASTA format with
@@ -93,7 +91,7 @@ was isolated. See the help file (`?runTigger`) for a description of all options.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Run tigger on the example input
-sample_output = runTigger(pgp1_example, germline_ighv)
+sample_output = runTigger(sample_db, germline_ighv)
 ```
 
 `sample_output` should now be a list of length three with the names `novel`,
@@ -210,7 +208,7 @@ be combined to the existing data frame, and used in future analyses as follows.
 ```{r, eval=TRUE, warning=FALSE}
 # Extract the corrected V allele calls and appened them to the data frame
 V_CALL_GENOTYPED = sample_output$new_calls
-pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 ```
 
 

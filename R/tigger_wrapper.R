@@ -104,8 +104,6 @@ readGermlineDb <- function(fasta_file,
 #'                                that includes the IMGT-gapped sequence
 #' @param    v_call_col           the name of the column in \code{sample_db}
 #'                                that includes the intial V call
-#' @param    v_start_col          the name of the column in \code{sample_db}
-#'                                that includes where the V nucleotides begin
 #'                                in the column indicated by \code{seq_gap}
 #' @param    v_length_col         the name of the column in \code{sample_db}
 #'                                that includes the length of the V sequence
@@ -123,12 +121,10 @@ readGermlineDb <- function(fasta_file,
 #' @details  The required columns that must be contained within \code{sample_db}
 #' are detailed below:
 #' \itemize{
-#' \item{\code{SEQUENCE_GAP}: }{V(D)J sequence in the IMGT gapped format}
+#' \item{\code{SEQUENCE_IMGT}: }{V(D)J sequence in the IMGT gapped format}
 #' \item{\code{V_CALL}: }{(Comma separated) name(s) of the nearest V allele(s)}
-#' \item{\code{V_GERM_START}: }{Position in the germline sequence where sample V starts}
-#' \item{\code{V_GAP_LENGTH}: }{Length (including gaps) of V sequence in \code{SEQUENCE_GAP}}
 #' \item{\code{J_CALL}: }{(Comma separated) name(s) of the nearest J allele(s)}
-#' \item{\code{JUNCTION_GAP_LENGTH}: }{Length of the junction region of the V(D)J sample}
+#' \item{\code{JUNCTION_LENGTH}: }{Length of the junction region of the V(D)J sample}
 #' }
 #'
 #' @seealso \code{\link{detectNovelV}}, \code{\link{inferGenotype}},
@@ -141,9 +137,9 @@ readGermlineDb <- function(fasta_file,
 #' @examples
 #' \dontrun{
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
-#' results = runTigger(pgp1_example, germline_ighv)
+#' results = runTigger(sample_db, germline_ighv)
 #' 
 #' ## Summarize the detected novel alleles, add them to vector of all alleles
 #' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
@@ -162,7 +158,7 @@ readGermlineDb <- function(fasta_file,
 #' 
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
-#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 #' }
 #' 
 #' @export
@@ -171,10 +167,9 @@ runTigger <- function(sample_db, germline_db,
                    allele_min = 1e-4, y_intercept = 1/8, nt_min=1, nt_max = 312,
                    mut_min=1, mut_max=10, j_max = 0.1, min_seqs = 50, min_frac = 3/4,
                    fraction_to_explain = 7/8,  gene_cutoff = 0.001,
-                   seq_gap = "SEQUENCE_GAP",
-                   v_call_col = "V_CALL", v_start_col = "V_GERM_START",
-                   v_length_col = "V_GAP_LENGTH", j_call_col = "J_CALL",
-                   junc_length_col = "JUNCTION_GAP_LENGTH", quiet=FALSE){
+                   seq_gap = "SEQUENCE_IMGT",
+                   v_call_col = "V_CALL", j_call_col = "J_CALL",
+                   junc_length_col = "JUNCTION_LENGTH", quiet=FALSE){
   
   result = list(novel=NULL, genotype=NULL, new_calls=NULL)
   
@@ -184,24 +179,19 @@ runTigger <- function(sample_db, germline_db,
   v_calls = updateAlleleNames(v_calls)
   # New version of sample db files are different, so check the columns names
   seqs = sample_db[,seq_gap]
-  if ("V_GAP_LENGTH" %in% colnames(sample_db) ){
-    v_sequences = sapply(seqs, substr, 1, 312)
-  } else {
-    v_sequences = sapply(seqs, substr, 1, 312)
-  }
-  
+  v_sequences = sapply(seqs, substr, 1, 312)
 
   # FIND NOVEL ALLELES
 
   if (find_novel){
-    if(!quiet){ cat("Finding novel alleles...") }
+    if(!quiet){ cat("Finding novel alleles") }
     allele_groups = assignAlleleGroups(v_calls, allele_min)
     j_genes = getGene(sample_db[,j_call_col], first = FALSE)
     junc_lengths = sample_db[,junc_length_col]
     novel = detectNovelV(v_sequences, j_genes, junc_lengths, allele_groups,
                          germline_db,  y_intercept, nt_min, nt_max,
                          mut_min, mut_max, j_max, min_seqs, min_frac, 
-                         verbose=FALSE)
+                         verbose=FALSE, quiet=quiet)
     # Extract the nucleotide sequence portion
     fasta = unlist(unique(sapply(novel, "[", 1)))
     # In case we found the same allele multiple ways, ditch the duplicate
@@ -273,9 +263,9 @@ runTigger <- function(sample_db, germline_db,
 #' @examples
 #' \dontrun{
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
-#' results = runTigger(pgp1_example, germline_ighv)
+#' results = runTigger(sample_db, germline_ighv)
 #' 
 #' ## Summarize the detected novel alleles, add them to vector of all alleles
 #' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
@@ -294,7 +284,7 @@ runTigger <- function(sample_db, germline_db,
 #' 
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
-#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 #' }
 #' 
 #' @export
@@ -303,7 +293,10 @@ novelSummary <- function(tigger_result,
  
   r_names = names(which(sapply(tigger_result, length) > 0))
   
-  if (!("novel" %in% r_names)){ stop("Novel alleles not present in input.") }
+  if (!("novel" %in% r_names)){
+    warning("Novel alleles not present in input.")
+    return(NULL)
+  }
   cat(length(tigger_result$novel), "potential novel alleles were detected.\n")
   
   if(seqs_to_return == "in genotype"){
@@ -350,9 +343,9 @@ novelSummary <- function(tigger_result,
 #' @examples
 #' \dontrun{
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
-#' results = runTigger(pgp1_example, germline_ighv)
+#' results = runTigger(sample_db, germline_ighv)
 #' 
 #' ## Summarize the detected novel alleles, add them to vector of all alleles
 #' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
@@ -371,7 +364,7 @@ novelSummary <- function(tigger_result,
 #' 
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
-#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 #' }
 #' 
 #' @export
@@ -410,9 +403,9 @@ plotNovelLines <- function(novel){
 #' @examples
 #' \dontrun{
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
-#' results = runTigger(pgp1_example, germline_ighv)
+#' results = runTigger(sample_db, germline_ighv)
 #' 
 #' ## Summarize the detected novel alleles, add them to vector of all alleles
 #' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
@@ -431,7 +424,7 @@ plotNovelLines <- function(novel){
 #' 
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
-#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 #' }
 #' 
 #' @export
@@ -476,9 +469,9 @@ plotNovelBars <- function(novel){
 #' @examples
 #' \dontrun{
 #' ## Load example data and run all aspects of TIgGER (takes a few minutes)
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
-#' results = runTigger(pgp1_example, germline_ighv)
+#' results = runTigger(sample_db, germline_ighv)
 #' 
 #' ## Summarize the detected novel alleles, add them to vector of all alleles
 #' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
@@ -497,7 +490,7 @@ plotNovelBars <- function(novel){
 #' 
 #' ## Extract the corrected V allele calls and appened them to the data frame
 #' V_CALL_GENOTYPED = results$new_calls
-#' pgp1_example = cbind(pgp1_example, V_CALL_GENOTYPED)
+#' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 #' }
 #' 
 #' @export
@@ -513,8 +506,103 @@ plotJunctionBars <- function(novel){
 }
 
 
-
-
+# modifyChangeoDb --------------------------------------------------------
+#' Standardize Sample Db data
+#'
+#' \code{modifyChangeoDb} take a Change-O Sample Db and modifies it for use with
+#' TIgGER.
+#' 
+#' @param  sample_db            A Change-O db data frame.
+#' @param  seq_imgt_col         The name of the column in \code{sample_db}
+#'                              containing the IMGT-gapped nucleotide sequence.
+#' @param  v_call_col           The name of the column in \code{sample_db}
+#'                              containingthe IMGT-assigned V allele call.
+#' @param  j_call_col           The name of the column in \code{sample_db}
+#'                              containing the IMGT-assigned J allele call.
+#' @param  junc_len_col         The name of the column in \code{sample_db} 
+#'                              containing the junction length.
+#' @param  func_col             The name of the column in \code{sample_db}
+#'                              indicating if the sequence is functional.
+#' @param  cols_to_add          One or more of \code{"V_GENE"}, \code{"J_GENE"}, or
+#'                              \code{"V_SEQUENCE_IMGT"}, indicating which columns
+#'                              should be added. See details for more information.
+#' @param  distinct_seq_only    Logical indicating if duplicate IMGT-gapped
+#'                              sequences should be removed.
+#' @param  functional_seq_only  Logical indicating if nonfunctional sequences
+#'                              should be removed.
+#' @param  standardize_calls    Logical indicating if IMGT-assigned allele calls
+#'                              should be standardized.
+#' @param  factor2char          Logical indicating if columns of type
+#'                              \code{factor} should be converted to type
+#'                              \code{character}.
+#' @details  The supplied column names will be renamed to the current preferred
+#' names (and utilized for the creation of new columns, if requested). Columns
+#' \code{"V_GENE"}, \code{"J_GENE"}, and \code{"V_SEQUENCE_IMGT"}, if added,
+#' will respectively contain the IMGT-assigned V gene call, the IMGT-assigned J
+#' gene call, and the first 312 nucleotides (FWR1, CDR1, FWR2, CDR2, and FRW3)
+#' of the IMGT-gapped nucleotide sequence.
+#' 
+#' @return  A corrected Change-O Db data frame
+#' 
+#' @examples
+#' data(sample_db)
+#' corrected_sample_db = modifySampleDb(sample_db, cols_to_add = c("V_GENE"))
+#' 
+#' @export
+modifyChangeoDb <- function(sample_db,
+                           seq_imgt_col = "SEQUENCE_IMGT",
+                           v_call_col = "V_CALL",
+                           j_call_col = "J_CALL",
+                           junc_len_col = "JUNCTION_LENTH",
+                           func_col = "FUNCTIONAL",
+                           cols_to_add = c("V_GENE", "J_GENE", "V_SEQUENCE_IMGT"),
+                           distinct_seq_only = TRUE,
+                           functional_seq_only = FALSE,
+                           standardize_calls = TRUE,
+                           factor2char = TRUE
+){
+  
+  # Convert factors to characters
+  if(factor2char){
+    i <- sapply(sample_db, is.factor)
+    sample_db[,i] <- sapply(sample_db[,i], as.character)
+  }
+  
+  # Rename columns, if needed
+  sample_db = data.frame(sample_db, stringsAsFactors = FALSE)
+  names(sample_db)[which(names(sample_db) == seq_imgt_col)] = "SEQUENCE_IMGT"
+  names(sample_db)[which(names(sample_db) == v_call_col)] = "V_CALL"
+  names(sample_db)[which(names(sample_db) == j_call_col)] = "J_CALL"
+  names(sample_db)[which(names(sample_db) == junc_len_col)] = "JUNCTION_LENGTH"
+  names(sample_db)[which(names(sample_db) == func_col)] = "FUNCTIONAL"
+  
+  # Filter out duplicates and non-functional seqs, if requested
+  if(distinct_seq_only){ sample_db = distinct(sample_db, SEQUENCE_IMGT) }
+  if(functional_seq_only & ("FUNCTIONAL" %in% names(sample_db))){
+    sample_db = sample_db %>%
+      mutate(FUNCTIONAL = FUNCTIONAL=="T" | FUNCTIONAL == "TRUE" | FUNCTIONAL == T) %>%
+      filter(FUNCTIONAL == "TRUE")
+  }
+  # Standardize allele calls
+  if(standardize_calls){
+    sample_db = mutate(sample_db, V_CALL = updateAlleleNames(getAllele(V_CALL, first = F)))
+    sample_db = mutate(sample_db, J_CALL = getAllele(J_CALL, first = F))
+  }
+  
+  # Add columns, if requested
+  if (("V_GENE" %in% cols_to_add) & !("V_GENE" %in% names(sample_db))){
+    sample_db = mutate(sample_db, V_GENE = getGene(V_CALL))
+  }
+  if (("J_GENE" %in% cols_to_add) & !("J_GENE" %in% names(sample_db))){
+    sample_db = mutate(sample_db, J_GENE = getGene(J_CALL))
+  }
+  if (("V_SEQUENCE_IMGT" %in% cols_to_add) & !("V_SEQUENCE_IMGT" %in% names(sample_db))){
+    sample_db = mutate(sample_db, V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312))
+  }
+  
+  return(sample_db)
+  
+}
 
 
 

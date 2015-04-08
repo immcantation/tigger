@@ -413,13 +413,13 @@ findIntercepts <- function(mut_fracs, y_intercept=1/8, alpha=0.05){
 #' 
 #' @examples
 #' # Load example data and germlines
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
 #' 
 #' # Single out calls utilizing a particular germline sequence
 #' germ = germline_ighv[1]
-#' matches = grep(names(germ), pgp1_example$V_CALL, fixed=TRUE)
-#' samples = pgp1_example$SEQUENCE_GAP[matches]
+#' matches = grep(names(germ), sample_db$V_CALL, fixed=TRUE)
+#' samples = sample_db$SEQUENCE_IMGT[matches]
 #' 
 #' # Find mutation counts in those sequences
 #' mut_counts = getMutCount(samples, rep(names(germ), length(samples)), germ)
@@ -595,15 +595,15 @@ createGermlines <- function(germline, positions, nucleotides){
 #' 
 #' @examples
 #' # Load example data and germlines
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
 #' 
 #' # Single out calls utilizing a particular germline sequence and extract info
 #' germ = germline_ighv[41]
-#' matches = grep(names(germ), pgp1_example$V_CALL, fixed=TRUE)
-#' samples = pgp1_example$SEQUENCE_GAP[matches]
-#' j_genes = getGene(pgp1_example$J_CALL[matches])
-#' junc_lengths = pgp1_example$JUNCTION_GAP_LENGTH[matches]
+#' matches = grep(names(germ), sample_db$V_CALL, fixed=TRUE)
+#' samples = sample_db$SEQUENCE_IMGT[matches]
+#' j_genes = getGene(sample_db$J_CALL[matches])
+#' junc_lengths = sample_db$JUNCTION_LENGTH[matches]
 #' 
 #' # Find novel alleles and return relevant data
 #' novel = findNovelAlleles(samples, germ, j_genes, junc_lengths)
@@ -634,7 +634,7 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
     put_mut_locs = lapply(putative, function(x) getMutatedPositions(samples, x))
     perfect_matches = lapply(put_mut_locs, function(x) which(sapply(x,length) == 0))
     j_junc_tables = lapply(perfect_matches, function(x) table(junc_lengths[x], j_genes[x]))
-    pass_test = which(sapply(j_junc_tables, function(x) abs(max(x/sum(x),na.rm = T))) < j_max)
+    pass_test = suppressWarnings(which(sapply(j_junc_tables, function(x) abs(max(x/sum(x),na.rm = T))) < j_max))
     if(length(pass_test) > 0){
       allele_summary = list()
       for(i in 1:length(pass_test)){
@@ -721,16 +721,16 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
 #' 
 #' @examples
 #' # Load example data and germlines
-#' data(pgp1_example)
+#' data(sample_db)
 #' data(germline_ighv)
 #' 
 #' # Single out calls utilizing particular germline sequences and extract info
 #' germs = germline_ighv[c(1,41)]
-#' matches = lapply(names(germs),grep, pgp1_example$V_CALL, fixed=TRUE)
+#' matches = lapply(names(germs),grep, sample_db$V_CALL, fixed=TRUE)
 #' names(matches) = names(germs)
-#' samples = pgp1_example$SEQUENCE_GAP
-#' j_genes = getGene(pgp1_example$J_CALL)
-#' junc_lengths = pgp1_example$JUNCTION_GAP_LENGTH
+#' samples = sample_db$SEQUENCE_IMGT
+#' j_genes = getGene(sample_db$J_CALL)
+#' junc_lengths = sample_db$JUNCTION_LENGTH
 #' 
 #' # Find novel alleles and return relevant data
 #' novel = detectNovelV(samples, j_genes, junc_lengths, matches, germline_ighv)
