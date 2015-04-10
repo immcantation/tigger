@@ -14,7 +14,8 @@
 #' @examples
 #' # Create a list of allele names
 #' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
-#' "IGHV2-5*01","IGHV1-NL1*01","IGHV1-2*02", "IGHV1-69*02")
+#' "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*02,IGHV1-2*05", "IGHV1-2",
+#' "IGHV1-2*02", "IGHV1-69*02")
 #' 
 #' # Sort the alleles
 #' sortAlleles(alleles)
@@ -22,30 +23,29 @@
 #' @export
 sortAlleles <- function(allele_calls) {  
   
-  # Standardize format, keep only first call
-  allele_calls = getAllele(allele_calls)
-  allele_calls = sort(allele_calls) # This will help sort the Ds later.
-  fam_and_seg = getFamily(allele_calls)
-  segment = substr(fam_and_seg, 1, 4)
-  family = as.numeric(substr(fam_and_seg, 5, 5))
-  gene = getGene(allele_calls) %>%
-    strsplit("-") %>%
-    sapply("[", 2) %>%
-    gsub("([^H])D", "\\1",.) %>%
-    gsub("NL|a|b|f", "99", .) %>% # This helps to sort the odd letters
-    as.numeric()
+  # Standardize format of submitted alleles, first
+  SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE)
   
-  gene2 = gsub(".*-.*-|\\*..", "", allele_calls)
-  # The following throws warnings for names that don't meet this criteria
-  gene2 = suppressWarnings(as.numeric(gsub("NL|a|b|f", "99", gene2)) )
-  gene2[is.na(gene2)] = 0
+  allele_df = data.frame(SUBMITTED_CALLS, stringsAsFactors = FALSE) %>%
+    # Sort to help with the Ds later
+    arrange(SUBMITTED_CALLS) %>%
+    # Determine the family
+    mutate(FAMILY = getFamily(SUBMITTED_CALLS)) %>%
+    # Determine the gene (exclude family); convert letters to numbers for sort
+    mutate(GENE = getGene(SUBMITTED_CALLS)) %>%
+    mutate(GENE1 = gsub("[^-]+-([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
+    mutate(GENE1 = as.numeric(gsub("NL|a|b|f", "99", GENE1))) %>%
+    # If there is a second gene number, determine that, too
+    mutate(GENE2 = gsub("[^-]+-[^-]+-?","",GENE)) %>%
+    mutate(GENE2 = as.numeric(gsub("NL|a|b|f", "99", GENE2))) %>%
+    mutate(ALLELE = as.numeric(gsub(".+\\*?","",getAllele(SUBMITTED_CALLS))))
   
-  # The following throws warnings if only gene names are submitted (not alleles)
-  allele = suppressWarnings(as.numeric(gsub(".*\\*","",allele_calls)))
+  # Convert missing values to 0, sort data frame
+  allele_df[is.na(allele_df)] = 0
+  sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
   
-  sorted_calls = allele_calls[order(segment, family, gene + gene2*.01, allele)]
-  
-  return(sorted_calls)
+  return(sorted_df$SUBMITTED_CALLS)
+
 }
 
 
@@ -611,26 +611,36 @@ createGermlines <- function(germline, positions, nucleotides){
 #' novel[[1]][[1]]
 #' 
 #' @export
-findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
+findNovelAlleles  <- function(samples, germlines, j_genes, junc_lengths,
                               y_intercept = 1/8, nt_min=1, nt_max=312,
                               mut_min=1, mut_max=10, j_max = 0.1,
                               min_seqs = 50, min_frac = 3/4, verbose=FALSE){
+  
+  #   args = as.list(match.call())
+  #   mcd_options = names(which(nchar(formals(modifyChangeoDb))>0))
+  #   
+  #   # Functions to which arguments may be passed with ...
+  #   gmp_options = names(which(nchar(formals(getMutatedPositions))>0))
+  #   tmm_options = names(which(nchar(formals(trimMutMatrix))>0))
+  #   fi_options = names(which(nchar(formals(findIntercepts))>0))
+  #   fnu_options = names(which(nchar(formals(findNucletoideUsage))>0))
+  
   # Find the positions of differences and similarities between sequences
-  mut_list = getMutatedPositions(samples, germline)
+  mut_list = getMutatedPositions(samples, germlines, match_instead = FALSE)
   mut_counts = sapply(mut_list, length)
-  match_list = getMutatedPositions(samples, germline, match_instead = TRUE)
+  match_list = getMutatedPositions(samples, germlines, match_instead = TRUE)
   mut_summary = summarizeMutations(mut_list, match_list)
   mut_matrix = trimMutMatrix(mut_summary, mut_min, mut_max, nt_min, nt_max,
                              min_seqs, min_frac, verbose)
   if (is.null(mut_matrix)){ return(NULL) }
-  intercepts = findIntercepts(mut_matrix,y_intercept)
+  intercepts = findIntercepts(mut_matrix, y_intercept)
   polymorphs = as.numeric(names(intercepts))
   if (length(polymorphs) > 0) {
-    nuc_usage = lapply(polymorphs, findNucletoideUsage, samples, germline,
+    nuc_usage = lapply(polymorphs, findNucletoideUsage, samples, germlines,
                        mut_counts, mut_min, mut_max)
     names(nuc_usage) = polymorphs
     snp_nucs = sapply(nuc_usage, function(x) rownames(x)[4])
-    putative = createGermlines(germline, polymorphs, snp_nucs)
+    putative = createGermlines(germlines, polymorphs, snp_nucs)
     put_mut_locs = lapply(putative, function(x) getMutatedPositions(samples, x))
     perfect_matches = lapply(put_mut_locs, function(x) which(sapply(x,length) == 0))
     j_junc_tables = lapply(perfect_matches, function(x) table(junc_lengths[x], j_genes[x]))
@@ -741,14 +751,19 @@ findNovelAlleles  <- function(samples, germline, j_genes, junc_lengths,
 detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
                          germline_db,  y_intercept =1/8, nt_min=1, nt_max = 312,
                          mut_min=1, mut_max=10, j_max = 0.10, min_seqs = 50, min_frac= 1/8,
-                         verbose=FALSE){
- 
+                         verbose=FALSE, quiet=T){
+  
+ # args = as.list(match.call())
+  
+ # args_findNovelAlleles = names(formals(findNovelAlleles))
+  
   novel=list()
   for (allele_name in names(allele_groups)) {
     indicies = allele_groups[[allele_name]]
     samples = v_sequences[indicies]
     germline = germline_db[allele_name]
     if (!is.na(germline)){
+      if(!quiet){ cat(".") }
       fna = findNovelAlleles(samples, germline,
                              j_genes[indicies],
                              junc_lengths[indicies],
