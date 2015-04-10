@@ -1,4 +1,3 @@
-# readGermlineDb ----------------------------------------------------------
 #' Read a germline database
 #'
 #' \code{readGermlineDb} reads a fasta-formatted file of immunoglobulin (Ig)
@@ -243,8 +242,6 @@ runTigger <- function(sample_db, germline_db,
 }
 
 
-
-# novelSummary ------------------------------------------------------------
 #' Return a summary of any novel alleles discovered
 #'
 #' \code{novelSummary} summaries the output of \code{\link{runTigger}}, stating
@@ -326,7 +323,6 @@ novelSummary <- function(tigger_result,
 }
 
 
-# plotNovelLines ---------------------------------------------------------------
 #' Visualization of positional mutation frequencies
 #'
 #' \code{plotNovelLines} plots the mutation frequency of nucleotide positions as
@@ -387,7 +383,6 @@ plotNovelLines <- function(novel){
 }
 
 
-# plotNovelBars -----------------------------------------------------------
 #' Visualization of nucleotide usage
 #'
 #' \code{plotNovelBars} shows the nucleotide usage at polymorphic positions as a
@@ -452,7 +447,6 @@ plotNovelBars <- function(novel){
 }
 
 
-# plotJunctionBars --------------------------------------------------------
 #' Visualization of J gene usage and junction length
 #'
 #' \code{plotJunctionBars} shows the frequency of each combination of J gene
@@ -506,11 +500,10 @@ plotJunctionBars <- function(novel){
 }
 
 
-# modifyChangeoDb --------------------------------------------------------
 #' Standardize Sample Db data
 #'
-#' \code{modifyChangeoDb} take a Change-O Sample Db and modifies it for use with
-#' TIgGER.
+#' \code{modifyChangeoDb} takes a Change-O Sample Db and modifies it for use
+#' with TIgGER.
 #' 
 #' @param  sample_db            A Change-O db data frame.
 #' @param  seq_imgt_col         The name of the column in \code{sample_db}
@@ -605,7 +598,81 @@ modifyChangeoDb <- function(sample_db,
 }
 
 
-
+#' Find Frequent Sequences' Mutation Counts
+#'
+#' \code{getPopularMutationCount} determines which sequences occur frequently
+#' for each V gene and returns the mutation count of those sequences.
+#' 
+#' @param  sample_db     A Change-O db data frame. See \code{\link{runTigger}}
+#'                       for a list of required columns.
+#' @param  germline_db   A named list of IMGT-gapped germline sequences.
+#' @param  gene_min      The portion of all unique sequences a gene must
+#'                       constitute to avoid exclusion.
+#' @param  seq_min       The number of copies of the V that must be present for
+#'                       to avoid exclusion.
+#' @param  seq_p_of_max  For each gene, fraction of the most common V sequence's
+#'                       count that a sequence must meet to avoid exclusion.
+#' @param  full_return   If true, will return all \code{sample_db} columns and
+#'                       will include sequences with mutation count < 1.
+#' @param  ...           Additional arguments to pass to
+#'                       \code{\link{modifyChangeoDb}} prior to computation.
+#' 
+#' @return  A data frame of genes that have a frequent sequence mutation count
+#' above 1.
+#' 
+#' @examples
+#' data(sample_db, germline_ighv)
+#' getPopularMutationCount(sample_db, germline_ighv)
+#' 
+#' @export
+getPopularMutationCount <- function(sample_db,
+                                    germline_db,
+                                    gene_min = 1e-03,
+                                    seq_min = 50,
+                                    seq_p_of_max = 1/8,
+                                    full_return = FALSE,
+                                    ...){
+  
+  # Process dots for later
+  args = as.list(match.call())
+  mcd_options = names(which(nchar(formals(modifyChangeoDb))>0))
+  
+  modified_db = sample_db %>%
+    # Correct common formatting problems, remove duplicates, add V_GENE column
+    modifyChangeoDb(args[names(args) %in% mcd_options]) %>%
+    # Count occurence of each unique IMGT-gapped V sequence
+    group_by(V_GENE, V_SEQUENCE_IMGT) %>%
+    mutate(V_SEQUENCE_IMGT_N = n()) %>%
+    # Count occurence of each gene and determine count of most common sequence
+    group_by(V_GENE) %>%
+    mutate(V_GENE_N = n()) %>%
+    mutate(V_SEQUENCE_IMGT_N_MAX = max(V_SEQUENCE_IMGT_N)) %>%
+    # Remove rare V genes, rare sequences, and sequences not making up a
+    # sufficient proportion of sequences as compared to the most common
+    ungroup() %>%
+    distinct(V_SEQUENCE_IMGT) %>%
+    filter(V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
+    filter(V_SEQUENCE_IMGT_N >= seq_min) %>%
+    mutate(V_SEQUENCE_IMGT_P_MAX = V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
+    filter(V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
+  
+  # Determine the mutation counts of the V sequences and append them to the db
+  MUTATION_COUNT = getMutCount(modified_db$V_SEQUENCE_IMGT,
+                               modified_db$V_CALL,
+                               germline_db) %>% 
+    sapply(function(x) min(unlist(x)))
+  merged_db = bind_cols(modified_db, data.frame(MUTATION_COUNT))
+  
+  # Strip down the data frame before returning it
+  if (!full_return) {
+    merged_db = merged_db %>%
+      filter(MUTATION_COUNT > 0) %>%
+      select(V_GENE, MUTATION_COUNT)
+  }
+  
+  return(merged_db)
+  
+}
 
 
 
