@@ -134,7 +134,7 @@ plots of positional mutation frequency vs sequence-wide mutation count,
 Remember that some or all sequences may not have been included in the final
 genotype.
 
-```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4.5}
 # Plot positional mutation frequency versus sequence-wide mutation count
 plotNovelLines(sample_output$novel)
 ```
@@ -146,7 +146,7 @@ and we expect the mutation count equal to the number of polymorphisms in the
 novel sequence to be the most prevalent. `plotNovelBars()` can be used to view
 the nucleotide usage at polymorphic positions.
 
-```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4.5}
 # Plot nucleotide usage at polymorphic positions
 plotNovelBars(sample_output$novel)
 ```
@@ -161,7 +161,7 @@ junction length may be specified in `runTigger()` by `j_max`.
 `plotJunctionBars()` can be used to view the distribution of J genes and
 junctions.
 
-```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4}
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4.5}
 # Plot J and junction usage for sequences perfectly matching the novel allele
 plotJunctionBars(sample_output$novel)
 ```

@@ -14,7 +14,7 @@
 #' @examples
 #' # Create a list of allele names
 #' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
-#' "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*02,IGHV1-2*05", "IGHV1-2",
+#' "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", "IGHV1-2",
 #' "IGHV1-2*02", "IGHV1-69*02")
 #' 
 #' # Sort the alleles
@@ -38,7 +38,7 @@ sortAlleles <- function(allele_calls) {
     # If there is a second gene number, determine that, too
     mutate(GENE2 = gsub("[^-]+-[^-]+-?","",GENE)) %>%
     mutate(GENE2 = as.numeric(gsub("NL|a|b|f", "99", GENE2))) %>%
-    mutate(ALLELE = as.numeric(gsub(".+\\*?","",getAllele(SUBMITTED_CALLS))))
+    mutate(ALLELE = as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",getAllele(SUBMITTED_CALLS))))
   
   # Convert missing values to 0, sort data frame
   allele_df[is.na(allele_df)] = 0
@@ -371,7 +371,7 @@ trimMutMatrix <- function(mut_summary, mut_min=1, mut_max=10,
 #'                      sapply(1:10, function(x) max(rnorm(1, x),0)/20),
 #'                      sapply(1:10, function(x) max(rnorm(1, x),0)/20),
 #'                      sapply(rep(5,10), function(x) max(rnorm(1, x),0)/10)),
-#'                    nrow=4, byrow=T)
+#'                    nrow=4, byrow=TRUE)
 #' colnames(mut_fracs) = 1:10; rownames(mut_fracs) = 1:4
 #' # Test to see if any have a y-intercept above 1/8 (position 4 should)
 #' findIntercepts(mut_fracs)
@@ -763,7 +763,6 @@ detectNovelV <- function(v_sequences, j_genes, junc_lengths, allele_groups,
     samples = v_sequences[indicies]
     germline = germline_db[allele_name]
     if (!is.na(germline)){
-      if(!quiet){ cat(".") }
       fna = findNovelAlleles(samples, germline,
                              j_genes[indicies],
                              junc_lengths[indicies],

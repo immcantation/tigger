@@ -183,7 +183,7 @@ runTigger <- function(sample_db, germline_db,
   # FIND NOVEL ALLELES
 
   if (find_novel){
-    if(!quiet){ cat("Finding novel alleles") }
+    if(!quiet){ cat("Finding novel alleles...") }
     allele_groups = assignAlleleGroups(v_calls, allele_min)
     j_genes = getGene(sample_db[,j_call_col], first = FALSE)
     junc_lengths = sample_db[,junc_length_col]
@@ -523,6 +523,8 @@ plotJunctionBars <- function(novel){
 #'                              sequences should be removed.
 #' @param  functional_seq_only  Logical indicating if nonfunctional sequences
 #'                              should be removed.
+#' @param  nonempty_seq_only    Logical indicating if empty sequences should be
+#'                              removed.
 #' @param  standardize_calls    Logical indicating if IMGT-assigned allele calls
 #'                              should be standardized.
 #' @param  factor2char          Logical indicating if columns of type
@@ -550,6 +552,7 @@ modifyChangeoDb <- function(sample_db,
                            func_col = "FUNCTIONAL",
                            cols_to_add = c("V_GENE", "J_GENE", "V_SEQUENCE_IMGT"),
                            distinct_seq_only = TRUE,
+                           nonempty_seq_only = TRUE,
                            functional_seq_only = FALSE,
                            standardize_calls = TRUE,
                            factor2char = TRUE
@@ -591,6 +594,9 @@ modifyChangeoDb <- function(sample_db,
   }
   if (("V_SEQUENCE_IMGT" %in% cols_to_add) & !("V_SEQUENCE_IMGT" %in% names(sample_db))){
     sample_db = mutate(sample_db, V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312))
+  }
+  if (nonempty_seq_only){
+    sample_db = filter(sample_db, nchar(SEQUENCE_IMGT) > 2)
   }
   
   return(sample_db)
