@@ -658,47 +658,17 @@ findNovelAlleles  <- function(clip_db, germlines,
 
 #' Visualize evidence of novel V alleles
 #'
-#' \code{plotTigger} can be used to visualize the evidence of any novel V
+#' \code{plotTigger} is be used to visualize the evidence of any novel V
 #' alleles found using \code{\link{findNovelAlleles}}.
 #' 
-#' @details A \code{data.frame} in Change-O format contains the following
-#' columns:
-#' \itemize{
-#'   \item \code{"SEQUENCE_IMGT"} containing the IMGT-gapped nucleotide sequence
-#'   \item \code{"V_CALL"} containing the IMGT/V-QUEST V allele call(s)
-#'   \item \code{"J_CALL"} containing the IMGT/V-QUEST J allele call(s)
-#'   \item \code{"JUNCTION_LENGTH"} containing the junction length
-#' }
-#' 
-#' @param    clip_db        a \code{data.frame} in Change-O format. See details.
-#' @param    germlines      a vector of named nucleotide germline sequences
-#'                          matching the V calls in \code{clip_db}
-#' @param    germline_min   the minimum number of sequences that must have a
-#'                          particular germline allele call for the allele to
-#'                          be analyzed
-#' @param    nproc          the number of processors to use
-#' @param    auto_mutrange  if \code{TRUE}, the algorithm will attempt to
-#'                          determine the appropriate mutation range
-#'                          automatically using the mutation count of the most
-#'                          common sequence assigned to each allele analyzed
-#' @param    mut_range      the range of mutations that sampled may carry and
-#'                          be considered by the algorithm
-#' @param    pos_range      the range of IMGT-numbered positions that should be
-#'                          considered by the algorithm
-#' @param    alpha          the alpha cutoff to be used when constructing the
-#'                          confidence interval for the y-intercept           
-#' @param    y_intercept    the y-intercept above which positions should be
-#'                          considered potentially polymorphic
-#' @param    j_max          the maximum fraction of sequences perfectly aligning
-#'                          to a potential novel allele that are allowed to
-#'                          utilize to a particular combination of junction
-#'                          length and J gene
-#' @param    min_seqs       the minimum number of total sequences (within the
-#'                          desired mutational range and nucleotide range)
-#'                          required for the samples to be considered
-#' @param    min_frac       the minimum fraction of sequences that must have
-#'                          usable nucleotides in a given position for that
-#'                          position to considered
+#' @param    clip_db        a \code{data.frame} in Change-O format. See
+#'                          \code{\link{findNovelAlleles}} for details.
+#' @param    novel_df_row   a single row from a data frame as output by
+#'                          \code{\link{findNovelAlleles}} that contains a
+#'                          polymorphism-containing germline allele
+#' @param    ...            additional arguments to pass to \code{\link{pdf}}.
+#'                          If none are passed, a 15 x 5 pdf called "temp" will
+#'                          be created.
 #' @return   NULL
 #' 
 #' @examples
@@ -715,7 +685,7 @@ findNovelAlleles  <- function(clip_db, germlines,
 #' }
 #' 
 #' @export
-plotTigger <- function(clip_db, novel_df_row){
+plotTigger <- function(clip_db, novel_df_row, ...){
   
   min_frac=0.75 # Need to integrate this into the tigger result
   
@@ -821,8 +791,17 @@ plotTigger <- function(clip_db, novel_df_row){
     theme(legend.position=c(1,1), legend.justification=c(1,1),
           legend.background=element_rect(fill = "transparent"))
   
-  multiplot(p1,p2,p3, cols = 3)
+  # Process additonal arguments to pdf
+  args = as.list(match.call())
+  pdf_formals = names(formals(pdf))
+  dot_args = args[names(args) %in% setdiff(pdf_formals, pdf_formals[1:3])]
+  file = ifelse("file" %in% names(args), args["file"], "temp.pdf")
+  file = ifelse("file" %in% names(args), args["file"], "temp.pdf")
+  file = ifelse("file" %in% names(args), args["file"], "temp.pdf")
   
+  pdf(file, width, height, dot_args)
+  multiplot(p1,p2,p3, cols = 3)
+  dev.off()
 }
 
 
