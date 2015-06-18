@@ -788,7 +788,7 @@ plotTigger <- function(clip_db, novel_df_row){
   pos = pass_y$POSITION
   pos_muts = mutate(pos_muts, Polymorphic = POSITION %in% pos)
   # MAKE THE FIRST PLOT
-  POLYCOLORS = setNames(DNA_COLORS[c(4,3)], c("FALSE", "TRUE"))
+  POLYCOLORS = setNames(DNA_COLORS[c(3,4)], c("TRUE", "FALSE"))
   p1 = ggplot(pos_muts, aes(factor(MUT_COUNT), POS_MUT_RATE, group=POSITION,
                             color=Polymorphic)) +
     geom_line(size = 0.75) +
@@ -797,25 +797,29 @@ plotTigger <- function(clip_db, novel_df_row){
     xlab("Mutation Count (Sequence)") +
     ylab("Mutation Frequency (Position)") +
     theme_bw() +
-    theme(legend.position=c(1,1), legend.justification=c(1,1)) +
-    guides(color = guide_legend(ncol = 2))
+    theme(legend.position=c(0.5,1), legend.justification=c(1,1),
+          legend.background=element_rect(fill = "transparent")) +
+    guides(color = guide_legend(ncol = 1))
   # MAKE THE SECOND PLOT
   p2 = ggplot(mutate(filter(pos_db, POSITION %in% pos),
                      POSITION = paste("Position", POSITION)),
               aes(factor(MUT_COUNT), fill=NT)) +
     geom_bar(binwidth=1) +
-    guides(fill = guide_legend("Nucleotide", ncol = 4)) +
+    guides(fill = guide_legend("Nucleotide", ncol = 1)) +
     facet_grid(POSITION ~ .) +
     xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
     scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS)) +
     theme_bw() +
-    theme(legend.position=c(1,1), legend.justification=c(1,1))
+    theme(legend.position=c(1,1), legend.justification=c(1,1),
+          legend.background=element_rect(fill = "transparent"))
   # MAKE THE THIRD PLOT
   p3 = ggplot(db_subset, aes(JUNCTION_LENGTH, fill=factor(J_GENE))) +
     geom_bar(binwidth=1) +
     guides(fill = guide_legend("J Gene", ncol = 1)) +
     xlab("Junction Length") + ylab("Unmutated Sequence Count") +
-    theme_bw()
+    theme_bw() +
+    theme(legend.position=c(1,1), legend.justification=c(1,1),
+          legend.background=element_rect(fill = "transparent"))
   
   multiplot(p1,p2,p3, cols = 3)
   
