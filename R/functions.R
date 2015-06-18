@@ -47,117 +47,6 @@ updateAlleleNames <- function(allele_calls){
 }
 
 
-#' Standardize Sample Db data
-#'
-#' \code{modifyChangeoDb} takes a Change-O Sample Db and modifies it for use
-#' with TIgGER.
-#' 
-#' @param  sample_db            A Change-O db data frame.
-#' @param  seq_imgt_col         The name of the column in \code{sample_db}
-#'                              containing the IMGT-gapped nucleotide sequence.
-#' @param  v_call_col           The name of the column in \code{sample_db}
-#'                              containingthe IMGT-assigned V allele call.
-#' @param  j_call_col           The name of the column in \code{sample_db}
-#'                              containing the IMGT-assigned J allele call.
-#' @param  junc_len_col         The name of the column in \code{sample_db} 
-#'                              containing the junction length.
-#' @param  func_col             The name of the column in \code{sample_db}
-#'                              indicating if the sequence is functional.
-#' @param  cols_to_add          One or more of \code{"V_GENE"}, \code{"J_GENE"},
-#'                              or \code{"V_SEQUENCE_IMGT"}, indicating which
-#'                              columns should be added. See details for more
-#'                              information.
-#' @param  distinct_seq_only    Logical indicating if duplicate IMGT-gapped
-#'                              sequences should be removed.
-#' @param  functional_seq_only  Logical indicating if nonfunctional sequences
-#'                              should be removed.
-#' @param  nonempty_seq_only    Logical indicating if empty sequences should be
-#'                              removed.
-#' @param  standardize_calls    Logical indicating if IMGT-assigned allele calls
-#'                              should be standardized.
-#' @param  factor2char          Logical indicating if columns of type
-#'                              \code{factor} should be converted to type
-#'                              \code{character}.
-#' @details  The supplied column names will be renamed to the current preferred
-#' names (and utilized for the creation of new columns, if requested). Columns
-#' \code{"V_GENE"}, \code{"J_GENE"}, and \code{"V_SEQUENCE_IMGT"}, if added,
-#' will respectively contain the IMGT-assigned V gene call, the IMGT-assigned J
-#' gene call, and the first 312 nucleotides (FWR1, CDR1, FWR2, CDR2, and FRW3)
-#' of the IMGT-gapped nucleotide sequence.
-#' 
-#' @return  A corrected Change-O Db data frame
-#' 
-#' @examples
-#' data(sample_db)
-#' corrected_sample_db = modifyChangeoDb(sample_db, cols_to_add = c("V_GENE"))
-#' 
-#' @export
-modifyChangeoDb <- function(sample_db,
-                            seq_imgt_col = "SEQUENCE_IMGT",
-                            v_call_col = "V_CALL",
-                            j_call_col = "J_CALL",
-                            junc_len_col = "JUNCTION_LENGTH", 
-                            func_col = "FUNCTIONAL",
-                            cols_to_add = c("V_GENE", "J_GENE",
-                                            "V_SEQUENCE_IMGT"),
-                            distinct_seq_only = TRUE,
-                            nonempty_seq_only = TRUE,
-                            functional_seq_only = FALSE,
-                            standardize_calls = TRUE,
-                            factor2char = TRUE
-){
-  
-  # Convert factors to characters
-  if(factor2char){
-    i <- sapply(sample_db, is.factor)
-    sample_db[,i] <- sapply(sample_db[,i], as.character)
-  }
-  
-  # Rename columns, if needed
-  sample_db = data.frame(sample_db, stringsAsFactors = FALSE)
-  names(sample_db)[which(names(sample_db) == seq_imgt_col)] = "SEQUENCE_IMGT"
-  names(sample_db)[which(names(sample_db) == v_call_col)] = "V_CALL"
-  names(sample_db)[which(names(sample_db) == j_call_col)] = "J_CALL"
-  names(sample_db)[which(names(sample_db) == junc_len_col)] = "JUNCTION_LENGTH"
-  names(sample_db)[which(names(sample_db) == func_col)] = "FUNCTIONAL"
-  
-  # Filter out duplicates and non-functional seqs, if requested
-  if(distinct_seq_only){ sample_db = distinct(sample_db, SEQUENCE_IMGT) }
-  if(functional_seq_only & ("FUNCTIONAL" %in% names(sample_db))){
-    sample_db = sample_db %>%
-      mutate(FUNCTIONAL =
-               FUNCTIONAL=="T" | FUNCTIONAL == "TRUE" | FUNCTIONAL == TRUE) %>%
-      filter(FUNCTIONAL == "TRUE")
-  }
-  # Standardize allele calls
-  if(standardize_calls){
-    sample_db = mutate(sample_db, V_CALL =
-                         updateAlleleNames(getAllele(V_CALL, first = FALSE)))
-    sample_db = mutate(sample_db, J_CALL = getAllele(J_CALL, first = FALSE))
-  }
-  
-  # Add columns, if requested
-  if (("V_GENE" %in% cols_to_add) & !("V_GENE" %in% names(sample_db))){
-    sample_db = mutate(sample_db, V_GENE = getGene(V_CALL))
-  }
-  if (("J_GENE" %in% cols_to_add) & !("J_GENE" %in% names(sample_db))){
-    sample_db = mutate(sample_db, J_GENE = getGene(J_CALL))
-  }
-  if ("V_SEQUENCE_IMGT" %in% cols_to_add){
-    if(!("V_SEQUENCE_IMGT" %in% names(sample_db))){
-      sample_db = mutate(sample_db, V_SEQUENCE_IMGT =
-                           substring(SEQUENCE_IMGT, 1, 312))
-    }
-  }
-  if (nonempty_seq_only){
-    sample_db = filter(sample_db, nchar(SEQUENCE_IMGT) > 2)
-  }
-  
-  return(sample_db)
-  
-}
-
-
 #' Find Frequent Sequences' Mutation Counts
 #'
 #' \code{getPopularMutationCount} determines which sequences occur frequently
@@ -175,8 +64,6 @@ modifyChangeoDb <- function(sample_db,
 #'                       count that a sequence must meet to avoid exclusion.
 #' @param  full_return   If true, will return all \code{sample_db} columns and
 #'                       will include sequences with mutation count < 1.
-#' @param  ...           Additional arguments to pass to
-#'                       \code{\link{modifyChangeoDb}} prior to computation.
 #' 
 #' @return  A data frame of genes that have a frequent sequence mutation count
 #' above 1.
@@ -191,16 +78,12 @@ getPopularMutationCount <- function(sample_db,
                                     gene_min = 1e-03,
                                     seq_min = 50,
                                     seq_p_of_max = 1/8,
-                                    full_return = FALSE,
-                                    ...){
-  
-  # Process dots for later
-  args = as.list(match.call())
-  mcd_options = names(which(nchar(formals(modifyChangeoDb))>0))
+                                    full_return = FALSE){
   
   modified_db = sample_db %>%
-    # Correct common formatting problems, remove duplicates, add V_GENE column
-    modifyChangeoDb(args[names(args) %in% mcd_options]) %>%
+    mutate(V_GENE = getGene(V_CALL)) %>%
+    group_by(1:n()) %>%
+    mutate(V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312)) %>%
     # Count occurence of each unique IMGT-gapped V sequence
     group_by(V_GENE, V_SEQUENCE_IMGT) %>%
     mutate(V_SEQUENCE_IMGT_N = n()) %>%
