@@ -1,6 +1,6 @@
 Package: tigger
-Title: R tools for inferring new IGHV alleles from Rep-Seq data
-Version: 2.1
+Title: R Tools for Inferring New IGHV Alleles from Rep-Seq Data
+Version: 0.2.2
 Author: Daniel Gadala-Maria and Jason Anthony Vander Heiden
 Maintainer: Daniel Gadala-Maria <daniel.gadala-maria@yale.edu>
 Description: Infers the IGHV genotype of an individual from Rep-Seq data,
@@ -13,6 +13,9 @@ License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
     R (>= 3.0.0),
-    dplyr
+    alakazam,
+    shm,
+    dplyr,
+    ggplot2
 Suggests: knitr
 VignetteBuilder: knitr

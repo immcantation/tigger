@@ -3,8 +3,8 @@
 # @author     Daniel Gadala-Maria
 # @copyright  Copyright 2015 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
-# @version    2.1
-# @date       2015.03.04
+# @version    0.2.2
+# @date       2015.06.17
 
 
 #' tigger
@@ -27,6 +27,6 @@
 #' @docType     package
 #' @references  Gadala-Maria et al. (2015) Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles. PNAS. 112(8):E862-70 
 #' 
-#' @import dplyr
+#' @import alakazam shm dplyr ggplot2
 #' 
 NULL
