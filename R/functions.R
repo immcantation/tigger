@@ -1,3 +1,73 @@
+
+
+# Other mutation-related functions ----------------------------------------
+
+#' Find Frequent Sequences' Mutation Counts
+#'
+#' \code{getPopularMutationCount} determines which sequences occur frequently
+#' for each V gene and returns the mutation count of those sequences.
+#' 
+#' @param  sample_db     A Change-O db data frame. See
+#'                       \code{\link{findNovelAlleles}} for a list of required
+#'                       columns.
+#' @param  germline_db   A named list of IMGT-gapped germline sequences.
+#' @param  gene_min      The portion of all unique sequences a gene must
+#'                       constitute to avoid exclusion.
+#' @param  seq_min       The number of copies of the V that must be present for
+#'                       to avoid exclusion.
+#' @param  seq_p_of_max  For each gene, fraction of the most common V sequence's
+#'                       count that a sequence must meet to avoid exclusion.
+#' @param  full_return   If true, will return all \code{sample_db} columns and
+#'                       will include sequences with mutation count < 1.
+#' 
+#' @return  A data frame of genes that have a frequent sequence mutation count
+#' above 1.
+#' 
+#' @examples
+#' data(sample_db, germline_ighv)
+#' getPopularMutationCount(sample_db, germline_ighv)
+#' 
+#' @export
+getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
+                                    seq_min = 50, seq_p_of_max = 1/8,
+                                    full_return = FALSE){
+  modified_db = sample_db %>%
+    mutate(V_GENE = getGene(V_CALL)) %>%
+    group_by(1:n()) %>%
+    mutate(V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312)) %>%
+    # Count occurence of each unique IMGT-gapped V sequence
+    group_by(V_GENE, V_SEQUENCE_IMGT) %>%
+    mutate(V_SEQUENCE_IMGT_N = n()) %>%
+    # Count occurence of each gene and determine count of most common sequence
+    group_by(V_GENE) %>%
+    mutate(V_GENE_N = n()) %>%
+    mutate(V_SEQUENCE_IMGT_N_MAX = max(V_SEQUENCE_IMGT_N)) %>%
+    # Remove rare V genes, rare sequences, and sequences not making up a
+    # sufficient proportion of sequences as compared to the most common
+    ungroup() %>%
+    distinct(V_SEQUENCE_IMGT) %>%
+    filter(V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
+    filter(V_SEQUENCE_IMGT_N >= seq_min) %>%
+    mutate(V_SEQUENCE_IMGT_P_MAX = V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
+    filter(V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
+  # Determine the mutation counts of the V sequences and append them to the db
+  MUTATION_COUNT = getMutCount(modified_db$V_SEQUENCE_IMGT,
+                               modified_db$V_CALL,
+                               germline_db) %>% 
+    sapply(function(x) min(unlist(x)))
+  merged_db = bind_cols(modified_db, data.frame(MUTATION_COUNT))
+  # Strip down the data frame before returning it
+  if (!full_return) {
+    merged_db = merged_db %>%
+      filter(MUTATION_COUNT > 0) %>%
+      select(V_GENE, MUTATION_COUNT)
+  }
+  return(merged_db)
+}
+
+
+# Formatting and cleanup --------------------------------------------------
+
 #' Update IGHV allele names
 #'
 #' \code{updateAlleleNames} takes a set of IGHV allele calls and replaces any
@@ -6,13 +76,16 @@
 #' @note    IGMT has removed IGHV2-5*10 and IGHV2-5*07 as it has determined they
 #'          are actually alleles *02 and *04, respectively.
 #' 
-#' @param    allele_calls  vector of strings respresenting IGHV allele names.
+#' @param    allele_calls  a vector of strings respresenting IGHV allele names
 #' 
 #' @return   vector of strings respresenting updated IGHV allele names
 #' 
 #' @references Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
 #' and alleles: new entities, new names and implications for research and
 #' prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
+#' 
+#' @seealso Like \code{updateAlleleNames}, \code{\link{sortAlleles}} can help
+#'          format a list of allele names.
 #' 
 #' @examples
 #' # Create a vector that uses old gene/allele names.
@@ -46,79 +119,6 @@ updateAlleleNames <- function(allele_calls){
   return(allele_calls)
 }
 
-
-#' Find Frequent Sequences' Mutation Counts
-#'
-#' \code{getPopularMutationCount} determines which sequences occur frequently
-#' for each V gene and returns the mutation count of those sequences.
-#' 
-#' @param  sample_db     A Change-O db data frame. See
-#'                       \code{\link{findNovelAlleles}} for a list of required
-#'                       columns.
-#' @param  germline_db   A named list of IMGT-gapped germline sequences.
-#' @param  gene_min      The portion of all unique sequences a gene must
-#'                       constitute to avoid exclusion.
-#' @param  seq_min       The number of copies of the V that must be present for
-#'                       to avoid exclusion.
-#' @param  seq_p_of_max  For each gene, fraction of the most common V sequence's
-#'                       count that a sequence must meet to avoid exclusion.
-#' @param  full_return   If true, will return all \code{sample_db} columns and
-#'                       will include sequences with mutation count < 1.
-#' 
-#' @return  A data frame of genes that have a frequent sequence mutation count
-#' above 1.
-#' 
-#' @examples
-#' data(sample_db, germline_ighv)
-#' getPopularMutationCount(sample_db, germline_ighv)
-#' 
-#' @export
-getPopularMutationCount <- function(sample_db,
-                                    germline_db,
-                                    gene_min = 1e-03,
-                                    seq_min = 50,
-                                    seq_p_of_max = 1/8,
-                                    full_return = FALSE){
-  
-  modified_db = sample_db %>%
-    mutate(V_GENE = getGene(V_CALL)) %>%
-    group_by(1:n()) %>%
-    mutate(V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312)) %>%
-    # Count occurence of each unique IMGT-gapped V sequence
-    group_by(V_GENE, V_SEQUENCE_IMGT) %>%
-    mutate(V_SEQUENCE_IMGT_N = n()) %>%
-    # Count occurence of each gene and determine count of most common sequence
-    group_by(V_GENE) %>%
-    mutate(V_GENE_N = n()) %>%
-    mutate(V_SEQUENCE_IMGT_N_MAX = max(V_SEQUENCE_IMGT_N)) %>%
-    # Remove rare V genes, rare sequences, and sequences not making up a
-    # sufficient proportion of sequences as compared to the most common
-    ungroup() %>%
-    distinct(V_SEQUENCE_IMGT) %>%
-    filter(V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
-    filter(V_SEQUENCE_IMGT_N >= seq_min) %>%
-    mutate(V_SEQUENCE_IMGT_P_MAX = V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
-    filter(V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
-  
-  # Determine the mutation counts of the V sequences and append them to the db
-  MUTATION_COUNT = getMutCount(modified_db$V_SEQUENCE_IMGT,
-                               modified_db$V_CALL,
-                               germline_db) %>% 
-    sapply(function(x) min(unlist(x)))
-  merged_db = bind_cols(modified_db, data.frame(MUTATION_COUNT))
-  
-  # Strip down the data frame before returning it
-  if (!full_return) {
-    merged_db = merged_db %>%
-      filter(MUTATION_COUNT > 0) %>%
-      select(V_GENE, MUTATION_COUNT)
-  }
-  
-  return(merged_db)
-  
-}
-
-
 #' Sort allele names
 #'
 #' \code{sortAlleles} returns a sorted vector of strings respresenting Ig allele
@@ -131,6 +131,9 @@ getPopularMutationCount <- function(sample_db,
 #' @param    allele_calls  a vector of strings respresenting Ig allele names
 #' @return   A sorted vector of strings respresenting Ig allele names
 #' 
+#' @seealso Like \code{sortAlleles}, \code{\link{updateAlleleNames}} can help
+#'          format a list of allele names.
+#' 
 #' @examples
 #' # Create a list of allele names
 #' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
@@ -142,10 +145,8 @@ getPopularMutationCount <- function(sample_db,
 #' 
 #' @export
 sortAlleles <- function(allele_calls) {  
-  
   # Standardize format of submitted alleles, first
   SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE)
-  
   allele_df = data.frame(SUBMITTED_CALLS, stringsAsFactors = FALSE) %>%
     # Sort to help with the Ds later
     arrange(SUBMITTED_CALLS) %>%
@@ -160,18 +161,34 @@ sortAlleles <- function(allele_calls) {
     mutate(GENE2 = as.numeric(gsub("NL|a|b|f", "99", GENE2))) %>%
     mutate(ALLELE = as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",
                                    getAllele(SUBMITTED_CALLS))))
-  
   # Convert missing values to 0, sort data frame
   allele_df[is.na(allele_df)] = 0
   sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
-  
   return(sorted_df$SUBMITTED_CALLS)
-  
 }
 
 
+# Private functions -------------------------------------------------------
+
+# Find muations-by-position compared to a germline
+#
+# \code{positionMutations} duplicates the rows of a data frame for each
+# position to be analyzed and determines if each sample is mutated at that
+# position
+# 
+# @param  clip_db       A Change-O db data frame. See
+#                       \code{\link{findNovelAlleles}} for a list of required
+#                       columns.
+# @param  germline      The germline to which all the sequences should be
+#                       compared
+# @param  pos_range     The range of positions within the sequence for which
+#                       the rows should be duplicated and checked for mutation
+# 
+# @return  A data frame with rows duplicated for all the positions to be
+# analyzed and a column indicating whether the position is mutated in
+# comparison to the germline
+#
 positionMutations <- function(clip_db, germline, pos_range){
-  # Duplicate each sequence for all the positions to be analyzed
   pos_db = pos_range %>%
     length() %>%
     rep("clip_db", .) %>%
@@ -666,9 +683,6 @@ findNovelAlleles  <- function(clip_db, germlines,
 #' @param    novel_df_row   a single row from a data frame as output by
 #'                          \code{\link{findNovelAlleles}} that contains a
 #'                          polymorphism-containing germline allele
-#' @param    ...            additional arguments to pass to \code{\link{pdf}}.
-#'                          If none are passed, a 15 x 5 pdf called "temp" will
-#'                          be created.
 #' @return   NULL
 #' 
 #' @examples
@@ -681,11 +695,13 @@ findNovelAlleles  <- function(clip_db, germlines,
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel = slice(novel_df, which(!is.na(novel_df$POLYMORPHISM_CALL)))
+#' pdf(paste(gsub("\\*","+", novel$POLYMORPHISM_CALL), ".pdf", sep=""), 15, 5)
 #' plotTigger(sample_db, novel[1,])
+#' dev.off()
 #' }
 #' 
 #' @export
-plotTigger <- function(clip_db, novel_df_row, ...){
+plotTigger <- function(clip_db, novel_df_row){
   
   min_frac=0.75 # Need to integrate this into the tigger result
   
@@ -767,7 +783,7 @@ plotTigger <- function(clip_db, novel_df_row, ...){
     xlab("Mutation Count (Sequence)") +
     ylab("Mutation Frequency (Position)") +
     theme_bw() +
-    theme(legend.position=c(0.5,1), legend.justification=c(1,1),
+    theme(legend.position=c(0.5,1), legend.justification=c(0.5,1),
           legend.background=element_rect(fill = "transparent")) +
     guides(color = guide_legend(ncol = 1))
   # MAKE THE SECOND PLOT
@@ -791,17 +807,7 @@ plotTigger <- function(clip_db, novel_df_row, ...){
     theme(legend.position=c(1,1), legend.justification=c(1,1),
           legend.background=element_rect(fill = "transparent"))
   
-  # Process additonal arguments to pdf
-  args = as.list(match.call())
-  pdf_formals = names(formals(pdf))
-  dot_args = args[names(args) %in% setdiff(pdf_formals, pdf_formals[1:3])]
-  file = ifelse("file" %in% names(args), args["file"], "temp.pdf")
-  file = ifelse("file" %in% names(args), args["file"], "temp.pdf")
-  file = ifelse("file" %in% names(args), args["file"], "temp.pdf")
-  
-  pdf(file, width, height, dot_args)
   multiplot(p1,p2,p3, cols = 3)
-  dev.off()
 }
 
 
