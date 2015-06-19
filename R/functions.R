@@ -433,8 +433,12 @@ plotTigger <- function(clip_db, novel_df_row){
 #'           belonging to all groups until one of those groups is included in
 #'           the genotype.
 #' 
-#' @param    allele_calls         a vector of strings respresenting Ig allele
-#'                                calls from a single subject
+#' @param    clip_db              a \code{data.frame} containing V allele
+#'                                calls from a single subject under
+#'                                \code{"V_CALL"}. If
+#'                                \code{find_unmutated} is \code{TRUE}, then
+#'                                the sample IMGT-gapped V(D)J sequence should 
+#'                                be provided in a column \code{"SEQUENCE_IMGT"}
 #' @param    fraction_to_explain  the portion of each gene that must be
 #'                                explained by the alleles that will be included
 #'                                in the genotype
@@ -451,14 +455,16 @@ plotTigger <- function(clip_db, novel_df_row){
 #'                                germline sequences named in
 #'                                \code{allele_calls}. Only required if
 #'                                \code{find_unmutated} is \code{TRUE}.
-#' @param    novel_germline       an optional named vector of novel germline
-#'                                sequences that will be utilized if
+#' @param    novel_df             an optional \code{data.frame} of the type
+#'                                novel returned by
+#'                                \code{\link{findNovelAlleles}} containing
+#'                                germline sequences that will be utilized if
 #'                                \code{find_unmutated} is \code{TRUE}. See
 #'                                details.
-#' @details  if \code{novel_germlines} is provided, all sequences that are
-#' assigned to the same gene as any novel germline allele will have the novel
-#' germline allele appended to their assignent prior to searching for unmutated
-#' sequences.
+#' @details  if \code{novel_df} is provided, all sequences that are
+#' assigned to the same starting allele as any novel germline allele will have
+#' the novel germline allele appended to their assignent prior to searching for
+#' unmutated sequences.
 #' 
 #' @return   A table of alleles denoting the genotype of the subject
 #' 
@@ -470,15 +476,38 @@ plotTigger <- function(clip_db, novel_df_row){
 #' # Load example data; we'll pretend allele calls are unmutated
 #' data(sample_db)
 #' 
-#' # Infer the V genotype
+#' # Infer the V genotype using all provided sequences
 #' inferGenotype(sample_db[,"V_CALL"])
 #' 
+#' #
+#' 
 #' @export
-inferGenotype <- function(allele_calls, fraction_to_explain = 7/8,
+inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
                           gene_cutoff = 1e-3, find_unmutated = FALSE,
-                          germline_db = NA, novel_germlines = NA){
-  
-  
+                          germline_db = NA, novel_df = NA){
+  allele_calls = clip_db$V_CALL
+  # Find the unmutated subset, if requested
+  if(find_unmutated){
+    if(is.na(germline_db)){
+      stop("germline_db needed if find_unmutated is TRUE")
+    }
+    if(!is.na(novel_df)){
+      novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
+        select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
+      if(nrow(novel_df) > 0){
+        # Extract novel alleles if any and add them to germline_db
+        novel_gl = novel_df$NOVEL_IMGT
+        names(novel_gl) = novel_df$POLYMORPHISM_CALL
+        germline_db = c(germline_db, novel_gl)
+        # Add the novel allele calls to allele calls of the same starting allele
+        for(r in 1:nrow(novel_df)){
+          ind = grep(novel_df$GERMLINE_CALL[r], allele_calls, fixed=TRUE)
+          allele_calls[ind] = allele_calls[ind] %>%
+            sapply(paste, novel_df$POLYMORPHISM_CALL, sep=",")
+        }
+      }
+    }
+  }
   
   # Standardize allele call names
   allele_calls = getAllele(allele_calls, first = FALSE)
