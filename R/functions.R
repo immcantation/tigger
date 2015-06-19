@@ -1,5 +1,5 @@
 
-# The TIgGER Trifecta: SNPs, Genotype, and Call Correction ----------------
+# The TIgGER Trifecta -----------------------------------------------------
 
 #' Find novel alleles from repertoire sequencing data
 #'
@@ -25,7 +25,7 @@
 #' allele utilize a wide range of combinations of J gene and junction length.
 #' 
 #' @param    clip_db        a \code{data.frame} in Change-O format. See details.
-#' @param    germlines      a vector of named nucleotide germline sequences
+#' @param    germline_db    a vector of named nucleotide germline sequences
 #'                          matching the V calls in \code{clip_db}
 #' @param    germline_min   the minimum number of sequences that must have a
 #'                          particular germline allele call for the allele to
@@ -72,7 +72,7 @@
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' 
 #' @export
-findNovelAlleles  <- function(clip_db, germlines,
+findNovelAlleles  <- function(clip_db, germline_db,
                               germline_min = 200,
                               nproc = 4,
                               min_seqs = 50,
@@ -86,7 +86,7 @@ findNovelAlleles  <- function(clip_db, germlines,
   
   # Keep only the columns we need and clean up the sequences
   clip_db = select(clip_db, SEQUENCE_IMGT, V_CALL, J_CALL, JUNCTION_LENGTH)
-  germlines = cleanSeqs(germlines)
+  germlines = cleanSeqs(germline_db)
   clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
   
   # Find which rows' calls contain which germline alleles
@@ -390,7 +390,7 @@ plotTigger <- function(clip_db, novel_df_row){
     xlab("Mutation Count (Sequence)") +
     ylab("Mutation Frequency (Position)") +
     theme_bw() +
-    theme(legend.position=c(0.5,0.8), legend.justification=c(0.5,1),
+    theme(legend.position=c(0.5,0.85), legend.justification=c(0.5,1),
           legend.background=element_rect(fill = "transparent")) +
     guides(color = guide_legend(ncol = 1))
   # MAKE THE SECOND PLOT
@@ -476,10 +476,18 @@ plotTigger <- function(clip_db, novel_df_row){
 #' # Load example data; we'll pretend allele calls are unmutated
 #' data(sample_db)
 #' 
-#' # Infer the V genotype using all provided sequences
-#' inferGenotype(sample_db[,"V_CALL"])
+#' # Infer the IGHV genotype using all provided sequences
+#' inferGenotype(sample_db)
 #' 
-#' #
+#' # Infer the IGHV genotype using only unmutated sequences
+#' data(germline_ighv)
+#' inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv)
+#' 
+#' # Infer the IGHV genotype, using only unmutated sequences,
+#' # including sequences that match novel alleles (recommended)
+#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv,
+#'               novel_df = novel_df)
 #' 
 #' @export
 inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
@@ -488,10 +496,10 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
   allele_calls = clip_db$V_CALL
   # Find the unmutated subset, if requested
   if(find_unmutated){
-    if(is.na(germline_db)){
+    if(is.na(germline_db[1])){
       stop("germline_db needed if find_unmutated is TRUE")
     }
-    if(!is.na(novel_df)){
+    if(!is.null(nrow(novel_df))){
       novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
         select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
       if(nrow(novel_df) > 0){
@@ -503,13 +511,16 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
         for(r in 1:nrow(novel_df)){
           ind = grep(novel_df$GERMLINE_CALL[r], allele_calls, fixed=TRUE)
           allele_calls[ind] = allele_calls[ind] %>%
-            sapply(paste, novel_df$POLYMORPHISM_CALL, sep=",")
+            sapply(paste, novel_df$POLYMORPHISM_CALL[r], sep=",")
         }
       }
     }
+    # Find unmutated sequences
+    allele_calls = findUnmutatedCalls(allele_calls, clip_db$SEQUENCE_IMGT,
+                                      germline_db)
   }
   
-  # Standardize allele call names
+  # Standardize allele call names, just in case
   allele_calls = getAllele(allele_calls, first = FALSE)
   
   # Find the gene(s) of the allele calls; group duplicates (e.g. 1-69D*) as one
@@ -843,6 +854,64 @@ getMutCount <- function(samples, allele_calls, germline_db){
   }
   
   return(mut_count_list)
+}
+
+#' Determine which calls represent an unmutated allele
+#'
+#' \code{findUnmutatedCalls} determines which allele calls would represent a 
+#' perfect match with the germline sequence, given a vector of allele calls and
+#' mutation counts. In the case of multiple alleles being assigned to a
+#' sequence, only the subset that would represent a perfect match is returned.
+#' 
+#' @param    allele_calls   a vector of strings respresenting Ig allele calls,
+#'                          where multiple calls are separated by a comma
+#' @param    germline_db    a vector of named nucleotide germline sequences
+#' @param    sample_seqs    V(D)J-rearranged sample sequences matching the order
+#'                          of the given \code{allele_calls}
+#' 
+#' @return   A vector of strings containing the members of \code{allele_calls}
+#'           that represent unmutated sequences
+#' 
+#' @examples
+#' # Load data
+#' data(germline_ighv)
+#' data(sample_db)
+#'
+#' # Find which of the sample alleles are unmutated
+#' findUnmutatedCalls(sample_db$V_CALL, sample_db$SEQUENCE_IMGT, germline_ighv)
+#' 
+#' @export
+findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
+  
+  mut_counts = getMutCount(sample_seqs, allele_calls, germline_db)
+  
+  # Find which seqs are unmutated and which of the allele calls that represents
+  unmut_i = which(sapply(mut_counts, function(x) min(unlist(x))) == 0)
+  which_no_muts = sapply(mut_counts, function(x) grep("^0$", unlist(x)) )
+  unmut_alleles = rep("", length(allele_calls))
+  
+  # How many alleles represent perfect matches?
+  n_gl_unmut = sapply(which_no_muts, length)
+  
+  one_unmut = which(n_gl_unmut == 1)
+  split_names = strsplit(allele_calls, ",")
+  if (length(one_unmut) > 0){
+    inds = unlist(which_no_muts[one_unmut])
+    unmut_alleles[one_unmut] = mapply("[", split_names[one_unmut], inds)
+  }
+  
+  more_unmut = which(n_gl_unmut > 1)
+  if (length(more_unmut) > 0){
+    inds = which_no_muts[more_unmut]      
+    unmut_multi = mapply(function(x,y) x[unlist(y)], split_names[more_unmut],
+                         inds, SIMPLIFY = FALSE)
+    unmut_alleles[more_unmut] = sapply(unmut_multi, paste, collapse=",")  
+  }
+  
+  unmut_alleles = unmut_alleles[unmut_i]
+  
+  return(unmut_alleles)
+  
 }
 
 #' Find Frequent Sequences' Mutation Counts

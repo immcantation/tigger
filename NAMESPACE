@@ -2,6 +2,7 @@
 
 export(cleanSeqs)
 export(findNovelAlleles)
+export(findUnmutatedCalls)
 export(genotypeFasta)
 export(getMutCount)
 export(getMutatedPositions)
