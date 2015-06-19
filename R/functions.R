@@ -1,397 +1,5 @@
 
-
-# Other mutation-related functions ----------------------------------------
-
-#' Find Frequent Sequences' Mutation Counts
-#'
-#' \code{getPopularMutationCount} determines which sequences occur frequently
-#' for each V gene and returns the mutation count of those sequences.
-#' 
-#' @param  sample_db     A Change-O db data frame. See
-#'                       \code{\link{findNovelAlleles}} for a list of required
-#'                       columns.
-#' @param  germline_db   A named list of IMGT-gapped germline sequences.
-#' @param  gene_min      The portion of all unique sequences a gene must
-#'                       constitute to avoid exclusion.
-#' @param  seq_min       The number of copies of the V that must be present for
-#'                       to avoid exclusion.
-#' @param  seq_p_of_max  For each gene, fraction of the most common V sequence's
-#'                       count that a sequence must meet to avoid exclusion.
-#' @param  full_return   If true, will return all \code{sample_db} columns and
-#'                       will include sequences with mutation count < 1.
-#' 
-#' @return  A data frame of genes that have a frequent sequence mutation count
-#' above 1.
-#' 
-#' @examples
-#' data(sample_db, germline_ighv)
-#' getPopularMutationCount(sample_db, germline_ighv)
-#' 
-#' @export
-getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
-                                    seq_min = 50, seq_p_of_max = 1/8,
-                                    full_return = FALSE){
-  modified_db = sample_db %>%
-    mutate(V_GENE = getGene(V_CALL)) %>%
-    group_by(1:n()) %>%
-    mutate(V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312)) %>%
-    # Count occurence of each unique IMGT-gapped V sequence
-    group_by(V_GENE, V_SEQUENCE_IMGT) %>%
-    mutate(V_SEQUENCE_IMGT_N = n()) %>%
-    # Count occurence of each gene and determine count of most common sequence
-    group_by(V_GENE) %>%
-    mutate(V_GENE_N = n()) %>%
-    mutate(V_SEQUENCE_IMGT_N_MAX = max(V_SEQUENCE_IMGT_N)) %>%
-    # Remove rare V genes, rare sequences, and sequences not making up a
-    # sufficient proportion of sequences as compared to the most common
-    ungroup() %>%
-    distinct(V_SEQUENCE_IMGT) %>%
-    filter(V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
-    filter(V_SEQUENCE_IMGT_N >= seq_min) %>%
-    mutate(V_SEQUENCE_IMGT_P_MAX = V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
-    filter(V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
-  # Determine the mutation counts of the V sequences and append them to the db
-  MUTATION_COUNT = getMutCount(modified_db$V_SEQUENCE_IMGT,
-                               modified_db$V_CALL,
-                               germline_db) %>% 
-    sapply(function(x) min(unlist(x)))
-  merged_db = bind_cols(modified_db, data.frame(MUTATION_COUNT))
-  # Strip down the data frame before returning it
-  if (!full_return) {
-    merged_db = merged_db %>%
-      filter(MUTATION_COUNT > 0) %>%
-      select(V_GENE, MUTATION_COUNT)
-  }
-  return(merged_db)
-}
-
-
-# Formatting and cleanup --------------------------------------------------
-
-#' Update IGHV allele names
-#'
-#' \code{updateAlleleNames} takes a set of IGHV allele calls and replaces any
-#' outdated names (e.g. IGHV1-f) with the new IMGT names.
-#' @details The updated allele names are based on IMGT release 201408-4.
-#' @note    IGMT has removed IGHV2-5*10 and IGHV2-5*07 as it has determined they
-#'          are actually alleles *02 and *04, respectively.
-#' 
-#' @param    allele_calls  a vector of strings respresenting IGHV allele names
-#' 
-#' @return   vector of strings respresenting updated IGHV allele names
-#' 
-#' @references Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
-#' and alleles: new entities, new names and implications for research and
-#' prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
-#' 
-#' @seealso Like \code{updateAlleleNames}, \code{\link{sortAlleles}} can help
-#'          format a list of allele names.
-#' 
-#' @examples
-#' # Create a vector that uses old gene/allele names.
-#' alleles = c("IGHV1-c*01", "IGHV1-f*02", "IGHV2-5*07")
-#' 
-#' # Update the alleles to the new names
-#' updateAlleleNames(alleles)
-#' 
-#' @export
-updateAlleleNames <- function(allele_calls){
-  temporary_names = c("IGHV1-c*",
-                      "IGHV1-f*",
-                      "IGHV3-d*",
-                      "IGHV3-h*",
-                      "IGHV4-b*",
-                      "IGHV5-a*",
-                      "IGHV2-5*10",
-                      "IGHV2-5*07")
-  definitive_names = c("IGHV1-38-4*",
-                       "IGHV1-69-2*",
-                       "IGHV3-38-3*",
-                       "IGHV3-69-1*",
-                       "IGHV4-38-2*",
-                       "IGHV5-10-1*",
-                       "IGHV2-5*02",
-                       "IGHV2-5*04")
-  for (i in 1:length(temporary_names)){
-    allele_calls = allele_calls %>%
-      gsub(temporary_names[i], definitive_names[i], ., fixed = TRUE)
-  }
-  return(allele_calls)
-}
-
-#' Sort allele names
-#'
-#' \code{sortAlleles} returns a sorted vector of strings respresenting Ig allele
-#' names. Names are first sorted by gene family, then by gene, then by allele.
-#' Duplicated genes have their alleles are sorted as if they were part of their
-#' non-duplicated counterparts (e.g. IGHV1-69D*01 comes after IGHV1-69*01 but
-#' before IGHV1-69*02), and non-localized genes (e.g. IGHV1-NL1*01) come last
-#' within their gene family.
-#' 
-#' @param    allele_calls  a vector of strings respresenting Ig allele names
-#' @return   A sorted vector of strings respresenting Ig allele names
-#' 
-#' @seealso Like \code{sortAlleles}, \code{\link{updateAlleleNames}} can help
-#'          format a list of allele names.
-#' 
-#' @examples
-#' # Create a list of allele names
-#' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
-#' "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", "IGHV1-2",
-#' "IGHV1-2*02", "IGHV1-69*02")
-#' 
-#' # Sort the alleles
-#' sortAlleles(alleles)
-#' 
-#' @export
-sortAlleles <- function(allele_calls) {  
-  # Standardize format of submitted alleles, first
-  SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE)
-  allele_df = data.frame(SUBMITTED_CALLS, stringsAsFactors = FALSE) %>%
-    # Sort to help with the Ds later
-    arrange(SUBMITTED_CALLS) %>%
-    # Determine the family
-    mutate(FAMILY = getFamily(SUBMITTED_CALLS)) %>%
-    # Determine the gene (exclude family); convert letters to numbers for sort
-    mutate(GENE = getGene(SUBMITTED_CALLS)) %>%
-    mutate(GENE1 = gsub("[^-]+-([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
-    mutate(GENE1 = as.numeric(gsub("NL|a|b|f", "99", GENE1))) %>%
-    # If there is a second gene number, determine that, too
-    mutate(GENE2 = gsub("[^-]+-[^-]+-?","",GENE)) %>%
-    mutate(GENE2 = as.numeric(gsub("NL|a|b|f", "99", GENE2))) %>%
-    mutate(ALLELE = as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",
-                                   getAllele(SUBMITTED_CALLS))))
-  # Convert missing values to 0, sort data frame
-  allele_df[is.na(allele_df)] = 0
-  sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
-  return(sorted_df$SUBMITTED_CALLS)
-}
-
-
-# Private functions -------------------------------------------------------
-
-# Find muations-by-position compared to a germline
-#
-# \code{positionMutations} duplicates the rows of a data frame for each
-# position to be analyzed and determines if each sample is mutated at that
-# position
-# 
-# @param  clip_db       A Change-O db data frame. See
-#                       \code{\link{findNovelAlleles}} for a list of required
-#                       columns.
-# @param  germline      The germline to which all the sequences should be
-#                       compared
-# @param  pos_range     The range of positions within the sequence for which
-#                       the rows should be duplicated and checked for mutation
-# 
-# @return  A data frame with rows duplicated for all the positions to be
-# analyzed and a column indicating whether the position is mutated in
-# comparison to the germline
-#
-positionMutations <- function(clip_db, germline, pos_range){
-  pos_db = pos_range %>%
-    length() %>%
-    rep("clip_db", .) %>%
-    paste(collapse=",") %>%
-    paste("bind_rows(",., ")") %>%
-    parse(text=.) %>%
-    eval()
-  pos_db$POSITION = c(sapply(pos_range, rep, nrow(clip_db)))
-  # Find which positions are mutated
-  pos_db = pos_db %>%
-    mutate(NT = substring(SEQUENCE_IMGT, POSITION, POSITION)) %>%
-    mutate(GERM_NT = substring(germline, POSITION, POSITION)) %>%
-    mutate(MUTATED = (NT != GERM_NT & NT != "N" & NT != "-" & NT != "")) %>%
-    mutate(OBSERVED = (NT != "-" & NT != ""))
-  return(pos_db)
-}
-
-
-
-mutationRangeSubset <- function(clip_db, germline, mut_range, pos_range){
-  pads = paste(rep("-", min(pos_range)-1), collapse="")
-  clip_db$MUT_COUNT = clip_db$SEQUENCE_IMGT %>%
-    substring(min(pos_range), max(pos_range)) %>%
-    paste(pads, ., sep="") %>%
-    getMutatedPositions(germline) %>%
-    sapply(length)
-  clip_db = clip_db %>%
-    filter(MUT_COUNT %in% mut_range)
-  return(clip_db)
-}
-
-
-
-# Make seqs into caps, replace . with -, make all non ACGT- into N
-cleanSeqs <- function(seqs){
-  seqs %>%
-    toupper() %>%
-    gsub(".", "-", . , fixed = TRUE) %>%
-    gsub("[^ACGT-]", "N", .) %>%
-    return()
-}
-
-
-#' Determine the mutation counts from allele calls
-#'
-#' \code{getMutCount} takes a set of nucleotide sequences and their allele calls
-#' and determines the distance between that seqeunce and any germline alleles
-#' contained within the call
-#' 
-#' @param    samples       a vector of IMGT-gapped sample V sequences
-#' @param    allele_calls  a vector of strings respresenting Ig allele calls for
-#'                         the sequences in \code{samples}, where multiple
-#'                         calls are separated by a comma
-#' @param    germline_db   a vector of named nucleotide germline sequences
-#'                         matching the calls detailed in \code{allele_calls}
-#' 
-#' @return   A list equal in length to \code{samples}, containing the Hamming
-#'           distance to each germline allele contained within each call within
-#'           each element of \code{samples}
-#' 
-#' @examples
-#' # Load germline database
-#' data(germline_ighv)
-#' 
-#' # Use createGermlines to insert a mutation into a germline sequence
-#' #sample_seqs = c(germline_ighv[2],
-#' #                createGermlines(germline_ighv[1], 103, "G"),
-#' #                createGermlines(germline_ighv[1], 107, "C"))
-#' 
-#' # Pretend that one sample sequence has received an ambiguous allele call
-#' #sample_alleles = c(paste(names(germline_ighv[1:2]), collapse=","),
-#' #                  names(germline_ighv[2]),
-#' #                  names(germline_ighv[1]))
-#' 
-#' # Compare each sequence to its assigned germline(s) to determine the distance
-#' #getMutCount(sample_seqs, sample_alleles, germline_ighv)
-#' 
-#' @export
-getMutCount <- function(samples, allele_calls, germline_db){
-  
-  call_list = strsplit(allele_calls, ",")
-  germline_list = lapply(call_list, function(x) germline_db[x])
-  
-  mut_pos_list = list()
-  mut_count_list = list()
-  # First, find mutations of all sequences with call count of 1
-  call_count = sapply(germline_list, length)
-  cc1 = which(call_count == 1)
-  if (length(cc1) > 0) {
-    mut_pos_list[cc1] = getMutatedPositions(samples[cc1],
-                                            unlist(germline_list[cc1]))
-    mut_count_list[cc1] = lapply(mut_pos_list[cc1], length)
-  }
-  # Then find mutations of all sequences with call count > 1
-  ccm = which(call_count > 1)
-  if (length(ccm) > 0){
-    mut_pos_list[ccm] = mapply(getMutatedPositions,
-                               germline_list[ccm], samples[ccm],
-                               SIMPLIFY=FALSE)
-    mut_count_list[ccm] = lapply(mut_pos_list[ccm],
-                                 function(x) lapply(x,length))
-  }
-  
-  return(mut_count_list)
-}
-
-
-#' Find the location of mutations in a sequence
-#'
-#' \code{getMutatedPositions} takes two vectors of aligned sequences and
-#' compares pairs of sequences. It returns a list of the nucleotide positions of
-#' any differences.
-#' 
-#' @param    samples        a vector of strings respresenting aligned sequences
-#' @param    germlines      a vector of strings respresenting aligned sequences
-#'                          to which \code{samples} will be compared. If only
-#'                          one string is submitted, it will be used for all
-#'                          \code{samples}.
-#' @param    ignored_regex  a regular expression indicating what characters
-#'                          should be ignored (such as gaps and N nucleotides).
-#' @param    match_instead  if \code{TRUE}, the function returns the positions
-#'                          that are the same instead of those that are
-#'                          different.
-#' @return   A list of the nucleotide positions of any differences between the
-#'           input vectors.
-#' 
-#' @examples
-#' # Create strings to act as a sample sequences and a reference sequence
-#' seqs = c("----GATA","GAGAGAGA","TANA")
-#' ref = "GATAGATA"
-#' 
-#' # Find the differences between the two
-#' getMutatedPositions(seqs, ref)
-#' 
-#' @export
-getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
-                                match_instead=FALSE) {
-  
-  # If only one germline sequence is given, use it for all the sample seqs
-  if(length(germlines) == 1){ germlines = rep(germlines, length(samples)) }
-  if(length(samples) != length(germlines)) {
-    stop("Number of input sequences does not match number of germlines.")
-  }
-  
-  # Truncate each pair of sequences to the length of the shorter
-  germ_mins = lapply(germlines, nchar)
-  samp_mins = lapply(samples, nchar)
-  min_lens = mapply(min, germ_mins, samp_mins)
-  germ = toupper(mapply(substr, germlines, 1, min_lens, SIMPLIFY=FALSE))
-  samp = toupper(mapply(substr, samples, 1, min_lens, SIMPLIFY=FALSE))
-  
-  # Calculate poisitions of mutations (or matches), ignoring gaps, Ns, and CDR3
-  samp_char = strsplit(samp,"")
-  germ_char = strsplit(germ,"")
-  if(!match_instead){
-    muts = lapply(mapply("!=", samp_char, germ_char, SIMPLIFY=FALSE), which)
-  } else {
-    muts = lapply(mapply("==", samp_char, germ_char, SIMPLIFY=FALSE), which)
-  }
-  ignore_germ = gregexpr(ignored_regex, germ)
-  ignore_samp = gregexpr(ignored_regex, samp)
-  ignore = mapply(c, ignore_germ, ignore_samp, SIMPLIFY=FALSE)
-  
-  muts = mapply(function(x, y) x[!x%in%y], muts, ignore, SIMPLIFY=FALSE)
-  return(muts)
-}
-
-# Private function to find lower range of y intercept confidence interval
-findLowerY = function(x, y, mut_min, alpha){
-  y = y+1-mut_min
-  lowerY = suppressWarnings(confint(lm(x ~ y),level=1-2*alpha)[[1]])
-  return(lowerY)
-}
-
-#' Insert polymorphisms into a nucleotide sequence
-#'
-#' \code{insertPolymorphisms} replaces nucleotides in the desired locations of a
-#' provided sequence.
-#' 
-#' 
-#' @param    sequence     the starting nucletide sequence
-#' @param    positions    a vector of positions which to be changed
-#' @param    nucleotides  a vector of nucletides to which to change the
-#'                        positions
-#' @return   a sequence with the desired nucleotides in provided locations
-#' 
-#' @examples
-#' insertPolymorphisms("hugged", c(1,2,6), c("t","i","r")) 
-#' 
-#' @export
-insertPolymorphisms <- function(sequence, positions, nucleotides){
-  
-  if(length(positions) != length(nucleotides)){
-    stop("Number of nucleotides and number of positions do not match.")
-  }
-  names(positions) = nucleotides
-  for (i in 1:length(positions)){
-    substr(sequence, positions[i], positions[i]) = names(positions[i])
-  }
-  
-  return(sequence)
-}
-
+# The TIgGER Trifecta: SNPs, Genotype, and Call Correction ----------------
 
 #' Find novel alleles from repertoire sequencing data
 #'
@@ -450,6 +58,10 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #' either a note as to where the polymorphism-finding algorithm exited or a
 #' nucleotide sequence for the predicted novel allele.
 #' 
+#' @seealso \code{\link{plotTigger}} to visualize the data supporting any
+#' novel alleles hypothesized to be present in the data and
+#' \code{\link{inferGenotype}} to determine if the novel alleles are frequent
+#' enought to be included in the subject's genotype
 #' 
 #' @examples
 #' # Load example data and germlines
@@ -483,7 +95,7 @@ findNovelAlleles  <- function(clip_db, germlines,
   allele_groups = sapply(names(germlines), grep, clip_db$V_CALL, fixed=TRUE)
   allele_groups = allele_groups[sapply(allele_groups, length) >= cutoff]
   allele_groups = allele_groups[sortAlleles(names(allele_groups))]
-    
+  
   # Prepare for parallel processing
   nproc = ifelse(Sys.info()['sysname'] == "Windows",
                  Sys.getenv('NUMBER_OF_PROCESSORS'),
@@ -513,161 +125,156 @@ findNovelAlleles  <- function(clip_db, germlines,
   }
   
   df_out <- foreach(a=icount(length(allele_groups)), .combine=rbind) %dopar% {
+    
+    allele_name = names(allele_groups)[a]
+    
+    # Subset of data being analyzed
+    germline = germlines[allele_name]
+    indicies = allele_groups[[allele_name]]
+    db_subset = slice(clip_db, indicies)
+    
+    # If mutrange is auto, find most popular mutation count and start from there
+    gpm = db_subset %>%
+      mutate(V_CALL = allele_name) %>%
+      getPopularMutationCount(germline,
+                              gene_min=0, seq_min=min_seqs,
+                              seq_p_of_max=1/8, full_return=TRUE)
+    
+    # Determine the mutation range(s) to scan
+    if(auto_mutrange & sum(gpm$MUTATION_COUNT > 0) > 0 ){
+      mut_mins = gpm$MUTATION_COUNT[gpm$MUTATION_COUNT > 0]
+    } else {
+      mut_mins = min(mut_range)
+    }
+    
+    for (mut_min in mut_mins) {
       
-      allele_name = names(allele_groups)[a]
+      mut_max = mut_min + diff(range(mut_range))
       
-      # Subset of data being analyzed
-      germline = germlines[allele_name]
-      indicies = allele_groups[[allele_name]]
-      db_subset = slice(clip_db, indicies)
+      # Create the run's return object
+      df_run = data.frame(GERMLINE_CALL = names(germline),
+                          NOTE = "",
+                          POLYMORPHISM_CALL = NA,
+                          NOVEL_IMGT = NA,
+                          PERFECT_MATCH_COUNT = NA,
+                          GERMLINE_CALL_COUNT = length(indicies),
+                          GERMLINE_IMGT = as.character(germline),
+                          POS_MIN = min(pos_range),
+                          POS_MAX = max(pos_range),
+                          MUT_MIN = mut_min, 
+                          MUT_MAX = mut_max,
+                          Y_INTERCEPT = y_intercept,
+                          ALPHA = alpha,
+                          MIN_SEQS = min_seqs,
+                          J_MAX = j_max,
+                          stringsAsFactors = FALSE)
       
-      # If mutrange is auto, find most popular mutation count and start from there
-      gpm = db_subset %>%
-        mutate(V_CALL = allele_name) %>%
-        getPopularMutationCount(germline,
-                                gene_min=0, seq_min=min_seqs,
-                                seq_p_of_max=1/8, full_return=TRUE)
-      
-      # Determine the mutation range(s) to scan
-      if(auto_mutrange & sum(gpm$MUTATION_COUNT > 0) > 0 ){
-        mut_mins = gpm$MUTATION_COUNT[gpm$MUTATION_COUNT > 0]
-      } else {
-        mut_mins = min(mut_range)
+      # If no sequence is frequent enough to pass the J test, give up now
+      if(length(gpm) < 1) {
+        df_run$NOTE = "Plurality sequence too rare"
+        return(df_run)
       }
       
-      for (mut_min in mut_mins) {
-        
-        mut_max = mut_min + diff(range(mut_range))
-        
-        # Create the run's return object
-        df_run = data.frame(GERMLINE_CALL = names(germline),
-                            NOTE = "",
-                            POLYMORPHISM_CALL = NA,
-                            NOVEL_IMGT = NA,
-                            PERFECT_MATCH_COUNT = NA,
-                            GERMLINE_CALL_COUNT = length(indicies),
-                            GERMLINE_IMGT = as.character(germline),
-                            POS_MIN = min(pos_range),
-                            POS_MAX = max(pos_range),
-                            MUT_MIN = mut_min, 
-                            MUT_MAX = mut_max,
-                            Y_INTERCEPT = y_intercept,
-                            ALPHA = alpha,
-                            MIN_SEQS = min_seqs,
-                            J_MAX = j_max,
-                            stringsAsFactors = FALSE)
-        
-        # If no sequence is frequent enough to pass the J test, give up now
-        if(length(gpm) < 1) {
-          df_run$NOTE = "Plurality sequence too rare"
-          return(df_run)
+      # Add a mutation count column and filter out sequences not in our range
+      db_subset = mutationRangeSubset(db_subset, germline, mut_range, pos_range)
+      
+      if(nrow(db_subset) < germline_min){
+        df_run$NOTE = "Insufficient sequences in desired mutational range"
+        return(df_run)
+      }
+      
+      # Duplicate each sequence for all the positions to be analyzed
+      # and find which positions are mutated
+      pos_db = positionMutations(db_subset, germline, pos_range)
+      
+      # Find positional mut freq vs seq mut count
+      pos_muts = pos_db %>%
+        group_by(POSITION) %>%
+        mutate(PASS = mean(OBSERVED) >= min_frac) %>%
+        group_by(MUT_COUNT, POSITION) %>%
+        summarise(POS_MUT_RATE = mean(MUTATED)*unique(PASS) ) %>% 
+        ungroup()   
+      
+      # Calculate y intercepts, find which pass the test
+      pass_y = pos_muts %>%
+        group_by(POSITION) %>%
+        summarise(Y_INT_MIN = findLowerY(POS_MUT_RATE, MUT_COUNT,
+                                         mut_min, alpha)) %>%
+        filter(Y_INT_MIN > y_intercept)
+      
+      if(nrow(pass_y) < 1){
+        df_run$NOTE = "No positions pass y-intercept test"
+        return(df_run)
+      }
+      
+      gl_substring = superSubstring(germline, pass_y$POSITION)
+      gl_minus_substring = insertPolymorphisms(germline, pass_y$POSITION,
+                                               rep("N", nrow(pass_y)))
+      
+      # Find the potential SNP positions and remove anything that matches
+      # the germline at all those positions or any combo that is too rare
+      db_y_subset = db_subset %>%
+        group_by(1:n()) %>%
+        mutate(SNP_STRING = superSubstring(SEQUENCE_IMGT, pass_y$POSITION)) %>%
+        filter(SNP_STRING != gl_substring) %>%
+        group_by(SNP_STRING) %>%
+        mutate(STRING_COUNT = n()) %>%
+        filter(STRING_COUNT >= min_seqs)
+      
+      if (nrow(db_y_subset) < 1 ){
+        df_run$NOTE = paste("Position(s) passed y-intercept but", 
+                            "the plurality sequence is too rare")
+        return(df_run)
+      }
+      
+      # Get mutation count at all positions that are not potential SNPs
+      pads = paste(rep("-", min(pos_range)-1), collapse="")
+      db_y_subset$MUT_COUNT_MINUS_SUBSTRING = db_y_subset$SEQUENCE_IMGT %>%
+        substring(min(pos_range), max(pos_range)) %>%
+        paste(pads, ., sep="") %>% 
+        getMutatedPositions(gl_minus_substring) %>%
+        sapply(length)
+      
+      # Keep only unmutated seqences and then find the counts of J and
+      # junction length for each of the SNP strings, and then check to
+      # see which pass the j/junction and count requirements
+      db_y_summary = db_y_subset %>%
+        filter(MUT_COUNT_MINUS_SUBSTRING == 0) %>%
+        mutate(J_GENE = getGene(J_CALL)) %>%
+        group_by(SNP_STRING, J_GENE, JUNCTION_LENGTH) %>%
+        summarise(COUNT = n()) %>%
+        group_by(SNP_STRING) %>%
+        mutate(FRACTION = COUNT/sum(COUNT)) %>%
+        summarise(TOTAL_COUNT = sum(COUNT), MAX_FRAC = max(FRACTION)) %>%
+        filter(TOTAL_COUNT >= min_seqs & MAX_FRAC <= j_max)
+      
+      if(nrow(db_y_summary) < 1){
+        df_run$NOTE = paste("Position(s) passed y-intercept but a",
+                            "J-junction combination is too prevalent")
+        return(df_run)
+      }
+      
+      germ_nts = unlist(strsplit(gl_substring,""))
+      for (r in 1:nrow(db_y_summary)) {
+        # Create the new germline
+        snp_nts = unlist(strsplit(db_y_summary$SNP_STRING[r],""))
+        germ = insertPolymorphisms(germline, pass_y$POSITION, snp_nts)
+        names(germ) = mapply(paste, germ_nts, pass_y$POSITION,
+                             snp_nts, sep="") %>%
+          paste(collapse="_") %>%
+          paste(names(germline), ., sep="_")
+        # Save the new germline to our data frame               
+        if (!is.na(df_run$NOVEL_IMGT[1])){
+          df_run = bind_rows(df_run[1,], df_run)
         }
-        
-        # Add a mutation count column and filter out sequences not in our range
-        db_subset = mutationRangeSubset(db_subset, germline, mut_range, pos_range)
-          
-        if(nrow(db_subset) < germline_min){
-          df_run$NOTE = "Insufficient sequences in desired mutational range"
-          return(df_run)
-        }
-        
-        # Duplicate each sequence for all the positions to be analyzed
-        # and find which positions are mutated
-        pos_db = positionMutations(db_subset, germline, pos_range)
-        
-        # Find positional mut freq vs seq mut count
-        pos_muts = pos_db %>%
-          group_by(POSITION) %>%
-          mutate(PASS = mean(OBSERVED) >= min_frac) %>%
-          group_by(MUT_COUNT, POSITION) %>%
-          summarise(POS_MUT_RATE = mean(MUTATED)*unique(PASS) ) %>% 
-          ungroup()   
-        
-        # Calculate y intercepts, find which pass the test
-        pass_y = pos_muts %>%
-          group_by(POSITION) %>%
-          summarise(Y_INT_MIN = findLowerY(POS_MUT_RATE, MUT_COUNT,
-                                           mut_min, alpha)) %>%
-          filter(Y_INT_MIN > y_intercept)
-
-        if(nrow(pass_y) < 1){
-          df_run$NOTE = "No positions pass y-intercept test"
-          return(df_run)
-        }
-        
-        # Make string to represent the nucleotides at positions of interest
-        superSubstring = function(string, positions){
-          chars = sapply(positions, function(x) substring(string, x, x))
-          return(paste(chars, collapse=""))
-        }
-        gl_substring = superSubstring(germline, pass_y$POSITION)
-        gl_minus_substring = insertPolymorphisms(germline, pass_y$POSITION,
-                                                 rep("N", nrow(pass_y)))
-        
-        # Find the potential SNP positions and remove anything that matches
-        # the germline at all those positions or any combo that is too rare
-        db_y_subset = db_subset %>%
-          group_by(1:n()) %>%
-          mutate(SNP_STRING = superSubstring(SEQUENCE_IMGT, pass_y$POSITION)) %>%
-          filter(SNP_STRING != gl_substring) %>%
-          group_by(SNP_STRING) %>%
-          mutate(STRING_COUNT = n()) %>%
-          filter(STRING_COUNT >= min_seqs)
-        
-        if (nrow(db_y_subset) < 1 ){
-          df_run$NOTE = paste("Position(s) passed y-intercept but", 
-                              "the plurality sequence is too rare")
-          return(df_run)
-        }
-        
-        # Get mutation count at all positions that are not potential SNPs
-        pads = paste(rep("-", min(pos_range)-1), collapse="")
-        db_y_subset$MUT_COUNT_MINUS_SUBSTRING = db_y_subset$SEQUENCE_IMGT %>%
-          substring(min(pos_range), max(pos_range)) %>%
-          paste(pads, ., sep="") %>% 
-          getMutatedPositions(gl_minus_substring) %>%
-          sapply(length)
-        
-        # Keep only unmutated seqences and then find the counts of J and
-        # junction length for each of the SNP strings, and then check to
-        # see which pass the j/junction and count requirements
-        db_y_summary = db_y_subset %>%
-          filter(MUT_COUNT_MINUS_SUBSTRING == 0) %>%
-          mutate(J_GENE = getGene(J_CALL)) %>%
-          group_by(SNP_STRING, J_GENE, JUNCTION_LENGTH) %>%
-          summarise(COUNT = n()) %>%
-          group_by(SNP_STRING) %>%
-          mutate(FRACTION = COUNT/sum(COUNT)) %>%
-          summarise(TOTAL_COUNT = sum(COUNT), MAX_FRAC = max(FRACTION)) %>%
-          filter(TOTAL_COUNT >= min_seqs & MAX_FRAC <= j_max)
-                
-        if(nrow(db_y_summary) < 1){
-          df_run$NOTE = paste("Position(s) passed y-intercept but a",
-                              "J-junction combination is too prevalent")
-          return(df_run)
-        }
-        
-        germ_nts = unlist(strsplit(gl_substring,""))
-        for (r in 1:nrow(db_y_summary)) {
-          # Create the new germline
-          snp_nts = unlist(strsplit(db_y_summary$SNP_STRING[r],""))
-          germ = insertPolymorphisms(germline, pass_y$POSITION, snp_nts)
-          names(germ) = mapply(paste, germ_nts, pass_y$POSITION,
-                               snp_nts, sep="") %>%
-            paste(collapse="_") %>%
-            paste(names(germline), ., sep="_")
-          # Save the new germline to our data frame               
-          if (!is.na(df_run$NOVEL_IMGT[1])){
-            df_run = bind_rows(df_run[1,], df_run)
-          }
-          df_run$POLYMORPHISM_CALL[1] = names(germ)
-          df_run$NOVEL_IMGT[1] =  as.character(germ)
-          df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
-        }
-        
-      } # end for each starting mutation counts
-      return(df_run)
-    } # end foreach allele
+        df_run$POLYMORPHISM_CALL[1] = names(germ)
+        df_run$NOVEL_IMGT[1] =  as.character(germ)
+        df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
+      }
+      
+    } # end for each starting mutation counts
+    return(df_run)
+  } # end foreach allele
   if(nproc > 1) { stopCluster(cluster) }
   return(df_out)
 }
@@ -783,7 +390,7 @@ plotTigger <- function(clip_db, novel_df_row){
     xlab("Mutation Count (Sequence)") +
     ylab("Mutation Frequency (Position)") +
     theme_bw() +
-    theme(legend.position=c(0.5,1), legend.justification=c(0.5,1),
+    theme(legend.position=c(0.5,0.8), legend.justification=c(0.5,1),
           legend.background=element_rect(fill = "transparent")) +
     guides(color = guide_legend(ncol = 1))
   # MAKE THE SECOND PLOT
@@ -810,48 +417,6 @@ plotTigger <- function(clip_db, novel_df_row){
   multiplot(p1,p2,p3, cols = 3)
 }
 
-
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
-  library(grid)
-  
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-  
-  numPlots = length(plots)
-  
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  
-  if (numPlots==1) {
-    print(plots[[1]])
-    
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
-    
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
-    }
-  }
-}
-
-
- 
-# ADD TO FOLLOWING A FUNCTION THAT WILL FIND WHICH SEQUENCES ARE UNMUTATED -----
-
-
 #' Infer a subject-specific genotype
 #'
 #' \code{inferGenotype} infers an subject's genotype by finding the minimum
@@ -869,8 +434,7 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #'           the genotype.
 #' 
 #' @param    allele_calls         a vector of strings respresenting Ig allele
-#'                                calls of unmutated sequences from a single
-#'                                subject
+#'                                calls from a single subject
 #' @param    fraction_to_explain  the portion of each gene that must be
 #'                                explained by the alleles that will be included
 #'                                in the genotype
@@ -879,6 +443,22 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #'                                minimum number of times a gene must be
 #'                                observed in \code{allele_calls} to be included
 #'                                in the genotype
+#' @param    find_unmutated       if \code{TRUE}, use \code{germline_db} to
+#'                                find which samples are unmutated. Not needed
+#'                                if \code{allele_calls} only represent
+#'                                unmutated samples.
+#' @param    germline_db          named vector of sequences containing the
+#'                                germline sequences named in
+#'                                \code{allele_calls}. Only required if
+#'                                \code{find_unmutated} is \code{TRUE}.
+#' @param    novel_germline       an optional named vector of novel germline
+#'                                sequences that will be utilized if
+#'                                \code{find_unmutated} is \code{TRUE}. See
+#'                                details.
+#' @details  if \code{novel_germlines} is provided, all sequences that are
+#' assigned to the same gene as any novel germline allele will have the novel
+#' germline allele appended to their assignent prior to searching for unmutated
+#' sequences.
 #' 
 #' @return   A table of alleles denoting the genotype of the subject
 #' 
@@ -894,10 +474,12 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
 #' inferGenotype(sample_db[,"V_CALL"])
 #' 
 #' @export
-inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
-                          fraction_to_explain = 7/8,
-                          gene_cutoff = 1e-3 # Can be a no. of seqs or frac < 1
-){
+inferGenotype <- function(allele_calls, fraction_to_explain = 7/8,
+                          gene_cutoff = 1e-3, find_unmutated = FALSE,
+                          germline_db = NA, novel_germlines = NA){
+  
+  
+  
   # Standardize allele call names
   allele_calls = getAllele(allele_calls, first = FALSE)
   
@@ -986,7 +568,6 @@ inferGenotype <- function(allele_calls, # Calls of unique, unmutated sequences
   return(as.data.frame(genotype, stringsAsFactors = FALSE))
 }
 
-
 #' Return the nucleotide sequences of a genotype
 #'
 #' \code{genotypeFasta} converts a genotype table into a vector of nucleotide
@@ -1026,7 +607,6 @@ genotypeFasta <- function(genotype, germline_db){
   }
   return(seqs)
 }
-
 
 #' Correct allele calls based on a personalized genotype
 #'
@@ -1108,3 +688,511 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   
   return(new_calls)
 }
+
+
+# Other Mutation-Related Functions ----------------------------------------
+
+#' Find the location of mutations in a sequence
+#'
+#' \code{getMutatedPositions} takes two vectors of aligned sequences and
+#' compares pairs of sequences. It returns a list of the nucleotide positions of
+#' any differences.
+#' 
+#' @param    samples        a vector of strings respresenting aligned sequences
+#' @param    germlines      a vector of strings respresenting aligned sequences
+#'                          to which \code{samples} will be compared. If only
+#'                          one string is submitted, it will be used for all
+#'                          \code{samples}.
+#' @param    ignored_regex  a regular expression indicating what characters
+#'                          should be ignored (such as gaps and N nucleotides).
+#' @param    match_instead  if \code{TRUE}, the function returns the positions
+#'                          that are the same instead of those that are
+#'                          different.
+#' @return   A list of the nucleotide positions of any differences between the
+#'           input vectors.
+#' 
+#' @examples
+#' # Create strings to act as a sample sequences and a reference sequence
+#' seqs = c("----GATA","GAGAGAGA","TANA")
+#' ref = "GATAGATA"
+#' 
+#' # Find the differences between the two
+#' getMutatedPositions(seqs, ref)
+#' 
+#' @export
+getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
+                                match_instead=FALSE) {
+  
+  # If only one germline sequence is given, use it for all the sample seqs
+  if(length(germlines) == 1){ germlines = rep(germlines, length(samples)) }
+  if(length(samples) != length(germlines)) {
+    stop("Number of input sequences does not match number of germlines.")
+  }
+  
+  # Truncate each pair of sequences to the length of the shorter
+  germ_mins = lapply(germlines, nchar)
+  samp_mins = lapply(samples, nchar)
+  min_lens = mapply(min, germ_mins, samp_mins)
+  germ = toupper(mapply(substr, germlines, 1, min_lens, SIMPLIFY=FALSE))
+  samp = toupper(mapply(substr, samples, 1, min_lens, SIMPLIFY=FALSE))
+  
+  # Calculate poisitions of mutations (or matches), ignoring gaps, Ns, and CDR3
+  samp_char = strsplit(samp,"")
+  germ_char = strsplit(germ,"")
+  if(!match_instead){
+    muts = lapply(mapply("!=", samp_char, germ_char, SIMPLIFY=FALSE), which)
+  } else {
+    muts = lapply(mapply("==", samp_char, germ_char, SIMPLIFY=FALSE), which)
+  }
+  ignore_germ = gregexpr(ignored_regex, germ)
+  ignore_samp = gregexpr(ignored_regex, samp)
+  ignore = mapply(c, ignore_germ, ignore_samp, SIMPLIFY=FALSE)
+  
+  muts = mapply(function(x, y) x[!x%in%y], muts, ignore, SIMPLIFY=FALSE)
+  return(muts)
+}
+
+
+#' Determine the mutation counts from allele calls
+#'
+#' \code{getMutCount} takes a set of nucleotide sequences and their allele calls
+#' and determines the distance between that seqeunce and any germline alleles
+#' contained within the call
+#' 
+#' @param    samples       a vector of IMGT-gapped sample V sequences
+#' @param    allele_calls  a vector of strings respresenting Ig allele calls for
+#'                         the sequences in \code{samples}, where multiple
+#'                         calls are separated by a comma
+#' @param    germline_db   a vector of named nucleotide germline sequences
+#'                         matching the calls detailed in \code{allele_calls}
+#' 
+#' @return   A list equal in length to \code{samples}, containing the Hamming
+#'           distance to each germline allele contained within each call within
+#'           each element of \code{samples}
+#' 
+#' @examples
+#' # Load germline database
+#' data(germline_ighv)
+#' 
+#' # Use createGermlines to insert a mutation into a germline sequence
+#' #sample_seqs = c(germline_ighv[2],
+#' #                createGermlines(germline_ighv[1], 103, "G"),
+#' #                createGermlines(germline_ighv[1], 107, "C"))
+#' 
+#' # Pretend that one sample sequence has received an ambiguous allele call
+#' #sample_alleles = c(paste(names(germline_ighv[1:2]), collapse=","),
+#' #                  names(germline_ighv[2]),
+#' #                  names(germline_ighv[1]))
+#' 
+#' # Compare each sequence to its assigned germline(s) to determine the distance
+#' #getMutCount(sample_seqs, sample_alleles, germline_ighv)
+#' 
+#' @export
+getMutCount <- function(samples, allele_calls, germline_db){
+  
+  call_list = strsplit(allele_calls, ",")
+  germline_list = lapply(call_list, function(x) germline_db[x])
+  
+  mut_pos_list = list()
+  mut_count_list = list()
+  # First, find mutations of all sequences with call count of 1
+  call_count = sapply(germline_list, length)
+  cc1 = which(call_count == 1)
+  if (length(cc1) > 0) {
+    mut_pos_list[cc1] = getMutatedPositions(samples[cc1],
+                                            unlist(germline_list[cc1]))
+    mut_count_list[cc1] = lapply(mut_pos_list[cc1], length)
+  }
+  # Then find mutations of all sequences with call count > 1
+  ccm = which(call_count > 1)
+  if (length(ccm) > 0){
+    mut_pos_list[ccm] = mapply(getMutatedPositions,
+                               germline_list[ccm], samples[ccm],
+                               SIMPLIFY=FALSE)
+    mut_count_list[ccm] = lapply(mut_pos_list[ccm],
+                                 function(x) lapply(x,length))
+  }
+  
+  return(mut_count_list)
+}
+
+#' Find Frequent Sequences' Mutation Counts
+#'
+#' \code{getPopularMutationCount} determines which sequences occur frequently
+#' for each V gene and returns the mutation count of those sequences.
+#' 
+#' @param  sample_db     A Change-O db data frame. See
+#'                       \code{\link{findNovelAlleles}} for a list of required
+#'                       columns.
+#' @param  germline_db   A named list of IMGT-gapped germline sequences.
+#' @param  gene_min      The portion of all unique sequences a gene must
+#'                       constitute to avoid exclusion.
+#' @param  seq_min       The number of copies of the V that must be present for
+#'                       to avoid exclusion.
+#' @param  seq_p_of_max  For each gene, fraction of the most common V sequence's
+#'                       count that a sequence must meet to avoid exclusion.
+#' @param  full_return   If true, will return all \code{sample_db} columns and
+#'                       will include sequences with mutation count < 1.
+#' 
+#' @return  A data frame of genes that have a frequent sequence mutation count
+#' above 1.
+#' 
+#' @seealso \code{\link{getMutatedPositions}} can be used to find which positions
+#' of a set of sequences are mutated.
+#' 
+#' @examples
+#' data(sample_db, germline_ighv)
+#' getPopularMutationCount(sample_db, germline_ighv)
+#' 
+#' @export
+getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
+                                    seq_min = 50, seq_p_of_max = 1/8,
+                                    full_return = FALSE){
+  modified_db = sample_db %>%
+    mutate(V_GENE = getGene(V_CALL)) %>%
+    group_by(1:n()) %>%
+    mutate(V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312)) %>%
+    # Count occurence of each unique IMGT-gapped V sequence
+    group_by(V_GENE, V_SEQUENCE_IMGT) %>%
+    mutate(V_SEQUENCE_IMGT_N = n()) %>%
+    # Count occurence of each gene and determine count of most common sequence
+    group_by(V_GENE) %>%
+    mutate(V_GENE_N = n()) %>%
+    mutate(V_SEQUENCE_IMGT_N_MAX = max(V_SEQUENCE_IMGT_N)) %>%
+    # Remove rare V genes, rare sequences, and sequences not making up a
+    # sufficient proportion of sequences as compared to the most common
+    ungroup() %>%
+    distinct(V_SEQUENCE_IMGT) %>%
+    filter(V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
+    filter(V_SEQUENCE_IMGT_N >= seq_min) %>%
+    mutate(V_SEQUENCE_IMGT_P_MAX = V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
+    filter(V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
+  # Determine the mutation counts of the V sequences and append them to the db
+  MUTATION_COUNT = getMutCount(modified_db$V_SEQUENCE_IMGT,
+                               modified_db$V_CALL,
+                               germline_db) %>% 
+    sapply(function(x) min(unlist(x)))
+  merged_db = bind_cols(modified_db, data.frame(MUTATION_COUNT))
+  # Strip down the data frame before returning it
+  if (!full_return) {
+    merged_db = merged_db %>%
+      filter(MUTATION_COUNT > 0) %>%
+      select(V_GENE, MUTATION_COUNT)
+  }
+  return(merged_db)
+}
+
+#' Insert polymorphisms into a nucleotide sequence
+#'
+#' \code{insertPolymorphisms} replaces nucleotides in the desired locations of a
+#' provided sequence.
+#' 
+#' 
+#' @param    sequence     the starting nucletide sequence
+#' @param    positions    a vector of positions which to be changed
+#' @param    nucleotides  a vector of nucletides to which to change the
+#'                        positions
+#' @return   a sequence with the desired nucleotides in provided locations
+#' 
+#' @examples
+#' insertPolymorphisms("hugged", c(1,6,2), c("t","r","i")) 
+#' 
+#' @export
+insertPolymorphisms <- function(sequence, positions, nucleotides){
+  
+  if(length(positions) != length(nucleotides)){
+    stop("Number of nucleotides and number of positions do not match.")
+  }
+  names(positions) = nucleotides
+  for (i in 1:length(positions)){
+    substr(sequence, positions[i], positions[i]) = names(positions[i])
+  }
+  
+  return(sequence)
+}
+
+# Formatting and Cleanup --------------------------------------------------
+
+#' Update IGHV allele names
+#'
+#' \code{updateAlleleNames} takes a set of IGHV allele calls and replaces any
+#' outdated names (e.g. IGHV1-f) with the new IMGT names.
+#' @details The updated allele names are based on IMGT release 201408-4.
+#' @note    IGMT has removed IGHV2-5*10 and IGHV2-5*07 as it has determined they
+#'          are actually alleles *02 and *04, respectively.
+#' 
+#' @param    allele_calls  a vector of strings respresenting IGHV allele names
+#' 
+#' @return   vector of strings respresenting updated IGHV allele names
+#' 
+#' @references Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
+#' and alleles: new entities, new names and implications for research and
+#' prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
+#' 
+#' @seealso Like \code{updateAlleleNames}, \code{\link{sortAlleles}} can help
+#'          format a list of allele names.
+#' 
+#' @examples
+#' # Create a vector that uses old gene/allele names.
+#' alleles = c("IGHV1-c*01", "IGHV1-f*02", "IGHV2-5*07")
+#' 
+#' # Update the alleles to the new names
+#' updateAlleleNames(alleles)
+#' 
+#' @export
+updateAlleleNames <- function(allele_calls){
+  temporary_names = c("IGHV1-c*",
+                      "IGHV1-f*",
+                      "IGHV3-d*",
+                      "IGHV3-h*",
+                      "IGHV4-b*",
+                      "IGHV5-a*",
+                      "IGHV2-5*10",
+                      "IGHV2-5*07")
+  definitive_names = c("IGHV1-38-4*",
+                       "IGHV1-69-2*",
+                       "IGHV3-38-3*",
+                       "IGHV3-69-1*",
+                       "IGHV4-38-2*",
+                       "IGHV5-10-1*",
+                       "IGHV2-5*02",
+                       "IGHV2-5*04")
+  for (i in 1:length(temporary_names)){
+    allele_calls = allele_calls %>%
+      gsub(temporary_names[i], definitive_names[i], ., fixed = TRUE)
+  }
+  return(allele_calls)
+}
+
+#' Sort allele names
+#'
+#' \code{sortAlleles} returns a sorted vector of strings respresenting Ig allele
+#' names. Names are first sorted by gene family, then by gene, then by allele.
+#' Duplicated genes have their alleles are sorted as if they were part of their
+#' non-duplicated counterparts (e.g. IGHV1-69D*01 comes after IGHV1-69*01 but
+#' before IGHV1-69*02), and non-localized genes (e.g. IGHV1-NL1*01) come last
+#' within their gene family.
+#' 
+#' @param    allele_calls  a vector of strings respresenting Ig allele names
+#' @return   A sorted vector of strings respresenting Ig allele names
+#' 
+#' @seealso Like \code{sortAlleles}, \code{\link{updateAlleleNames}} can help
+#'          format a list of allele names.
+#' 
+#' @examples
+#' # Create a list of allele names
+#' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
+#' "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", "IGHV1-2",
+#' "IGHV1-2*02", "IGHV1-69*02")
+#' 
+#' # Sort the alleles
+#' sortAlleles(alleles)
+#' 
+#' @export
+sortAlleles <- function(allele_calls) {  
+  # Standardize format of submitted alleles, first
+  SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE)
+  allele_df = data.frame(SUBMITTED_CALLS, stringsAsFactors = FALSE) %>%
+    # Sort to help with the Ds later
+    arrange(SUBMITTED_CALLS) %>%
+    # Determine the family
+    mutate(FAMILY = getFamily(SUBMITTED_CALLS)) %>%
+    # Determine the gene (exclude family); convert letters to numbers for sort
+    mutate(GENE = getGene(SUBMITTED_CALLS)) %>%
+    mutate(GENE1 = gsub("[^-]+-([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
+    mutate(GENE1 = as.numeric(gsub("NL|a|b|f", "99", GENE1))) %>%
+    # If there is a second gene number, determine that, too
+    mutate(GENE2 = gsub("[^-]+-[^-]+-?","",GENE)) %>%
+    mutate(GENE2 = as.numeric(gsub("NL|a|b|f", "99", GENE2))) %>%
+    mutate(ALLELE = as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",
+                                   getAllele(SUBMITTED_CALLS))))
+  # Convert missing values to 0, sort data frame
+  allele_df[is.na(allele_df)] = 0
+  sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
+  return(sorted_df$SUBMITTED_CALLS)
+}
+
+#' Clean up nucleotide sequences
+#'
+#' \code{cleanSeqs} capitalizes nucleotides, replaces "." with "-", and then
+#' replaces all characters besides ACGT- with "N". 
+#' 
+#' @param    seqs  a vector of nucleotide sequences
+#' @return   A vector of nucleotide sequences
+#' 
+#' @seealso \code{\link{sortAlleles}} and \code{\link{updateAlleleNames}} can
+#'          help format a list of allele names.
+#' 
+#' @examples
+#' # Create messy nucleotide sequences
+#' seqs = c("AGAT.taa-GAG...ATA",
+#'          "GATACAGTXXXXXAGNNNPPPACA")
+#' # Clean them up
+#' cleanSeqs(seqs)
+#' 
+#' @export
+cleanSeqs <- function(seqs){
+  seqs %>%
+    toupper() %>%
+    gsub(".", "-", . , fixed = TRUE) %>%
+    gsub("[^ACGT-]", "N", .) %>%
+    return()
+}
+
+
+# Private Functions -------------------------------------------------------
+
+# Find muations-by-position compared to a germline
+#
+# \code{positionMutations} duplicates the rows of a data frame for each
+# position to be analyzed and determines if each sample is mutated at that
+# position
+# 
+# @param  clip_db       A Change-O db data frame. See
+#                       \code{\link{findNovelAlleles}} for a list of required
+#                       columns.
+# @param  germline      The germline to which all the sequences should be
+#                       compared
+# @param  pos_range     The range of positions within the sequence for which
+#                       the rows should be duplicated and checked for mutation
+# 
+# @return  A data frame with rows duplicated for all the positions to be
+# analyzed and a column indicating whether the position is mutated in
+# comparison to the germline
+#
+positionMutations <- function(clip_db, germline, pos_range){
+  pos_db = pos_range %>%
+    length() %>%
+    rep("clip_db", .) %>%
+    paste(collapse=",") %>%
+    paste("bind_rows(",., ")") %>%
+    parse(text=.) %>%
+    eval()
+  pos_db$POSITION = c(sapply(pos_range, rep, nrow(clip_db)))
+  # Find which positions are mutated
+  pos_db = pos_db %>%
+    mutate(NT = substring(SEQUENCE_IMGT, POSITION, POSITION)) %>%
+    mutate(GERM_NT = substring(germline, POSITION, POSITION)) %>%
+    mutate(MUTATED = (NT != GERM_NT & NT != "N" & NT != "-" & NT != "")) %>%
+    mutate(OBSERVED = (NT != "-" & NT != ""))
+  return(pos_db)
+}
+
+# Find sequences carrying certain levels of mutation
+#
+# \code{mutationRangeSubset} determines the mutations in a \code{data.frame} of
+# sequences and returns the subset of sequences that meet the given mutation
+# count limits
+# 
+# @param  clip_db       A Change-O db data frame. See
+#                       \code{\link{findNovelAlleles}} for a list of required
+#                       columns.
+# @param  germline      The germline to which all the sequences should be
+#                       compared
+# @param  pos_range     The range of positions within the sequences that should
+#                       be analyzed for mutations
+# @param  pos_range     The range of mutation counts that sequences can have
+#                       and still be included
+#
+# @return  A data frame containing only the subset carrying the desired levels
+# of mutation
+#
+mutationRangeSubset <- function(clip_db, germline, mut_range, pos_range){
+  pads = paste(rep("-", min(pos_range)-1), collapse="")
+  clip_db$MUT_COUNT = clip_db$SEQUENCE_IMGT %>%
+    substring(min(pos_range), max(pos_range)) %>%
+    paste(pads, ., sep="") %>%
+    getMutatedPositions(germline) %>%
+    sapply(length)
+  clip_db = clip_db %>%
+    filter(MUT_COUNT %in% mut_range)
+  return(clip_db)
+}
+
+# Find lower range of y-intercept confidence interval
+#
+# \code{findLowerY} finds the lower range of y-intercept confidence interval
+# 
+# @param    x         A vector of x values
+# @param    y         A vector of y values
+# @param    mut_min   The value where the the lowest mutation count should be
+#                     found. See details.
+# @param    alpha     The alpha cutoff the be used in constructing the
+#                     confidence interval
+#
+# @details  If mut_min is 1, a y-intercept will be searched for at 0. If
+# mut_min is above 1, then the "y-intercept" will be found at x = mut_min - 1.
+#
+# @return  A data frame containing only the subset carrying the desired levels
+# of mutation
+#
+findLowerY = function(x, y, mut_min, alpha){
+  y = y+1-mut_min
+  lowerY = suppressWarnings(confint(lm(x ~ y),level=1-2*alpha)[[1]])
+  return(lowerY)
+}
+
+# Enchanced substring extraction
+#
+# \code{superSubstring} is an enahnced version of \code{substring} in that
+# it can find disjoint positions in one call.
+#
+# @param    string      a single string
+# @param    positions   the positions to be extracted
+#
+# @return  a substring
+# 
+superSubstring = function(string, positions){
+  if(length(string) != 1){ stop("Please submit only one string.") }
+  chars = sapply(positions, function(x) substring(string, x, x))
+  return(paste(chars, collapse=""))
+}
+
+
+# Layout multiple ggplots
+#
+# \code{multiplot} is a function provided by http://www.cookbook-r.com/ which
+# allows for plotting multiple ggplot objects in one panel.
+# 
+# @param    ...       ggplot2 object(s)
+# @param    plotlist  a list alternative to ...
+# @param    file      an unused parameter, but present in the provided function
+# @param    cols      Number of columns in layout
+# @param    layout    A matrix specifying the layout. If present, 'cols' is
+#                     ignored.
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
