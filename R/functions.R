@@ -502,7 +502,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
     if(!is.null(nrow(novel_df))){
       novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
         select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
-      if(nrow(novel_df) > 0){
+      if(length(novel_df) > 0){
         # Extract novel alleles if any and add them to germline_db
         novel_gl = novel_df$NOVEL_IMGT
         names(novel_gl) = novel_df$POLYMORPHISM_CALL
@@ -556,14 +556,14 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
       sapply(strsplit(as.vector(df$gene_calls[stillmulti]),","),"[",1)
   }
   # Make a table to store the resulting genotype
-  gene = sortAlleles(as.character(unique(df$gene_calls)))
-  gene = setdiff(gene, "")
-  alleles = counts = rep("", length(gene))
-  total = as.vector(table(as.character(df$gene_calls))[gene])
-  genotype = cbind(gene, alleles,counts,total)
+  GENE = sortAlleles(as.character(unique(df$gene_calls)))
+  GENE = setdiff(GENE, "")
+  ALLELES = COUNTS = rep("", length(GENE))
+  TOTAL = as.vector(table(as.character(df$gene_calls))[GENE])
+  genotype = cbind(GENE, ALLELES,COUNTS,TOTAL)
   
   # For each gene, find which alleles to include
-  for (g in gene){
+  for (g in GENE){
     
     ac = as.vector(df[df$gene_calls==g,"allele_calls"]) # find allele calls
     target = ceiling(fraction_to_explain*length(ac)) # how many we need to explain
@@ -571,12 +571,11 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
     potentials = unique(unlist(strsplit(names(t_ac),","))) # potential alleles
     # One allele? Easy!
     if (length(potentials) == 1 | length(t_ac) == 1){
-      genotype[genotype[,"gene"]==g,"alleles"] =
+      genotype[genotype[,"GENE"]==g,"ALLELES"] =
         gsub("[^d\\*]*[d\\*]","",potentials )[1]
-      genotype[genotype[,"gene"]==g,"counts"] = t_ac
+      genotype[genotype[,"GENE"]==g,"COUNTS"] = t_ac
     } else {
       # More alleles? Let's find the fewest that can explain the needed fraction
-      
       # Make a table of whic alleles can explain which calls
       regexpotentials = paste(gsub("\\*","\\\\*", potentials),"$",sep="")
       regexpotentials = 
@@ -597,9 +596,9 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
         tot_expl = max(allele_tot)  + tot_expl
         seqs_expl = seqs_expl[which(seqs_expl[,which.max(allele_tot)]==0),]
       }
-      genotype[genotype[,"gene"]==g,"alleles"] =
+      genotype[genotype[,"GENE"]==g,"ALLELES"] =
         paste(gsub("[^d\\*]*[d\\*]","",included ),collapse=",")
-      genotype[genotype[,"gene"]==g,"counts"] =
+      genotype[genotype[,"GENE"]==g,"COUNTS"] =
         paste(counts,collapse=",")
     }
     
@@ -616,7 +615,10 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
 #'                        \code{\link{inferGenotype}}
 #' @param    germline_db  a vector of named nucleotide germline sequences
-#'                        matching the alleles detailed in \code{genotype} 
+#'                        matching the alleles detailed in \code{genotype}
+#' @param    novel_df     an optional \code{data.frame} containing putative
+#'                        novel alleeles of the type returned by
+#'                        \code{\link{findNovelAlleles}}
 #' 
 #' @return   A named vector of strings containing the germline nucleotide
 #'           sequences of the alleles in the provided genotype
@@ -629,16 +631,30 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
 #' data(sample_db)
 #' 
 #' # Infer and view a genotype from the sample
-#' geno = inferGenotype(sample_db[,"V_CALL"])
+#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' geno = inferGenotype(sample_db, find_unmutated = TRUE,
+#'                      germline_db = germline_ighv, novel_df = novel_df)
+#' print(geno)
+#'                      
+#' # Find the sequences that correspond to the genotype
+#' genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
 #' 
-#' # Return the sequences that correspond to the genotype
-#' seqs = genotypeFasta(geno, germline_ighv)
 #' 
 #' @export
-genotypeFasta <- function(genotype, germline_db){
+genotypeFasta <- function(genotype, germline_db, novel_df=NA){
+  if(!is.null(nrow(novel_df))){
+    # Extract novel alleles if any and add them to germline_db
+    novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
+      select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
+    if(length(novel_df) > 0){
+      novel_gl = novel_df$NOVEL_IMGT
+      names(novel_gl) = novel_df$POLYMORPHISM_CALL
+      germline_db = c(germline_db, novel_gl)
+    }
+  }
   g_names = names(germline_db)
   names(g_names) = gsub("D", "", names(germline_db))
-  table_calls = mapply(paste, genotype$gene, strsplit(genotype$alleles, ","),
+  table_calls = mapply(paste, genotype$GENE, strsplit(genotype$ALLELES, ","),
                        sep="*")
   seqs = germline_db[as.vector(g_names[unlist(table_calls)])]
   if(sum(is.na(seqs)) > 0){
@@ -654,38 +670,44 @@ genotypeFasta <- function(genotype, germline_db){
 #' correct preliminary allele assignments of a set of sequences derived
 #' from a single subject.
 #' 
-#' @param    v_calls       a vector of strings respresenting Ig allele calls for
-#'                         the sequences in \code{v_sequences}, where multiple
-#'                         calls are separated by a comma
-#' @param    v_sequences   a vector of IMGT-gapped sample V sequences from a
-#'                         single subject
+#' @details In order to save time, initial gene assignments are preserved and
+#' the allele calls are chosen from among those provided in \code{genotype_db},
+#' based on a simple alignment to the sample sequence.
+#' 
+#' @param    clip_db       a \code{data.frame} containing V allele calls from a
+#'                         single subject under \code{"V_CALL"} and the sample
+#'                         IMGT-gapped V(D)J sequences under
+#'                         \code{"SEQUENCE_IMGT"}
 #' @param    genotype_db   a vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #'                         and personalized to the subject
 #' 
-#' @return   a list equal in length to \code{v_calls}, best allele call from
-#'           among the sequences listed in \code{genotype_db}
+#' @return   a single-column \code{data.frame} corresponding to \code{clip.db}
+#'           and containing the best allele call from among the sequences
+#'           listed in \code{genotype_db}
 #' 
 #' @examples
-#' \dontrun{
-#' ## Load example data and run all aspects of TIgGER (takes a few minutes)
-#' data(sample_db)
+#' # Load example data
 #' data(germline_ighv)
+#' data(sample_db)
 #' 
-#' ## Derive the subject-specific Ig sequences
-#' novel_sequences = novelSummary(results, seqs_to_return = "in genotype")
-#' germline_ighv = c(germline_ighv, novel_sequences)
-#' genotype_db = genotypeFasta(sample_output$genotype, germline_ighv)
+#' # Infer genotype from the sample
+#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' geno = inferGenotype(sample_db, find_unmutated = TRUE,
+#'                      germline_db = germline_ighv, novel_df = novel_df)
+#'                      
+#' # Find the sequences that correspond to the genotype
+#' genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
 #' 
-#' ## Extract the appropriate portions of example data
-#' v_seqs = sapply(sample_db$SEQUENCE_IMGT, substr, 1, 312)
-#' 
-#' ## Derive the vector of corrected calls
-#' corrected_calls = reassignAlleles(sample_db$V_CALL, v_seqs, genotype_db)
-#' }
+#' # Use the personlized genotype to determine corrected allele assignments
+#' V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)
+#' sample_db = bind_cols(sample_db, V_CALL_GENOTYPED)
 #' 
 #' @export
-reassignAlleles <- function(v_calls, v_sequences, genotype_db){
+reassignAlleles <- function(clip_db, genotype_db){
+  
+  v_calls = clip_db$V_CALL
+  v_sequences = clip_db$SEQUENCE_IMGT
   
   new_calls = rep("", length(v_calls))
   v_genes = getGene(v_calls, first = TRUE)
@@ -726,7 +748,7 @@ reassignAlleles <- function(v_calls, v_sequences, genotype_db){
   best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
   new_calls[not_called] = sapply(best_alleles, paste, collapse=",")
   
-  return(new_calls)
+  return(data.frame(new_calls,stringsAsFactors=FALSE))
 }
 
 
