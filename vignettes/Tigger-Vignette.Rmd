@@ -62,6 +62,7 @@ library(tigger)
 
 # Load example Rep-Seq data
 data(sample_db)
+glimpse(sample_db)
 ```
 
 The database of germline sequences should be provided in FASTA format with
@@ -71,52 +72,31 @@ read in your own fasta file using `readGermlineDb()`.
 ```{r, eval=TRUE, warning=FALSE}
 # Load example germline database
 data(germline_ighv)
+germline_ighv[1]
 ```
 
 
 ## Running TIgGER
 
-The function most users will wish to use is `runTigger()`. This function takes
-the two inputs discussed above and can perform any combination of the following:
+The functions provided by this package can be used to perform any combination of
+the following:
 
 1. Infer the presence of novel IGHV alleles not in the germline database
 2. Infer the individual's IGHV genotype
 3. Correct the IGHV allele calls of the samples based on the IGHV genotype
 
-These options are controlled by the logical arguments `find_novel`,
-`find_genotype`, and `correct_calls`, which default to `TRUE`. Note, however,
-that if `find_genotype` is `FALSE`, the provided germline database should
-contain only the alleles carried by the individual from which the Rep-Seq data
-was isolated. See the help file (`?runTigger`) for a description of all options.
-
-```{r, eval=TRUE, warning=FALSE}
-# Run tigger on the example input
-sample_output = runTigger(sample_db, germline_ighv)
-```
-
-`sample_output` should now be a list of length three with the names `novel`,
-`genotype`, and `new_calls`. Let's take a moment to examine the contents of
-each. (If any of these three options of `runTigger` are set to `FALSE`,
-the some elements of `sample_output` will be empty.)
-
 ### Novel Alleles
-Potential novel alleles detected by TIgGER are in the first element of the list.
-Some of these may have been included in the genotype (see below) while others
-may not have been. A summary of which were included will be printed by
-`novelSummary()`, which will also return the named novel nucleotide sequences.
-You may wish to add these to the existing germline database alleles. However,
-you may also set `seqs_to_return` to `"all"` to also return the non-genotype
-potential novel alleles.
+Potential novel alleles can be detected by TIgGER. Some of these may be included
+in the genotype later (see below). `findNovelAlleles()` will return a
+`data.frame` with a row for each allele tested for the presence of
+polymorphisms. If polymorphisms are found and the novel sequence passes all
+quality tests (see below), then the novel allele is named and the germline
+sequence is included in the `data.frame`.
 
 ```{r, eval=TRUE, warning=FALSE}
-# Summarize the detected novel alleles
-novel_sequences = novelSummary(sample_output, seqs_to_return = "in genotype")
-germline_ighv = c(germline_ighv, novel_sequences)
+# Deetect novel alleles
+novel_df = findNovelAlleles(sample_db, germline_ighv)
 ```
-
-The first part of `r names(novel_sequences)[1]` identifies the nearest database
-allele, and the part after the underscore indicates the polymorphic position(s)
-using the format `[database_nucleotide][position][polymorphic_nucleotide]`.
 
 The TIgGER procedure for identifying novel alleles (see citation above) involves
 taking all seqeunces which align to a particular germline allele and, for each
@@ -134,17 +114,23 @@ plots of positional mutation frequency vs sequence-wide mutation count,
 Remember that some or all sequences may not have been included in the final
 genotype.
 
-```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4.5}
-# Plot positional mutation frequency versus sequence-wide mutation count
-plotNovelLines(sample_output$novel)
-```
-
 The second piece of evidence supporting novel allele calls is the nucleotide
 usage at the polymorphic positions as a function of sequence-wide mutation
 count. We expect the polymorphic allele to be prevalent at all mutation counts,
 and we expect the mutation count equal to the number of polymorphisms in the
 novel sequence to be the most prevalent. `plotNovelBars()` can be used to view
 the nucleotide usage at polymorphic positions.
+
+
+
+
+
+
+```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4.5}
+# Plot positional mutation frequency versus sequence-wide mutation count
+plotNovelLines(sample_output$novel)
+```
+
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=4.5}
 # Plot nucleotide usage at polymorphic positions

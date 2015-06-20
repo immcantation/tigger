@@ -1033,6 +1033,35 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 
 # Formatting and Cleanup --------------------------------------------------
 
+#' Read a germline database
+#'
+#' \code{readGermlineDb} reads a fasta-formatted file of immunoglobulin (Ig)
+#' sequences and returns a named vector of those sequences.
+#' 
+#' @param    fasta_file       fasta-formatted file of immunoglobuling sequences
+#' @param    strip_down_name  if \code{TRUE}, will extract only the allele name
+#'                            from the strings fasta file's sequence names
+#' @param    force_caps       if \code{TRUE}, will force nucleotides to
+#'                            uppercase
+#' @return   a named vector of strings respresenting Ig alleles
+#' 
+#' @export
+readGermlineDb <- function(fasta_file, 
+                           strip_down_name = TRUE,
+                           force_caps = TRUE){
+  all_char = readChar(fasta_file, file.info(fasta_file)$size)
+  split_by_sequence = strsplit(all_char, "[ \t\r\n\v\f]?>")
+  add_name_break = sapply(split_by_sequence, function(x) sub("[\r\n]",">",x))
+  cleaned_up = sapply(add_name_break, function(x) gsub("[ \t\r\n\v\f]", "", x))
+  broken_names = sapply(cleaned_up, strsplit, ">")
+  seqs = sapply(broken_names, "[", 2)
+  seq_names = sapply(broken_names, "[", 1)
+  if(force_caps){ seqs = toupper(seqs) }
+  if(strip_down_name){ seq_names = getAllele(seq_names) }
+  names(seqs) = seq_names
+  return(seqs[which(!is.na(seqs))])
+}
+
 #' Update IGHV allele names
 #'
 #' \code{updateAlleleNames} takes a set of IGHV allele calls and replaces any
