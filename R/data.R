@@ -3,6 +3,8 @@
 #' A \code{character} vector of all 344 human IGHV germline gene segment alleles
 #' in IMGT Gene-db release 201408-4.
 #'
+#' @name germline_ighv
+#' @docType data
 #' @format Values correspond to IMGT-gaped nuceltoide sequences (with
 #' nucleotides capitalized and gaps represented by ".") while names correspond
 #' to stripped-down IMGT allele names (e.g. "IGHV1-18*01").
@@ -11,7 +13,8 @@
 #' (IGHV) genes and alleles: new entities, new names and implications for
 #' research and prognostication in chronic lymphocytic leukaemia.
 #' \emph{Immunogenetics}. 67(1):61-6.
-"germline_ighv"
+#' @keywords data
+NULL
 
 
 #' Example human Rep-Seq data
@@ -20,6 +23,8 @@
 #' individual (PGP1), sequenced on the Roche 454 platform, and thought by
 #' IMGT/V-QUEST to utilize IGHV1 family alleles.
 #'
+#' @name sample_db
+#' @docType data
 #' @format A \code{data.frame} where rows correspond to unique VDJ sequences and
 #' columns include:
 #' \itemize{
@@ -32,4 +37,5 @@
 #' @references Gadala-Maria \emph{et al}. (2015) Automated analysis of
 #' high-throughput B cell sequencing data reveals a high frequency of novel
 #' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
-"sample_db"
+#' @keywords data
+NULL
