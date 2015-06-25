@@ -290,6 +290,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
 #' @param    novel_df_row   a single row from a data frame as output by
 #'                          \code{\link{findNovelAlleles}} that contains a
 #'                          polymorphism-containing germline allele
+#' @param    ncol           number of columns to use when laying out the plots            
 #' @return   NULL
 #' 
 #' @examples
@@ -308,7 +309,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
 #' }
 #' 
 #' @export
-plotTigger <- function(clip_db, novel_df_row){
+plotTigger <- function(clip_db, novel_df_row, ncol = 1){
   
   min_frac=0.75 # Need to integrate this into the tigger result
   
@@ -420,7 +421,7 @@ plotTigger <- function(clip_db, novel_df_row){
     theme(legend.position=c(1,1), legend.justification=c(1,1),
           legend.background=element_rect(fill = "transparent"))
   
-  multiplot(p1,p2,p3, cols = 1)
+  multiplot(p1,p2,p3, cols = ncol)
 }
 
 #' Infer a subject-specific genotype

@@ -14,6 +14,7 @@ Depends:
     alakazam,
     shm,
     dplyr,
+    grid,
     ggplot2
 Suggests: knitr
 VignetteBuilder: knitr
