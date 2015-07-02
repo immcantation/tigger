@@ -85,6 +85,12 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               min_frac = 0.75){
   
   # Keep only the columns we need and clean up the sequences
+  missing = c("SEQUENCE_IMGT", "V_CALL", "J_CALL", "JUNCTION_LENGTH") %>%
+    setdiff(colnames(clip_db))
+  if (length(missing) != 0) {
+    stop("Could not find required columns in clip_db:\n  ",
+         paste(missing, collapse="\n  "))
+  }
   clip_db = select(clip_db, SEQUENCE_IMGT, V_CALL, J_CALL, JUNCTION_LENGTH)
   germlines = cleanSeqs(germline_db)
   clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
@@ -141,51 +147,68 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               seq_p_of_max=1/8, full_return=TRUE)
     
     # Determine the mutation range(s) to scan
+    mut_mins = min(mut_range)
     if(auto_mutrange & sum(gpm$MUTATION_COUNT > 0) > 0 ){
-      mut_mins = gpm$MUTATION_COUNT[gpm$MUTATION_COUNT > 0]
-    } else {
-      mut_mins = min(mut_range)
+      mut_mins = c(mut_mins, gpm$MUTATION_COUNT[gpm$MUTATION_COUNT > 0]) %>%
+        unique() %>%
+        sort()
     }
     
-    for (mut_min in mut_mins) {
+    # Create the run's return object
+    df_run_empty = data.frame(GERMLINE_CALL = names(germline),
+                              NOTE = "",
+                              POLYMORPHISM_CALL = NA,
+                              NOVEL_IMGT = NA,
+                              PERFECT_MATCH_COUNT = NA,
+                              GERMLINE_CALL_COUNT = length(indicies),
+                              MUT_MIN = NA,
+                              MUT_MAX = NA,
+                              GERMLINE_IMGT = as.character(germline),
+                              POS_MIN = min(pos_range),
+                              POS_MAX = max(pos_range),
+                              Y_INTERCEPT = y_intercept,
+                              ALPHA = alpha,
+                              MIN_SEQS = min_seqs,
+                              J_MAX = j_max,
+                              MIN_FRAC = min_frac,
+                              stringsAsFactors = FALSE)
+    
+    for (mut_min in rev(mut_mins)) {
       
+      if (mut_min == rev(mut_mins)[1]){
+        df_run = df_run_empty
+      } else {
+        df_run = bind_rows(df_run_empty, df_run)
+      }
       mut_max = mut_min + diff(range(mut_range))
-      
-      # Create the run's return object
-      df_run = data.frame(GERMLINE_CALL = names(germline),
-                          NOTE = "",
-                          POLYMORPHISM_CALL = NA,
-                          NOVEL_IMGT = NA,
-                          PERFECT_MATCH_COUNT = NA,
-                          GERMLINE_CALL_COUNT = length(indicies),
-                          GERMLINE_IMGT = as.character(germline),
-                          POS_MIN = min(pos_range),
-                          POS_MAX = max(pos_range),
-                          MUT_MIN = mut_min, 
-                          MUT_MAX = mut_max,
-                          Y_INTERCEPT = y_intercept,
-                          ALPHA = alpha,
-                          MIN_SEQS = min_seqs,
-                          J_MAX = j_max,
-                          stringsAsFactors = FALSE)
+      df_run$MUT_MIN[1] = mut_min
+      df_run$MUT_MAX[1] = mut_max
       
       # If no sequence is frequent enough to pass the J test, give up now
       if(length(gpm) < 1) {
         df_run$NOTE = "Plurality sequence too rare"
-        return(df_run)
+        if(mut_mins[1] == mut_min){
+          return(df_run)
+        } else {
+          next
+        }
       }
       
       # Add a mutation count column and filter out sequences not in our range
-      db_subset = mutationRangeSubset(db_subset, germline, mut_range, pos_range)
+      db_subset_mm = mutationRangeSubset(db_subset, germline, mut_range, pos_range)
       
-      if(nrow(db_subset) < germline_min){
+      if(nrow(db_subset_mm) < germline_min){
         df_run$NOTE = "Insufficient sequences in desired mutational range"
-        return(df_run)
+        if(mut_mins[1] == mut_min){
+          return(df_run)
+        } else {
+          next
+        }
       }
       
       # Duplicate each sequence for all the positions to be analyzed
       # and find which positions are mutated
-      pos_db = positionMutations(db_subset, germline, pos_range)
+      pos_db = positionMutations(db_subset_mm, germline, pos_range)
       
       # Find positional mut freq vs seq mut count
       pos_muts = pos_db %>%
@@ -204,7 +227,11 @@ findNovelAlleles  <- function(clip_db, germline_db,
       
       if(nrow(pass_y) < 1){
         df_run$NOTE = "No positions pass y-intercept test"
-        return(df_run)
+        if(mut_mins[1] == mut_min){
+          return(df_run)
+        } else {
+          next
+        }
       }
       
       gl_substring = superSubstring(germline, pass_y$POSITION)
@@ -213,7 +240,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       
       # Find the potential SNP positions and remove anything that matches
       # the germline at all those positions or any combo that is too rare
-      db_y_subset = db_subset %>%
+      db_y_subset_mm = db_subset_mm %>%
         group_by(1:n()) %>%
         mutate(SNP_STRING = superSubstring(SEQUENCE_IMGT, pass_y$POSITION)) %>%
         filter(SNP_STRING != gl_substring) %>%
@@ -221,15 +248,19 @@ findNovelAlleles  <- function(clip_db, germline_db,
         mutate(STRING_COUNT = n()) %>%
         filter(STRING_COUNT >= min_seqs)
       
-      if (nrow(db_y_subset) < 1 ){
+      if (nrow(db_y_subset_mm) < 1 ){
         df_run$NOTE = paste("Position(s) passed y-intercept but", 
                             "the plurality sequence is too rare")
-        return(df_run)
+        if(mut_mins[1] == mut_min){
+          return(df_run)
+        } else {
+          next
+        }
       }
       
       # Get mutation count at all positions that are not potential SNPs
       pads = paste(rep("-", min(pos_range)-1), collapse="")
-      db_y_subset$MUT_COUNT_MINUS_SUBSTRING = db_y_subset$SEQUENCE_IMGT %>%
+      db_y_subset_mm$MUT_COUNT_MINUS_SUBSTRING = db_y_subset_mm$SEQUENCE_IMGT %>%
         substring(min(pos_range), max(pos_range)) %>%
         paste(pads, ., sep="") %>% 
         getMutatedPositions(gl_minus_substring) %>%
@@ -238,7 +269,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       # Keep only unmutated seqences and then find the counts of J and
       # junction length for each of the SNP strings, and then check to
       # see which pass the j/junction and count requirements
-      db_y_summary = db_y_subset %>%
+      db_y_summary = db_y_subset_mm %>%
         filter(MUT_COUNT_MINUS_SUBSTRING == 0) %>%
         mutate(J_GENE = getGene(J_CALL)) %>%
         group_by(SNP_STRING, J_GENE, JUNCTION_LENGTH) %>%
@@ -251,22 +282,30 @@ findNovelAlleles  <- function(clip_db, germline_db,
       if(nrow(db_y_summary) < 1){
         df_run$NOTE = paste("Position(s) passed y-intercept but a",
                             "J-junction combination is too prevalent")
-        return(df_run)
+        if(mut_mins[1] == mut_min){
+          return(df_run)
+        } else {
+          next
+        }
       }
       
       germ_nts = unlist(strsplit(gl_substring,""))
       for (r in 1:nrow(db_y_summary)) {
+        if (r > 1){
+          df_run = bind_rows(df_run[1], df_run)
+        }
         # Create the new germline
         snp_nts = unlist(strsplit(db_y_summary$SNP_STRING[r],""))
+        remain_mut = db_y_summary$SNP_STRING %>%
+          getMutatedPositions(gl_substring) %>%
+          unlist()
         germ = insertPolymorphisms(germline, pass_y$POSITION, snp_nts)
-        names(germ) = mapply(paste, germ_nts, pass_y$POSITION,
-                             snp_nts, sep="") %>%
+        names(germ) = mapply(paste, germ_nts[remain_mut],
+                             pass_y$POSITION[remain_mut],
+                             snp_nts[remain_mut], sep="") %>%
           paste(collapse="_") %>%
           paste(names(germline), ., sep="_")
         # Save the new germline to our data frame               
-        if (!is.na(df_run$NOVEL_IMGT[1])){
-          df_run = bind_rows(df_run[1,], df_run)
-        }
         df_run$POLYMORPHISM_CALL[1] = names(germ)
         df_run$NOVEL_IMGT[1] =  as.character(germ)
         df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
@@ -279,6 +318,39 @@ findNovelAlleles  <- function(clip_db, germline_db,
   return(df_out)
 }
 
+#' Select rows containing novel alleles
+#' 
+#' \code{selectNovel} takes the result from \code{\link{findNovelAlleles}} and
+#' selects only the rows containing unique, novel alleles.
+#' 
+#' @param   novel_df        A \code{data.frame} of the type returned by
+#'                          \code{\link{findNovelAlleles}}
+#' @param   keep_alleles    A \code{logical} indicating if different alleles
+#'                          leading to the same novel sequence should be kept.
+#'                          See details.
+#'                          
+#' @details  If, for instance, subject has in his genome IGHV1-2*02 and a novel 
+#' allele equally close to IGHV1-2*02 and IGHV1-2*05, the novel allele may be
+#' detected by analyzing sequences that best align to either of these alleles.
+#' If \code{keep_alleles} is \code{TRUE}, both polymorphic allele calls will
+#' be retained. In the case that multiple mutation ranges are checked for the
+#' same allele, only one mutation range will be kept in the output.
+#'                        
+#' @return  A \code{data.frame} containing only unique, novel alleles (if any)
+#' that were in the input.
+#' 
+#' @examples
+#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' novel = selectNovel(novel_df)
+#' 
+#' @export
+selectNovel <- function(novel_df, keep_alleles=FALSE) {
+  if (keep_alleles) { novel_df = group_by(novel_df, GERMLINE_CALL) }
+  novel = novel_df %>%
+    distinct(NOVEL_IMGT) %>%
+    filter(nchar(NOVEL_IMGT) > 2)
+  return(novel)
+}
 
 #' Visualize evidence of novel V alleles
 #'
@@ -302,7 +374,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
 #' # Find novel alleles and return relevant data
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' # Plot the evidence for the first (and only) novel allele in the example data
-#' novel = filter(novel_df, !is.na(POLYMORPHISM_CALL))
+#' novel = selectNovel(novel_df)
 #' pdf(paste(gsub("\\*","+", novel$POLYMORPHISM_CALL), ".pdf", sep=""), 5, 15)
 #' plotTigger(sample_db, novel[1,])
 #' dev.off()
@@ -311,24 +383,23 @@ findNovelAlleles  <- function(clip_db, germline_db,
 #' @export
 plotTigger <- function(clip_db, novel_df_row, ncol = 1){
   
-  min_frac=0.75 # Need to integrate this into the tigger result
-  
   # Use the data frame
   if(length(novel_df_row) > 0){
     if(is.data.frame(novel_df_row) & nrow(novel_df_row) == 1){
       pos_range = novel_df_row$POS_MIN:novel_df_row$POS_MAX
       germline = novel_df_row$GERMLINE_IMGT
       names(germline) = novel_df_row$GERMLINE_CALL
-      mut_range = novel_df_row$MUT_MIN:novel_df_row$MUT_MAX
+      mut_range = novel_df_row$MUT_MIN[1]:novel_df_row$MUT_MAX[1]
       y_intercept = novel_df_row$Y_INTERCEPT
       alpha = novel_df_row$ALPHA
       novel_imgt = novel_df_row$NOVEL_IMGT
+      names(novel_imgt) = novel_df_row$POLYMORPHISM_CALL
+      min_frac = novel_df_row$MIN_FRAC
     } else {
       stop("novel_df_row is not a data frame with only one row.")
     }
   }
   
-  clip_db = select(clip_db, SEQUENCE_IMGT, V_CALL, J_CALL, JUNCTION_LENGTH)
   germline = cleanSeqs(germline)
   clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
   
@@ -341,7 +412,6 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
   pos_db = db_subset %>%  
     mutationRangeSubset(germline, mut_range, pos_range) %>%
     positionMutations(germline, pos_range)
-  
   pos_muts = pos_db %>%
     group_by(POSITION) %>%
     mutate(PASS = mean(OBSERVED) >= min_frac) %>%
@@ -357,19 +427,14 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
                                      min(mut_range), alpha)) %>%
     filter(Y_INT_MIN > y_intercept)
   
-  pos_muts = left_join(pos_muts, pass_y, by = "POSITION")
-  
-  if(nrow(pass_y) > 0){
-    lms = lapply(pass_y$POSITION,
-                 function(x) coef(lm(POS_MUT_RATE ~ MUT_COUNT,
-                                     filter(pos_muts, POSITION == x)))) %>%
-      unlist() %>%
-      matrix(ncol = 2,byrow = TRUE) %>%
-      as.data.frame()
-  }
+  # Label the polymorphic positions as such
+  pass_y = unlist(strsplit(names(novel_imgt), "_"))[-1] %>%
+    gsub("[^0-9]", "", .) %>%
+    as.numeric()
+  pos_muts = pos_muts %>%
+    mutate(Polymorphic = ifelse(POSITION %in% pass_y, "True", "False"))
   
   pads = paste(rep("-", min(pos_range)-1), collapse="")
-  
   db_subset$MUT_COUNT_NOVEL = db_subset$SEQUENCE_IMGT %>%
     substring(min(pos_range), max(pos_range)) %>%
     paste(pads, ., sep="") %>%
@@ -380,10 +445,6 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
     mutate(J_GENE = getGene(J_CALL))
   db_subset$JUNCTION_LENGTH = db_subset$JUNCTION_LENGTH %>%
     factor(levels=min(db_subset$JUNCTION_LENGTH):max(db_subset$JUNCTION_LENGTH))
-  
-  pos = pass_y$POSITION
-  pos_muts = pos_muts %>%
-    mutate(Polymorphic = ifelse(POSITION %in% pos, "True", "False"))
   pos_muts$Polymorphic = pos_muts$Polymorphic %>%
     factor(levels = c("True", "False"))
   
@@ -401,7 +462,7 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
           legend.background=element_rect(fill = "transparent")) +
     guides(color = guide_legend(ncol = 2))
   # MAKE THE SECOND PLOT
-  p2 = ggplot(mutate(filter(pos_db, POSITION %in% pos),
+  p2 = ggplot(mutate(filter(pos_db, POSITION %in% pass_y),
                      POSITION = paste("Position", POSITION)),
               aes(factor(MUT_COUNT), fill=NT)) +
     geom_bar(binwidth=1) +
