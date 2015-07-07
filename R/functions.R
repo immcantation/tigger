@@ -98,7 +98,11 @@ findNovelAlleles  <- function(clip_db, germline_db,
   # Find which rows' calls contain which germline alleles
   cutoff =
     ifelse(germline_min < 1, round(nrow(clip_db)*germline_min), germline_min)
-  allele_groups = sapply(names(germlines), grep, clip_db$V_CALL, fixed=TRUE)
+  allele_regex = names(germlines) %>%
+    gsub("*", "\\*", ., fixed=TRUE) %>%
+    sapply(function(x) paste(x, c("[, ]","$"), sep="", collapse="|"))
+  allele_groups = sapply(allele_regex, grep, clip_db$V_CALL)
+  names(allele_groups) = names(germlines)
   allele_groups = allele_groups[sapply(allele_groups, length) >= cutoff]
   allele_groups = allele_groups[sortAlleles(names(allele_groups))]
   
@@ -447,6 +451,8 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
     factor(levels=min(db_subset$JUNCTION_LENGTH):max(db_subset$JUNCTION_LENGTH))
   pos_muts$Polymorphic = pos_muts$Polymorphic %>%
     factor(levels = c("True", "False"))
+  pos_db$NT = pos_db$NT %>%
+    factor(levels = names(DNA_COLORS))
   
   # MAKE THE FIRST PLOT
   POLYCOLORS = setNames(DNA_COLORS[c(3,4)], c("True", "False"))
@@ -469,7 +475,8 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
     facet_grid(POSITION ~ .) +
     xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
-    scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS)) +
+    scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS),
+                      drop=FALSE) +
     theme_bw() +
     theme(legend.position=c(1,1), legend.justification=c(1,1),
           legend.background=element_rect(fill = "transparent"))
@@ -561,7 +568,7 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
 inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
                           gene_cutoff = 1e-3, find_unmutated = FALSE,
                           germline_db = NA, novel_df = NA){
-  allele_calls = clip_db$V_CALL
+  allele_calls = getAllele(clip_db$V_CALL, first=FALSE)
   # Find the unmutated subset, if requested
   if(find_unmutated){
     if(is.na(germline_db[1])){
@@ -584,12 +591,10 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
       }
     }
     # Find unmutated sequences
-    allele_calls = findUnmutatedCalls(allele_calls, clip_db$SEQUENCE_IMGT,
+    allele_calls = findUnmutatedCalls(allele_calls,
+                                      as.character(clip_db$SEQUENCE_IMGT),
                                       germline_db)
   }
-  
-  # Standardize allele call names, just in case
-  allele_calls = getAllele(allele_calls, first = FALSE)
   
   # Find the gene(s) of the allele calls; group duplicates (e.g. 1-69D*) as one
   gene_calls = getGene(allele_calls, first = FALSE, collapse = TRUE)
@@ -774,10 +779,10 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' @export
 reassignAlleles <- function(clip_db, genotype_db){
   
-  v_calls = clip_db$V_CALL
-  v_sequences = clip_db$SEQUENCE_IMGT
+  v_calls = getAllele(clip_db$V_CALL, first=FALSE)
+  v_sequences = as.character(clip_db$SEQUENCE_IMGT)
   
-V_CALL_GENOTYPED = rep("", length(v_calls))
+  V_CALL_GENOTYPED = rep("", length(v_calls))
   v_genes = getGene(v_calls, first = TRUE)
   
   # Find which genotype genes are homozygous and assign those alleles first
@@ -787,7 +792,7 @@ V_CALL_GENOTYPED = rep("", length(v_calls))
   homo_genes = geno_genes[!(geno_genes %in% hetero_genes)]
   homo_alleles = names(homo_genes); names(homo_alleles) = homo_genes
   homo_calls_i = which(v_genes %in% homo_genes)
-V_CALL_GENOTYPED[homo_calls_i] = homo_alleles[v_genes[homo_calls_i]]
+  V_CALL_GENOTYPED[homo_calls_i] = homo_alleles[v_genes[homo_calls_i]]
   
   # Now realign the heterozygote sequences to each allele of that gene
   for (het_gene in hetero_genes){
@@ -805,7 +810,7 @@ V_CALL_GENOTYPED[homo_calls_i] = homo_alleles[v_genes[homo_calls_i]]
     }
   }
   
-  # Not realign the gene-not-in-genotype calls to every genotype allele
+  # Now realign the gene-not-in-genotype calls to every genotype allele
   hetero_calls_i = which(v_genes %in% hetero_genes)
   not_called = setdiff(1:length(v_genes), c(homo_calls_i, hetero_calls_i))
   dists = lapply(genotype_db, function(x)
@@ -814,7 +819,7 @@ V_CALL_GENOTYPED[homo_calls_i] = homo_alleles[v_genes[homo_calls_i]]
   dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
   best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
   best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
-V_CALL_GENOTYPED[not_called] = sapply(best_alleles, paste, collapse=",")
+  V_CALL_GENOTYPED[not_called] = sapply(best_alleles, paste, collapse=",")
   
   return(data.frame(V_CALL_GENOTYPED,stringsAsFactors=FALSE))
 }
@@ -921,6 +926,7 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
 getMutCount <- function(samples, allele_calls, germline_db){
   
   call_list = strsplit(allele_calls, ",")
+  
   germline_list = lapply(call_list, function(x) germline_db[x])
   
   mut_pos_list = list()
@@ -972,6 +978,24 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
+  
+  allele_calls = getAllele(allele_calls, first = FALSE)
+  sample_seqs = as.character(sample_seqs)
+  
+  # Remove calls not in germline_db
+  not_in_db = allele_calls %>%
+    strsplit(",") %>%
+    unlist() %>%
+    setdiff(names(germline_db))
+  no_call = which(allele_calls == "") 
+  in_db = not_in_db %>%
+    sapply(grep, allele_calls, fixed=TRUE) %>%
+    unlist() %>%
+    c(no_call) %>%
+    unique() %>%
+    setdiff(1:length(allele_calls), .)
+  allele_calls = allele_calls[in_db]
+  sample_seqs = sample_seqs[in_db]
   
   mut_counts = getMutCount(sample_seqs, allele_calls, germline_db)
   
