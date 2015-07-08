@@ -296,13 +296,14 @@ findNovelAlleles  <- function(clip_db, germline_db,
       germ_nts = unlist(strsplit(gl_substring,""))
       for (r in 1:nrow(db_y_summary)) {
         if (r > 1){
-          df_run = bind_rows(df_run[1], df_run)
+          df_run = bind_rows(df_run[1,], df_run)
         }
         # Create the new germline
         snp_nts = unlist(strsplit(db_y_summary$SNP_STRING[r],""))
         remain_mut = db_y_summary$SNP_STRING %>%
           getMutatedPositions(gl_substring) %>%
-          unlist()
+          unlist() %>%
+          unique()
         germ = insertPolymorphisms(germline, pass_y$POSITION, snp_nts)
         names(germ) = mapply(paste, germ_nts[remain_mut],
                              pass_y$POSITION[remain_mut],
