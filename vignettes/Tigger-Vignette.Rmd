@@ -67,10 +67,8 @@ in your own fasta file using `readGermlineDb`.
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
 library(tigger)
-# Load example Rep-Seq data
-data(sample_db)
-# Load example germline database
-data(germline_ighv)
+# Load example Rep-Seq data and example germline database
+data(sample_db, germline_ighv)
 ```
 
 ## Running TIgGER
@@ -96,7 +94,7 @@ changed in `findNovelAlleles`).
 # Detect novel alleles
 novel_df = findNovelAlleles(sample_db, germline_ighv)
 # Extract and view the rows that contain successful novel allele calls
-novel = filter(novel_df, !is.na(POLYMORPHISM_CALL))
+novel = selectNovel(novel_df)
 glimpse(novel)
 ```
 
@@ -182,18 +180,22 @@ the subject's genotype, greatly reducing the number of problematic calls, as
 can be seen below.
 
 ```{r, eval=TRUE, warning=FALSE}
-# Determine the fraction of sequences that were ambigious before correction
-sum(grepl(",",sample_db$V_CALL))/nrow(sample_db)
-# Determine the fraction of sequences that were ambigious after correction
-sum(grepl(",",sample_db$V_CALL_GENOTYPED))/nrow(sample_db)
 # Find the set of alleles in the original calls that were not in the genotype
 not_in_genotype = sample_db$V_CALL %>%
   strsplit(",") %>%
   unlist() %>%
   unique() %>%
   setdiff(names(genotype_seqs))
-# Find the fraction that contained original calls to non-genotype alleles 
-sum(sample_db$V_CALL %in% not_in_genotype)/nrow(sample_db)
+# Determine the fraction of calls that were ambigious before/after correction
+# and the fraction that contained original calls to non-genotype alleles. Note
+# that by design, only genotype alleles are allowed in "after" calls.
+data.frame(
+  Ambiguous = c(mean(grepl(",",sample_db$V_CALL)),
+  mean(grepl(",",sample_db$V_CALL_GENOTYPED))),
+  NotInGenotype = c(mean(sample_db$V_CALL %in% not_in_genotype),
+  mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
+  row.names = c("Before", "After")
+  ) %>% t() %>% round(3)
 
 ```
 

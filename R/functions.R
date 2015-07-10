@@ -81,7 +81,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               pos_range = 1:312,
                               y_intercept = 1/8,
                               alpha = 0.05,
-                              j_max = 0.10,
+                              j_max = 0.15,
                               min_frac = 0.75){
   
   # Keep only the columns we need and clean up the sequences
@@ -91,7 +91,11 @@ findNovelAlleles  <- function(clip_db, germline_db,
     stop("Could not find required columns in clip_db:\n  ",
          paste(missing, collapse="\n  "))
   }
-  clip_db = select(clip_db, SEQUENCE_IMGT, V_CALL, J_CALL, JUNCTION_LENGTH)
+  empty_junctions = sum(clip_db$JUNCTION_LENGTH == 0)
+  if (empty_junctions > 0) {
+    stop(empty_junctions, " sequences have junction ", "length of zero. ",
+         "Please remove these sequences.")
+  }
   germlines = cleanSeqs(germline_db)
   clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
   
@@ -190,7 +194,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       
       # If no sequence is frequent enough to pass the J test, give up now
       if(length(gpm) < 1) {
-        df_run$NOTE = "Plurality sequence too rare"
+        df_run$NOTE[1] = "Plurality sequence too rare."
         if(mut_mins[1] == mut_min){
           return(df_run)
         } else {
@@ -202,7 +206,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       db_subset_mm = mutationRangeSubset(db_subset, germline, mut_range, pos_range)
       
       if(nrow(db_subset_mm) < germline_min){
-        df_run$NOTE = "Insufficient sequences in desired mutational range"
+        df_run$NOTE[1] = "Insufficient sequences in desired mutational range."
         if(mut_mins[1] == mut_min){
           return(df_run)
         } else {
@@ -230,7 +234,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         filter(Y_INT_MIN > y_intercept)
       
       if(nrow(pass_y) < 1){
-        df_run$NOTE = "No positions pass y-intercept test"
+        df_run$NOTE[1] = "No positions pass y-intercept test."
         if(mut_mins[1] == mut_min){
           return(df_run)
         } else {
@@ -253,8 +257,10 @@ findNovelAlleles  <- function(clip_db, germline_db,
         filter(STRING_COUNT >= min_seqs)
       
       if (nrow(db_y_subset_mm) < 1 ){
-        df_run$NOTE = paste("Position(s) passed y-intercept but", 
-                            "the plurality sequence is too rare")
+        df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
+                               paste(pass_y$POSITION, sep = ","),
+                               ") but the plurality sequence is too rare.",
+                               sep="")
         if(mut_mins[1] == mut_min){
           return(df_run)
         } else {
@@ -273,19 +279,39 @@ findNovelAlleles  <- function(clip_db, germline_db,
       # Keep only unmutated seqences and then find the counts of J and
       # junction length for each of the SNP strings, and then check to
       # see which pass the j/junction and count requirements
-      db_y_summary = db_y_subset_mm %>%
+      db_y_summary0 = db_y_subset_mm %>%
         filter(MUT_COUNT_MINUS_SUBSTRING == 0) %>%
         mutate(J_GENE = getGene(J_CALL)) %>%
         group_by(SNP_STRING, J_GENE, JUNCTION_LENGTH) %>%
         summarise(COUNT = n()) %>%
         group_by(SNP_STRING) %>%
         mutate(FRACTION = COUNT/sum(COUNT)) %>%
-        summarise(TOTAL_COUNT = sum(COUNT), MAX_FRAC = max(FRACTION)) %>%
+        summarise(TOTAL_COUNT = sum(COUNT), MAX_FRAC = max(FRACTION))
+        
+      if(nrow(db_y_summary0) < 1){
+        df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
+                               paste(pass_y$POSITION, sep = ","),
+                               ") but no unmutated versions of novel allele",
+                               " found.", sep="")
+        if(mut_mins[1] == mut_min){
+          return(df_run)
+        } else {
+          next
+        }
+      }
+      
+      db_y_summary = db_y_summary0 %>%
         filter(TOTAL_COUNT >= min_seqs & MAX_FRAC <= j_max)
       
       if(nrow(db_y_summary) < 1){
-        df_run$NOTE = paste("Position(s) passed y-intercept but a",
-                            "J-junction combination is too prevalent")
+        df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
+                               paste(pass_y$POSITION, sep = ","),
+                               ") but a ",
+                               "J-junction combination is too prevalent (",
+                               round(100*max(db_y_summary0$MAX_FRAC),1),
+                               "% of sequences).",
+                               sep="")
+        df_run$PERFECT_MATCH_COUNT = max(db_y_summary0$TOTAL_COUNT)
         if(mut_mins[1] == mut_min){
           return(df_run)
         } else {
@@ -314,6 +340,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         df_run$POLYMORPHISM_CALL[1] = names(germ)
         df_run$NOVEL_IMGT[1] =  as.character(germ)
         df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
+        df_run$NOTE = "Novel allele found!"
       }
       
     } # end for each starting mutation counts
