@@ -643,8 +643,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
     potentials = unique(unlist(strsplit(names(t_ac),","))) # potential alleles
     # One allele? Easy!
     if (length(potentials) == 1 | length(t_ac) == 1){
-      genotype[genotype[,"GENE"]==g,"ALLELES"] =
-        gsub("[^d\\*]*[d\\*]","",potentials )[1]
+      genotype[genotype[,"GENE"]==g,"ALLELES"] = potentials
       genotype[genotype[,"GENE"]==g,"COUNTS"] = t_ac
     } else {
       # More alleles? Let's find the fewest that can explain the needed fraction
@@ -668,10 +667,8 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
         tot_expl = max(allele_tot)  + tot_expl
         seqs_expl = seqs_expl[which(seqs_expl[,which.max(allele_tot)]==0),]
       }
-      genotype[genotype[,"GENE"]==g,"ALLELES"] =
-        paste(gsub("[^d\\*]*[d\\*]","",included ),collapse=",")
-      genotype[genotype[,"GENE"]==g,"COUNTS"] =
-        paste(counts,collapse=",")
+      genotype[genotype[,"GENE"]==g,"ALLELES"] = paste(included,collapse=",")
+      genotype[genotype[,"GENE"]==g,"COUNTS"] = paste(counts,collapse=",")
     }
     
   }
