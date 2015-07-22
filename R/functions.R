@@ -742,7 +742,7 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
     }
   }
   
-  genotype$GENE = gsub("D\\*|d\\*","",genotype$GENE)
+  genotype$GENE = gsub("D$|d$","",genotype$GENE)
   
   g_names = names(germline_db)
   names(g_names) = gsub("D", "", names(germline_db))
