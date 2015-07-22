@@ -326,7 +326,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         }
         # Create the new germline
         snp_nts = unlist(strsplit(db_y_summary$SNP_STRING[r],""))
-        remain_mut = db_y_summary$SNP_STRING[r] %>%
+        remain_mut = db_y_summary$SNP_STRING %>%
           getMutatedPositions(gl_substring) %>%
           unlist() %>%
           unique()
@@ -451,6 +451,14 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
     summarise(POS_MUT_RATE = mean(MUTATED)*unique(PASS) ) %>% 
     ungroup()
   
+  # Calculate y intercepts
+  # and find which positions have y-intercepts above the required cutoff
+  pass_y = pos_muts %>%
+    group_by(POSITION) %>%
+    summarise(Y_INT_MIN = findLowerY(POS_MUT_RATE, MUT_COUNT,
+                                     min(mut_range), alpha)) %>%
+    filter(Y_INT_MIN > y_intercept)
+  
   # Label the polymorphic positions as such
   pass_y = unlist(strsplit(names(novel_imgt), "_"))[-1] %>%
     gsub("[^0-9]", "", .) %>%
@@ -572,7 +580,7 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
 #' data(sample_db)
 #' 
 #' # Infer the IGHV genotype using all provided sequences
-#' inferGenotype(sample_db, find_unmutated = FALSE)
+#' inferGenotype(sample_db)
 #' 
 #' # Infer the IGHV genotype using only unmutated sequences
 #' data(germline_ighv)
@@ -586,7 +594,7 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
 #' 
 #' @export
 inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
-                          gene_cutoff = 1e-3, find_unmutated = TRUE,
+                          gene_cutoff = 1e-3, find_unmutated = FALSE,
                           germline_db = NA, novel_df = NA){
   allele_calls = getAllele(clip_db$V_CALL, first=FALSE)
   # Find the unmutated subset, if requested
@@ -615,29 +623,50 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
                                       as.character(clip_db$SEQUENCE_IMGT),
                                       germline_db)
   }
-
-  # Find which rows' calls contain which genes
-  cutoff = ifelse(gene_cutoff < 1, nrow(clip_db)*gene_cutoff, gene_cutoff)
-  gene_regex = names(germline_db) %>% getGene(first=TRUE) %>% unique() %>%
-    paste("\\*", sep="")
-  gene_groups = sapply(gene_regex, grep, allele_calls)
-  names(gene_groups) = gsub("\\*", "", gene_regex, fixed=TRUE)
-  gene_groups = gene_groups[sapply(gene_groups, length) >= cutoff]
-  gene_groups = gene_groups[sortAlleles(names(gene_groups))]
   
+  # Find the gene(s) of the allele calls; group duplicates (e.g. 1-69D*) as one
+  gene_calls = getGene(allele_calls, first = FALSE, collapse = TRUE)
+  gene_calls = gsub("([^H])D", "\\1", gene_calls)
+  
+  # If the sequences are assigned multiple genes, pick the more common gene
+  # This should be very rare, since calls should be from unmutated sequences
+  gctab = table(gene_calls)
+  multigene = grep(",",names(gctab),value=TRUE)
+  if (length(multigene) > 0){
+    set_to = sapply(multigene,
+                    function(x) names(which.max(gctab[unlist(strsplit(x,","))])))
+    for (i in 1:length(set_to)){
+      if(!is.null(set_to[[i]])){
+        gene_calls[which(gene_calls == names(set_to[i]))] = set_to[[i]]
+      }
+    }
+  }
+  
+  # Remove genes that are too rare
+  if(gene_cutoff < 1){ gene_cutoff = ceiling(length(gene_calls)*gene_cutoff) }
+  rare_genes = names(which(table(gene_calls) < gene_cutoff))  
+  df = data.frame(cbind(allele_calls,gene_calls),row.names=NULL,
+                  stringsAsFactors=FALSE)
+  exclude = which(gene_calls %in% rare_genes)
+  if (length(exclude > 0)) { df = df[-exclude,] }
+  
+  #If after all that there still gene-ambiguous sequences, just keep  first gene
+  stillmulti = grep(",",as.vector(df$gene_calls))
+  if (length(stillmulti) > 0 ){
+    df$gene_calls[stillmulti] = 
+      sapply(strsplit(as.vector(df$gene_calls[stillmulti]),","),"[",1)
+  }
   # Make a table to store the resulting genotype
-  GENE = names(gene_groups)
-  ALLELES = COUNTS = NOTE = rep("", length(GENE))
-  TOTAL = sapply(gene_groups, length)
-  genotype = cbind(GENE, ALLELES, COUNTS, TOTAL, NOTE)
+  GENE = sortAlleles(as.character(unique(df$gene_calls)))
+  GENE = setdiff(GENE, "")
+  ALLELES = COUNTS = rep("", length(GENE))
+  TOTAL = as.vector(table(as.character(df$gene_calls))[GENE])
+  genotype = cbind(GENE, ALLELES,COUNTS,TOTAL)
   
   # For each gene, find which alleles to include
   for (g in GENE){
-    # Keep only the part of the allele calls that uses the gene being analyzed
-    ac = allele_calls[gene_groups[[g]]] %>%
-      strsplit(",") %>%
-      lapply(function(x) x[grep(paste(g, "\\*", sep=""), x)]) %>%
-      sapply(paste, collapse=",")
+    
+    ac = as.vector(df[df$gene_calls==g,"allele_calls"]) # find allele calls
     target = ceiling(fraction_to_explain*length(ac)) # how many we need to explain
     t_ac = table(ac) # table of allele calls
     potentials = unique(unlist(strsplit(names(t_ac),","))) # potential alleles
@@ -647,7 +676,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
       genotype[genotype[,"GENE"]==g,"COUNTS"] = t_ac
     } else {
       # More alleles? Let's find the fewest that can explain the needed fraction
-      # Make a table of which alleles can explain which calls
+      # Make a table of whic alleles can explain which calls
       regexpotentials = paste(gsub("\\*","\\\\*", potentials),"$",sep="")
       regexpotentials = 
         paste(regexpotentials,gsub("\\$",",",regexpotentials),sep="|")
@@ -672,25 +701,8 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
     }
     
   }
-  geno = as.data.frame(genotype, stringsAsFactors = FALSE)
   
-  # Check for indistinguishable calls
-  seqs = genotypeFasta(geno, germline_db)
-  dist_mat = seqs %>%
-    sapply(function(x) sapply((getMutatedPositions(seqs, x)), length))
-  rownames(dist_mat) = colnames(dist_mat)
-  for (i in 1:nrow(dist_mat)){ dist_mat[i,i] = NA }
-  same = which(dist_mat == 0, arr.ind=TRUE)
-  if (nrow(same) > 0 ) {
-    for (r in 1:nrow(same)) {
-      inds = as.vector(same[r,])
-      geno[getGene(rownames(dist_mat)[inds][1]),]$NOTE =
-        paste(rownames(dist_mat)[inds], collapse=" and ") %>%
-        paste("Cannot distinguish", .)
-    }
-  }
-  rownames(geno) = NULL
-  return(geno)
+  return(as.data.frame(genotype, stringsAsFactors = FALSE))
 }
 
 #' Return the nucleotide sequences of a genotype
