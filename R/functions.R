@@ -470,7 +470,7 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
   db_subset$JUNCTION_LENGTH = db_subset$JUNCTION_LENGTH %>%
     factor(levels=min(db_subset$JUNCTION_LENGTH):max(db_subset$JUNCTION_LENGTH))
   pos_muts$Polymorphic = pos_muts$Polymorphic %>%
-    factor(levels = c("True", "False"))
+    factor(levels = c("False", "True"))
   pos_db$NT = pos_db$NT %>%
     factor(levels = names(DNA_COLORS))
   
@@ -486,7 +486,7 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
     theme_bw() +
     theme(legend.position=c(0.5,0.9), legend.justification=c(0.5,1),
           legend.background=element_rect(fill = "transparent")) +
-    guides(color = guide_legend(ncol = 2))
+    guides(color = guide_legend(ncol = 2, reverse = TRUE))
   # MAKE THE SECOND PLOT
   p2 = ggplot(mutate(filter(pos_db, POSITION %in% pass_y),
                      POSITION = paste("Position", POSITION)),
