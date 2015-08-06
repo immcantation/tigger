@@ -834,13 +834,15 @@ reassignAlleles <- function(clip_db, genotype_db){
   # Now realign the gene-not-in-genotype calls to every genotype allele
   hetero_calls_i = which(v_genes %in% hetero_genes)
   not_called = setdiff(1:length(v_genes), c(homo_calls_i, hetero_calls_i))
-  dists = lapply(genotype_db, function(x)
-    sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=FALSE),
-           length))
-  dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
-  best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
-  best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
-  V_CALL_GENOTYPED[not_called] = sapply(best_alleles, paste, collapse=",")
+  if(length(not_called)>1){
+    dists = lapply(genotype_db, function(x)
+      sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=FALSE),
+             length))
+    dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
+    best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
+    best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
+    V_CALL_GENOTYPED[not_called] = sapply(best_alleles, paste, collapse=",")
+  }
   
   return(data.frame(V_CALL_GENOTYPED,stringsAsFactors=FALSE))
 }
