@@ -113,7 +113,9 @@ findNovelAlleles  <- function(clip_db, germline_db,
   # Prepare for parallel processing
   nproc = ifelse(Sys.info()['sysname'] == "Windows",
                  Sys.getenv('NUMBER_OF_PROCESSORS'),
-                 system("nproc", intern=TRUE)) %>%
+            ifelse(Sys.info()['sysname'] == "Darwin",  
+                   system("sysctl -n hw.ncpu", intern=TRUE),
+                   system("nproc", intern=TRUE))) %>%
     as.numeric() %>% 
     min(nproc, . - 1) %>%
     max(1, .)
