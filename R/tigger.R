@@ -27,8 +27,9 @@
 #' @section  Core tigger functions:
 #' \itemize{
 #'   \item  \code{\link{findNovelAlleles}}:   Detect novel alleles
-#'   \item  \code{\link{plotTigger}}:         Plot evidence of novel alleles
+#'   \item  \code{\link{plotNovel}}:          Plot evidence of novel alleles
 #'   \item  \code{\link{inferGenotype}}:      Infer an Ig genotype
+#'   \item  \code{\link{plotGenotype}}:       A colorful genotype visualization
 #'   \item  \code{\link{genotypeFasta}}:      Convert a genotype to sequences
 #'   \item  \code{\link{reassignAlleles}}:    Correct allele calls
 #' }

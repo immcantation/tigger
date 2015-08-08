@@ -123,12 +123,12 @@ which can consist of a specific combination of J gene and junction length may be
 specified in `findNovelAlleles` by `j_max`.
 
 The three pieces of evidence desribed above can be viewed for any allele call
-made by `findNovelAlleles` using the function `plotTigger`.
+made by `findNovelAlleles` using the function `plotNovel`.
 
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=8}
 # Plot evidence of the first (and only) novel allele from the example data
-plotTigger(sample_db, novel[1,])
+plotNovel(sample_db, novel[1,])
 ```
 
 ### Genotype
@@ -138,13 +138,14 @@ may result from mutations in allele-differentiating regions. This is done by
 determining the fewest alleles that account for nearly all (default is 7/8) of 
 the allele calls made. The user may opt to only use sequences which perfectly
 match germline alleles, and may opt to include potential novel alleles.
-The genotype output is designed to be human readable. For each allele, the
+(The genotype output is designed to be human readable, though `plotGenotype`
+can be used to make a colorful visualization.) For each allele, the
 number of sequences which  match the germline are listed in the same order as
 the alleles are listed. The total number of sequences that match any allele of
 that gene is also given. To output these alleles as a names vector of nucleotide
 sequences, the use may use the function `genotypeFasta`.
 
-```{r, eval=TRUE, warning=FALSE}
+```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
 # Infer the individual's genotype, using only unmutated sequences and checking
 # for the use of the novel alleles inferred in the earlier step.
 geno = inferGenotype(sample_db, find_unmutated = TRUE,
@@ -153,6 +154,8 @@ geno = inferGenotype(sample_db, find_unmutated = TRUE,
 genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
 # Visualize the genotype and sequence counts
 print(geno)
+# Make a colorful visualization. Bars indicate presence, not proportion.
+plotGenotype(geno, text_size = 10)
 
 ```
 

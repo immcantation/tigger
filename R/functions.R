@@ -58,7 +58,7 @@
 #' either a note as to where the polymorphism-finding algorithm exited or a
 #' nucleotide sequence for the predicted novel allele.
 #' 
-#' @seealso \code{\link{plotTigger}} to visualize the data supporting any
+#' @seealso \code{\link{plotNovel}} to visualize the data supporting any
 #' novel alleles hypothesized to be present in the data and
 #' \code{\link{inferGenotype}} to determine if the novel alleles are frequent
 #' enought to be included in the subject's genotype
@@ -388,7 +388,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 
 #' Visualize evidence of novel V alleles
 #'
-#' \code{plotTigger} is be used to visualize the evidence of any novel V
+#' \code{plotNovel} is be used to visualize the evidence of any novel V
 #' alleles found using \code{\link{findNovelAlleles}}.
 #' 
 #' @param    clip_db        a \code{data.frame} in Change-O format. See
@@ -410,12 +410,12 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel = selectNovel(novel_df)
 #' pdf(paste(gsub("\\*","+", novel$POLYMORPHISM_CALL), ".pdf", sep=""), 5, 15)
-#' plotTigger(sample_db, novel[1,])
+#' plotNovel(sample_db, novel[1,])
 #' dev.off()
 #' }
 #' 
 #' @export
-plotTigger <- function(clip_db, novel_df_row, ncol = 1){
+plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   
   # Use the data frame
   if(length(novel_df_row) > 0){
@@ -523,13 +523,6 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
 #' explained. In this way, mistaken allele calls (resulting from sequences which
 #' by chance have been mutated to look like another allele) can be removed.
 #' 
-#' @details  Allele calls representing cases where multiple alleles have been
-#'           assigned to a single sample sequence are rare among unmutated
-#'           sequences but may result if nucleotides for certain positions are
-#'           not available. Calls containing multiple alleles are treated as
-#'           belonging to all groups until one of those groups is included in
-#'           the genotype.
-#' 
 #' @param    clip_db              a \code{data.frame} containing V allele
 #'                                calls from a single subject under
 #'                                \code{"V_CALL"}. If
@@ -558,10 +551,14 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
 #'                                germline sequences that will be utilized if
 #'                                \code{find_unmutated} is \code{TRUE}. See
 #'                                details.
-#' @details  if \code{novel_df} is provided, all sequences that are
-#' assigned to the same starting allele as any novel germline allele will have
-#' the novel germline allele appended to their assignent prior to searching for
-#' unmutated sequences.
+#' @details  Allele calls representing cases where multiple alleles have been
+#'           assigned to a single sample sequence are rare among unmutated
+#'           sequences but may result if nucleotides for certain positions are
+#'           not available. Calls containing multiple alleles are treated as
+#'           belonging to all groups. If \code{novel_df} is provided, all
+#'           sequences that are assigned to the same starting allele as any
+#'           novel germline allele will have the novel germline allele appended
+#'           to their assignent prior to searching for unmutated sequences.
 #' 
 #' @return   A table of alleles denoting the genotype of the subject
 #' 
@@ -585,6 +582,9 @@ plotTigger <- function(clip_db, novel_df_row, ncol = 1){
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv,
 #'               novel_df = novel_df)
+#' 
+#' @seealso \code{\link{plotGenotype}} for a colorful visualization and
+#' \code{\link{genotypeFasta}} to convert the genotype to nucleotide sequences.
 #' 
 #' @export
 inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
@@ -696,6 +696,65 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
   }
   rownames(geno) = NULL
   return(geno)
+}
+
+#' Show a colorful representation of a genotype
+#'
+#' \code{plotGenotype} .
+#' 
+#' @param    genotype     a table of alleles denoting a genotype, as returned by
+#'                        \code{\link{inferGenotype}}
+#' @param    text_size    the point size of the plotted text
+#' 
+#' @details If a columns \code{SUBJECT} is added to \code{genotype}, the data
+#' will be faceted according to this column automatically.
+#' 
+#' @return   NULL
+#' 
+#' @seealso \code{\link{inferGenotype}}
+#' 
+#' @examples
+#' \dontrun{
+#' # Infer and view a genotype from the sample
+#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' geno = inferGenotype(sample_db, find_unmutated = TRUE,
+#'                      germline_db = germline_ighv, novel_df = novel_df)
+#' plotGenotype(geno)
+#' }
+#' 
+#' @export
+plotGenotype = function(genotype, text_size=12) {
+  # Split genes' alleles into their own rows
+  alleles = strsplit(genotype$ALLELES, ",")
+  geno2 = genotype; r = 1
+  for (g in 1:nrow(genotype)){
+    for(a in 1:length(alleles[[g]])) {
+      geno2[r,] = genotype[g,]
+      geno2[r,]$ALLELES = alleles[[g]][a]
+      r = r+1
+    }
+  }
+  # Set the gene order
+  geno2$GENE = factor(geno2$GENE, levels = rev(sortAlleles(unique(geno2$GENE))))
+  if ("SUBJECT" %in% names(geno2)) {
+    geno2$SUBJECT = factor(geno2$SUBJECT, levels = unique(geno2$SUBJECT))
+  }
+  # Create the base plot
+  p = ggplot(geno2, aes(x = GENE, fill=ALLELES)) +
+    geom_bar(position="fill") +
+    coord_flip() + ylab("") + theme_bw() +
+    scale_fill_hue(h=c(0, 270), h.start=10) +
+    theme(axis.ticks = element_blank(),
+          axis.text.x = element_blank(),
+          panel.grid.major = element_blank(),
+          panel.grid.minor = element_blank(),
+          text = element_text(size=text_size))
+  # Plot, with facets by SUBJECT if that column is present
+  if ("SUBJECT" %in% names(geno2)) {
+    plot(p + facet_grid(. ~ SUBJECT))
+  } else {
+    plot(p)
+  }
 }
 
 #' Return the nucleotide sequences of a genotype
