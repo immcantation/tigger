@@ -415,7 +415,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' }
 #' 
 #' @export
-plotNovel <- function(clip_db, novel_df_row, ncol = 1){
+plotNovel <- function(clip_db, novel_df_row, ncol = 1, ){
   
   # Use the data frame
   if(length(novel_df_row) > 0){
@@ -485,6 +485,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     ylim(0,1) +
     xlab("Mutation Count (Sequence)") +
     ylab("Mutation Frequency (Position)") +
+    ggtitle(names(germline)) +
     theme_bw() +
     theme(legend.position=c(0.5,0.9), legend.justification=c(0.5,1),
           legend.background=element_rect(fill = "transparent")) +
