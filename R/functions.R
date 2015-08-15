@@ -409,13 +409,13 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel = selectNovel(novel_df)
-#' pdf(paste(gsub("\\*","+", novel$POLYMORPHISM_CALL), ".pdf", sep=""), 5, 15)
+#' pdf(paste(gsub("\\*","+", novel$POLYMORPHISM_CALL), ".pdf", sep=""), 10, 15)
 #' plotNovel(sample_db, novel[1,])
 #' dev.off()
 #' }
 #' 
 #' @export
-plotNovel <- function(clip_db, novel_df_row, ncol = 1, ){
+plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   
   # Use the data frame
   if(length(novel_df_row) > 0){
@@ -457,6 +457,12 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, ){
   pass_y = unlist(strsplit(names(novel_imgt), "_"))[-1] %>%
     gsub("[^0-9]", "", .) %>%
     as.numeric()
+  p_y_f = unlist(strsplit(names(novel_imgt), "_"))[-1] %>%
+    gsub("[0-9]+.", "", .)
+  p_y_t = unlist(strsplit(names(novel_imgt), "_"))[-1] %>%
+    gsub(".[0-9]+", "", .)
+  to_from = paste(paste("Position", pass_y), paste(paste(p_y_f, "->"), p_y_t))
+  names(to_from) = pass_y
   pos_muts = pos_muts %>%
     mutate(Polymorphic = ifelse(POSITION %in% pass_y, "True", "False"))
   
@@ -475,24 +481,25 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, ){
     factor(levels = c("False", "True"))
   pos_db$NT = pos_db$NT %>%
     factor(levels = names(DNA_COLORS))
+  pos_muts$GERMLINE = names(germline)
   
   # MAKE THE FIRST PLOT
-  POLYCOLORS = setNames(DNA_COLORS[c(3,4)], c("True", "False"))
+  POLYCOLORS = setNames(DNA_COLORS[c(4,3)], c("False", "True"))
   p1 = ggplot(pos_muts, aes(factor(MUT_COUNT), POS_MUT_RATE, group=POSITION,
                             color=Polymorphic)) +
     geom_line(size = 0.75) +
+    facet_grid(GERMLINE ~ .) +
     scale_color_manual(values = POLYCOLORS) +
     ylim(0,1) +
     xlab("Mutation Count (Sequence)") +
     ylab("Mutation Frequency (Position)") +
-    ggtitle(names(germline)) +
     theme_bw() +
     theme(legend.position=c(0.5,0.9), legend.justification=c(0.5,1),
           legend.background=element_rect(fill = "transparent")) +
     guides(color = guide_legend(ncol = 2, reverse = TRUE))
   # MAKE THE SECOND PLOT
   p2 = ggplot(mutate(filter(pos_db, POSITION %in% pass_y),
-                     POSITION = paste("Position", POSITION)),
+                     POSITION = to_from[as.character(POSITION)]),
               aes(factor(MUT_COUNT), fill=NT)) +
     geom_bar(binwidth=1) +
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
@@ -600,7 +607,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
     if(!is.null(nrow(novel_df))){
       novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
         select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
-      if(length(novel_df) > 0){
+      if(nrow(novel_df) > 0){
         # Extract novel alleles if any and add them to germline_db
         novel_gl = novel_df$NOVEL_IMGT
         names(novel_gl) = novel_df$POLYMORPHISM_CALL
@@ -617,6 +624,9 @@ inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
     allele_calls = findUnmutatedCalls(allele_calls,
                                       as.character(clip_db$SEQUENCE_IMGT),
                                       germline_db)
+    if(length(allele_calls) == 0){
+      stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
+    }
   }
 
   # Find which rows' calls contain which genes
@@ -1315,19 +1325,17 @@ updateAlleleNames <- function(allele_calls){
 #' @export
 sortAlleles <- function(allele_calls) {  
   # Standardize format of submitted alleles, first
-  SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE)
-  allele_df = data.frame(SUBMITTED_CALLS, stringsAsFactors = FALSE) %>%
-    # Sort to help with the Ds later
-    arrange(SUBMITTED_CALLS) %>%
+  SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE) %>% sort()
+  allele_df = data.frame(SUBMITTED_CALLS,stringsAsFactors = FALSE) %>%
     # Determine the family
     mutate(FAMILY = getFamily(SUBMITTED_CALLS)) %>%
     # Determine the gene (exclude family); convert letters to numbers for sort
     mutate(GENE = getGene(SUBMITTED_CALLS)) %>%
     mutate(GENE1 = gsub("[^-]+-([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
-    mutate(GENE1 = as.numeric(gsub("NL|a|b|f", "99", GENE1))) %>%
+    mutate(GENE1 = as.numeric(gsub("[^0-9]+", "99", GENE1))) %>%
     # If there is a second gene number, determine that, too
     mutate(GENE2 = gsub("[^-]+-[^-]+-?","",GENE)) %>%
-    mutate(GENE2 = as.numeric(gsub("NL|a|b|f", "99", GENE2))) %>%
+    mutate(GENE2 = as.numeric(gsub("[^0-9]+", "99", GENE2))) %>%
     mutate(ALLELE = as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",
                                    getAllele(SUBMITTED_CALLS))))
   # Convert missing values to 0, sort data frame
