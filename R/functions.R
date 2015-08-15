@@ -595,7 +595,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #' \code{\link{genotypeFasta}} to convert the genotype to nucleotide sequences.
 #' 
 #' @export
-inferGenotype <- function(clip_db, fraction_to_explain = 7/8,
+inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
                           gene_cutoff = 1e-3, find_unmutated = TRUE,
                           germline_db = NA, novel_df = NA){
   allele_calls = getAllele(clip_db$V_CALL, first=FALSE)
@@ -807,7 +807,7 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
     # Extract novel alleles if any and add them to germline_db
     novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
       select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
-    if(length(novel_df) > 0){
+    if(nrow(novel_df) > 0){
       novel_gl = novel_df$NOVEL_IMGT
       names(novel_gl) = novel_df$POLYMORPHISM_CALL
       germline_db = c(germline_db, novel_gl)
