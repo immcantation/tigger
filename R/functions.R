@@ -415,7 +415,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' }
 #' 
 #' @export
-plotNovel <- function(clip_db, novel_df_row, ncol = 1, ){
+plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   
   # Use the data frame
   if(length(novel_df_row) > 0){
