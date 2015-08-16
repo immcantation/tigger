@@ -63,7 +63,7 @@ PGP1 (referenced in Gadala-Maria *et al.* 2015).
 The database of germline sequences should be provided in FASTA format with 
 sequences gapped according to the IMGT numbering scheme[[3]][3]. IGHV alleles in
 the IMGT database (build 201408-4) are provided with this package. You may read 
-in your own fasta file using `readGermlineDb`.
+in your own fasta file using `readIgFasta`.
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
 library(tigger)
@@ -143,7 +143,8 @@ can be used to make a colorful visualization.) For each allele, the
 number of sequences which  match the germline are listed in the same order as
 the alleles are listed. The total number of sequences that match any allele of
 that gene is also given. To output these alleles as a names vector of nucleotide
-sequences, the use may use the function `genotypeFasta`.
+sequences, the user may use the function `genotypeFasta`. To save this vector to
+a fasta file, `writeFasta` may be used.
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
 # Infer the individual's genotype, using only unmutated sequences and checking

@@ -3,8 +3,8 @@
 # @author     Daniel Gadala-Maria
 # @copyright  Copyright 2015 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported
-# @version    0.2.2
-# @date       2015.06.17
+# @version    0.2.3
+# @date       2015.08.15
 
 
 #' tigger
@@ -46,7 +46,7 @@
 #' 
 #' @section  Input and formatting:
 #' \itemize{
-#'   \item  \code{\link{readGermlineDb}}:     Read a fasta file
+#'   \item  \code{\link{readIgFasta}}:        Read a fasta file of Ig sequences
 #'   \item  \code{\link{updateAlleleNames}}:  Correct outdated allele names
 #'   \item  \code{\link{sortAlleles}}:        Sort allele names intelligently
 #'   \item  \code{\link{cleanSeqs}}:          Standardize sequence format

@@ -1218,9 +1218,9 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 
 # Formatting and Cleanup --------------------------------------------------
 
-#' Read a germline database
+#' Read immunoglobulin sequences
 #'
-#' \code{readGermlineDb} reads a fasta-formatted file of immunoglobulin (Ig)
+#' \code{readIgFasta} reads a fasta-formatted file of immunoglobulin (Ig)
 #' sequences and returns a named vector of those sequences.
 #' 
 #' @param    fasta_file       fasta-formatted file of immunoglobuling sequences
@@ -1230,8 +1230,10 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #'                            uppercase
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
+#' @seealso \link{\code{writeFasta}} to do the inverse.
+#' 
 #' @export
-readGermlineDb <- function(fasta_file, 
+readIgFasta <- function(fasta_file, 
                            strip_down_name = TRUE,
                            force_caps = TRUE){
   all_char = readChar(fasta_file, file.info(fasta_file)$size)
@@ -1246,6 +1248,34 @@ readGermlineDb <- function(fasta_file,
   names(seqs) = seq_names
   return(seqs[which(!is.na(seqs))])
 }
+
+#' Write to a fasta file
+#'
+#' \code{writeFasta} writes a named vector of sequences to a file in fasta
+#' format.
+#' 
+#' @param    named_sequences  a vector of named string representing sequences
+#' @param    file             the name of the output file
+#' @param    width            the number of characters to be printed per line
+#' @param    append           \code{logical} indicating if the output should be
+#'                            appended to \code{file} instead of overwriting it
+#' 
+#' @return   a named vector of strings respresenting Ig alleles
+#' 
+#' @seealso \link{\code{readIgFasta}} to do the inverse.
+#' 
+#' @export
+writeFasta <- function(named_sequences, file, width=60, append=FALSE){
+  width_regex = paste("(.{", width, ",", width, "})", sep="")
+  seq_names = names(named_sequences) %>%
+    paste(">", ., "\n", sep="")
+  seqs = as.character(named_sequences) %>%
+    gsub(width_regex, "\\1\n", .) %>%
+    paste("\n", sep="") %>%
+    gsub("\n\n", "\n", .)
+  paste(seq_names, seqs, sep="", collapse="") %>%
+    cat(file=file, append=append)
+} 
 
 #' Update IGHV allele names
 #'
