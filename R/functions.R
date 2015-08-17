@@ -1230,7 +1230,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #'                            uppercase
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
-#' @seealso \link{\code{writeFasta}} to do the inverse.
+#' @seealso \code{\link{writeFasta}} to do the inverse.
 #' 
 #' @export
 readIgFasta <- function(fasta_file, 
@@ -1262,7 +1262,7 @@ readIgFasta <- function(fasta_file,
 #' 
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
-#' @seealso \link{\code{readIgFasta}} to do the inverse.
+#' @seealso \code{\link{readIgFasta}} to do the inverse.
 #' 
 #' @export
 writeFasta <- function(named_sequences, file, width=60, append=FALSE){
