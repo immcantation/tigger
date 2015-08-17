@@ -1272,7 +1272,7 @@ writeFasta <- function(named_sequences, file, width=60, append=FALSE){
   seqs = as.character(named_sequences)
   if(is.numeric(width) & width > 0 & width < 256){
     width_regex = paste("(.{", width, ",", width, "})", sep="")
-    seqs = gsub(seqs, width_regex, "\\1\n", .)
+    seqs = gsub(width_regex, "\\1\n", seqs)
   }
   seqs = seqs %>%
     paste("\n", sep="") %>%
