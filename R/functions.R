@@ -1256,7 +1256,8 @@ readIgFasta <- function(fasta_file,
 #' 
 #' @param    named_sequences  a vector of named string representing sequences
 #' @param    file             the name of the output file
-#' @param    width            the number of characters to be printed per line
+#' @param    width            the number of characters to be printed per line.
+#'                            If not between 1 and 255, width with be infinite.
 #' @param    append           \code{logical} indicating if the output should be
 #'                            appended to \code{file} instead of overwriting it
 #' 
@@ -1266,11 +1267,14 @@ readIgFasta <- function(fasta_file,
 #' 
 #' @export
 writeFasta <- function(named_sequences, file, width=60, append=FALSE){
-  width_regex = paste("(.{", width, ",", width, "})", sep="")
   seq_names = names(named_sequences) %>%
     paste(">", ., "\n", sep="")
-  seqs = as.character(named_sequences) %>%
-    gsub(width_regex, "\\1\n", .) %>%
+  seqs = as.character(named_sequences)
+  if(is.numeric(width) & width > 0 & width < 256){
+    width_regex = paste("(.{", width, ",", width, "})", sep="")
+    seqs = gsub(seqs, width_regex, "\\1\n", .)
+  }
+  seqs = seqs %>%
     paste("\n", sep="") %>%
     gsub("\n\n", "\n", .)
   paste(seq_names, seqs, sep="", collapse="") %>%
