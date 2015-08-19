@@ -596,7 +596,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #' 
 #' @export
 inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
-                          gene_cutoff = 1e-3, find_unmutated = TRUE,
+                          gene_cutoff = 1e-4, find_unmutated = TRUE,
                           germline_db = NA, novel_df = NA){
   allele_calls = getAllele(clip_db$V_CALL, first=FALSE)
   # Find the unmutated subset, if requested
@@ -630,7 +630,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
   }
 
   # Find which rows' calls contain which genes
-  cutoff = ifelse(gene_cutoff < 1, nrow(clip_db)*gene_cutoff, gene_cutoff)
+  cutoff = ifelse(gene_cutoff < 1, length(allele_calls)*gene_cutoff, gene_cutoff)
   gene_regex = names(germline_db) %>% getGene(first=TRUE) %>% unique() %>%
     paste("\\*", sep="")
   gene_groups = sapply(gene_regex, grep, allele_calls)
