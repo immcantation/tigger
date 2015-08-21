@@ -79,7 +79,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               auto_mutrange = TRUE,
                               mut_range = 1:10,
                               pos_range = 1:312,
-                              y_intercept = 1/8,
+                              y_intercept = 0.125,
                               alpha = 0.05,
                               j_max = 0.15,
                               min_frac = 0.75){
