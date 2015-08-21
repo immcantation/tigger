@@ -243,7 +243,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         }
       }
       
-      gl_substring = superSubstring(germline, pass_y$POSITION)
+      gl_substring = tigger:::superSubstring(germline, pass_y$POSITION)
       gl_minus_substring = insertPolymorphisms(germline, pass_y$POSITION,
                                                rep("N", nrow(pass_y)))
       
@@ -251,7 +251,8 @@ findNovelAlleles  <- function(clip_db, germline_db,
       # the germline at all those positions or any combo that is too rare
       db_y_subset_mm = db_subset_mm %>%
         group_by(1:n()) %>%
-        mutate(SNP_STRING = superSubstring(SEQUENCE_IMGT, pass_y$POSITION)) %>%
+        mutate(SNP_STRING = tigger:::superSubstring(SEQUENCE_IMGT,
+                                                    pass_y$POSITION)) %>%
         filter(SNP_STRING != gl_substring) %>%
         group_by(SNP_STRING) %>%
         mutate(STRING_COUNT = n()) %>%
@@ -291,7 +292,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         
       if(nrow(db_y_summary0) < 1){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
-                               paste(pass_y$POSITION, sep = ","),
+                               paste(pass_y$POSITION, collapse = ","),
                                ") but no unmutated versions of novel allele",
                                " found.", sep="")
         if(mut_mins[1] == mut_min){
