@@ -203,7 +203,8 @@ findNovelAlleles  <- function(clip_db, germline_db,
       }
       
       # Add a mutation count column and filter out sequences not in our range
-      db_subset_mm = mutationRangeSubset(db_subset, germline, mut_range, pos_range)
+      db_subset_mm = tigger:::mutationRangeSubset(db_subset, germline,
+                                                  mut_min:mut_max, pos_range)
       
       if(nrow(db_subset_mm) < germline_min){
         df_run$NOTE[1] = "Insufficient sequences in desired mutational range."
@@ -216,7 +217,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       
       # Duplicate each sequence for all the positions to be analyzed
       # and find which positions are mutated
-      pos_db = positionMutations(db_subset_mm, germline, pos_range)
+      pos_db = tigger:::positionMutations(db_subset_mm, germline, pos_range)
       
       # Find positional mut freq vs seq mut count
       pos_muts = pos_db %>%
@@ -229,8 +230,8 @@ findNovelAlleles  <- function(clip_db, germline_db,
       # Calculate y intercepts, find which pass the test
       pass_y = pos_muts %>%
         group_by(POSITION) %>%
-        summarise(Y_INT_MIN = findLowerY(POS_MUT_RATE, MUT_COUNT,
-                                         mut_min, alpha)) %>%
+        summarise(Y_INT_MIN = tigger:::findLowerY(POS_MUT_RATE, MUT_COUNT,
+                                                  mut_min, alpha)) %>%
         filter(Y_INT_MIN > y_intercept)
       
       if(nrow(pass_y) < 1){
@@ -258,7 +259,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       
       if (nrow(db_y_subset_mm) < 1 ){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
-                               paste(pass_y$POSITION, sep = ","),
+                               paste(pass_y$POSITION, collapse = ","),
                                ") but the plurality sequence is too rare.",
                                sep="")
         if(mut_mins[1] == mut_min){
