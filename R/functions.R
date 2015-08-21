@@ -97,15 +97,13 @@ findNovelAlleles  <- function(clip_db, germline_db,
          "Please remove these sequences.")
   }
   germlines = cleanSeqs(germline_db)
+  names(germlines) = getAllele(names(germlines), first=FALSE, strip_d=FALSE)
   clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
   
   # Find which rows' calls contain which germline alleles
   cutoff =
     ifelse(germline_min < 1, round(nrow(clip_db)*germline_min), germline_min)
-  allele_regex = names(germlines) %>%
-    gsub("*", "\\*", ., fixed=TRUE) %>%
-    sapply(function(x) paste(x, c("[, ]","$"), sep="", collapse="|"))
-  allele_groups = sapply(allele_regex, grep, clip_db$V_CALL)
+  allele_groups = sapply(names(germlines), grep, clip_db$V_CALL, fixed=TRUE)
   names(allele_groups) = names(germlines)
   allele_groups = allele_groups[sapply(allele_groups, length) >= cutoff]
   allele_groups = allele_groups[sortAlleles(names(allele_groups))]
