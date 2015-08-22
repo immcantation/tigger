@@ -598,7 +598,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
                           gene_cutoff = 1e-4, find_unmutated = TRUE,
                           germline_db = NA, novel_df = NA){
-  allele_calls = getAllele(clip_db$V_CALL, first=FALSE)
+  allele_calls = getAllele(clip_db$V_CALL, first=FALSE, strip_d=FALSE)
   # Find the unmutated subset, if requested
   if(find_unmutated){
     if(is.na(germline_db[1])){
@@ -691,18 +691,20 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
   geno = as.data.frame(genotype, stringsAsFactors = FALSE)
   
   # Check for indistinguishable calls
-  seqs = genotypeFasta(geno, germline_db)
-  dist_mat = seqs %>%
-    sapply(function(x) sapply((getMutatedPositions(seqs, x)), length))
-  rownames(dist_mat) = colnames(dist_mat)
-  for (i in 1:nrow(dist_mat)){ dist_mat[i,i] = NA }
-  same = which(dist_mat == 0, arr.ind=TRUE)
-  if (nrow(same) > 0 ) {
-    for (r in 1:nrow(same)) {
-      inds = as.vector(same[r,])
-      geno[getGene(rownames(dist_mat)[inds][1]),]$NOTE =
-        paste(rownames(dist_mat)[inds], collapse=" and ") %>%
-        paste("Cannot distinguish", .)
+  if(find_unmutated == TRUE){
+    seqs = genotypeFasta(geno, germline_db)
+    dist_mat = seqs %>%
+      sapply(function(x) sapply((getMutatedPositions(seqs, x)), length))
+    rownames(dist_mat) = colnames(dist_mat)
+    for (i in 1:nrow(dist_mat)){ dist_mat[i,i] = NA }
+    same = which(dist_mat == 0, arr.ind=TRUE)
+    if (nrow(same) > 0 ) {
+      for (r in 1:nrow(same)) {
+        inds = as.vector(same[r,])
+        geno[getGene(rownames(dist_mat)[inds][1]),]$NOTE =
+          paste(rownames(dist_mat)[inds], collapse=" and ") %>%
+          paste("Cannot distinguish", .)
+      }
     }
   }
   rownames(geno) = NULL
