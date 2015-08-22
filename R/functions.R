@@ -631,8 +631,8 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 
   # Find which rows' calls contain which genes
   cutoff = ifelse(gene_cutoff < 1, length(allele_calls)*gene_cutoff, gene_cutoff)
-  gene_regex = names(germline_db) %>% getGene(first=TRUE) %>% unique() %>%
-    paste("\\*", sep="")
+  gene_regex = allele_calls %>% strsplit(",") %>% unlist() %>% getGene() %>% 
+    unique() %>% paste("\\*", sep="")
   gene_groups = sapply(gene_regex, grep, allele_calls)
   names(gene_groups) = gsub("\\*", "", gene_regex, fixed=TRUE)
   gene_groups = gene_groups[sapply(gene_groups, length) >= cutoff]
