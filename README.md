@@ -4,7 +4,7 @@ High-throughput sequencing of B cell immunoglobulin receptors is providing unpre
 
 **TIgGER is a computational method that significantly improves V(D)J allele assignments by first determining the complete set of gene segments carried by an individual (including novel alleles) from V(D)J-rearrange sequences. TIgGER can then infer a subject's genotype from these sequences, and use this genotype to correct the initial V(D)J allele assignments.**
 
-The application of TIgGER identifies a surprisingly high frequency of novel alleles, highlighting the critical need for this approach. To cite TIgGER, please use:
+The application of TIgGER continues to identify a surprisingly high frequency of novel alleles in humans, highlighting the critical need for this approach. (TIgGER, however, can and has be used with data from other species.) To cite TIgGER, please use:
 
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) "Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles." *PNAS* 112(8), E862-E870](http://www.pnas.org/content/112/8/E862.abstract)
 
