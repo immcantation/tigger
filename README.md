@@ -8,13 +8,12 @@ The application of TIgGER identifies a surprisingly high frequency of novel alle
 
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) "Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles." *PNAS* 112(8), E862-E870](http://www.pnas.org/content/112/8/E862.abstract)
 
-
-###Core Abilities###
+### Core Abilities ###
 * Detecting novel alleles
 * Inferring a subject's genotype
 * Correcting preliminary allele calls
 
-###Required Input###
+### Required Input ###
 * A table of V(D)J-rearranged sequences from a single individual, with columns containing the following:
     * V(D)J sequences (in IMGT-gapped format)
     * Names of preliminary V allele calls
@@ -24,7 +23,7 @@ The application of TIgGER identifies a surprisingly high frequency of novel alle
 
 The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.org/) and [Change-O CLT](http://clip.med.yale.edu/changeo/download.php).
 
-### Requirements ###
+### Required Software ###
 
 Software             | Link
 ---------------------|-------------------------------------------
@@ -34,7 +33,6 @@ shm (R package)      | https://bitbucket.org/kleinstein/shm
 dplyr (R package)    | https://cran.rstudio.com/web/packages/dplyr/
 ggplot2 (R package)  | https://cran.rstudio.com/web/packages/ggplot2/
 grid (R package)     | https://cran.rstudio.com/src/contrib/Archive/grid/
-
 
 ### Build Instructions ###
 
@@ -62,7 +60,7 @@ build(vignettes=FALSE)
 install()
 ```
 
-####Step-by-step Usage Example####
+#### Usage Example ####
 Please see the [TIgGER vignette](http://clip.med.yale.edu/tigger/Tigger-Vignette.pdf).
 
 ### Contact ###
