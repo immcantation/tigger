@@ -14,12 +14,12 @@ The application of TIgGER identifies a surprisingly high frequency of novel alle
 * Correcting preliminary allele calls
 
 ### Required Input ###
-* A table of V(D)J-rearranged sequences from a single individual, with columns containing the following:
-    * V(D)J sequences (in IMGT-gapped format)
-    * Names of preliminary V allele calls
-    * Name of preliminary J allele calls
-    * Length of the junction region 
-* Germline Ig sequences in IMGT-gapped fasta format
+* A table of sequences from a single individual, with columns containing the following:
+    * V(D)J-rearranged nucleotide sequence (in IMGT-gapped format)
+    * Preliminary V allele calls
+    * Preliminary J allele calls
+    * Length of the junction region
+* Germline Ig sequences in IMGT-gapped fasta format (e.g., as those downloaded from [IMGT/GENE-DB](http://www.imgt.org/genedb/))
 
 The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.org/) and [Change-O CLT](http://clip.med.yale.edu/changeo/download.php).
 
