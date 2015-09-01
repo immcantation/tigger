@@ -8,6 +8,22 @@ The application of TIgGER identifies a surprisingly high frequency of novel alle
 
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) "Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles." *PNAS* 112(8), E862-E870](http://www.pnas.org/content/112/8/E862.abstract)
 
+
+####Core Abilities###
+* Detecting novel alleles
+* Inferring a subject's genotype
+* Correcting preliminary allele calls
+
+###Required Input###
+* A table of V(D)J-rearranged sequences from a single individual, with columns containing the following:
+    * V(D)J sequences (in IMGT-gapped format)
+    * Names of preliminary V allele calls
+    * Name of preliminary J allele calls
+    * Length of the junction region 
+* Germline Ig sequences in IMGT-gapped fasta format
+
+The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.org/) and [Change-O CLT](http://clip.med.yale.edu/changeo/download.php).
+
 ### Requirements ###
 
 Software             | Link
@@ -46,24 +62,7 @@ build(vignettes=FALSE)
 install()
 ```
 
-### Getting Started ###
-
-####Core Abilities####
-* Detecting novel alleles
-* Inferring a subject's genotype
-* Correcting preliminary allele calls
-
-####Required Input####
-* A table of V(D)J-rearranged sequences from a single individual, with columns containing the following:
-    * V(D)J sequences (in IMGT-gapped format)
-    * Names of preliminary V allele calls
-    * Name of preliminary J allele calls
-    * Length of the junction region 
-* Germline Ig sequences in IMGT-gapped fasta format
-
-The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.org/) and [Change-O CLT](http://clip.med.yale.edu/changeo/download.php).
-
-####Step-by-step Example####
+####Step-by-step Usage Example####
 Please see the [TIgGER vignette](http://clip.med.yale.edu/tigger/Tigger-Vignette.pdf).
 
 ### Contact ###
