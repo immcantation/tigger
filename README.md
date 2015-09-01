@@ -9,7 +9,7 @@ The application of TIgGER identifies a surprisingly high frequency of novel alle
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) "Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles." *PNAS* 112(8), E862-E870](http://www.pnas.org/content/112/8/E862.abstract)
 
 
-####Core Abilities###
+###Core Abilities###
 * Detecting novel alleles
 * Inferring a subject's genotype
 * Correcting preliminary allele calls
