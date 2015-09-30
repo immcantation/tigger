@@ -633,7 +633,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
   cutoff = ifelse(gene_cutoff < 1, length(allele_calls)*gene_cutoff, gene_cutoff)
   gene_regex = allele_calls %>% strsplit(",") %>% unlist() %>% getGene() %>% 
     unique() %>% paste("\\*", sep="")
-  gene_groups = sapply(gene_regex, grep, allele_calls)
+  gene_groups = sapply(gene_regex, grep, allele_calls, simplify=FALSE)
   names(gene_groups) = gsub("\\*", "", gene_regex, fixed=TRUE)
   gene_groups = gene_groups[sapply(gene_groups, length) >= cutoff]
   gene_groups = gene_groups[sortAlleles(names(gene_groups))]

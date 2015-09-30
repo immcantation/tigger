@@ -10,7 +10,7 @@ Description: The 'tigger' package infers the V genotype of an individual from
 License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
-    R (>= 3.0.0),
+    R (>= 3.0.0),   
     alakazam,
     shm,
     dplyr,
