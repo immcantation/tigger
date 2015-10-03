@@ -91,7 +91,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
     stop("Could not find required columns in clip_db:\n  ",
          paste(missing, collapse="\n  "))
   }
-  empty_junctions = sum(clip_db$JUNCTION_LENGTH == 0)
+  empty_junctions = sum(clip_db$JUNCTION_LENGTH == 0, na.rm=TRUE)
   if (empty_junctions > 0) {
     stop(empty_junctions, " sequences have junction ", "length of zero. ",
          "Please remove these sequences.")
@@ -631,8 +631,8 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 
   # Find which rows' calls contain which genes
   cutoff = ifelse(gene_cutoff < 1, length(allele_calls)*gene_cutoff, gene_cutoff)
-  gene_regex = allele_calls %>% strsplit(",") %>% unlist() %>% getGene() %>% 
-    unique() %>% paste("\\*", sep="")
+  gene_regex = allele_calls %>% strsplit(",") %>% unlist() %>%
+    getGene(strip_d=FALSE) %>%  unique() %>% paste("\\*", sep="")
   gene_groups = sapply(gene_regex, grep, allele_calls, simplify=FALSE)
   names(gene_groups) = gsub("\\*", "", gene_regex, fixed=TRUE)
   gene_groups = gene_groups[sapply(gene_groups, length) >= cutoff]
@@ -1361,7 +1361,8 @@ updateAlleleNames <- function(allele_calls){
 #' @export
 sortAlleles <- function(allele_calls) {  
   # Standardize format of submitted alleles, first
-  SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE) %>% sort()
+  SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE, strip_d= FALSE) %>%
+    sort()
   allele_df = data.frame(SUBMITTED_CALLS,stringsAsFactors = FALSE) %>%
     # Determine the family
     mutate(FAMILY = getFamily(SUBMITTED_CALLS)) %>%
