@@ -4,17 +4,23 @@ Version: 0.2.3
 Author: Daniel Gadala-Maria and Jason Anthony Vander Heiden
 Maintainer: Daniel Gadala-Maria <daniel.gadala-maria@yale.edu>
 Description: The 'tigger' package infers the V genotype of an individual from
-  immunogliubulin (Ig) repertoire-sequencing (Rep-Seq) data. This includes
-  detection of any novel alleles. This information is then used to correct
-  existing V allele calls from among the sample sequences.
+    immunogliubulin (Ig) repertoire-sequencing (Rep-Seq) data. This includes
+    detection of any novel alleles. This information is then used to correct
+    existing V allele calls from among the sample sequences.
 License: CC BY-NC-SA 3.0
 LazyData: true
 Depends:
-    R (>= 3.0.0),   
+    R (>= 3.0.0),
     alakazam,
     shm,
     dplyr,
     grid,
     ggplot2
-Suggests: knitr
+Imports:
+    doParallel,
+    foreach,
+    parallel
+Suggests:
+    knitr
 VignetteBuilder: knitr
+RoxygenNote: 5.0.1

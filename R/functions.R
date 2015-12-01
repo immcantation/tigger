@@ -121,21 +121,21 @@ findNovelAlleles  <- function(clip_db, germline_db,
     registerDoSEQ()
   } else {
     cluster <- makeCluster(nproc, type = "SOCK")
-    clusterExport( cluster, list( "allele_groups",
-                                  "germlines",
-                                  "clip_db",
-                                  "min_seqs",
-                                  "auto_mutrange",
-                                  "mut_range",
-                                  "pos_range",
-                                  "y_intercept",
-                                  "alpha",
-                                  "j_max",
-                                  "germline_min",
-                                  "min_frac"), 
-                   envir=environment() )
+    clusterExport(cluster, list("allele_groups",
+                                "germlines",
+                                "clip_db",
+                                "min_seqs",
+                                "auto_mutrange",
+                                "mut_range",
+                                "pos_range",
+                                "y_intercept",
+                                "alpha",
+                                "j_max",
+                                "germline_min",
+                                "min_frac"), 
+                   envir=environment())
     clusterEvalQ(cluster, library(tigger))
-    registerDoSNOW(cluster)
+    registerDoParallel(cluster)
   }
   
   df_out <- foreach(a=icount(length(allele_groups)), .combine=rbind) %dopar% {
