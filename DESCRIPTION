@@ -14,11 +14,12 @@ Depends:
     alakazam,
     shm,
     dplyr,
-    grid,
     ggplot2
 Imports:
     doParallel,
     foreach,
+    grid,
+    iterators,
     parallel
 Suggests:
     knitr
