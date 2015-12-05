@@ -106,6 +106,12 @@ findNovelAlleles  <- function(clip_db, germline_db,
   allele_groups = sapply(names(germlines), grep, clip_db$V_CALL, fixed=TRUE)
   names(allele_groups) = names(germlines)
   allele_groups = allele_groups[sapply(allele_groups, length) >= cutoff]
+  if(length(allele_groups) == 0){
+    paste("Not enough sample sequences were assigned to any germline:\n",
+          " (1) germline_min is too large or\n",
+          " (2)sequences names don't match germlines.") %>%
+      stop()
+  }
   allele_groups = allele_groups[sortAlleles(names(allele_groups))]
   
   # Prepare for parallel processing
