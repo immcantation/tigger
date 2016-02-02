@@ -723,57 +723,81 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
 #'                        \code{\link{inferGenotype}}
+#' @param    facet_by     a column name in \code{genotype} to facet the plot by. 
+#'                        If \code{NULL}, then do not facet the plot. 
+#' @param    gene_sort    a string defining the method to use when sorting alleles.
+#'                        If \code{"name"} then sort in lexicographic order. If
+#'                        \code{"position"} then sort by position in the locus, as
+#'                        determined by the final two numbers in the gene name.
 #' @param    text_size    the point size of the plotted text
+#' @param    silent       if \code{TRUE} do not draw the plot and just return the ggplot
+#'                        object; if \code{FALSE} draw the plot.
+#' @param    ...          additional arguments to pass to ggplot2::theme.
 #' 
-#' @details If a columns \code{SUBJECT} is added to \code{genotype}, the data
-#' will be faceted according to this column automatically.
-#' 
-#' @return   NULL
+#' @return  A ggplot object defining the plot.
 #' 
 #' @seealso \code{\link{inferGenotype}}
 #' 
 #' @examples
-#' \dontrun{
 #' # Infer and view a genotype from the sample
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' geno = inferGenotype(sample_db, find_unmutated = TRUE,
 #'                      germline_db = germline_ighv, novel_df = novel_df)
 #' plotGenotype(geno)
-#' }
+#' 
+#' # Facet by subject
+#' geno_sub = bind_rows(list(A=geno, B=geno), .id="SUBJECT")
+#' geno_sub$SUBJECT <- factor(geno_sub$SUBJECT, levels=c("B", "A"))
+#' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #' 
 #' @export
-plotGenotype = function(genotype, text_size=12) {
+plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position"), 
+                        text_size=12, silent=FALSE, ...) {
+  # Check arguments
+  gene_sort <- match.arg(gene_sort)
+    
   # Split genes' alleles into their own rows
   alleles = strsplit(genotype$ALLELES, ",")
-  geno2 = genotype; r = 1
+  geno2 = genotype
+  r = 1
   for (g in 1:nrow(genotype)){
     for(a in 1:length(alleles[[g]])) {
-      geno2[r,] = genotype[g,]
-      geno2[r,]$ALLELES = alleles[[g]][a]
-      r = r+1
+      geno2[r, ] = genotype[g, ]
+      geno2[r, ]$ALLELES = alleles[[g]][a]
+      r = r + 1
     }
   }
+  
   # Set the gene order
-  geno2$GENE = factor(geno2$GENE, levels = rev(sortAlleles(unique(geno2$GENE))))
-  if ("SUBJECT" %in% names(geno2)) {
-    geno2$SUBJECT = factor(geno2$SUBJECT, levels = unique(geno2$SUBJECT))
-  }
+  geno2$GENE = factor(geno2$GENE, 
+                      levels=rev(sortAlleles(unique(geno2$GENE), method=gene_sort)))
+  
   # Create the base plot
-  p = ggplot(geno2, aes(x = GENE, fill=ALLELES)) +
+  p = ggplot(geno2, aes(x=GENE, fill=ALLELES)) +
+    theme_bw() +
+    theme(axis.ticks=element_blank(),
+          axis.text.x=element_blank(),
+          panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),
+          text=element_text(size=text_size),
+          strip.background=element_blank(),
+          strip.text=element_text(face="bold")) +
     geom_bar(position="fill") +
-    coord_flip() + ylab("") + theme_bw() +
-    scale_fill_hue(h=c(0, 270), h.start=10) +
-    theme(axis.ticks = element_blank(),
-          axis.text.x = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          text = element_text(size=text_size))
+    coord_flip() + xlab("Gene") + ylab("") +
+    scale_fill_hue(name="Allele", h=c(0, 270), h.start=10)
+  
   # Plot, with facets by SUBJECT if that column is present
-  if ("SUBJECT" %in% names(geno2)) {
-    plot(p + facet_grid(. ~ SUBJECT))
-  } else {
-    plot(p)
+  if (!is.null(facet_by)) {
+    p = p + facet_grid(paste0(".~", facet_by))
   }
+
+  # Add additional theme elements
+  p = p + do.call(theme, list(...))
+  
+  # Plot
+  if (!silent) { plot(p) }
+  
+  invisible(p)
 }
 
 #' Return the nucleotide sequences of a genotype
@@ -1350,6 +1374,10 @@ updateAlleleNames <- function(allele_calls){
 #' within their gene family.
 #' 
 #' @param    allele_calls  a vector of strings respresenting Ig allele names
+#' @param    method        a string defining the method to use when sorting alleles.
+#'                         If \code{"name"} then sort in lexicographic order. If
+#'                         \code{"position"} then sort by position in the locus, as
+#'                         determined by the final two numbers in the gene name.
 #' @return   A sorted vector of strings respresenting Ig allele names
 #' 
 #' @seealso Like \code{sortAlleles}, \code{\link{updateAlleleNames}} can help
@@ -1358,14 +1386,20 @@ updateAlleleNames <- function(allele_calls){
 #' @examples
 #' # Create a list of allele names
 #' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
-#' "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", "IGHV1-2",
-#' "IGHV1-2*02", "IGHV1-69*02")
+#'             "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
+#'             "IGHV1-2", "IGHV1-2*02", "IGHV1-69*02")
 #' 
-#' # Sort the alleles
+#' # Sort the alleles by name
 #' sortAlleles(alleles)
 #' 
+#' # Sort the alleles by position in the locus
+#' sortAlleles(alleles, method="pos")
+#' 
 #' @export
-sortAlleles <- function(allele_calls) {  
+sortAlleles <- function(allele_calls, method=c("name", "position")) { 
+  # Check arguments
+  method <- match.arg(method)
+    
   # Standardize format of submitted alleles, first
   SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE, strip_d= FALSE) %>%
     sort()
@@ -1383,7 +1417,12 @@ sortAlleles <- function(allele_calls) {
                                    getAllele(SUBMITTED_CALLS))))
   # Convert missing values to 0, sort data frame
   allele_df[is.na(allele_df)] = 0
-  sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
+  if (method == "name") {  
+    sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
+  } else if (method == "position") {
+    sorted_df = arrange(allele_df, desc(GENE1), desc(GENE2), FAMILY, ALLELE)
+  }
+  
   return(sorted_df$SUBMITTED_CALLS)
 }
 
