@@ -719,7 +719,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 
 #' Show a colorful representation of a genotype
 #'
-#' \code{plotGenotype} .
+#' \code{plotGenotype} plots a genotype table.
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
 #'                        \code{\link{inferGenotype}}
