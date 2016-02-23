@@ -9,6 +9,7 @@ The application of TIgGER continues to identify a surprisingly high frequency of
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) "Automated analysis of high-throughput B cell sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles." *PNAS* 112(8), E862-E870](http://www.pnas.org/content/112/8/E862.abstract)
 
 ### Core Abilities ###
+
 * Detecting novel alleles
 * Inferring a subject's genotype
 * Correcting preliminary allele calls
@@ -29,40 +30,37 @@ Software             | Link
 ---------------------|-------------------------------------------
 R Studio (IDE)       | https://www.rstudio.com/
 alakazam (R package) | https://bitbucket.org/kleinstein/alakazam/
-shm (R package)      | https://bitbucket.org/kleinstein/shm
+shazam (R package)   | https://bitbucket.org/kleinstein/shazam
 dplyr (R package)    | https://cran.rstudio.com/web/packages/dplyr/
 ggplot2 (R package)  | https://cran.rstudio.com/web/packages/ggplot2/
-grid (R package)     | https://cran.rstudio.com/src/contrib/Archive/grid/
+
 
 ### Build Instructions ###
 
 Install build dependencies:
+
 ```R
 install.packages(c("devtools", "roxygen2", "testthat", "knitr", "rmarkdown"))
 ```
 
-Building with Rstudio:
-
--  Build -> Configure Build Tools
--  Check use devtools option
--  Check use roxygen option
--  Select configure roxygen options and check everything.
--  Build -> Build and Reload
-
 Building from the R console:
 
 ```R
-library(roxygen2)
-library(devtools)
-install_deps()
-document()
-build(vignettes=FALSE)
-install()
+devtools::install_deps()
+devtools::document()
+devtools::build()
+devtools::install()
+```
+
+Optionally, you can skip the vignettes:
+```R
+devtools::build(vignettes=FALSE)
 ```
 
 #### Usage Example ####
+
 Please see the [TIgGER vignette](http://clip.med.yale.edu/tigger/Tigger-Vignette.pdf).
 
 ### Contact ###
 
-For help, questions, or suggestions, please contact [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu)
+For help, questions, or suggestions, please contact daniel.gadala-maria@yale.edu

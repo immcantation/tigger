@@ -1,20 +1,30 @@
 Package: tigger
-Title: R Tools for Inferring New IGHV Alleles from Rep-Seq Data
+Type: Package
 Version: 0.2.3
-Author: Daniel Gadala-Maria and Jason Anthony Vander Heiden
-Maintainer: Daniel Gadala-Maria <daniel.gadala-maria@yale.edu>
+Date: 2016-02-23
+Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut", "cre"), 
+                    email="daniel.gadala-maria@yale.edu"),
+             person("Jason", "Vander Heiden", role=c("ctb"), 
+                    email="jason.vanderheiden@yale.edu"),
+             person("Steven", "Kleinstein", role=c("aut", "cph"), 
+                    email="steven.kleinstein@yale.edu"))
+Title: R Tools for Inferring New IGHV Alleles from Rep-Seq Data
 Description: The 'tigger' package infers the V genotype of an individual from
     immunogliubulin (Ig) repertoire-sequencing (Rep-Seq) data. This includes
     detection of any novel alleles. This information is then used to correct
     existing V allele calls from among the sample sequences.
-License: CC BY-NC-SA 3.0
+License: CC BY-NC-SA 4.0
+URL: http://clip.med.yale.edu/tigger
+BugReports: https://bitbucket.org/kleinstein/tigger/issues
 LazyData: true
+BuildVignettes: true
+VignetteBuilder: knitr
 Depends:
-    R (>= 3.0.0),
-    alakazam,
-    shm,
-    dplyr,
-    ggplot2
+    R (>= 3.1.2),
+    alakazam (>= 0.2.1),
+    shazam (>= 0.1.2),
+    ggplot2 (>= 2.0.0),
+    dplyr
 Imports:
     doParallel,
     foreach,
@@ -23,5 +33,4 @@ Imports:
     parallel
 Suggests:
     knitr
-VignetteBuilder: knitr
 RoxygenNote: 5.0.1

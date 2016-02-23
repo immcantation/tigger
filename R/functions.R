@@ -406,7 +406,6 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' @return   NULL
 #' 
 #' @examples
-#' \dontrun{
 #' # Load example data and germlines
 #' data(sample_db)
 #' data(germline_ighv)
@@ -415,14 +414,12 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel = selectNovel(novel_df)
-#' pdf(paste(gsub("\\*","+", novel$POLYMORPHISM_CALL), ".pdf", sep=""), 10, 15)
 #' plotNovel(sample_db, novel[1,])
-#' dev.off()
-#' }
 #' 
 #' @export
 plotNovel <- function(clip_db, novel_df_row, ncol = 1){
-  
+  # clip_db=sample_db; novel_df_row=novel[1, ]; ncol = 1
+    
   # Use the data frame
   if(length(novel_df_row) > 0){
     if(is.data.frame(novel_df_row) & nrow(novel_df_row) == 1){
@@ -507,7 +504,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   p2 = ggplot(mutate(filter(pos_db, POSITION %in% pass_y),
                      POSITION = to_from[as.character(POSITION)]),
               aes(factor(MUT_COUNT), fill=NT)) +
-    geom_bar(binwidth=1) +
+    geom_bar(width=0.9) +
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
     facet_grid(POSITION ~ .) +
     xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
@@ -518,7 +515,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
           legend.background=element_rect(fill = "transparent"))
   # MAKE THE THIRD PLOT
   p3 = ggplot(db_subset, aes(JUNCTION_LENGTH, fill=factor(J_GENE))) +
-    geom_bar(binwidth=1) +
+    geom_bar(width=0.9) +
     guides(fill = guide_legend("J Gene", ncol = 2)) +
     xlab("Junction Length") + ylab("Unmutated Sequence Count") +
     theme_bw() +

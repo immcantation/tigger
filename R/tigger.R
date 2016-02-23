@@ -59,7 +59,7 @@
 #' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
 #' 
 #' @import alakazam 
-#' @import shm
+#' @import shazam
 #' @import doParallel
 #' @import dplyr
 #' @import foreach
