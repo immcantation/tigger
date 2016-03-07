@@ -1276,7 +1276,7 @@ readIgFasta <- function(fasta_file,
   seqs = sapply(broken_names, "[", 2)
   seq_names = sapply(broken_names, "[", 1)
   if(force_caps){ seqs = toupper(seqs) }
-  if(strip_down_name){ seq_names = getAllele(seq_names) }
+  if(strip_down_name){ seq_names = getAllele(seq_names, strip_d=FALSE) }
   names(seqs) = seq_names
   return(seqs[which(!is.na(seqs))])
 }
