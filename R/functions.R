@@ -58,9 +58,9 @@
 #' either a note as to where the polymorphism-finding algorithm exited or a
 #' nucleotide sequence for the predicted novel allele.
 #' 
-#' @seealso \code{\link{plotNovel}} to visualize the data supporting any
+#' @seealso \link{plotNovel} to visualize the data supporting any
 #' novel alleles hypothesized to be present in the data and
-#' \code{\link{inferGenotype}} to determine if the novel alleles are frequent
+#' \link{inferGenotype} to determine if the novel alleles are frequent
 #' enought to be included in the subject's genotype
 #' 
 #' @examples
@@ -360,11 +360,11 @@ findNovelAlleles  <- function(clip_db, germline_db,
 
 #' Select rows containing novel alleles
 #' 
-#' \code{selectNovel} takes the result from \code{\link{findNovelAlleles}} and
+#' \code{selectNovel} takes the result from \link{findNovelAlleles} and
 #' selects only the rows containing unique, novel alleles.
 #' 
 #' @param   novel_df        A \code{data.frame} of the type returned by
-#'                          \code{\link{findNovelAlleles}}
+#'                          \link{findNovelAlleles}
 #' @param   keep_alleles    A \code{logical} indicating if different alleles
 #'                          leading to the same novel sequence should be kept.
 #'                          See details.
@@ -395,12 +395,12 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' Visualize evidence of novel V alleles
 #'
 #' \code{plotNovel} is be used to visualize the evidence of any novel V
-#' alleles found using \code{\link{findNovelAlleles}}.
+#' alleles found using \link{findNovelAlleles}.
 #' 
 #' @param    clip_db        a \code{data.frame} in Change-O format. See
-#'                          \code{\link{findNovelAlleles}} for details.
+#'                          \link{findNovelAlleles} for details.
 #' @param    novel_df_row   a single row from a data frame as output by
-#'                          \code{\link{findNovelAlleles}} that contains a
+#'                          \link{findNovelAlleles} that contains a
 #'                          polymorphism-containing germline allele
 #' @param    ncol           number of columns to use when laying out the plots            
 #' @return   NULL
@@ -558,7 +558,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #'                                \code{find_unmutated} is \code{TRUE}.
 #' @param    novel_df             an optional \code{data.frame} of the type
 #'                                novel returned by
-#'                                \code{\link{findNovelAlleles}} containing
+#'                                \link{findNovelAlleles} containing
 #'                                germline sequences that will be utilized if
 #'                                \code{find_unmutated} is \code{TRUE}. See
 #'                                details.
@@ -594,8 +594,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #' inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv,
 #'               novel_df = novel_df)
 #' 
-#' @seealso \code{\link{plotGenotype}} for a colorful visualization and
-#' \code{\link{genotypeFasta}} to convert the genotype to nucleotide sequences.
+#' @seealso \link{plotGenotype} for a colorful visualization and
+#'          \link{genotypeFasta} to convert the genotype to nucleotide sequences.
 #' 
 #' @export
 inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
@@ -719,7 +719,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 #' \code{plotGenotype} plots a genotype table.
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
-#'                        \code{\link{inferGenotype}}
+#'                        \link{inferGenotype}
 #' @param    facet_by     a column name in \code{genotype} to facet the plot by. 
 #'                        If \code{NULL}, then do not facet the plot. 
 #' @param    gene_sort    a string defining the method to use when sorting alleles.
@@ -733,7 +733,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 #' 
 #' @return  A ggplot object defining the plot.
 #' 
-#' @seealso \code{\link{inferGenotype}}
+#' @seealso \link{inferGenotype}
 #' 
 #' @examples
 #' # Infer and view a genotype from the sample
@@ -803,17 +803,17 @@ plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position")
 #' sequences.
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
-#'                        \code{\link{inferGenotype}}
+#'                        \link{inferGenotype}
 #' @param    germline_db  a vector of named nucleotide germline sequences
 #'                        matching the alleles detailed in \code{genotype}
 #' @param    novel_df     an optional \code{data.frame} containing putative
 #'                        novel alleeles of the type returned by
-#'                        \code{\link{findNovelAlleles}}
+#'                        \link{findNovelAlleles}
 #' 
 #' @return   A named vector of strings containing the germline nucleotide
 #'           sequences of the alleles in the provided genotype
 #' 
-#' @seealso \code{\link{inferGenotype}}
+#' @seealso \link{inferGenotype}
 #' 
 #' @examples
 #' # Load example data
@@ -1156,7 +1156,7 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #' for each V gene and returns the mutation count of those sequences.
 #' 
 #' @param  sample_db     A Change-O db data frame. See
-#'                       \code{\link{findNovelAlleles}} for a list of required
+#'                       \link{findNovelAlleles} for a list of required
 #'                       columns.
 #' @param  germline_db   A named list of IMGT-gapped germline sequences.
 #' @param  gene_min      The portion of all unique sequences a gene must
@@ -1169,10 +1169,10 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'                       will include sequences with mutation count < 1.
 #' 
 #' @return  A data frame of genes that have a frequent sequence mutation count
-#' above 1.
+#'          above 1.
 #' 
-#' @seealso \code{\link{getMutatedPositions}} can be used to find which positions
-#' of a set of sequences are mutated.
+#' @seealso \link{getMutatedPositions} can be used to find which positions
+#'          of a set of sequences are mutated.
 #' 
 #' @examples
 #' data(sample_db, germline_ighv)
@@ -1259,7 +1259,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #'                            uppercase
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
-#' @seealso \code{\link{writeFasta}} to do the inverse.
+#' @seealso  \link{writeFasta} to do the inverse.
 #' 
 #' @export
 readIgFasta <- function(fasta_file, 
@@ -1292,7 +1292,7 @@ readIgFasta <- function(fasta_file,
 #' 
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
-#' @seealso \code{\link{readIgFasta}} to do the inverse.
+#' @seealso  \link{readIgFasta} to do the inverse.
 #' 
 #' @export
 writeFasta <- function(named_sequences, file, width=60, append=FALSE){
@@ -1326,7 +1326,7 @@ writeFasta <- function(named_sequences, file, width=60, append=FALSE){
 #' and alleles: new entities, new names and implications for research and
 #' prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
 #' 
-#' @seealso Like \code{updateAlleleNames}, \code{\link{sortAlleles}} can help
+#' @seealso Like \code{updateAlleleNames}, \link{sortAlleles} can help
 #'          format a list of allele names.
 #' 
 #' @examples
@@ -1377,7 +1377,7 @@ updateAlleleNames <- function(allele_calls){
 #'                         determined by the final two numbers in the gene name.
 #' @return   A sorted vector of strings respresenting Ig allele names
 #' 
-#' @seealso Like \code{sortAlleles}, \code{\link{updateAlleleNames}} can help
+#' @seealso Like \code{sortAlleles}, \link{updateAlleleNames} can help
 #'          format a list of allele names.
 #' 
 #' @examples
@@ -1431,7 +1431,7 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
 #' @param    seqs  a vector of nucleotide sequences
 #' @return   A vector of nucleotide sequences
 #' 
-#' @seealso \code{\link{sortAlleles}} and \code{\link{updateAlleleNames}} can
+#' @seealso \link{sortAlleles} and \link{updateAlleleNames} can
 #'          help format a list of allele names.
 #' 
 #' @examples
@@ -1460,7 +1460,7 @@ cleanSeqs <- function(seqs){
 # position
 # 
 # @param  clip_db       A Change-O db data frame. See
-#                       \code{\link{findNovelAlleles}} for a list of required
+#                       \link{findNovelAlleles} for a list of required
 #                       columns.
 # @param  germline      The germline to which all the sequences should be
 #                       compared
@@ -1496,7 +1496,7 @@ positionMutations <- function(clip_db, germline, pos_range){
 # count limits
 # 
 # @param  clip_db       A Change-O db data frame. See
-#                       \code{\link{findNovelAlleles}} for a list of required
+#                       \link{findNovelAlleles} for a list of required
 #                       columns.
 # @param  germline      The germline to which all the sequences should be
 #                       compared
