@@ -103,7 +103,8 @@ findNovelAlleles  <- function(clip_db, germline_db,
   # Find which rows' calls contain which germline alleles
   cutoff =
     ifelse(germline_min < 1, round(nrow(clip_db)*germline_min), germline_min)
-  allele_groups = sapply(names(germlines), grep, clip_db$V_CALL, fixed=TRUE)
+  allele_groups = sapply(names(germlines), grep, clip_db$V_CALL, fixed=TRUE,
+                         simplify=FALSE)
   names(allele_groups) = names(germlines)
   allele_groups = allele_groups[sapply(allele_groups, length) >= cutoff]
   if(length(allele_groups) == 0){
@@ -891,14 +892,14 @@ reassignAlleles <- function(clip_db, genotype_db, method="hamming", path=NA,
   
   # Extract data subset and prepare output vector
   v_sequences = as.character(clip_db$SEQUENCE_IMGT)
-  v_calls = getAllele(clip_db$V_CALL, first=FALSE)
-  v_genes = getGene(v_calls, first = TRUE)
+  v_calls = getAllele(clip_db$V_CALL, first=FALSE, strip_d=FALSE)
+  v_genes = getGene(v_calls, first = TRUE, strip_d=FALSE)
   V_CALL_GENOTYPED = rep("", length(v_calls))
   
   
   if(keep_gene){
     # Find which genotype genes are homozygous and assign those alleles first
-    geno_genes = gsub("D", "", getGene(names(genotype_db)))
+    geno_genes = getGene(names(genotype_db),strip_d=TRUE)
     names(geno_genes) = names(genotype_db)
     hetero_genes = unique(geno_genes[which(duplicated(geno_genes))])
     homo_genes = geno_genes[!(geno_genes %in% hetero_genes)]

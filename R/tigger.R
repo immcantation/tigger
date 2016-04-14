@@ -1,10 +1,10 @@
 # Project documentation for tigger
 # 
 # @author     Daniel Gadala-Maria
-# @copyright  Copyright 2015 Kleinstein Lab, Yale University. All rights reserved
+# @copyright  Copyright 2016 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported
-# @version    0.2.3
-# @date       2015.08.15
+# @version    0.2.3.999
+# @date       2016.03.14
 
 
 #' tigger
@@ -59,8 +59,9 @@
 #' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
 #' 
 #' @import alakazam 
-#' @import shm
+#' @import shazam
 #' @import doParallel
+#' @import tidyr
 #' @import dplyr
 #' @import foreach
 #' @import ggplot2
