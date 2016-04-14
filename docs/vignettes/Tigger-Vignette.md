@@ -1,17 +1,6 @@
----
-title: "Tool for Immunoglobulin Genotype Elucidation via Rep-Seq (TIgGER)"
-author: "Daniel Gadala-Maria"
-date: "Last modified `r Sys.Date()`"
-output:
-  pdf_document: default
-  html_document:
-    keep_md: yes
-  word_document: default
-vignette: >
-  %\VignetteEngine{knitr::rmarkdown} 
-  %\VignetteIndexEntry{Polymorphism detection and genotyping} 
-  %\usepackage[utf8]{inputenc}
----
+Polymorphism detection and genotyping
+====================
+
 
 Introduction 
 --------------------------------------------------------------------------------
@@ -66,7 +55,8 @@ sequences gapped according to the IMGT numbering scheme[[3]][3]. IGHV alleles in
 the IMGT database (build 201408-4) are provided with this package. You may read 
 in your own fasta file using `readIgFasta`.
 
-```{r, eval=TRUE, message=FALSE, warning=FALSE}
+
+```r
 library(tigger)
 # Load example Rep-Seq data and example germline database
 data(sample_db, germline_ighv)
@@ -91,12 +81,34 @@ the `data.frame`. Additionally, the result will contain metadata on the
 parameters used when searching for novel alleles (which can be optionally
 changed in `findNovelAlleles`).
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Detect novel alleles
 novel_df = findNovelAlleles(sample_db, germline_ighv)
 # Extract and view the rows that contain successful novel allele calls
 novel = selectNovel(novel_df)
 glimpse(novel)
+```
+
+```
+## Observations: 1
+## Variables: 16
+## $ GERMLINE_CALL       (chr) "IGHV1-8*02"
+## $ NOTE                (chr) "Novel allele found!"
+## $ POLYMORPHISM_CALL   (chr) "IGHV1-8*02_G234T"
+## $ NOVEL_IMGT          (chr) "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
+## $ PERFECT_MATCH_COUNT (int) 661
+## $ GERMLINE_CALL_COUNT (int) 906
+## $ MUT_MIN             (int) 1
+## $ MUT_MAX             (int) 10
+## $ GERMLINE_IMGT       (chr) "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
+## $ POS_MIN             (int) 1
+## $ POS_MAX             (int) 312
+## $ Y_INTERCEPT         (dbl) 0.125
+## $ ALPHA               (dbl) 0.05
+## $ MIN_SEQS            (dbl) 50
+## $ J_MAX               (dbl) 0.15
+## $ MIN_FRAC            (dbl) 0.75
 ```
 
 The TIgGER procedure for identifying novel alleles (see citation above) involves
@@ -127,10 +139,13 @@ The three pieces of evidence desribed above can be viewed for any allele call
 made by `findNovelAlleles` using the function `plotNovel`.
 
 
-```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=8}
+
+```r
 # Plot evidence of the first (and only) novel allele from the example data
 plotNovel(sample_db, novel[1,])
 ```
+
+![plot of chunk Tigger-Vignette-3](figure/Tigger-Vignette-3-1.png)
 
 ### Genotype
 An individual's genotype can be inferred using the function `inferGenotype`.
@@ -147,7 +162,8 @@ that gene is also given. To output these alleles as a names vector of nucleotide
 sequences, the user may use the function `genotypeFasta`. To save this vector to
 a fasta file, `writeFasta` may be used.
 
-```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
+
+```r
 # Infer the individual's genotype, using only unmutated sequences and checking
 # for the use of the novel alleles inferred in the earlier step.
 geno = inferGenotype(sample_db, find_unmutated = TRUE,
@@ -156,10 +172,27 @@ geno = inferGenotype(sample_db, find_unmutated = TRUE,
 genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
 # Visualize the genotype and sequence counts
 print(geno)
-# Make a colorful visualization. Bars indicate presence, not proportion.
-plotGenotype(geno, text_size = 10)
+```
 
 ```
+##         GENE     ALLELES      COUNTS TOTAL NOTE
+## 1    IGHV1-2       02,04     664,302   966     
+## 2    IGHV1-3          01         226   226     
+## 3    IGHV1-8 01,02_G234T     467,370   837     
+## 4   IGHV1-18          01        1005  1005     
+## 5   IGHV1-24          01         105   105     
+## 6   IGHV1-46          01         624   624     
+## 7   IGHV1-58       01,02       23,18    41     
+## 8   IGHV1-69    01,04,06 515,469,280  1279     
+## 9 IGHV1-69-2          01          31    31
+```
+
+```r
+# Make a colorful visualization. Bars indicate presence, not proportion.
+plotGenotype(geno, text_size = 10)
+```
+
+![plot of chunk Tigger-Vignette-4](figure/Tigger-Vignette-4-1.png)
 
 ### Corrected Allele Calls
 
@@ -171,7 +204,8 @@ V alleles, thus preventing the mutations analysis of allele-differentiating
 positions). Additionally, assignments to erroneous not-in-genotype alleles
 (expected to be ~5% [[2]][2], as mentioned above, are corrected in this manner.
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Use the personlized genotype to determine corrected allele assignments
 V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)
 # Append the corrected calls to the original data.frame
@@ -184,7 +218,8 @@ alleles not in the IGMT database, the calls made by IMGT have been tailored to
 the subject's genotype, greatly reducing the number of problematic calls, as
 can be seen below.
 
-```{r, eval=TRUE, warning=FALSE}
+
+```r
 # Find the set of alleles in the original calls that were not in the genotype
 not_in_genotype = sample_db$V_CALL %>%
   strsplit(",") %>%
@@ -201,7 +236,12 @@ data.frame(
   mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
   row.names = c("Before", "After")
   ) %>% t() %>% round(3)
+```
 
+```
+##               Before After
+## Ambiguous      0.112 0.006
+## NotInGenotype  0.057 0.000
 ```
 
 

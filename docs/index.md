@@ -64,3 +64,41 @@ Please see the [TIgGER vignette](http://clip.med.yale.edu/tigger/Tigger-Vignette
 ### Contact ###
 
 For help, questions, or suggestions, please contact daniel.gadala-maria@yale.edu
+
+Dependencies
+---------------
+
+**Depends:** alakazam, shazam, ggplot2, dplyr  
+**Imports:** doParallel, foreach, grid, iterators, parallel  
+**Suggests:** knitr
+
+Authors
+---------------
+
+[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut, cre)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (ctb)  
+[Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
+
+Citing
+---------------
+
+
+Gadala-Maria D, Yaari G, Uduman M and Kleinstein Ss (2015). “Automated analysis of high-throughput B cell sequencing
+data reveals a high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the National Academy of
+Sciency of the United States of America_, pp. E862-70. [http://clip.med.yale.edu/tigger/](http://clip.med.yale.edu/tigger/).
+
+A BibTeX entry for LaTeX users is
+
+  @Article{,
+    title = {Automated analysis of high-throughput B cell sequencing data
+         reveals a high frequency of novel immunoglobulin V gene segment
+         alleles.},
+    author = {Daniel Gadala-Maria and Gur Yaari and Mohamed Uduman and Steven H. steven.kleinstein@yale.edu Kleinstein},
+    year = {2015},
+    journal = {Proceedings of the National Academy of Sciency of the United
+         States of America},
+    number = {122},
+    pages = {E862-70},
+    url = {http://clip.med.yale.edu/tigger/},
+  }
+

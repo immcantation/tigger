@@ -58,9 +58,9 @@
 #' either a note as to where the polymorphism-finding algorithm exited or a
 #' nucleotide sequence for the predicted novel allele.
 #' 
-#' @seealso \code{\link{plotNovel}} to visualize the data supporting any
+#' @seealso \link{plotNovel} to visualize the data supporting any
 #' novel alleles hypothesized to be present in the data and
-#' \code{\link{inferGenotype}} to determine if the novel alleles are frequent
+#' \link{inferGenotype} to determine if the novel alleles are frequent
 #' enought to be included in the subject's genotype
 #' 
 #' @examples
@@ -361,11 +361,11 @@ findNovelAlleles  <- function(clip_db, germline_db,
 
 #' Select rows containing novel alleles
 #' 
-#' \code{selectNovel} takes the result from \code{\link{findNovelAlleles}} and
+#' \code{selectNovel} takes the result from \link{findNovelAlleles} and
 #' selects only the rows containing unique, novel alleles.
 #' 
 #' @param   novel_df        A \code{data.frame} of the type returned by
-#'                          \code{\link{findNovelAlleles}}
+#'                          \link{findNovelAlleles}
 #' @param   keep_alleles    A \code{logical} indicating if different alleles
 #'                          leading to the same novel sequence should be kept.
 #'                          See details.
@@ -396,18 +396,17 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' Visualize evidence of novel V alleles
 #'
 #' \code{plotNovel} is be used to visualize the evidence of any novel V
-#' alleles found using \code{\link{findNovelAlleles}}.
+#' alleles found using \link{findNovelAlleles}.
 #' 
 #' @param    clip_db        a \code{data.frame} in Change-O format. See
-#'                          \code{\link{findNovelAlleles}} for details.
+#'                          \link{findNovelAlleles} for details.
 #' @param    novel_df_row   a single row from a data frame as output by
-#'                          \code{\link{findNovelAlleles}} that contains a
+#'                          \link{findNovelAlleles} that contains a
 #'                          polymorphism-containing germline allele
 #' @param    ncol           number of columns to use when laying out the plots            
 #' @return   NULL
 #' 
 #' @examples
-#' \dontrun{
 #' # Load example data and germlines
 #' data(sample_db)
 #' data(germline_ighv)
@@ -416,14 +415,12 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel = selectNovel(novel_df)
-#' pdf(paste(gsub("\\*","+", novel$POLYMORPHISM_CALL), ".pdf", sep=""), 10, 15)
 #' plotNovel(sample_db, novel[1,])
-#' dev.off()
-#' }
 #' 
 #' @export
 plotNovel <- function(clip_db, novel_df_row, ncol = 1){
-  
+  # clip_db=sample_db; novel_df_row=novel[1, ]; ncol = 1
+    
   # Use the data frame
   if(length(novel_df_row) > 0){
     if(is.data.frame(novel_df_row) & nrow(novel_df_row) == 1){
@@ -508,7 +505,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   p2 = ggplot(mutate(filter(pos_db, POSITION %in% pass_y),
                      POSITION = to_from[as.character(POSITION)]),
               aes(factor(MUT_COUNT), fill=NT)) +
-    geom_bar(binwidth=1) +
+    geom_bar(width=0.9) +
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
     facet_grid(POSITION ~ .) +
     xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
@@ -519,7 +516,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
           legend.background=element_rect(fill = "transparent"))
   # MAKE THE THIRD PLOT
   p3 = ggplot(db_subset, aes(JUNCTION_LENGTH, fill=factor(J_GENE))) +
-    geom_bar(binwidth=1) +
+    geom_bar(width=0.9) +
     guides(fill = guide_legend("J Gene", ncol = 2)) +
     xlab("Junction Length") + ylab("Unmutated Sequence Count") +
     theme_bw() +
@@ -562,7 +559,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #'                                \code{find_unmutated} is \code{TRUE}.
 #' @param    novel_df             an optional \code{data.frame} of the type
 #'                                novel returned by
-#'                                \code{\link{findNovelAlleles}} containing
+#'                                \link{findNovelAlleles} containing
 #'                                germline sequences that will be utilized if
 #'                                \code{find_unmutated} is \code{TRUE}. See
 #'                                details.
@@ -598,8 +595,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #' inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv,
 #'               novel_df = novel_df)
 #' 
-#' @seealso \code{\link{plotGenotype}} for a colorful visualization and
-#' \code{\link{genotypeFasta}} to convert the genotype to nucleotide sequences.
+#' @seealso \link{plotGenotype} for a colorful visualization and
+#'          \link{genotypeFasta} to convert the genotype to nucleotide sequences.
 #' 
 #' @export
 inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
@@ -720,61 +717,85 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 
 #' Show a colorful representation of a genotype
 #'
-#' \code{plotGenotype} .
+#' \code{plotGenotype} plots a genotype table.
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
-#'                        \code{\link{inferGenotype}}
+#'                        \link{inferGenotype}
+#' @param    facet_by     a column name in \code{genotype} to facet the plot by. 
+#'                        If \code{NULL}, then do not facet the plot. 
+#' @param    gene_sort    a string defining the method to use when sorting alleles.
+#'                        If \code{"name"} then sort in lexicographic order. If
+#'                        \code{"position"} then sort by position in the locus, as
+#'                        determined by the final two numbers in the gene name.
 #' @param    text_size    the point size of the plotted text
+#' @param    silent       if \code{TRUE} do not draw the plot and just return the ggplot
+#'                        object; if \code{FALSE} draw the plot.
+#' @param    ...          additional arguments to pass to ggplot2::theme.
 #' 
-#' @details If a columns \code{SUBJECT} is added to \code{genotype}, the data
-#' will be faceted according to this column automatically.
+#' @return  A ggplot object defining the plot.
 #' 
-#' @return   NULL
-#' 
-#' @seealso \code{\link{inferGenotype}}
+#' @seealso \link{inferGenotype}
 #' 
 #' @examples
-#' \dontrun{
 #' # Infer and view a genotype from the sample
 #' novel_df = findNovelAlleles(sample_db, germline_ighv)
 #' geno = inferGenotype(sample_db, find_unmutated = TRUE,
 #'                      germline_db = germline_ighv, novel_df = novel_df)
 #' plotGenotype(geno)
-#' }
+#' 
+#' # Facet by subject
+#' geno_sub = bind_rows(list(A=geno, B=geno), .id="SUBJECT")
+#' geno_sub$SUBJECT <- factor(geno_sub$SUBJECT, levels=c("B", "A"))
+#' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #' 
 #' @export
-plotGenotype = function(genotype, text_size=12) {
+plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position"), 
+                        text_size=12, silent=FALSE, ...) {
+  # Check arguments
+  gene_sort <- match.arg(gene_sort)
+    
   # Split genes' alleles into their own rows
   alleles = strsplit(genotype$ALLELES, ",")
-  geno2 = genotype; r = 1
+  geno2 = genotype
+  r = 1
   for (g in 1:nrow(genotype)){
     for(a in 1:length(alleles[[g]])) {
-      geno2[r,] = genotype[g,]
-      geno2[r,]$ALLELES = alleles[[g]][a]
-      r = r+1
+      geno2[r, ] = genotype[g, ]
+      geno2[r, ]$ALLELES = alleles[[g]][a]
+      r = r + 1
     }
   }
+  
   # Set the gene order
-  geno2$GENE = factor(geno2$GENE, levels = rev(sortAlleles(unique(geno2$GENE))))
-  if ("SUBJECT" %in% names(geno2)) {
-    geno2$SUBJECT = factor(geno2$SUBJECT, levels = unique(geno2$SUBJECT))
-  }
+  geno2$GENE = factor(geno2$GENE, 
+                      levels=rev(sortAlleles(unique(geno2$GENE), method=gene_sort)))
+  
   # Create the base plot
-  p = ggplot(geno2, aes(x = GENE, fill=ALLELES)) +
+  p = ggplot(geno2, aes(x=GENE, fill=ALLELES)) +
+    theme_bw() +
+    theme(axis.ticks=element_blank(),
+          axis.text.x=element_blank(),
+          panel.grid.major=element_blank(),
+          panel.grid.minor=element_blank(),
+          text=element_text(size=text_size),
+          strip.background=element_blank(),
+          strip.text=element_text(face="bold")) +
     geom_bar(position="fill") +
-    coord_flip() + ylab("") + theme_bw() +
-    scale_fill_hue(h=c(0, 270), h.start=10) +
-    theme(axis.ticks = element_blank(),
-          axis.text.x = element_blank(),
-          panel.grid.major = element_blank(),
-          panel.grid.minor = element_blank(),
-          text = element_text(size=text_size))
+    coord_flip() + xlab("Gene") + ylab("") +
+    scale_fill_hue(name="Allele", h=c(0, 270), h.start=10)
+  
   # Plot, with facets by SUBJECT if that column is present
-  if ("SUBJECT" %in% names(geno2)) {
-    plot(p + facet_grid(. ~ SUBJECT))
-  } else {
-    plot(p)
+  if (!is.null(facet_by)) {
+    p = p + facet_grid(paste0(".~", facet_by))
   }
+
+  # Add additional theme elements
+  p = p + do.call(theme, list(...))
+  
+  # Plot
+  if (!silent) { plot(p) }
+  
+  invisible(p)
 }
 
 #' Return the nucleotide sequences of a genotype
@@ -783,17 +804,17 @@ plotGenotype = function(genotype, text_size=12) {
 #' sequences.
 #' 
 #' @param    genotype     a table of alleles denoting a genotype, as returned by
-#'                        \code{\link{inferGenotype}}
+#'                        \link{inferGenotype}
 #' @param    germline_db  a vector of named nucleotide germline sequences
 #'                        matching the alleles detailed in \code{genotype}
 #' @param    novel_df     an optional \code{data.frame} containing putative
 #'                        novel alleeles of the type returned by
-#'                        \code{\link{findNovelAlleles}}
+#'                        \link{findNovelAlleles}
 #' 
 #' @return   A named vector of strings containing the germline nucleotide
 #'           sequences of the alleles in the provided genotype
 #' 
-#' @seealso \code{\link{inferGenotype}}
+#' @seealso \link{inferGenotype}
 #' 
 #' @examples
 #' # Load example data
@@ -1160,7 +1181,7 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #' for each V gene and returns the mutation count of those sequences.
 #' 
 #' @param  sample_db     A Change-O db data frame. See
-#'                       \code{\link{findNovelAlleles}} for a list of required
+#'                       \link{findNovelAlleles} for a list of required
 #'                       columns.
 #' @param  germline_db   A named list of IMGT-gapped germline sequences.
 #' @param  gene_min      The portion of all unique sequences a gene must
@@ -1173,10 +1194,10 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'                       will include sequences with mutation count < 1.
 #' 
 #' @return  A data frame of genes that have a frequent sequence mutation count
-#' above 1.
+#'          above 1.
 #' 
-#' @seealso \code{\link{getMutatedPositions}} can be used to find which positions
-#' of a set of sequences are mutated.
+#' @seealso \link{getMutatedPositions} can be used to find which positions
+#'          of a set of sequences are mutated.
 #' 
 #' @examples
 #' data(sample_db, germline_ighv)
@@ -1263,7 +1284,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #'                            uppercase
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
-#' @seealso \code{\link{writeFasta}} to do the inverse.
+#' @seealso  \link{writeFasta} to do the inverse.
 #' 
 #' @export
 readIgFasta <- function(fasta_file, 
@@ -1296,7 +1317,7 @@ readIgFasta <- function(fasta_file,
 #' 
 #' @return   a named vector of strings respresenting Ig alleles
 #' 
-#' @seealso \code{\link{readIgFasta}} to do the inverse.
+#' @seealso  \link{readIgFasta} to do the inverse.
 #' 
 #' @export
 writeFasta <- function(named_sequences, file, width=60, append=FALSE){
@@ -1330,7 +1351,7 @@ writeFasta <- function(named_sequences, file, width=60, append=FALSE){
 #' and alleles: new entities, new names and implications for research and
 #' prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
 #' 
-#' @seealso Like \code{updateAlleleNames}, \code{\link{sortAlleles}} can help
+#' @seealso Like \code{updateAlleleNames}, \link{sortAlleles} can help
 #'          format a list of allele names.
 #' 
 #' @examples
@@ -1375,22 +1396,32 @@ updateAlleleNames <- function(allele_calls){
 #' within their gene family.
 #' 
 #' @param    allele_calls  a vector of strings respresenting Ig allele names
+#' @param    method        a string defining the method to use when sorting alleles.
+#'                         If \code{"name"} then sort in lexicographic order. If
+#'                         \code{"position"} then sort by position in the locus, as
+#'                         determined by the final two numbers in the gene name.
 #' @return   A sorted vector of strings respresenting Ig allele names
 #' 
-#' @seealso Like \code{sortAlleles}, \code{\link{updateAlleleNames}} can help
+#' @seealso Like \code{sortAlleles}, \link{updateAlleleNames} can help
 #'          format a list of allele names.
 #' 
 #' @examples
 #' # Create a list of allele names
 #' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
-#' "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", "IGHV1-2",
-#' "IGHV1-2*02", "IGHV1-69*02")
+#'             "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
+#'             "IGHV1-2", "IGHV1-2*02", "IGHV1-69*02")
 #' 
-#' # Sort the alleles
+#' # Sort the alleles by name
 #' sortAlleles(alleles)
 #' 
+#' # Sort the alleles by position in the locus
+#' sortAlleles(alleles, method="pos")
+#' 
 #' @export
-sortAlleles <- function(allele_calls) {  
+sortAlleles <- function(allele_calls, method=c("name", "position")) { 
+  # Check arguments
+  method <- match.arg(method)
+    
   # Standardize format of submitted alleles, first
   SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE, strip_d= FALSE) %>%
     sort()
@@ -1408,7 +1439,12 @@ sortAlleles <- function(allele_calls) {
                                    getAllele(SUBMITTED_CALLS))))
   # Convert missing values to 0, sort data frame
   allele_df[is.na(allele_df)] = 0
-  sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
+  if (method == "name") {  
+    sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
+  } else if (method == "position") {
+    sorted_df = arrange(allele_df, desc(GENE1), desc(GENE2), FAMILY, ALLELE)
+  }
+  
   return(sorted_df$SUBMITTED_CALLS)
 }
 
@@ -1420,7 +1456,7 @@ sortAlleles <- function(allele_calls) {
 #' @param    seqs  a vector of nucleotide sequences
 #' @return   A vector of nucleotide sequences
 #' 
-#' @seealso \code{\link{sortAlleles}} and \code{\link{updateAlleleNames}} can
+#' @seealso \link{sortAlleles} and \link{updateAlleleNames} can
 #'          help format a list of allele names.
 #' 
 #' @examples
@@ -1449,7 +1485,7 @@ cleanSeqs <- function(seqs){
 # position
 # 
 # @param  clip_db       A Change-O db data frame. See
-#                       \code{\link{findNovelAlleles}} for a list of required
+#                       \link{findNovelAlleles} for a list of required
 #                       columns.
 # @param  germline      The germline to which all the sequences should be
 #                       compared
@@ -1485,7 +1521,7 @@ positionMutations <- function(clip_db, germline, pos_range){
 # count limits
 # 
 # @param  clip_db       A Change-O db data frame. See
-#                       \code{\link{findNovelAlleles}} for a list of required
+#                       \link{findNovelAlleles} for a list of required
 #                       columns.
 # @param  germline      The germline to which all the sequences should be
 #                       compared
