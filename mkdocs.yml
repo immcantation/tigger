@@ -1,4 +1,5 @@
 site_name: tigger
+repo_url: https://bitbucket.org/kleinstein/tigger
 theme: readthedocs
 markdown_extensions:
   - def_list
