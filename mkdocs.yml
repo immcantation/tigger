@@ -10,6 +10,7 @@ docs_dir: docs
 pages:
   - About:
     - 'Introduction': index.md
+    - 'Download & Installation': install.md
     - 'Package Overview': topics/tigger.md
   - Vignettes:
     - 'Polymorphism detection and genotyping': vignettes/Tigger-Vignette.md
