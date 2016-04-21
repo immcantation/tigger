@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
 Version: 0.2.3.999
-Date: 2016-04-13
+Date: 2016-04-14
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut", "cre"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Jason", "Vander Heiden", role=c("ctb"), 
@@ -14,7 +14,7 @@ Description: The 'tigger' package infers the V genotype of an individual from
     detection of any novel alleles. This information is then used to correct
     existing V allele calls from among the sample sequences.
 License: CC BY-NC-SA 4.0
-URL: http://clip.med.yale.edu/tigger
+URL: http://tigger.readthedocs.org
 BugReports: https://bitbucket.org/kleinstein/tigger/issues
 LazyData: true
 BuildVignettes: true

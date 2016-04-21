@@ -12,5 +12,4 @@ bibentry(bibtype = "Article",
          journal = "Proceedings of the National Academy of Sciency of the United
          States of America",
          number = 122,
-         pages = "E862-70",
-         url = "http://clip.med.yale.edu/tigger/")
+         pages = "E862-70")

@@ -18,9 +18,9 @@ Introduction
 Immunoglobulin Repertoire-Sequencing (Rep-Seq) data is currently the subject of 
 much study. A key step in analyzing these data involves assigning the closest 
 known V(D)J germline alleles to the (often somatically mutated) sample sequences
-using a tool such as IMGT/HighV-QUEST[[1]][1]. However, if the sample utilizes 
+using a tool such as IMGT/HighV-QUEST ([[1]][1]). However, if the sample utilizes 
 alleles not in the germline database used for alignment, this step will fail. 
-Additionally, this alignment has an associated error rate of ~5%[[2]][2], 
+Additionally, this alignment has an associated error rate of ~5% ([[2]][2]), 
 notably among sequences carrying a large number of somatic mutations.
 
 Here we provide a **T**ool for **I**mmuno**g**lobulin **G**enotype 
@@ -29,8 +29,7 @@ inferring the set of Ig alleles carried by an individual (including any novel
 alleles) and then using this set of alleles to correct the initial assignments 
 given to sample sequences by existing tools.
 
-Additional information is available at 
-[http://clip.med.yale.edu/tigger/](http://clip.med.yale.edu/tigger/) and in:
+Additional information is available in:
 
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated analysis of 
 high-throughput B cell sequencing data reveals a high frequency of novel 
@@ -52,7 +51,7 @@ each.
 
 Column Name           | Description 
 ----------------------|---------------------------------------------------------
-`SEQUENCE_IMGT`       | V(D)J sequence gapped in the IMGT gapped format[[3]][3] 
+`SEQUENCE_IMGT`       | V(D)J sequence gapped in the IMGT gapped format ([[3]][3])
 `V_CALL`              | (Comma separated) name(s) of the nearest V allele(s) 
 `J_CALL`              | (Comma separated) name(s) of the nearest J allele(s) 
 `JUNCTION_LENGTH`     | Length of the junction region of the V(D)J sample
@@ -62,7 +61,7 @@ functional sequences assigned to IGHV1 family genes isolated from individual
 PGP1 (referenced in Gadala-Maria *et al.* 2015).
 
 The database of germline sequences should be provided in FASTA format with 
-sequences gapped according to the IMGT numbering scheme[[3]][3]. IGHV alleles in
+sequences gapped according to the IMGT numbering scheme ([[3]][3]). IGHV alleles in
 the IMGT database (build 201408-4) are provided with this package. You may read 
 in your own fasta file using `readIgFasta`.
 
@@ -169,7 +168,7 @@ By corrected the calls in this manner, the user can greatly reduce the numer of
 ambiguous allele calls (where a single sample sequences is assigned to multiple
 V alleles, thus preventing the mutations analysis of allele-differentiating
 positions). Additionally, assignments to erroneous not-in-genotype alleles
-(expected to be ~5% [[2]][2], as mentioned above, are corrected in this manner.
+(expected to be ~5% ([[2]][2]), as mentioned above, are corrected in this manner.
 
 ```{r, eval=TRUE, warning=FALSE}
 # Use the personlized genotype to determine corrected allele assignments

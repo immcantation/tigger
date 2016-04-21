@@ -42,7 +42,7 @@ Core functions
 + [reassignAlleles](reassignAlleles.md):    Correct allele calls
 
 
-Mutation-related functions
+Mutation handling
 -------------------
 
 
