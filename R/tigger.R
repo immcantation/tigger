@@ -3,8 +3,8 @@
 # @author     Daniel Gadala-Maria
 # @copyright  Copyright 2016 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported
-# @version    0.2.3.999
-# @date       2016.04.13
+# @version    0.2.4.999
+# @date       2016.04.20
 
 
 #' tigger
