@@ -1,10 +1,10 @@
 # Project documentation for tigger
 # 
 # @author     Daniel Gadala-Maria
-# @copyright  Copyright 2015 Kleinstein Lab, Yale University. All rights reserved
+# @copyright  Copyright 2016 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported
-# @version    0.2.3
-# @date       2015.08.15
+# @version    0.2.4.999
+# @date       2016.04.20
 
 
 #' tigger
@@ -24,32 +24,32 @@
 #' ~5 percent, notably among sequences carrying a large number of somatic
 #' mutations. The purpose of TIgGER is to address these issues.
 #' 
-#' @section  Core functions:
+#' @section  Core tigger functions:
 #' \itemize{
-#'   \item  \link{findNovelAlleles}:   Detect novel alleles
-#'   \item  \link{plotNovel}:          Plot evidence of novel alleles
-#'   \item  \link{inferGenotype}:      Infer an Ig genotype
-#'   \item  \link{plotGenotype}:       A colorful genotype visualization
-#'   \item  \link{genotypeFasta}:      Convert a genotype to sequences
-#'   \item  \link{reassignAlleles}:    Correct allele calls
+#'   \item  \code{\link{findNovelAlleles}}:   Detect novel alleles
+#'   \item  \code{\link{plotNovel}}:          Plot evidence of novel alleles
+#'   \item  \code{\link{inferGenotype}}:      Infer an Ig genotype
+#'   \item  \code{\link{plotGenotype}}:       A colorful genotype visualization
+#'   \item  \code{\link{genotypeFasta}}:      Convert a genotype to sequences
+#'   \item  \code{\link{reassignAlleles}}:    Correct allele calls
 #' }
 #' 
-#' @section  Mutation handling:
+#' @section  Mutation-related functions:
 #' \itemize{
-#'   \item  \link{getMutatedPositions}:      Find mutation locations
-#'   \item  \link{getMutCount}:              Find distance from germline
-#'   \item  \link{findUnmutatedCalls}:       Subset unmutated sequences
-#'   \item  \link{getPopularMutationCount}:  Find most common sequence's
-#'                                           mutation count
-#'   \item  \link{insertPolymorphisms}:      Insert SNPs into a sequence
+#'   \item  \code{\link{getMutatedPositions}}:      Find mutation locations
+#'   \item  \code{\link{getMutCount}}:              Find distance from germline
+#'   \item  \code{\link{findUnmutatedCalls}}:       Subset unmutated sequences
+#'   \item  \code{\link{getPopularMutationCount}}:  Find most common sequence's
+#'                                                  mutation count
+#'   \item  \code{\link{insertPolymorphisms}}:      Insert SNPs into a sequence
 #' }
 #' 
 #' @section  Input and formatting:
 #' \itemize{
-#'   \item  \link{readIgFasta}:        Read a fasta file of Ig sequences
-#'   \item  \link{updateAlleleNames}:  Correct outdated allele names
-#'   \item  \link{sortAlleles}:        Sort allele names intelligently
-#'   \item  \link{cleanSeqs}:          Standardize sequence format
+#'   \item  \code{\link{readIgFasta}}:        Read a fasta file of Ig sequences
+#'   \item  \code{\link{updateAlleleNames}}:  Correct outdated allele names
+#'   \item  \code{\link{sortAlleles}}:        Sort allele names intelligently
+#'   \item  \code{\link{cleanSeqs}}:          Standardize sequence format
 #' }
 #' 
 #' @name        tigger
@@ -61,6 +61,7 @@
 #' @import alakazam 
 #' @import shazam
 #' @import doParallel
+#' @import tidyr
 #' @import dplyr
 #' @import foreach
 #' @import ggplot2

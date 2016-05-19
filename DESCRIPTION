@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
-Version: 0.2.3.999
-Date: 2016-04-14
+Version: 0.2.4.999
+Date: 2016-04-20
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut", "cre"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Jason", "Vander Heiden", role=c("ctb"), 
@@ -20,10 +20,11 @@ LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr
 Depends:
-    R (>= 3.1.2),
+    R (>= 3.2.3),
     alakazam (>= 0.2.1),
     shazam (>= 0.1.2),
     ggplot2 (>= 2.0.0),
+    tidyr,
     dplyr
 Imports:
     doParallel,
