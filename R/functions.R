@@ -100,6 +100,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
   names(germlines) = getAllele(names(germlines), first=FALSE, strip_d=FALSE)
   clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
   
+  
   # Find which rows' calls contain which germline alleles
   cutoff =
     ifelse(germline_min < 1, round(nrow(clip_db)*germline_min), germline_min)
