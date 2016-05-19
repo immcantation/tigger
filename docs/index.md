@@ -21,7 +21,7 @@ The application of TIgGER continues to identify a surprisingly high frequency of
     * Length of the junction region
 * Germline Ig sequences in IMGT-gapped fasta format (e.g., as those downloaded from [IMGT/GENE-DB](http://www.imgt.org/genedb))
 
-The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.org) and [Change-O](http://changeo.readthedocs.org).
+The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.org) and [Change-O](http://changeo.readthedocs.io).
 
 ## Contact ##
 
@@ -29,14 +29,14 @@ For help, questions, or suggestions, please contact [Daniel Gadala-Maria](mailto
 
 ## Related Projects ##
 
-* [pRESTO](http://presto.readthedocs.org) - 
+* [pRESTO](http://presto.readthedocs.io) - 
   Raw read assembly, quality control and UMI processing 
-* [Change-O](http://changeo.readthedocs.org) - 
+* [Change-O](http://changeo.readthedocs.io) - 
   V(D)J alignment standardization and clonal clustering
-* [Alakazam](http://alakazam.readthedocs.org) - 
+* [Alakazam](http://alakazam.readthedocs.io) - 
   Lineage reconstruction, V(D)J gene usage, repertoire diversity and 
   physicochemical property analysis
-* [SHazaM](http://shazam.readthedocs.org) - 
+* [SHazaM](http://shazam.readthedocs.io) - 
   Mutation profiling and selection strength quantification
 
 Dependencies
