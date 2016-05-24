@@ -153,11 +153,11 @@ findNovelAlleles  <- function(clip_db, germline_db,
     # Subset of data being analyzed
     germline = germlines[allele_name]
     indicies = allele_groups[[allele_name]]
-    db_subset = slice(clip_db, indicies)
+    db_subset = slice_(clip_db, ~indicies)
     
     # If mutrange is auto, find most popular mutation count and start from there
     gpm = db_subset %>%
-      mutate(V_CALL = allele_name) %>%
+      mutate_(V_CALL = ~allele_name) %>%
       getPopularMutationCount(germline,
                               gene_min=0, seq_min=min_seqs,
                               seq_p_of_max=1/8, full_return=TRUE)
@@ -211,7 +211,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       }
       
       # Add a mutation count column and filter out sequences not in our range
-      db_subset_mm = tigger:::mutationRangeSubset(db_subset, germline,
+      db_subset_mm = mutationRangeSubset(db_subset, germline,
                                                   mut_min:mut_max, pos_range)
       
       if(nrow(db_subset_mm) < germline_min){
@@ -225,22 +225,22 @@ findNovelAlleles  <- function(clip_db, germline_db,
       
       # Duplicate each sequence for all the positions to be analyzed
       # and find which positions are mutated
-      pos_db = tigger:::positionMutations(db_subset_mm, germline, pos_range)
+      pos_db = positionMutations(db_subset_mm, germline, pos_range)
       
       # Find positional mut freq vs seq mut count
       pos_muts = pos_db %>%
-        group_by(POSITION) %>%
-        mutate(PASS = mean(OBSERVED) >= min_frac) %>%
-        group_by(MUT_COUNT, POSITION) %>%
-        summarise(POS_MUT_RATE = mean(MUTATED)*unique(PASS) ) %>% 
+        group_by_(~POSITION) %>%
+        mutate_(PASS = ~mean(OBSERVED) >= min_frac) %>%
+        group_by_(~MUT_COUNT, ~POSITION) %>%
+        summarise_(POS_MUT_RATE = ~ mean(MUTATED)*unique(PASS) ) %>% 
         ungroup()   
       
       # Calculate y intercepts, find which pass the test
       pass_y = pos_muts %>%
-        group_by(POSITION) %>%
-        summarise(Y_INT_MIN = tigger:::findLowerY(POS_MUT_RATE, MUT_COUNT,
+        group_by_(~POSITION) %>%
+        summarise_(Y_INT_MIN = ~findLowerY(POS_MUT_RATE, MUT_COUNT,
                                                   mut_min, alpha)) %>%
-        filter(Y_INT_MIN > y_intercept)
+        filter_(~Y_INT_MIN > y_intercept)
       
       if(nrow(pass_y) < 1){
         df_run$NOTE[1] = "No positions pass y-intercept test."
@@ -251,7 +251,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         }
       }
       
-      gl_substring = tigger:::superSubstring(germline, pass_y$POSITION)
+      gl_substring = superSubstring(germline, pass_y$POSITION)
       gl_minus_substring = insertPolymorphisms(germline, pass_y$POSITION,
                                                rep("N", nrow(pass_y)))
       
@@ -259,12 +259,12 @@ findNovelAlleles  <- function(clip_db, germline_db,
       # the germline at all those positions or any combo that is too rare
       db_y_subset_mm = db_subset_mm %>%
         group_by(1:n()) %>%
-        mutate(SNP_STRING = tigger:::superSubstring(SEQUENCE_IMGT,
+        mutate_(SNP_STRING = ~superSubstring(SEQUENCE_IMGT,
                                                     pass_y$POSITION)) %>%
-        filter(SNP_STRING != gl_substring) %>%
-        group_by(SNP_STRING) %>%
-        mutate(STRING_COUNT = n()) %>%
-        filter(STRING_COUNT >= min_seqs)
+        filter_(~SNP_STRING != gl_substring) %>%
+        group_by_(~SNP_STRING) %>%
+        mutate_(STRING_COUNT = ~n()) %>%
+        filter_(~STRING_COUNT >= min_seqs)
       
       if (nrow(db_y_subset_mm) < 1 ){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
@@ -290,13 +290,13 @@ findNovelAlleles  <- function(clip_db, germline_db,
       # junction length for each of the SNP strings, and then check to
       # see which pass the j/junction and count requirements
       db_y_summary0 = db_y_subset_mm %>%
-        filter(MUT_COUNT_MINUS_SUBSTRING == 0) %>%
-        mutate(J_GENE = getGene(J_CALL)) %>%
-        group_by(SNP_STRING, J_GENE, JUNCTION_LENGTH) %>%
-        summarise(COUNT = n()) %>%
-        group_by(SNP_STRING) %>%
-        mutate(FRACTION = COUNT/sum(COUNT)) %>%
-        summarise(TOTAL_COUNT = sum(COUNT), MAX_FRAC = max(FRACTION))
+        filter_(~MUT_COUNT_MINUS_SUBSTRING == 0) %>%
+        mutate_(J_GENE = ~getGene(J_CALL)) %>%
+        group_by_(~SNP_STRING, ~J_GENE, ~JUNCTION_LENGTH) %>%
+        summarise_(COUNT = ~n()) %>%
+        group_by_(~SNP_STRING) %>%
+        mutate_(FRACTION = ~COUNT/sum(COUNT)) %>%
+        summarise_(TOTAL_COUNT = ~sum(COUNT), MAX_FRAC = ~max(FRACTION))
         
       if(nrow(db_y_summary0) < 1){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
