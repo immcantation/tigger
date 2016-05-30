@@ -83,7 +83,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               alpha = 0.05,
                               j_max = 0.15,
                               min_frac = 0.75){
-  
+  . = NULL
   # Keep only the columns we need and clean up the sequences
   missing = c("SEQUENCE_IMGT", "V_CALL", "J_CALL", "JUNCTION_LENGTH") %>%
     setdiff(colnames(clip_db))
@@ -311,7 +311,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       }
       
       db_y_summary = db_y_summary0 %>%
-        filter(TOTAL_COUNT >= min_seqs & MAX_FRAC <= j_max)
+        filter_(~TOTAL_COUNT >= min_seqs & MAX_FRAC <= j_max)
       
       if(nrow(db_y_summary) < 1){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
@@ -431,8 +431,6 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
       germline = novel_df_row$GERMLINE_IMGT
       names(germline) = novel_df_row$GERMLINE_CALL
       mut_range = novel_df_row$MUT_MIN[1]:novel_df_row$MUT_MAX[1]
-      y_intercept = novel_df_row$Y_INTERCEPT
-      alpha = novel_df_row$ALPHA
       novel_imgt = novel_df_row$NOVEL_IMGT
       names(novel_imgt) = novel_df_row$POLYMORPHISM_CALL
       min_frac = novel_df_row$MIN_FRAC
@@ -492,8 +490,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   
   # MAKE THE FIRST PLOT
   POLYCOLORS = setNames(DNA_COLORS[c(4,3)], c("False", "True"))
-  p1 = ggplot(pos_muts, aes(factor(MUT_COUNT), POS_MUT_RATE, group=POSITION,
-                            color=Polymorphic)) +
+  p1 = ggplot(pos_muts, aes_string(~factor(MUT_COUNT), ~POS_MUT_RATE, group=~POSITION,
+                            color=~Polymorphic)) +
     geom_line(size = 0.75) +
     facet_grid(GERMLINE ~ .) +
     scale_color_manual(values = POLYCOLORS) +
@@ -507,7 +505,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   # MAKE THE SECOND PLOT
   p2 = ggplot(mutate_(filter_(pos_db, ~POSITION %in% pass_y),
                      POSITION = ~to_from[as.character(POSITION)]),
-              aes(factor(MUT_COUNT), fill=NT)) +
+              aes_string(~factor(MUT_COUNT), fill=~NT)) +
     geom_bar(width=0.9) +
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
     facet_grid(POSITION ~ .) +
@@ -518,7 +516,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     theme(legend.position=c(1,1), legend.justification=c(1,1),
           legend.background=element_rect(fill = "transparent"))
   # MAKE THE THIRD PLOT
-  p3 = ggplot(db_subset, aes(JUNCTION_LENGTH, fill=factor(J_GENE))) +
+  p3 = ggplot(db_subset, aes_string(~JUNCTION_LENGTH, fill=~factor(J_GENE))) +
     geom_bar(width=0.9) +
     guides(fill = guide_legend("J Gene", ncol = 2)) +
     xlab("Junction Length") + ylab("Unmutated Sequence Count") +
@@ -776,7 +774,7 @@ plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position")
                       levels=rev(sortAlleles(unique(geno2$GENE), method=gene_sort)))
   
   # Create the base plot
-  p = ggplot(geno2, aes(x=GENE, fill=ALLELES)) +
+  p = ggplot(geno2, aes_string(x=~GENE, fill=~ALLELES)) +
     theme_bw() +
     theme(axis.ticks=element_blank(),
           axis.text.x=element_blank(),
@@ -883,7 +881,7 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' @param    method        the method to be used when realigning sequences to
 #'                         the genotype_db sequences. Currently only "hammming"
 #'                         (for Hamming distance) is implemented.
-#' @pararm   path          directory containing the tool used in the
+#' @param    path          directory containing the tool used in the
 #'                         realignment method, if needed. Hamming distance does
 #'                         not require a path to a tool.
 #' @param    keep_gene     logical indicating if gene assignments should be
@@ -1130,7 +1128,7 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
-  
+  . = NULL
   allele_calls = getAllele(allele_calls, first = FALSE)
   sample_seqs = as.character(sample_seqs)
   
@@ -1475,6 +1473,7 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
 #' 
 #' @export
 cleanSeqs <- function(seqs){
+  . = NULL
   seqs %>%
     toupper %>%
     gsub(".", "-", . , fixed = TRUE) %>%
