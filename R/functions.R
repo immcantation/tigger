@@ -387,10 +387,12 @@ findNovelAlleles  <- function(clip_db, germline_db,
 #' 
 #' @export
 selectNovel <- function(novel_df, keep_alleles=FALSE) {
-  if (keep_alleles) { novel_df = group_by(novel_df, GERMLINE_CALL) }
+  if (keep_alleles) {
+    novel_df = novel_df %>% group_by_(~GERMLINE_CALL)
+  }
   novel = novel_df %>%
-    distinct(NOVEL_IMGT) %>%
-    filter(nchar(NOVEL_IMGT) > 2)
+    distinct_(~NOVEL_IMGT) %>%
+    filter_(~nchar(NOVEL_IMGT) > 2)
   return(novel)
 }
 
@@ -446,16 +448,16 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   # have an appropriate range of mutations, and find the mutation
   # frequency of each position
   db_subset = clip_db %>%
-    select(SEQUENCE_IMGT, V_CALL, J_CALL, JUNCTION_LENGTH) %>%
-    filter(grepl(names(germline), V_CALL, fixed=TRUE))
+    select_(~SEQUENCE_IMGT, ~V_CALL, ~J_CALL, ~JUNCTION_LENGTH) %>%
+    filter_(~grepl(names(germline), V_CALL, fixed=TRUE))
   pos_db = db_subset %>%  
     mutationRangeSubset(germline, mut_range, pos_range) %>%
     positionMutations(germline, pos_range)
   pos_muts = pos_db %>%
-    group_by(POSITION) %>%
-    mutate(PASS = mean(OBSERVED) >= min_frac) %>%
-    group_by(MUT_COUNT, POSITION) %>%
-    summarise(POS_MUT_RATE = mean(MUTATED)*unique(PASS) ) %>% 
+    group_by_(~POSITION) %>%
+    mutate_(PASS = ~mean(OBSERVED) >= min_frac) %>%
+    group_by_(~MUT_COUNT, ~POSITION) %>%
+    summarise_(POS_MUT_RATE = ~mean(MUTATED)*unique(PASS) ) %>% 
     ungroup()
   
   # Label the polymorphic positions as such
@@ -469,7 +471,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   to_from = paste(paste("Position", pass_y), paste(paste(p_y_f, "->"), p_y_t))
   names(to_from) = pass_y
   pos_muts = pos_muts %>%
-    mutate(Polymorphic = ifelse(POSITION %in% pass_y, "True", "False"))
+    mutate_(Polymorphic = ~ifelse(POSITION %in% pass_y, "True", "False"))
   
   pads = paste(rep("-", min(pos_range)-1), collapse="")
   db_subset$MUT_COUNT_NOVEL = db_subset$SEQUENCE_IMGT %>%
@@ -478,8 +480,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     getMutatedPositions(novel_imgt) %>%
     sapply(length)
   db_subset = db_subset %>%
-    filter(MUT_COUNT_NOVEL == 0) %>%
-    mutate(J_GENE = getGene(J_CALL))
+    filter_(~MUT_COUNT_NOVEL == 0) %>%
+    mutate_(J_GENE = ~getGene(J_CALL))
   db_subset$JUNCTION_LENGTH = db_subset$JUNCTION_LENGTH %>%
     factor(levels=min(db_subset$JUNCTION_LENGTH):max(db_subset$JUNCTION_LENGTH))
   pos_muts$Polymorphic = pos_muts$Polymorphic %>%
@@ -503,8 +505,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
           legend.background=element_rect(fill = "transparent")) +
     guides(color = guide_legend(ncol = 2, reverse = TRUE))
   # MAKE THE SECOND PLOT
-  p2 = ggplot(mutate(filter(pos_db, POSITION %in% pass_y),
-                     POSITION = to_from[as.character(POSITION)]),
+  p2 = ggplot(mutate_(filter_(pos_db, ~POSITION %in% pass_y),
+                     POSITION = ~to_from[as.character(POSITION)]),
               aes(factor(MUT_COUNT), fill=NT)) +
     geom_bar(width=0.9) +
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
@@ -603,6 +605,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
                           gene_cutoff = 1e-4, find_unmutated = TRUE,
                           germline_db = NA, novel_df = NA){
+  
+  . = NULL
   allele_calls = getAllele(clip_db$V_CALL, first=FALSE, strip_d=FALSE)
   # Find the unmutated subset, if requested
   if(find_unmutated){
@@ -610,8 +614,8 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
       stop("germline_db needed if find_unmutated is TRUE")
     }
     if(!is.null(nrow(novel_df))){
-      novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
-        select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
+      novel_df = filter_(novel_df, ~!is.na(POLYMORPHISM_CALL)) %>%
+        select_(~GERMLINE_CALL, ~POLYMORPHISM_CALL, ~NOVEL_IMGT)
       if(nrow(novel_df) > 0){
         # Extract novel alleles if any and add them to germline_db
         novel_gl = novel_df$NOVEL_IMGT
@@ -836,8 +840,8 @@ plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position")
 genotypeFasta <- function(genotype, germline_db, novel_df=NA){
   if(!is.null(nrow(novel_df))){
     # Extract novel alleles if any and add them to germline_db
-    novel_df = filter(novel_df, !is.na(POLYMORPHISM_CALL)) %>%
-      select(GERMLINE_CALL, POLYMORPHISM_CALL, NOVEL_IMGT)
+    novel_df = filter_(novel_df, ~!is.na(POLYMORPHISM_CALL)) %>%
+      select_(~GERMLINE_CALL, ~POLYMORPHISM_CALL, ~NOVEL_IMGT)
     if(nrow(novel_df) > 0){
       novel_gl = novel_df$NOVEL_IMGT
       names(novel_gl) = novel_df$POLYMORPHISM_CALL
@@ -1133,7 +1137,7 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
   # Remove calls not in germline_db
   not_in_db = allele_calls %>%
     strsplit(",") %>%
-    unlist() %>%
+    unlist %>%
     setdiff(names(germline_db))
   no_call = which(allele_calls == "") 
   in_db = not_in_db %>%
@@ -1209,24 +1213,24 @@ getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
                                     seq_min = 50, seq_p_of_max = 1/8,
                                     full_return = FALSE){
   modified_db = sample_db %>%
-    mutate(V_GENE = getGene(V_CALL)) %>%
-    group_by(1:n()) %>%
-    mutate(V_SEQUENCE_IMGT = substring(SEQUENCE_IMGT, 1, 312)) %>%
+    mutate_(V_GENE = ~getGene(V_CALL)) %>%
+    group_by_(~1:n()) %>%
+    mutate_(V_SEQUENCE_IMGT = ~substring(SEQUENCE_IMGT, 1, 312)) %>%
     # Count occurence of each unique IMGT-gapped V sequence
-    group_by(V_GENE, V_SEQUENCE_IMGT) %>%
-    mutate(V_SEQUENCE_IMGT_N = n()) %>%
+    group_by_(~V_GENE, ~V_SEQUENCE_IMGT) %>%
+    mutate_(V_SEQUENCE_IMGT_N = ~n()) %>%
     # Count occurence of each gene and determine count of most common sequence
-    group_by(V_GENE) %>%
-    mutate(V_GENE_N = n()) %>%
-    mutate(V_SEQUENCE_IMGT_N_MAX = max(V_SEQUENCE_IMGT_N)) %>%
+    group_by_(~V_GENE) %>%
+    mutate_(V_GENE_N = ~n()) %>%
+    mutate_(V_SEQUENCE_IMGT_N_MAX = ~max(V_SEQUENCE_IMGT_N)) %>%
     # Remove rare V genes, rare sequences, and sequences not making up a
     # sufficient proportion of sequences as compared to the most common
-    ungroup() %>%
-    distinct(V_SEQUENCE_IMGT) %>%
-    filter(V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
-    filter(V_SEQUENCE_IMGT_N >= seq_min) %>%
-    mutate(V_SEQUENCE_IMGT_P_MAX = V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
-    filter(V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
+    ungroup %>%
+    distinct_(~V_SEQUENCE_IMGT) %>%
+    filter_(~V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
+    filter_(~V_SEQUENCE_IMGT_N >= seq_min) %>%
+    mutate_(V_SEQUENCE_IMGT_P_MAX = ~V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
+    filter_(~V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
   # Determine the mutation counts of the V sequences and append them to the db
   MUTATION_COUNT = getMutCount(modified_db$V_SEQUENCE_IMGT,
                                modified_db$V_CALL,
@@ -1236,8 +1240,8 @@ getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
   # Strip down the data frame before returning it
   if (!full_return) {
     merged_db = merged_db %>%
-      filter(MUTATION_COUNT > 0) %>%
-      select(V_GENE, MUTATION_COUNT)
+      filter_(~MUTATION_COUNT > 0) %>%
+      select_(~V_GENE, ~MUTATION_COUNT)
   }
   return(merged_db)
 }
@@ -1322,6 +1326,7 @@ readIgFasta <- function(fasta_file,
 #' 
 #' @export
 writeFasta <- function(named_sequences, file, width=60, append=FALSE){
+  . = NULL
   seq_names = names(named_sequences) %>%
     paste(">", ., "\n", sep="")
   seqs = as.character(named_sequences)
@@ -1364,6 +1369,7 @@ writeFasta <- function(named_sequences, file, width=60, append=FALSE){
 #' 
 #' @export
 updateAlleleNames <- function(allele_calls){
+  . = NULL
   temporary_names = c("IGHV1-c*",
                       "IGHV1-f*",
                       "IGHV3-d*",
@@ -1428,22 +1434,22 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
     sort()
   allele_df = data.frame(SUBMITTED_CALLS,stringsAsFactors = FALSE) %>%
     # Determine the family
-    mutate(FAMILY = getFamily(SUBMITTED_CALLS)) %>%
+    mutate_(FAMILY = ~getFamily(SUBMITTED_CALLS)) %>%
     # Determine the gene (exclude family); convert letters to numbers for sort
-    mutate(GENE = getGene(SUBMITTED_CALLS)) %>%
-    mutate(GENE1 = gsub("[^-]+-([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
-    mutate(GENE1 = as.numeric(gsub("[^0-9]+", "99", GENE1))) %>%
+    mutate_(GENE = ~getGene(SUBMITTED_CALLS)) %>%
+    mutate_(GENE1 = ~gsub("[^-]+-([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
+    mutate_(GENE1 = ~as.numeric(gsub("[^0-9]+", "99", GENE1))) %>%
     # If there is a second gene number, determine that, too
-    mutate(GENE2 = gsub("[^-]+-[^-]+-?","",GENE)) %>%
-    mutate(GENE2 = as.numeric(gsub("[^0-9]+", "99", GENE2))) %>%
-    mutate(ALLELE = as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",
+    mutate_(GENE2 = ~gsub("[^-]+-[^-]+-?","",GENE)) %>%
+    mutate_(GENE2 = ~as.numeric(gsub("[^0-9]+", "99", GENE2))) %>%
+    mutate_(ALLELE = ~as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",
                                    getAllele(SUBMITTED_CALLS))))
   # Convert missing values to 0, sort data frame
   allele_df[is.na(allele_df)] = 0
   if (method == "name") {  
-    sorted_df = arrange(allele_df, FAMILY, GENE1, GENE2, ALLELE)
+    sorted_df = arrange_(allele_df, ~FAMILY, ~GENE1, ~GENE2, ~ALLELE)
   } else if (method == "position") {
-    sorted_df = arrange(allele_df, desc(GENE1), desc(GENE2), FAMILY, ALLELE)
+    sorted_df = arrange_(allele_df, ~desc(GENE1), ~desc(GENE2), ~FAMILY, ~ALLELE)
   }
   
   return(sorted_df$SUBMITTED_CALLS)
@@ -1470,10 +1476,10 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
 #' @export
 cleanSeqs <- function(seqs){
   seqs %>%
-    toupper() %>%
+    toupper %>%
     gsub(".", "-", . , fixed = TRUE) %>%
     gsub("[^ACGT-]", "N", .) %>%
-    return()
+    return
 }
 
 
@@ -1498,6 +1504,7 @@ cleanSeqs <- function(seqs){
 # comparison to the germline
 #
 positionMutations <- function(clip_db, germline, pos_range){
+  . = NULL
   pos_db = pos_range %>%
     length() %>%
     rep("clip_db", .) %>%
@@ -1508,10 +1515,10 @@ positionMutations <- function(clip_db, germline, pos_range){
   pos_db$POSITION = c(sapply(pos_range, rep, nrow(clip_db)))
   # Find which positions are mutated
   pos_db = pos_db %>%
-    mutate(NT = substring(SEQUENCE_IMGT, POSITION, POSITION)) %>%
-    mutate(GERM_NT = substring(germline, POSITION, POSITION)) %>%
-    mutate(MUTATED = (NT != GERM_NT & NT != "N" & NT != "-" & NT != "")) %>%
-    mutate(OBSERVED = (NT != "-" & NT != ""))
+    mutate_(NT = ~substring(SEQUENCE_IMGT, POSITION, POSITION)) %>%
+    mutate_(GERM_NT = ~substring(germline, POSITION, POSITION)) %>%
+    mutate_(MUTATED = ~(NT != GERM_NT & NT != "N" & NT != "-" & NT != "")) %>%
+    mutate_(OBSERVED = ~(NT != "-" & NT != ""))
   return(pos_db)
 }
 
@@ -1535,6 +1542,7 @@ positionMutations <- function(clip_db, germline, pos_range){
 # of mutation
 #
 mutationRangeSubset <- function(clip_db, germline, mut_range, pos_range){
+  . = NULL
   pads = paste(rep("-", min(pos_range)-1), collapse="")
   clip_db$MUT_COUNT = clip_db$SEQUENCE_IMGT %>%
     substring(min(pos_range), max(pos_range)) %>%
@@ -1542,7 +1550,7 @@ mutationRangeSubset <- function(clip_db, germline, mut_range, pos_range){
     getMutatedPositions(germline) %>%
     sapply(length)
   clip_db = clip_db %>%
-    filter(MUT_COUNT %in% mut_range)
+    filter_(~MUT_COUNT %in% mut_range)
   return(clip_db)
 }
 
