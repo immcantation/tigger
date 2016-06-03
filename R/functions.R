@@ -69,7 +69,7 @@
 #' data(germline_ighv)
 #' 
 #' # Find novel alleles and return relevant data
-#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' \dontrun{novel_df = findNovelAlleles(sample_db, germline_ighv)}
 #' 
 #' @export
 findNovelAlleles  <- function(clip_db, germline_db,
@@ -83,7 +83,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               alpha = 0.05,
                               j_max = 0.15,
                               min_frac = 0.75){
-  . = NULL
+  . = a = NULL
   # Keep only the columns we need and clean up the sequences
   missing = c("SEQUENCE_IMGT", "V_CALL", "J_CALL", "JUNCTION_LENGTH") %>%
     setdiff(colnames(clip_db))
@@ -382,7 +382,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
 #' that were in the input.
 #' 
 #' @examples
-#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' data(novel_df)
 #' novel = selectNovel(novel_df)
 #' 
 #' @export
@@ -415,14 +415,15 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' data(germline_ighv)
 #' 
 #' # Find novel alleles and return relevant data
-#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' \dontrun{novel_df = findNovelAlleles(sample_db, germline_ighv)}
+#' data(novel_df)
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel = selectNovel(novel_df)
 #' plotNovel(sample_db, novel[1,])
 #' 
 #' @export
 plotNovel <- function(clip_db, novel_df_row, ncol = 1){
-  # clip_db=sample_db; novel_df_row=novel[1, ]; ncol = 1
+  . = NULL
     
   # Use the data frame
   if(length(novel_df_row) > 0){
@@ -490,7 +491,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   
   # MAKE THE FIRST PLOT
   POLYCOLORS = setNames(DNA_COLORS[c(4,3)], c("False", "True"))
-  p1 = ggplot(pos_muts, aes_string(~factor(MUT_COUNT), ~POS_MUT_RATE, group=~POSITION,
+  p1 = ggplot(pos_muts, aes_(~factor(MUT_COUNT), ~POS_MUT_RATE, group=~POSITION,
                             color=~Polymorphic)) +
     geom_line(size = 0.75) +
     facet_grid(GERMLINE ~ .) +
@@ -505,7 +506,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   # MAKE THE SECOND PLOT
   p2 = ggplot(mutate_(filter_(pos_db, ~POSITION %in% pass_y),
                      POSITION = ~to_from[as.character(POSITION)]),
-              aes_string(~factor(MUT_COUNT), fill=~NT)) +
+              aes_(~factor(MUT_COUNT), fill=~NT)) +
     geom_bar(width=0.9) +
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
     facet_grid(POSITION ~ .) +
@@ -516,7 +517,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     theme(legend.position=c(1,1), legend.justification=c(1,1),
           legend.background=element_rect(fill = "transparent"))
   # MAKE THE THIRD PLOT
-  p3 = ggplot(db_subset, aes_string(~JUNCTION_LENGTH, fill=~factor(J_GENE))) +
+  p3 = ggplot(db_subset, aes_(~JUNCTION_LENGTH, fill=~factor(J_GENE))) +
     geom_bar(width=0.9) +
     guides(fill = guide_legend("J Gene", ncol = 2)) +
     xlab("Junction Length") + ylab("Unmutated Sequence Count") +
@@ -580,19 +581,11 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #'           should be hundreds of allele calls per gene in the input.
 #' 
 #' @examples
-#' # Load example data; we'll pretend allele calls are unmutated
+#' # Infer the IGHV genotype, using only unmutated sequences, including any 
+#' # novel alleles
 #' data(sample_db)
-#' 
-#' # Infer the IGHV genotype using all provided sequences
-#' inferGenotype(sample_db, find_unmutated = FALSE)
-#' 
-#' # Infer the IGHV genotype using only unmutated sequences
 #' data(germline_ighv)
-#' inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv)
-#' 
-#' # Infer the IGHV genotype, using only unmutated sequences,
-#' # including sequences that match novel alleles (recommended)
-#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' data(novel_df)
 #' inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv,
 #'               novel_df = novel_df)
 #' 
@@ -740,14 +733,15 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 #' @seealso \link{inferGenotype}
 #' 
 #' @examples
-#' # Infer and view a genotype from the sample
-#' novel_df = findNovelAlleles(sample_db, germline_ighv)
-#' geno = inferGenotype(sample_db, find_unmutated = TRUE,
-#'                      germline_db = germline_ighv, novel_df = novel_df)
-#' plotGenotype(geno)
+#' # Load example data
+#' data(novel_df)
+#' data(genotype)
+#' 
+#' # Plot genotype
+#' plotGenotype(genotype)
 #' 
 #' # Facet by subject
-#' geno_sub = bind_rows(list(A=geno, B=geno), .id="SUBJECT")
+#' geno_sub = bind_rows(list(A=genotype, B=genotype), .id="SUBJECT")
 #' geno_sub$SUBJECT <- factor(geno_sub$SUBJECT, levels=c("B", "A"))
 #' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #' 
@@ -774,7 +768,7 @@ plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position")
                       levels=rev(sortAlleles(unique(geno2$GENE), method=gene_sort)))
   
   # Create the base plot
-  p = ggplot(geno2, aes_string(x=~GENE, fill=~ALLELES)) +
+  p = ggplot(geno2, aes_(x=~GENE, fill=~ALLELES)) +
     theme_bw() +
     theme(axis.ticks=element_blank(),
           axis.text.x=element_blank(),
@@ -822,16 +816,11 @@ plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position")
 #' @examples
 #' # Load example data
 #' data(germline_ighv)
-#' data(sample_db)
-#' 
-#' # Infer and view a genotype from the sample
-#' novel_df = findNovelAlleles(sample_db, germline_ighv)
-#' geno = inferGenotype(sample_db, find_unmutated = TRUE,
-#'                      germline_db = germline_ighv, novel_df = novel_df)
-#' print(geno)
+#' data(novel_df)
+#' data(genotype)
 #'                      
 #' # Find the sequences that correspond to the genotype
-#' genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
+#' genotype_seqs = genotypeFasta(genotype, germline_ighv, novel_df)
 #' 
 #' 
 #' @export
@@ -897,14 +886,11 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' # Load example data
 #' data(germline_ighv)
 #' data(sample_db)
-#' 
-#' # Infer genotype from the sample
-#' novel_df = findNovelAlleles(sample_db, germline_ighv)
-#' geno = inferGenotype(sample_db, find_unmutated = TRUE,
-#'                      germline_db = germline_ighv, novel_df = novel_df)
+#' data(genotype)
+#' data(novel_df)
 #'                      
-#' # Find the sequences that correspond to the genotype
-#' genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
+#' # Extract the database sequences that correspond to the genotype
+#' genotype_seqs = genotypeFasta(genotype, germline_ighv, novel_df)
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
 #' V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)

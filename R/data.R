@@ -39,3 +39,40 @@ NULL
 #' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
 #' @keywords data
 NULL
+
+#' Example of Analyzed Rep-Seq data
+#'
+#' Example VDJ-rearranged immunoglobulin Rep-Seq sequences derived from a single
+#' individual (PGP1), sequenced on the Roche 454 platform, and thought by
+#' IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
+#' \link{findNovelAlleles}.
+#'
+#' @name novel_df
+#' @docType data
+#' @format A \code{data.frame} where rows correspond to alleles checked for
+#' polymorphisms and columns give results as well as paramaters used to run
+#' the test.
+#' 
+#' @references Gadala-Maria \emph{et al}. (2015) Automated analysis of
+#' high-throughput B cell sequencing data reveals a high frequency of novel
+#' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
+#' @keywords data
+NULL
+
+#' Example of an Inferred Genotype
+#'
+#' Example VDJ-rearranged immunoglobulin Rep-Seq sequences derived from a single
+#' individual (PGP1), sequenced on the Roche 454 platform, and thought by
+#' IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
+#' \link{findNovelAlleles} and \link{inferGenotype}
+#'
+#' @name genotype
+#' @docType data
+#' @format A \code{data.frame} where rows correspond to genes carried by an
+#' individual and columns lists the alleles of those genes and their counts.
+#' 
+#' @references Gadala-Maria \emph{et al}. (2015) Automated analysis of
+#' high-throughput B cell sequencing data reveals a high frequency of novel
+#' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
+#' @keywords data
+NULL
