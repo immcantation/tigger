@@ -434,6 +434,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
       mut_range = novel_df_row$MUT_MIN[1]:novel_df_row$MUT_MAX[1]
       novel_imgt = novel_df_row$NOVEL_IMGT
       names(novel_imgt) = novel_df_row$POLYMORPHISM_CALL
+      min_frac = novel_df_row$MIN_FRAC
     } else {
       stop("novel_df_row is not a data frame with only one row.")
     }

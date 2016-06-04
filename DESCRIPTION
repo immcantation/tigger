@@ -23,10 +23,10 @@ Depends:
     R (>= 3.2.3),
     alakazam (>= 0.2.1),
     shazam (>= 0.1.2),
-    ggplot2 (>= 2.0.0),
-    tidyr,
-    dplyr
+    ggplot2 (>= 2.0.0)
 Imports:
+    tidyr,
+    dplyr,
     doParallel,
     foreach,
     grid,
