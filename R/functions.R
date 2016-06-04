@@ -896,7 +896,7 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
 #' V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)
-#' sample_db = bind_cols(sample_db, V_CALL_GENOTYPED)
+#' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 #' 
 #' @export
 reassignAlleles <- function(clip_db, genotype_db, method="hamming", path=NA,
