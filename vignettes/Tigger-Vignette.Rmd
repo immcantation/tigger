@@ -3,10 +3,23 @@ title: "Tool for Immunoglobulin Genotype Elucidation via Rep-Seq (TIgGER)"
 author: "Daniel Gadala-Maria"
 date: "Last modified `r Sys.Date()`"
 output:
-  pdf_document: default
+  pdf_document:
+    dev: pdf
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    toc: yes
   html_document:
-    keep_md: yes
-  word_document: default
+    fig_height: 4
+    fig_width: 7.5
+    highlight: pygments
+    theme: readable
+    toc: yes
+  md_document:
+    fig_height: 4
+    fig_width: 7.5
+    preserve_yaml: no
+    toc: yes
 vignette: >
   %\VignetteEngine{knitr::rmarkdown} 
   %\VignetteIndexEntry{Polymorphism detection and genotyping} 
