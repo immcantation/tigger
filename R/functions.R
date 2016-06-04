@@ -741,8 +741,10 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
 #' plotGenotype(genotype)
 #' 
 #' # Facet by subject
-#' geno_sub = bind_rows(list(A=genotype, B=genotype), .id="SUBJECT")
-#' geno_sub$SUBJECT <- factor(geno_sub$SUBJECT, levels=c("B", "A"))
+#' genotypea = genotypeb = genotype
+#' genotypea$SUBJECT = "A"
+#' genotypeb$SUBJECT = "B"
+#' geno_sub = rbind(genotypea, genotypeb)
 #' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #' 
 #' @export
