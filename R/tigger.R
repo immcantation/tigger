@@ -61,6 +61,9 @@
 #' @import      alakazam 
 #' @import      shazam
 #' @import      doParallel
+#' @import      graphics
+#' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
+#'                          confint lm
 #' @importFrom  tidyr       gather gather_ spread spread_
 #' @importFrom  dplyr       do n desc %>%
 #'                          glimpse distinct distinct_

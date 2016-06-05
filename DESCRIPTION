@@ -29,9 +29,11 @@ Imports:
     dplyr,
     doParallel,
     foreach,
+    graphics,
     grid,
     iterators,
-    parallel
+    parallel,
+    stats
 Suggests:
     knitr
 RoxygenNote: 5.0.1
