@@ -5,5 +5,5 @@
 ^test
 ^data-raw
 ^profil
-^docs
+^doc
 mkdocs.yml

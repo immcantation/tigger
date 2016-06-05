@@ -42,8 +42,8 @@ For help, questions, or suggestions, please contact [Daniel Gadala-Maria](mailto
 Dependencies
 ---------------
 
-**Depends:** alakazam, shazam, ggplot2, dplyr  
-**Imports:** doParallel, foreach, grid, iterators, parallel  
+**Depends:** alakazam, shazam, ggplot2  
+**Imports:** tidyr, dplyr, doParallel, foreach, grid, iterators, parallel  
 **Suggests:** knitr
 
 Authors
@@ -57,9 +57,9 @@ Citing
 ---------------
 
 
-Gadala-Maria D, Yaari G, Uduman M and Kleinstein Ss (2015). “Automated analysis of high-throughput B cell sequencing
-data reveals a high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the National Academy of
-Sciency of the United States of America_, pp. E862-70.
+Gadala-Maria D, Yaari G, Uduman M and Kleinstein Ss (2015). “Automated analysis of high-throughput B cell sequencing data
+reveals a high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the National Academy of Sciency
+of the United States of America_, pp. E862-70.
 
 A BibTeX entry for LaTeX users is
 

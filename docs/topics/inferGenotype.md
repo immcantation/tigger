@@ -99,60 +99,11 @@ Examples
 -------------------
 
 ```R
-# Load example data; we'll pretend allele calls are unmutated
+# Infer the IGHV genotype, using only unmutated sequences, including any 
+# novel alleles
 data(sample_db)
-
-# Infer the IGHV genotype using all provided sequences
-inferGenotype(sample_db, find_unmutated = FALSE)
-
-```
-
-
-```
-         GENE  ALLELES         COUNTS TOTAL NOTE
-1     IGHV1-2    02,04       2597,881  3485     
-2     IGHV1-3       01            912   912     
-3     IGHV1-8    01,02       1336,871  2207     
-4    IGHV1-18       01           2906  2907     
-5    IGHV1-24       01            633   633     
-6    IGHV1-45       02             14    14     
-7    IGHV1-46       01           1766  1784     
-8    IGHV1-58    01,02          65,61   126     
-9    IGHV1-69 01,06,04 2512,1484,1266  5365     
-10 IGHV1-69-2       01            126   126     
-
-```
-
-
-```R
-
-# Infer the IGHV genotype using only unmutated sequences
 data(germline_ighv)
-inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv)
-
-```
-
-
-```
-        GENE  ALLELES      COUNTS TOTAL NOTE
-1    IGHV1-2    02,04     664,302   966     
-2    IGHV1-3       01         226   226     
-3    IGHV1-8       01         467   467     
-4   IGHV1-18       01        1005  1005     
-5   IGHV1-24       01         105   105     
-6   IGHV1-46       01         624   624     
-7   IGHV1-58    01,02       23,18    41     
-8   IGHV1-69 01,04,06 515,469,280  1279     
-9 IGHV1-69-2       01          31    31     
-
-```
-
-
-```R
-
-# Infer the IGHV genotype, using only unmutated sequences,
-# including sequences that match novel alleles (recommended)
-novel_df = findNovelAlleles(sample_db, germline_ighv)
+data(novel_df)
 inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv,
 novel_df = novel_df)
 ```

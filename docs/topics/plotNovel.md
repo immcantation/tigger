@@ -47,7 +47,8 @@ data(sample_db)
 data(germline_ighv)
 
 # Find novel alleles and return relevant data
-novel_df = findNovelAlleles(sample_db, germline_ighv)
+### Not run: novel_df = findNovelAlleles(sample_db, germline_ighv)
+data(novel_df)
 # Plot the evidence for the first (and only) novel allele in the example data
 novel = selectNovel(novel_df)
 plotNovel(sample_db, novel[1,])

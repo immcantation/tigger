@@ -55,7 +55,7 @@ Examples
 -------------------
 
 ```R
-novel_df = findNovelAlleles(sample_db, germline_ighv)
+data(novel_df)
 novel = selectNovel(novel_df)
 ```
 

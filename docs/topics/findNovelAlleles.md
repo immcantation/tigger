@@ -120,7 +120,7 @@ data(sample_db)
 data(germline_ighv)
 
 # Find novel alleles and return relevant data
-novel_df = findNovelAlleles(sample_db, germline_ighv)
+### Not run: novel_df = findNovelAlleles(sample_db, germline_ighv)
 ```
 
 

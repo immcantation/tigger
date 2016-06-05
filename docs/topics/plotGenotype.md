@@ -59,11 +59,12 @@ Examples
 -------------------
 
 ```R
-# Infer and view a genotype from the sample
-novel_df = findNovelAlleles(sample_db, germline_ighv)
-geno = inferGenotype(sample_db, find_unmutated = TRUE,
-germline_db = germline_ighv, novel_df = novel_df)
-plotGenotype(geno)
+# Load example data
+data(novel_df)
+data(genotype)
+
+# Plot genotype
+plotGenotype(genotype)
 
 ```
 
@@ -72,8 +73,10 @@ plotGenotype(geno)
 ```R
 
 # Facet by subject
-geno_sub = bind_rows(list(A=geno, B=geno), .id="SUBJECT")
-geno_sub$SUBJECT <- factor(geno_sub$SUBJECT, levels=c("B", "A"))
+genotypea = genotypeb = genotype
+genotypea$SUBJECT = "A"
+genotypeb$SUBJECT = "B"
+geno_sub = rbind(genotypea, genotypeb)
 plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 ```
 

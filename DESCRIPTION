@@ -14,7 +14,7 @@ Description: The 'tigger' package infers the V genotype of an individual from
     detection of any novel alleles. This information is then used to correct
     existing V allele calls from among the sample sequences.
 License: CC BY-NC-SA 4.0
-URL: http://tigger.readthedocs.org
+URL: http://tigger.readthedocs.io
 BugReports: https://bitbucket.org/kleinstein/tigger/issues
 LazyData: true
 BuildVignettes: true

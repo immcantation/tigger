@@ -17,7 +17,8 @@ from a single subject.
 Usage
 --------------------
 ```
-reassignAlleles(clip_db, genotype_db)
+reassignAlleles(clip_db, genotype_db, method = "hamming", path = NA,
+keep_gene = TRUE)
 ```
 
 Arguments
@@ -33,6 +34,22 @@ genotype_db
 :   a vector of named nucleotide germline sequences
 matching the calls detailed in `allele_calls`
 and personalized to the subject
+
+method
+:   the method to be used when realigning sequences to
+the genotype_db sequences. Currently only "hammming"
+(for Hamming distance) is implemented.
+
+path
+:   directory containing the tool used in the
+realignment method, if needed. Hamming distance does
+not require a path to a tool.
+
+keep_gene
+:   logical indicating if gene assignments should be
+maintained when possible. Increases speed by
+minimizing required number of alignments. Currently
+only "TRUE" is implemented.
 
 
 
@@ -59,18 +76,15 @@ Examples
 # Load example data
 data(germline_ighv)
 data(sample_db)
+data(genotype)
+data(novel_df)
 
-# Infer genotype from the sample
-novel_df = findNovelAlleles(sample_db, germline_ighv)
-geno = inferGenotype(sample_db, find_unmutated = TRUE,
-germline_db = germline_ighv, novel_df = novel_df)
-
-# Find the sequences that correspond to the genotype
-genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
+# Extract the database sequences that correspond to the genotype
+genotype_seqs = genotypeFasta(genotype, germline_ighv, novel_df)
 
 # Use the personlized genotype to determine corrected allele assignments
 V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)
-sample_db = bind_cols(sample_db, V_CALL_GENOTYPED)
+sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 ```
 
 

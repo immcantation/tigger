@@ -29,30 +29,30 @@ step will fail. Additionally, this alignment has an associated error rate of
 ~5 percent, notably among sequences carrying a large number of somatic
 mutations. The purpose of TIgGER is to address these issues.
 
-Core functions
+Core tigger functions
 -------------------
 
 
 
-+ [findNovelAlleles](findNovelAlleles.md):   Detect novel alleles
-+ [plotNovel](plotNovel.md):          Plot evidence of novel alleles
-+ [inferGenotype](inferGenotype.md):      Infer an Ig genotype
-+ [plotGenotype](plotGenotype.md):       A colorful genotype visualization
-+ [genotypeFasta](genotypeFasta.md):      Convert a genotype to sequences
-+ [reassignAlleles](reassignAlleles.md):    Correct allele calls
++ `[findNovelAlleles](findNovelAlleles.md)`:   Detect novel alleles
++ `[plotNovel](plotNovel.md)`:          Plot evidence of novel alleles
++ `[inferGenotype](inferGenotype.md)`:      Infer an Ig genotype
++ `[plotGenotype](plotGenotype.md)`:       A colorful genotype visualization
++ `[genotypeFasta](genotypeFasta.md)`:      Convert a genotype to sequences
++ `[reassignAlleles](reassignAlleles.md)`:    Correct allele calls
 
 
-Mutation handling
+Mutation-related functions
 -------------------
 
 
 
-+ [getMutatedPositions](getMutatedPositions.md):      Find mutation locations
-+ [getMutCount](getMutCount.md):              Find distance from germline
-+ [findUnmutatedCalls](findUnmutatedCalls.md):       Subset unmutated sequences
-+ [getPopularMutationCount](getPopularMutationCount.md):  Find most common sequence's
++ `[getMutatedPositions](getMutatedPositions.md)`:      Find mutation locations
++ `[getMutCount](getMutCount.md)`:              Find distance from germline
++ `[findUnmutatedCalls](findUnmutatedCalls.md)`:       Subset unmutated sequences
++ `[getPopularMutationCount](getPopularMutationCount.md)`:  Find most common sequence's
 mutation count
-+ [insertPolymorphisms](insertPolymorphisms.md):      Insert SNPs into a sequence
++ `[insertPolymorphisms](insertPolymorphisms.md)`:      Insert SNPs into a sequence
 
 
 Input and formatting
@@ -60,10 +60,10 @@ Input and formatting
 
 
 
-+ [readIgFasta](readIgFasta.md):        Read a fasta file of Ig sequences
-+ [updateAlleleNames](updateAlleleNames.md):  Correct outdated allele names
-+ [sortAlleles](sortAlleles.md):        Sort allele names intelligently
-+ [cleanSeqs](cleanSeqs.md):          Standardize sequence format
++ `[readIgFasta](readIgFasta.md)`:        Read a fasta file of Ig sequences
++ `[updateAlleleNames](updateAlleleNames.md)`:  Correct outdated allele names
++ `[sortAlleles](sortAlleles.md)`:        Sort allele names intelligently
++ `[cleanSeqs](cleanSeqs.md)`:          Standardize sequence format
 
 
 References

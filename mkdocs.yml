@@ -1,0 +1,43 @@
+site_name: tigger
+theme: readthedocs
+markdown_extensions:
+  - def_list
+  - sane_lists
+  - smarty
+  - toc:
+      permalink: True
+docs_dir: docs
+pages:
+  - About:
+    - 'Introduction': index.md
+    - 'Download & Installation': install.md
+    - 'Package Overview': topics/tigger.md
+  - Vignettes:
+    - 'Polymorphism detection and genotyping': vignettes/Tigger-Vignette.md
+  - 'Help Topics':
+    - 'Core functions':
+      - topics/findNovelAlleles.md
+      - topics/selectNovel.md
+      - topics/plotNovel.md
+      - topics/inferGenotype.md
+      - topics/plotGenotype.md
+      - topics/genotypeFasta.md
+      - topics/reassignAlleles.md
+    - 'Mutation handling':
+      - topics/getMutatedPositions.md
+      - topics/getMutCount.md
+      - topics/getPopularMutationCount.md
+      - topics/findUnmutatedCalls.md
+      - topics/insertPolymorphisms.md
+    - 'File I/O and formatting':
+      - topics/readIgFasta.md
+      - topics/writeFasta.md
+      - topics/cleanSeqs.md
+      - topics/sortAlleles.md
+      - topics/updateAlleleNames.md
+    - 'Data':
+      - topics/genotype.md
+      - topics/germline_ighv.md
+      - topics/novel_df.md
+      - topics/sample_db.md
+
