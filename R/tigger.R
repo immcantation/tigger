@@ -26,30 +26,30 @@
 #' 
 #' @section  Core tigger functions:
 #' \itemize{
-#'   \item  \code{\link{findNovelAlleles}}:   Detect novel alleles
-#'   \item  \code{\link{plotNovel}}:          Plot evidence of novel alleles
-#'   \item  \code{\link{inferGenotype}}:      Infer an Ig genotype
-#'   \item  \code{\link{plotGenotype}}:       A colorful genotype visualization
-#'   \item  \code{\link{genotypeFasta}}:      Convert a genotype to sequences
-#'   \item  \code{\link{reassignAlleles}}:    Correct allele calls
+#'   \item  \link{findNovelAlleles}:   Detect novel alleles
+#'   \item  \link{plotNovel}:          Plot evidence of novel alleles
+#'   \item  \link{inferGenotype}:      Infer an Ig genotype
+#'   \item  \link{plotGenotype}:       A colorful genotype visualization
+#'   \item  \link{genotypeFasta}:      Convert a genotype to sequences
+#'   \item  \link{reassignAlleles}:    Correct allele calls
 #' }
 #' 
 #' @section  Mutation-related functions:
 #' \itemize{
-#'   \item  \code{\link{getMutatedPositions}}:      Find mutation locations
-#'   \item  \code{\link{getMutCount}}:              Find distance from germline
-#'   \item  \code{\link{findUnmutatedCalls}}:       Subset unmutated sequences
-#'   \item  \code{\link{getPopularMutationCount}}:  Find most common sequence's
-#'                                                  mutation count
-#'   \item  \code{\link{insertPolymorphisms}}:      Insert SNPs into a sequence
+#'   \item  \link{getMutatedPositions}:      Find mutation locations
+#'   \item  \link{getMutCount}:              Find distance from germline
+#'   \item  \link{findUnmutatedCalls}:       Subset unmutated sequences
+#'   \item  \link{getPopularMutationCount}:  Find most common sequence's
+#'                                           mutation count
+#'   \item  \link{insertPolymorphisms}:      Insert SNPs into a sequence
 #' }
 #' 
 #' @section  Input and formatting:
 #' \itemize{
-#'   \item  \code{\link{readIgFasta}}:        Read a fasta file of Ig sequences
-#'   \item  \code{\link{updateAlleleNames}}:  Correct outdated allele names
-#'   \item  \code{\link{sortAlleles}}:        Sort allele names intelligently
-#'   \item  \code{\link{cleanSeqs}}:          Standardize sequence format
+#'   \item  \link{readIgFasta}:        Read a fasta file of Ig sequences
+#'   \item  \link{updateAlleleNames}:  Correct outdated allele names
+#'   \item  \link{sortAlleles}:        Sort allele names intelligently
+#'   \item  \link{cleanSeqs}:          Standardize sequence format
 #' }
 #' 
 #' @name        tigger
