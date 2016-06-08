@@ -43,7 +43,7 @@ Dependencies
 ---------------
 
 **Depends:** alakazam, shazam, ggplot2  
-**Imports:** tidyr, dplyr, doParallel, foreach, grid, iterators, parallel  
+**Imports:** tidyr, dplyr, doParallel, foreach, graphics, grid, iterators, parallel, stats  
 **Suggests:** knitr
 
 Authors

@@ -2,11 +2,18 @@ Download
 -------------------------------------------------------------------------------
     
 The latest stable release of TIgGER can be downloaded from 
+[CRAN](http://cran.rstudio.com/web/packages/tigger) or 
 [Bitbucket](https://bitbucket.org/kleinstein/tigger/downloads).
 
 Installing Released Versions
 -------------------------------------------------------------------------------
-    
+
+The simplest way to install TIgGER is via CRAN:
+
+```R
+install.packages("tigger")
+```
+
 Downloaded source builds from Bitbucket may be installed in the usual way:
     
 ```R
