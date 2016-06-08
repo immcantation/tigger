@@ -8,11 +8,11 @@ Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut", "cre"),
                     email="jason.vanderheiden@yale.edu"),
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
-Title: R Tools for Inferring New IGHV Alleles from Rep-Seq Data
-Description: The 'tigger' package infers the V genotype of an individual from
-    immunoglobulin (Ig) repertoire-sequencing (Rep-Seq) data. This includes
-    detection of any novel alleles. This information is then used to correct
-    existing V allele calls from among the sample sequences.
+Title: R Tools for Inferring New Immunoglobulin Alleles from Rep-Seq Data
+Description: Infers the V genotype of an individual from immunoglobulin (Ig)
+    repertoire-sequencing (Rep-Seq) data, including detection of any novel
+    alleles. This information is then used to correct existing V allele calls
+    from among the sample sequences.
 License: CC BY-NC-SA 4.0
 URL: http://tigger.readthedocs.io
 BugReports: https://bitbucket.org/kleinstein/tigger/issues
