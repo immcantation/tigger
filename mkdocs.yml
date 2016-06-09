@@ -8,11 +8,12 @@ markdown_extensions:
       permalink: True
 docs_dir: docs
 pages:
-  - About:
+  - 'About':
     - 'Introduction': index.md
     - 'Download & Installation': install.md
+    - 'Release Notes': news.md
     - 'Package Overview': topics/tigger.md
-  - Vignettes:
+  - 'Vignettes':
     - 'Polymorphism detection and genotyping': vignettes/Tigger-Vignette.md
   - 'Help Topics':
     - 'Core functions':
