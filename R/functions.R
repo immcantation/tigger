@@ -30,7 +30,6 @@
 #' @param    germline_min   the minimum number of sequences that must have a
 #'                          particular germline allele call for the allele to
 #'                          be analyzed
-#' @param    nproc          the number of processors to use
 #' @param    auto_mutrange  if \code{TRUE}, the algorithm will attempt to
 #'                          determine the appropriate mutation range
 #'                          automatically using the mutation count of the most
@@ -53,6 +52,8 @@
 #' @param    min_frac       the minimum fraction of sequences that must have
 #'                          usable nucleotides in a given position for that
 #'                          position to considered
+#' @param    nproc          the number of processors to use
+#'
 #' @return   a \code{data.frame} with a row for each known allele analyzed.
 #' Besides metadata on the the parameters used in the search, each row will have
 #' either a note as to where the polymorphism-finding algorithm exited or a
@@ -74,7 +75,6 @@
 #' @export
 findNovelAlleles  <- function(clip_db, germline_db,
                               germline_min = 200,
-                              nproc = 4,
                               min_seqs = 50,
                               auto_mutrange = TRUE,
                               mut_range = 1:10,
@@ -82,7 +82,8 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               y_intercept = 0.125,
                               alpha = 0.05,
                               j_max = 0.15,
-                              min_frac = 0.75){
+                              min_frac = 0.75,
+                              nproc = 1) {
   . = a = NULL
   # Keep only the columns we need and clean up the sequences
   missing = c("SEQUENCE_IMGT", "V_CALL", "J_CALL", "JUNCTION_LENGTH") %>%

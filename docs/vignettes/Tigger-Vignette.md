@@ -2,8 +2,8 @@ Polymorphism detection and genotyping
 ====================
 
 
-Introduction 
---------------------------------------------------------------------------------
+## Introduction 
+
 Immunoglobulin Repertoire-Sequencing (Rep-Seq) data is currently the subject of 
 much study. A key step in analyzing these data involves assigning the closest 
 known V(D)J germline alleles to the (often somatically mutated) sample sequences
@@ -72,6 +72,7 @@ the following:
 3. Correct the IGHV allele calls of the samples based on the IGHV genotype
 
 ### Novel Alleles
+
 Potential novel alleles can be detected by TIgGER. Some of these may be included
 in the genotype later (see below). `findNovelAlleles` will return a `data.frame`
 with a row for each allele tested for the presence of polymorphisms. If
@@ -84,7 +85,7 @@ changed in `findNovelAlleles`).
 
 ```r
 # Detect novel alleles
-novel_df = findNovelAlleles(sample_db, germline_ighv)
+novel_df = findNovelAlleles(sample_db, germline_ighv, nproc=1)
 # Extract and view the rows that contain successful novel allele calls
 novel = selectNovel(novel_df)
 glimpse(novel)
