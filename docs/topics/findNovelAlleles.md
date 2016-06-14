@@ -17,10 +17,10 @@ might be polymorphic.
 Usage
 --------------------
 ```
-findNovelAlleles(clip_db, germline_db, germline_min = 200, nproc = 4,
-min_seqs = 50, auto_mutrange = TRUE, mut_range = 1:10,
-pos_range = 1:312, y_intercept = 0.125, alpha = 0.05, j_max = 0.15,
-min_frac = 0.75)
+findNovelAlleles(clip_db, germline_db, germline_min = 200, min_seqs = 50,
+auto_mutrange = TRUE, mut_range = 1:10, pos_range = 1:312,
+y_intercept = 0.125, alpha = 0.05, j_max = 0.15, min_frac = 0.75,
+nproc = 1)
 ```
 
 Arguments
@@ -37,9 +37,6 @@ germline_min
 :   the minimum number of sequences that must have a
 particular germline allele call for the allele to
 be analyzed
-
-nproc
-:   the number of processors to use
 
 min_seqs
 :   the minimum number of total sequences (within the
@@ -78,6 +75,9 @@ min_frac
 :   the minimum fraction of sequences that must have
 usable nucleotides in a given position for that
 position to considered
+
+nproc
+:   the number of processors to use
 
 
 
