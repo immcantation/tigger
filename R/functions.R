@@ -392,7 +392,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
     novel_df = novel_df %>% group_by_(~GERMLINE_CALL)
   }
   novel = novel_df %>%
-    distinct_(~NOVEL_IMGT) %>%
+    distinct_(~NOVEL_IMGT, .keep_all = TRUE) %>%
     filter_(~nchar(NOVEL_IMGT) > 2)
   return(novel)
 }
@@ -1207,13 +1207,12 @@ getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
     group_by_(~V_GENE, ~V_SEQUENCE_IMGT) %>%
     mutate_(V_SEQUENCE_IMGT_N = ~n()) %>%
     # Count occurence of each gene and determine count of most common sequence
-    group_by_(~V_GENE) %>%
     mutate_(V_GENE_N = ~n()) %>%
     mutate_(V_SEQUENCE_IMGT_N_MAX = ~max(V_SEQUENCE_IMGT_N)) %>%
     # Remove rare V genes, rare sequences, and sequences not making up a
     # sufficient proportion of sequences as compared to the most common
     ungroup %>%
-    distinct_(~V_SEQUENCE_IMGT) %>%
+    distinct_(~V_SEQUENCE_IMGT, .keep_all = TRUE) %>%
     filter_(~V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
     filter_(~V_SEQUENCE_IMGT_N >= seq_min) %>%
     mutate_(V_SEQUENCE_IMGT_P_MAX = ~V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
