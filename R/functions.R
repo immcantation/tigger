@@ -1222,7 +1222,7 @@ getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
                                modified_db$V_CALL,
                                germline_db) %>% 
     sapply(function(x) min(unlist(x)))
-  if (is.null(nrow(MUTATION_COUNT))){
+  if (length(MUTATION_COUNT)==0){
     MUTATION_COUNT = integer(0)
   }
   merged_db = bind_cols(modified_db, data.frame(MUTATION_COUNT))
