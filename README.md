@@ -26,15 +26,3 @@ The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.
 ## Contact ##
 
 For help, questions, or suggestions, please contact [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) or use the [issue tracker](http://bitbucket.org/kleinstein/tigger/issues).
-
-## Related Projects ##
-
-* [pRESTO](http://presto.readthedocs.io) - 
-  Raw read assembly, quality control and UMI processing 
-* [Change-O](http://changeo.readthedocs.io) - 
-  V(D)J alignment standardization and clonal clustering
-* [Alakazam](http://alakazam.readthedocs.io) - 
-  Lineage reconstruction, V(D)J gene usage, repertoire diversity and 
-  physicochemical property analysis
-* [SHazaM](http://shazam.readthedocs.io) - 
-  Mutation profiling and selection strength quantification

@@ -67,10 +67,9 @@ getPopularMutationCount(sample_db, germline_ighv)
 
 
 ```
-Source: local data frame [1 x 2]
-
+# A tibble: 1 x 2
    V_GENE MUTATION_COUNT
-    (chr)          (int)
+    <chr>          <int>
 1 IGHV1-8              1
 
 ```

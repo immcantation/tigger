@@ -94,22 +94,22 @@ glimpse(novel)
 ```
 ## Observations: 1
 ## Variables: 16
-## $ GERMLINE_CALL       (chr) "IGHV1-8*02"
-## $ NOTE                (chr) "Novel allele found!"
-## $ POLYMORPHISM_CALL   (chr) "IGHV1-8*02_G234T"
-## $ NOVEL_IMGT          (chr) "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
-## $ PERFECT_MATCH_COUNT (int) 661
-## $ GERMLINE_CALL_COUNT (int) 906
-## $ MUT_MIN             (int) 1
-## $ MUT_MAX             (int) 10
-## $ GERMLINE_IMGT       (chr) "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
-## $ POS_MIN             (int) 1
-## $ POS_MAX             (int) 312
-## $ Y_INTERCEPT         (dbl) 0.125
-## $ ALPHA               (dbl) 0.05
-## $ MIN_SEQS            (dbl) 50
-## $ J_MAX               (dbl) 0.15
-## $ MIN_FRAC            (dbl) 0.75
+## $ GERMLINE_CALL       <chr> "IGHV1-8*02"
+## $ NOTE                <chr> "Novel allele found!"
+## $ POLYMORPHISM_CALL   <chr> "IGHV1-8*02_G234T"
+## $ NOVEL_IMGT          <chr> "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
+## $ PERFECT_MATCH_COUNT <int> 661
+## $ GERMLINE_CALL_COUNT <int> 906
+## $ MUT_MIN             <int> 1
+## $ MUT_MAX             <int> 10
+## $ GERMLINE_IMGT       <chr> "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
+## $ POS_MIN             <int> 1
+## $ POS_MAX             <int> 312
+## $ Y_INTERCEPT         <dbl> 0.125
+## $ ALPHA               <dbl> 0.05
+## $ MIN_SEQS            <dbl> 50
+## $ J_MAX               <dbl> 0.15
+## $ MIN_FRAC            <dbl> 0.75
 ```
 
 The TIgGER procedure for identifying novel alleles (see citation above) involves
