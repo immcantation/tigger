@@ -392,7 +392,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
     novel_df = novel_df %>% group_by_(~GERMLINE_CALL)
   }
   novel = novel_df %>%
-    distinct_(~NOVEL_IMGT, .keep_all = TRUE) %>%
+    distinct_(~NOVEL_IMGT, .dots=list(), .keep_all = TRUE) %>%
     filter_(~nchar(NOVEL_IMGT) > 2)
   return(novel)
 }
