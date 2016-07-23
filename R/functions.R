@@ -1113,7 +1113,9 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' data(sample_db)
 #'
 #' # Find which of the sample alleles are unmutated
-#' findUnmutatedCalls(sample_db$V_CALL, sample_db$SEQUENCE_IMGT, germline_ighv)
+#' calls <- findUnmutatedCalls(sample_db$V_CALL, sample_db$SEQUENCE_IMGT, 
+#'          germline_db=germline_ighv)
+#' head(calls)
 #' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
