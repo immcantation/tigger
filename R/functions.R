@@ -394,7 +394,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
   novel = novel_df %>%
     distinct_(~NOVEL_IMGT, .dots=list(), .keep_all = TRUE) %>%
     filter_(~nchar(NOVEL_IMGT) > 2)
-  return(novel)
+  return(ungroup(novel))
 }
 
 #' Visualize evidence of novel V alleles

@@ -1,3 +1,11 @@
+Version 0.2.7:  July 24, 2016
+-------------------------------------------------------------------------------
+
++ More updates to work with the latest version of dplyr (0.5.0).
++ Bugfix in findNovelAlleles when allele passed germline_min but not min_seqs.
++ Fixed vignette typo and updated findUnmutatedCalls man page.
+
+
 Version 0.2.6:  July 01, 2016
 -------------------------------------------------------------------------------
 
