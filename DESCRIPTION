@@ -35,5 +35,6 @@ Imports:
     parallel,
     stats
 Suggests:
-    knitr
+    knitr,
+    testthat
 RoxygenNote: 5.0.1
