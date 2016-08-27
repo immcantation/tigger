@@ -1,0 +1,15 @@
+image: 
+  name: ssnn/immcantation
+  username: $USERNAME
+  password: $PASSWORD
+  email: $EMAIL
+
+pipelines:
+  default:
+    - step:
+        script:
+          - sed -i '/test/ d' .Rbuildignore
+          - Rscript install_dep.R
+          - R CMD build .
+          - R CMD check *.tar.gz --as-cran --timings
+          

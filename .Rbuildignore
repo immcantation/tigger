@@ -7,3 +7,5 @@
 ^profil
 ^doc
 mkdocs.yml
+bitbucket-pipelines.yml
+install_alakazam.R
