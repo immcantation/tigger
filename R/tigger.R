@@ -4,7 +4,7 @@
 # @copyright  Copyright 2016 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported
 # @version    0.2.7
-# @date       2016.07.24
+# @date       2016.08.26
 
 
 #' tigger
@@ -58,8 +58,7 @@
 #' high-throughput B cell sequencing data reveals a high frequency of novel
 #' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
 #' 
-#' @import      alakazam 
-#' @import      shazam
+#' @importFrom  alakazam    getAllele getGene getFamily DNA_COLORS
 #' @import      doParallel
 #' @importFrom  graphics    plot
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad

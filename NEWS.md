@@ -1,3 +1,9 @@
+Version 0.2.7: August 26, 2016
+-------------------------------------------------------------------------------
++ Bugfix following recent update of alakazam (0.2.5) to import selectively.
++ Removed unneeded dependency on shazam package (not needed as of 0.2.5.999).
+
+
 Version 0.2.7:  July 24, 2016
 -------------------------------------------------------------------------------
 
