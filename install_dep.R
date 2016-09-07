@@ -3,11 +3,10 @@ library(versions)
 
 tigger_version <- read.dcf("DESCRIPTION", fields = "Version")
 
-d <- read.dcf("DESCRIPTION", fields = "Depends")
+d <- read.dcf("DESCRIPTION", fields = "Imports")
 d <- sub("^\\n","",d)
-depends <- strsplit(d,",\n")[[1]]
-alakazam <- depends[grep("alakazam", depends)]
-shazam <- depends[grep("shazam", depends)]
+imports <- strsplit(d,",\n")[[1]]
+alakazam <- imports[grep("alakazam", imports)]
 
 installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
     required_version <- gsub(".*\\([^0-9.]*(.*)\\)$", "\\1", dep_pack_v)
@@ -32,5 +31,4 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
 }
 
 installDep(tigger_version, "alakazam", alakazam)
-installDep(tigger_version, "shazam", shazam)
 
