@@ -34,7 +34,7 @@
 #'                          determine the appropriate mutation range
 #'                          automatically using the mutation count of the most
 #'                          common sequence assigned to each allele analyzed
-#' @param    mut_range      the range of mutations that sampled may carry and
+#' @param    mut_range      the range of mutations that samples may carry and
 #'                          be considered by the algorithm
 #' @param    pos_range      the range of IMGT-numbered positions that should be
 #'                          considered by the algorithm
