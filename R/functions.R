@@ -299,7 +299,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         mutate_(FRACTION = ~COUNT/sum(COUNT)) %>%
         summarise_(TOTAL_COUNT = ~sum(COUNT), MAX_FRAC = ~max(FRACTION))
         
-      if(nrow(db_y_summary0) < 1){
+        if(nrow(db_y_summary0) < 1){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
                                paste(pass_y$POSITION, collapse = ","),
                                ") but no unmutated versions of novel allele",
@@ -316,13 +316,13 @@ findNovelAlleles  <- function(clip_db, germline_db,
       
       if(nrow(db_y_summary) < 1){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
-                               paste(pass_y$POSITION, sep = ","),
+                               paste(pass_y$POSITION, collapse = ","),
                                ") but a ",
                                "J-junction combination is too prevalent (",
                                round(100*max(db_y_summary0$MAX_FRAC),1),
                                "% of sequences).",
                                sep="")
-        df_run$PERFECT_MATCH_COUNT = max(db_y_summary0$TOTAL_COUNT)
+        df_run$PERFECT_MATCH_COUNT[1] = max(db_y_summary0$TOTAL_COUNT)
         if(mut_mins[1] == mut_min){
           return(df_run)
         } else {
