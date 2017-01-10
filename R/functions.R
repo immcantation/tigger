@@ -351,7 +351,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
         df_run$POLYMORPHISM_CALL[1] = names(germ)
         df_run$NOVEL_IMGT[1] =  as.character(germ)
         df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
-        df_run$NOTE = "Novel allele found!"
+        df_run$NOTE[1] = "Novel allele found!"
       }
       
     } # end for each starting mutation counts

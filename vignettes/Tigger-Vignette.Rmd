@@ -116,7 +116,7 @@ glimpse(novel)
 ```
 
 The TIgGER procedure for identifying novel alleles (see citation above) involves
-taking all seqeunces which align to a particular germline allele and, for each 
+taking all sequences which align to a particular germline allele and, for each 
 position along the aligned sequences, plotting the mutation frequency at that 
 postion as a function of the sequence-wide mutation count. While mutational 
 hot-spots and cold-spots are both expected to have a *y*-intercept around zero, 
