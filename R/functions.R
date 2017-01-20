@@ -311,17 +311,34 @@ findNovelAlleles  <- function(clip_db, germline_db,
         }
       }
       
-      db_y_summary = db_y_summary0 %>%
-        filter_(~TOTAL_COUNT >= min_seqs & MAX_FRAC <= j_max)
+      # db_y_summary = db_y_summary0 %>%
+      #   filter_(~TOTAL_COUNT >= min_seqs & MAX_FRAC <= j_max)
+      
+      min_seqs_pass <- db_y_summary0$TOTAL_COUNT >= min_seqs
+      j_max_pass <- db_y_summary0$MAX_FRAC <= j_max
+
+      db_y_summary <- db_y_summary0[min_seqs_pass & j_max_pass, , drop=FALSE]
       
       if(nrow(db_y_summary) < 1){
+        msg <- c(NA, NA)
+        names(msg) <- c("j_max", "min_seqs")
+
+        if (sum(min_seqs_pass) == 0) {
+            msg['min_seqs'] <- paste0("not enough sequences (maximum total count is ",
+                                      max(db_y_summary0$TOTAL_COUNT),
+                                      ")")
+        }
+        
+        if (sum(j_max_pass) == 0) {
+            msg['j_max'] <- paste0("a J-junction combination is too prevalent (",
+          round(100*max(db_y_summary0$MAX_FRAC),1),"% of sequences)")
+        }
+        
+        msg <- paste(na.omit(msg), collapse=" and ")
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
                                paste(pass_y$POSITION, collapse = ","),
-                               ") but a ",
-                               "J-junction combination is too prevalent (",
-                               round(100*max(db_y_summary0$MAX_FRAC),1),
-                               "% of sequences).",
-                               sep="")
+                               ") but ",
+                               msg,".", sep="")
         df_run$PERFECT_MATCH_COUNT[1] = max(db_y_summary0$TOTAL_COUNT)
         if(mut_mins[1] == mut_min){
           return(df_run)
