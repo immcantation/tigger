@@ -202,7 +202,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
       df_run$MUT_MAX[1] = mut_max
       
       # If no sequence is frequent enough to pass the J test, give up now
-      if(length(gpm) < 1) {
+      if(nrow(gpm) < 1) {
         df_run$NOTE[1] = "Plurality sequence too rare."
         if(mut_mins[1] == mut_min){
           return(df_run)
