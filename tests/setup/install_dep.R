@@ -1,3 +1,8 @@
+#!/usr/bin/env Rscript
+
+# Install dependencies from CRAN or Bitbucket as needed.
+
+# Imports
 library(devtools)
 library(versions)
 
