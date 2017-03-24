@@ -33,11 +33,13 @@ See details.
 
 
 
+
 Value
 -------------------
 
 A `data.frame` containing only unique, novel alleles (if any)
 that were in the input.
+
 
 Details
 -------------------

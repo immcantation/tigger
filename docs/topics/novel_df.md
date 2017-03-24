@@ -16,11 +16,13 @@ IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
 
 
 
+
 Format
 -------------------
 A `data.frame` where rows correspond to alleles checked for
 polymorphisms and columns give results as well as paramaters used to run
 the test.
+
 References
 -------------------
 

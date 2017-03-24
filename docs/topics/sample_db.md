@@ -15,6 +15,7 @@ IMGT/V-QUEST to utilize IGHV1 family alleles.
 
 
 
+
 Format
 -------------------
 A `data.frame` where rows correspond to unique VDJ sequences and
@@ -24,6 +25,7 @@ columns include:
 +  IMGT/V-QUEST allele calls (`"V_CALL"`, `"D_CALL"`, and
 `"J_CALL"`)
 +  Junction length (`"JUNCTION_LENGTH"`)
+
 
 References
 -------------------

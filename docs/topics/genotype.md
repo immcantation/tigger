@@ -16,10 +16,12 @@ IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
 
 
 
+
 Format
 -------------------
 A `data.frame` where rows correspond to genes carried by an
 individual and columns lists the alleles of those genes and their counts.
+
 References
 -------------------
 

@@ -81,6 +81,7 @@ nproc
 
 
 
+
 Value
 -------------------
 
@@ -88,6 +89,7 @@ a `data.frame` with a row for each known allele analyzed.
 Besides metadata on the the parameters used in the search, each row will have
 either a note as to where the polymorphism-finding algorithm exited or a
 nucleotide sequence for the predicted novel allele.
+
 
 Details
 -------------------

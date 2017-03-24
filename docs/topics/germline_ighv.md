@@ -14,11 +14,13 @@ in IMGT Gene-db release 201408-4.
 
 
 
+
 Format
 -------------------
 Values correspond to IMGT-gaped nuceltoide sequences (with
 nucleotides capitalized and gaps represented by ".") while names correspond
 to stripped-down IMGT allele names (e.g. "IGHV1-18*01").
+
 References
 -------------------
 

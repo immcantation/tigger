@@ -17,6 +17,7 @@ correct the initial assignments given to sample sequences by existing tools.
 
 
 
+
 Details
 -------------------
 
@@ -29,6 +30,7 @@ step will fail. Additionally, this alignment has an associated error rate of
 ~5 percent, notably among sequences carrying a large number of somatic
 mutations. The purpose of TIgGER is to address these issues.
 
+
 Core tigger functions
 -------------------
 
@@ -40,6 +42,7 @@ Core tigger functions
 + [plotGenotype](plotGenotype.md):       A colorful genotype visualization
 + [genotypeFasta](genotypeFasta.md):      Convert a genotype to sequences
 + [reassignAlleles](reassignAlleles.md):    Correct allele calls
+
 
 
 Mutation-related functions
@@ -55,6 +58,7 @@ mutation count
 + [insertPolymorphisms](insertPolymorphisms.md):      Insert SNPs into a sequence
 
 
+
 Input and formatting
 -------------------
 
@@ -64,6 +68,7 @@ Input and formatting
 + [updateAlleleNames](updateAlleleNames.md):  Correct outdated allele names
 + [sortAlleles](sortAlleles.md):        Sort allele names intelligently
 + [cleanSeqs](cleanSeqs.md):          Standardize sequence format
+
 
 
 References
