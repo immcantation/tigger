@@ -1,3 +1,25 @@
+Version 0.2.9: March 24, 2017
+-------------------------------------------------------------------------------
+
++ License changed to Creative Commons Attribution-ShareAlike 4.0 International
+(CC BY-SA 4.0).
+
+
+Version 0.2.8: August 26, 2016
+-------------------------------------------------------------------------------
+
++ Bugfix following recent update of alakazam (0.2.5) to import selectively.
++ Removed unneeded dependency on shazam package (not needed as of 0.2.5.999).
+
+
+Version 0.2.7:  July 24, 2016
+-------------------------------------------------------------------------------
+
++ More updates to work with the latest version of dplyr (0.5.0).
++ Bugfix in findNovelAlleles when allele passed germline_min but not min_seqs.
++ Fixed vignette typo and updated findUnmutatedCalls man page.
+
+
 Version 0.2.6:  July 01, 2016
 -------------------------------------------------------------------------------
 

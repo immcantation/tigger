@@ -1,15 +1,11 @@
 image: 
-  name: ssnn/immcantation
-  username: $USERNAME
-  password: $PASSWORD
-  email: $EMAIL
+  name: javh/immcantation:test-r
 
 pipelines:
   default:
     - step:
         script:
           - sed -i '/test/ d' .Rbuildignore
-          - Rscript install_dep.R
+          - Rscript tests/setup/install_dep.R
           - R CMD build .
-          - R CMD check *.tar.gz --as-cran --timings
-          
+          - R CMD check *.tar.gz --as-cran --run-donttest --timings

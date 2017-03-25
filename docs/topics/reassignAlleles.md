@@ -53,12 +53,14 @@ only "TRUE" is implemented.
 
 
 
+
 Value
 -------------------
 
 a single-column `data.frame` corresponding to `clip.db`
 and containing the best allele call from among the sequences
 listed in `genotype_db`
+
 
 Details
 -------------------

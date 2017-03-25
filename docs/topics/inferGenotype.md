@@ -69,10 +69,12 @@ details.
 
 
 
+
 Value
 -------------------
 
 A table of alleles denoting the genotype of the subject
+
 
 Details
 -------------------
@@ -85,6 +87,7 @@ belonging to all groups. If `novel_df` is provided, all
 sequences that are assigned to the same starting allele as any
 novel germline allele will have the novel germline allele appended
 to their assignent prior to searching for unmutated sequences.
+
 
 Note
 -------------------
