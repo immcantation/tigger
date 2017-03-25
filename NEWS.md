@@ -1,5 +1,12 @@
+Verison 0.2.8.999 January 1, 2017
+-------------------------------------------------------------------------------
+
++bugfix in findnovelalleles() when multiple hits given for a single germline
+
+
 Version 0.2.7: August 26, 2016
 -------------------------------------------------------------------------------
+
 + Bugfix following recent update of alakazam (0.2.5) to import selectively.
 + Removed unneeded dependency on shazam package (not needed as of 0.2.5.999).
 
