@@ -712,8 +712,8 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
   if(find_unmutated == TRUE){
     seqs = genotypeFasta(geno, germline_db)
     dist_mat = seqs %>%
-      sapply(function(x) sapply((getMutatedPositions(seqs, x)), length))
-    rownames(dist_mat) = colnames(dist_mat)
+      sapply(function(x) sapply((getMutatedPositions(seqs, x)), length)) %>%
+      as.matrix
     for (i in 1:nrow(dist_mat)){ dist_mat[i,i] = NA }
     same = which(dist_mat == 0, arr.ind=TRUE)
     if (nrow(same) > 0 ) {
@@ -1132,7 +1132,6 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' # Find which of the sample alleles are unmutated
 #' calls <- findUnmutatedCalls(sample_db$V_CALL, sample_db$SEQUENCE_IMGT, 
 #'          germline_db=germline_ighv)
-#' head(calls)
 #' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){

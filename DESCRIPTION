@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
-Version: 0.2.9
-Date: 2017-03-24
+Version: 0.2.9.999
+Date: 2017-05-16
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut", "cre"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Jason", "Vander Heiden", role=c("ctb"), 
@@ -36,4 +36,4 @@ Imports:
 Suggests:
     knitr,
     testthat
-RoxygenNote: 5.0.1
+RoxygenNote: 6.0.1
