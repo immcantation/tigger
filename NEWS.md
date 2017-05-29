@@ -1,3 +1,10 @@
+Version 0.3.0 May 29, 2017
+-------------------------------------------------------------------------------
+
++ Bugfix wherein `inferGenotype` would break when performing check for alleles
+  that could not be distinguished.
+
+
 Version 0.2.9.999 May 16, 2017
 -------------------------------------------------------------------------------
 

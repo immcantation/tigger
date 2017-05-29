@@ -714,6 +714,7 @@ inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
     dist_mat = seqs %>%
       sapply(function(x) sapply((getMutatedPositions(seqs, x)), length)) %>%
       as.matrix
+    rownames(dist_mat) = colnames(dist_mat)
     for (i in 1:nrow(dist_mat)){ dist_mat[i,i] = NA }
     same = which(dist_mat == 0, arr.ind=TRUE)
     if (nrow(same) > 0 ) {
