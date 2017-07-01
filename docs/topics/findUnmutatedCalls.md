@@ -57,13 +57,6 @@ data(sample_db)
 # Find which of the sample alleles are unmutated
 calls <- findUnmutatedCalls(sample_db$V_CALL, sample_db$SEQUENCE_IMGT, 
 germline_db=germline_ighv)
-head(calls)
-```
-
-
-```
-[1] "IGHV1-18*01" "IGHV1-69*04" "IGHV1-46*01" "IGHV1-18*01" "IGHV1-18*01" "IGHV1-46*01"
-
 ```
 
 

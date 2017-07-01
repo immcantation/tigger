@@ -1,8 +1,16 @@
+Version 0.2.10 July 1, 2017
+-------------------------------------------------------------------------------
+
++ Bugfix wherein `inferGenotype` would break when performing check for alleles
+  that could not be distinguished.
+
+
 Version 0.2.9.999 May 16, 2017
 -------------------------------------------------------------------------------
 
 + Bugfix wherein `inferGenotype` would break if all sequences submitted were
   from a single gene and `find_unmutated` was set to `TRUE`.
+
 
 Version 0.2.9: March 24, 2017
 -------------------------------------------------------------------------------

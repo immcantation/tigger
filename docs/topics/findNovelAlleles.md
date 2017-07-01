@@ -50,7 +50,7 @@ automatically using the mutation count of the most
 common sequence assigned to each allele analyzed
 
 mut_range
-:   the range of mutations that sampled may carry and
+:   the range of mutations that samples may carry and
 be considered by the algorithm
 
 pos_range
