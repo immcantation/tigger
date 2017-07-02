@@ -77,6 +77,7 @@
 #' @import      ggplot2
 #' @importFrom  grid        grid.layout grid.newpage pushViewport viewport
 #' @import      iterators
+#' @importFrom  lazyeval    interp
 #' @import      parallel
 #' 
 NULL
