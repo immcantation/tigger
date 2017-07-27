@@ -527,8 +527,9 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
           legend.background=element_rect(fill = "transparent")) +
     guides(color = guide_legend(ncol = 2, reverse = TRUE))
   # MAKE THE SECOND PLOT
-  p2 = ggplot(mutate_(filter_(pos_db, ~POSITION %in% pass_y),
-                     POSITION = ~to_from[as.character(POSITION)]),
+  p2_data = mutate_(filter_(pos_db, ~POSITION %in% pass_y),
+                    POSITION = ~to_from[as.character(POSITION)])
+  p2 = ggplot(p2_data,
               aes_(~factor(MUT_COUNT), fill=~NT)) +
     geom_bar(width=0.9) +
     guides(fill = guide_legend("Nucleotide", ncol = 4)) +
@@ -548,7 +549,10 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     theme(legend.position=c(1,1), legend.justification=c(1,1),
           legend.background=element_rect(fill = "transparent"))
   
-  multiplot(p1,p2,p3, cols = ncol)
+  p2_height = length(unique(p2_data$POSITION))
+  if (p2_height>1) { p2_height = 0.5 * p2_height}
+  heights = c(1, p2_height, 1)
+  multiplot(p1,p2,p3, cols = ncol, heights=heights)
 }
 
 #' Infer a subject-specific genotype
@@ -1619,12 +1623,17 @@ superSubstring = function(string, positions){
 # @param    cols      Number of columns in layout
 # @param    layout    A matrix specifying the layout. If present, 'cols' is
 #                     ignored.
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+# @param    heights   A numeric vector A numeric vector or unit object 
+#                     describing the heights of the rows in the layout. Will
+#                     be passed to grid.layout. Default is all plots have 
+#                     the same height.
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL, heights=NULL) {
   
   # Make a list from the ... arguments and plotlist
   plots <- c(list(...), plotlist)
   
   numPlots = length(plots)
+  if (is.null(heights)) { heights = rep(1,numPlots) }
   
   # If layout is NULL, then use 'cols' to determine layout
   if (is.null(layout)) {
@@ -1641,7 +1650,8 @@ multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
   } else {
     # Set up the page
     grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout),
+                                                 heights=heights)))
     
     # Make each plot, in the correct location
     for (i in 1:numPlots) {
