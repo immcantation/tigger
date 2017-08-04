@@ -473,7 +473,12 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     select_(~SEQUENCE_IMGT, ~V_CALL, ~J_CALL, ~JUNCTION_LENGTH) %>%
     filter_(~grepl(names(germline), V_CALL, fixed=TRUE))
   pos_db = db_subset %>%  
-    mutationRangeSubset(germline, mut_range, pos_range) %>%
+    mutationRangeSubset(germline, mut_range, pos_range)
+  if (nrow(pos_db) == 0) {
+      warning("Insufficient sequences in desired mutational range")
+      return (NA)
+  }
+  pos_db <- pos_db %>%
     positionMutations(germline, pos_range)
   pos_muts = pos_db %>%
     group_by_(~POSITION) %>%
@@ -529,17 +534,21 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   # MAKE THE SECOND PLOT
   p2_data = mutate_(filter_(pos_db, ~POSITION %in% pass_y),
                     POSITION = ~to_from[as.character(POSITION)])
-  p2 = ggplot(p2_data,
-              aes_(~factor(MUT_COUNT), fill=~NT)) +
-    geom_bar(width=0.9) +
-    guides(fill = guide_legend("Nucleotide", ncol = 4)) +
-    facet_grid(POSITION ~ .) +
-    xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
-    scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS),
-                      drop=FALSE) +
-    theme_bw() +
-    theme(legend.position=c(1,1), legend.justification=c(1,1),
-          legend.background=element_rect(fill = "transparent"))
+  if (nrow(p2_data)) {
+      p2 = ggplot(p2_data,
+                  aes_(~factor(MUT_COUNT), fill=~NT)) +
+        geom_bar(width=0.9) +
+        guides(fill = guide_legend("Nucleotide", ncol = 4)) +
+        facet_grid(POSITION ~ .) +
+        xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
+        scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS),
+                          drop=FALSE) +
+        theme_bw() +
+        theme(legend.position=c(1,1), legend.justification=c(1,1),
+              legend.background=element_rect(fill = "transparent"))
+  } else {
+      p2 <- ggplot()
+  }
   # MAKE THE THIRD PLOT
   p3 = ggplot(db_subset, aes_(~JUNCTION_LENGTH, fill=~factor(J_GENE))) +
     geom_bar(width=0.9) +
@@ -552,7 +561,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   p2_height = length(unique(p2_data$POSITION))
   if (p2_height>1) { p2_height = 0.5 * p2_height}
   heights = c(1, p2_height, 1)
-  multiplot(p1,p2,p3, cols = ncol, heights=heights)
+  multiplot(p1, p2, p3, cols = ncol, heights=heights)
 }
 
 #' Infer a subject-specific genotype
