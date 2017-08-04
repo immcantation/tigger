@@ -183,7 +183,7 @@ plotGenotype(geno, text_size = 10)
 ### Corrected Allele Calls
 
 Finally, the original V allele calls may be limited to only those within the 
-inferred genotype. this can be done by using the function `reassignAlleles`.
+inferred genotype. This can be done by using the function `reassignAlleles`.
 By corrected the calls in this manner, the user can greatly reduce the numer of
 ambiguous allele calls (where a single sample sequences is assigned to multiple
 V alleles, thus preventing the mutations analysis of allele-differentiating
