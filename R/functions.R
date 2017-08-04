@@ -476,7 +476,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     mutationRangeSubset(germline, mut_range, pos_range)
   if (nrow(pos_db) == 0) {
       warning("Insufficient sequences in desired mutational range")
-      return (NA)
+      return (invisible(NULL))
   }
   pos_db <- pos_db %>%
     positionMutations(germline, pos_range)
