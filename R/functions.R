@@ -458,6 +458,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
       novel_imgt = novel_df_row$NOVEL_IMGT
       names(novel_imgt) = novel_df_row$POLYMORPHISM_CALL
       min_frac = novel_df_row$MIN_FRAC
+      note = novel_df_row$NOTE
     } else {
       stop("novel_df_row is not a data frame with only one row.")
     }
@@ -495,6 +496,14 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
     gsub("[0-9]+.", "", .)
   p_y_t = unlist(strsplit(names(novel_imgt), "_"))[-1] %>%
     gsub(".[0-9]+", "", .)
+  # Parse the note to find positions that passed y intercept if no novel found
+  if(length(pass_y) == 0 & grepl("Position\\(s\\) passed y-intercept", note)){
+    pass_y = note %>% gsub("Position\\(s\\) passed y-intercept \\(", "", .) %>%
+      gsub("\\).*", "", .) %>% strsplit(",") %>% unlist %>% as.numeric
+    p_y_f = sapply(pass_y, function (x) substring(germline, x, x))
+    p_y_t = gsub(".", "?", p_y_f)
+  }
+
   to_from = paste(paste("Position", pass_y), paste(paste(p_y_f, "->"), p_y_t))
   names(to_from) = pass_y
   pos_muts = pos_muts %>%
@@ -518,36 +527,62 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   pos_muts$GERMLINE = names(germline)
   
   # MAKE THE FIRST PLOT
-  POLYCOLORS = setNames(DNA_COLORS[c(4,3)], c("False", "True"))
-  p1 = ggplot(pos_muts, aes_(~factor(MUT_COUNT), ~POS_MUT_RATE, group=~POSITION,
-                            color=~Polymorphic)) +
-    geom_line(size = 0.75) +
-    facet_grid(GERMLINE ~ .) +
-    scale_color_manual(values = POLYCOLORS) +
-    ylim(0,1) +
-    xlab("Mutation Count (Sequence)") +
-    ylab("Mutation Frequency (Position)") +
-    theme_bw() +
-    theme(legend.position=c(0.5,0.9), legend.justification=c(0.5,1),
-          legend.background=element_rect(fill = "transparent")) +
-    guides(color = guide_legend(ncol = 2, reverse = TRUE))
+  if(!is.na(novel_imgt)){
+    POLYCOLORS = setNames(DNA_COLORS[c(4,3)], c("False", "True"))
+    p1 = ggplot(pos_muts, aes_(~factor(MUT_COUNT), ~POS_MUT_RATE, group=~POSITION,
+                               color=~Polymorphic)) +
+      geom_line(size = 0.75) +
+      facet_grid(GERMLINE ~ .) +
+      scale_color_manual(values = POLYCOLORS) +
+      ylim(0,1) +
+      xlab("Mutation Count (Sequence)") +
+      ylab("Mutation Frequency (Position)") +
+      theme_bw() +
+      theme(legend.position=c(0.5,0.9), legend.justification=c(0.5,1),
+            legend.background=element_rect(fill = "transparent")) +
+      guides(color = guide_legend(ncol = 2, reverse = TRUE))
+  } else{
+    POLYCOLORS = setNames(DNA_COLORS[c(4,2)], c("False", "True"))
+    p1 = ggplot(pos_muts, aes_(~factor(MUT_COUNT), ~POS_MUT_RATE, group=~POSITION,
+                               color=~Polymorphic)) +
+      geom_line(size = 0.75) +
+      facet_grid(GERMLINE ~ .) +
+      scale_color_manual(values = POLYCOLORS) +
+      ylim(0,1) +
+      xlab("Mutation Count (Sequence)") +
+      ylab("Mutation Frequency (Position)") +
+      theme_bw() +
+      theme(legend.position=c(0.5,0.9), legend.justification=c(0.5,1),
+            legend.background=element_rect(fill = "transparent")) +
+      guides(color = guide_legend("Passed y-intercept test",
+                                  ncol = 2, reverse = TRUE))
+  }
   # MAKE THE SECOND PLOT
   p2_data = mutate_(filter_(pos_db, ~POSITION %in% pass_y),
                     POSITION = ~to_from[as.character(POSITION)])
   if (nrow(p2_data)) {
-      p2 = ggplot(p2_data,
-                  aes_(~factor(MUT_COUNT), fill=~NT)) +
-        geom_bar(width=0.9) +
-        guides(fill = guide_legend("Nucleotide", ncol = 4)) +
-        facet_grid(POSITION ~ .) +
-        xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
-        scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS),
-                          drop=FALSE) +
-        theme_bw() +
-        theme(legend.position=c(1,1), legend.justification=c(1,1),
-              legend.background=element_rect(fill = "transparent"))
+    p2 = ggplot(p2_data,
+                aes_(~factor(MUT_COUNT), fill=~NT)) +
+      geom_bar(width=0.9) +
+      guides(fill = guide_legend("Nucleotide", ncol = 4)) +
+      facet_grid(POSITION ~ .) +
+      xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
+      scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS),
+                        drop=FALSE) +
+      theme_bw() +
+      theme(legend.position=c(1,1), legend.justification=c(1,1),
+            legend.background=element_rect(fill = "transparent"))
   } else {
-      p2 <- ggplot()
+    p2_data = mutate_(filter_(pos_db,
+                      ~POSITION %in% names(which.max(table(pos_db$POSITION)))),
+                      POSITION = ~"No positions pass y-intercept test.")
+    p2 = ggplot(p2_data, aes_(~factor(MUT_COUNT))) +
+      geom_bar(width=0.9) +
+      facet_grid(POSITION ~ .) +
+      xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
+      theme_bw() +
+      theme(legend.position=c(1,1), legend.justification=c(1,1),
+            legend.background=element_rect(fill = "transparent"))
   }
   # MAKE THE THIRD PLOT
   p3 = ggplot(db_subset, aes_(~JUNCTION_LENGTH, fill=~factor(J_GENE))) +
