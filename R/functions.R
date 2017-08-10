@@ -1505,13 +1505,16 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
     mutate_(FAMILY = ~getFamily(SUBMITTED_CALLS)) %>%
     # Determine the gene (exclude family); convert letters to numbers for sort
     mutate_(GENE = ~getGene(SUBMITTED_CALLS)) %>%
-    mutate_(GENE1 = ~gsub("[^-]+-([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
+    mutate_(GENE1 = ~gsub("[^-]+[-S]([^-\\*D]+).*","\\1",SUBMITTED_CALLS)) %>%
     mutate_(GENE1 = ~as.numeric(gsub("[^0-9]+", "99", GENE1))) %>%
     # If there is a second gene number, determine that, too
-    mutate_(GENE2 = ~gsub("[^-]+-[^-]+-?","",GENE)) %>%
+    mutate_(GENE2 = ~gsub("[^-]+[-S][^-]+-?","",GENE)) %>%
     mutate_(GENE2 = ~as.numeric(gsub("[^0-9]+", "99", GENE2))) %>%
-    mutate_(ALLELE = ~as.numeric(sub("[^\\*]+\\*|[^\\*]+$","",
-                                   getAllele(SUBMITTED_CALLS))))
+    mutate_(ALLELE = ~getAllele(SUBMITTED_CALLS)) %>%      
+    mutate_(ALLELE = ~(sub("[^\\*]+\\*|[^\\*]+$","",
+                                   ALLELE))) %>%
+    mutate_(ALLELE = ~as.numeric(sub("_.+$","",
+                             ALLELE)))
   # Convert missing values to 0, sort data frame
   allele_df[is.na(allele_df)] = 0
   if (method == "name") {  
