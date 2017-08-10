@@ -27,6 +27,8 @@
 #' @param    clip_db        a \code{data.frame} in Change-O format. See details.
 #' @param    germline_db    a vector of named nucleotide germline sequences
 #'                          matching the V calls in \code{clip_db}
+#' @param    v_call         name of the column in clip_db with V allele calls. 
+#'                          Default is V_CALL.                                                    
 #' @param    germline_min   the minimum number of sequences that must have a
 #'                          particular germline allele call for the allele to
 #'                          be analyzed
@@ -73,7 +75,8 @@
 #' \dontrun{novel_df = findNovelAlleles(sample_db, germline_ighv)}
 #' 
 #' @export
-findNovelAlleles  <- function(clip_db, germline_db,
+findNovelAlleles <- function(clip_db, germline_db,
+                              v_call="V_CALL",
                               germline_min = 200,
                               min_seqs = 50,
                               auto_mutrange = TRUE,
@@ -86,7 +89,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
                               nproc = 1) {
   . = a = NULL
   # Keep only the columns we need and clean up the sequences
-  missing = c("SEQUENCE_IMGT", "V_CALL", "J_CALL", "JUNCTION_LENGTH") %>%
+  missing = c("SEQUENCE_IMGT", v_call, "J_CALL", "JUNCTION_LENGTH") %>%
     setdiff(colnames(clip_db))
   if (length(missing) != 0) {
     stop("Could not find required columns in clip_db:\n  ",
@@ -105,7 +108,7 @@ findNovelAlleles  <- function(clip_db, germline_db,
   # Find which rows' calls contain which germline alleles
   cutoff =
     ifelse(germline_min < 1, round(nrow(clip_db)*germline_min), germline_min)
-  allele_groups = sapply(names(germlines), grep, clip_db$V_CALL, fixed=TRUE,
+  allele_groups = sapply(names(germlines), grep, clip_db[[v_call]], fixed=TRUE,
                          simplify=FALSE)
   names(allele_groups) = names(germlines)
   allele_groups = allele_groups[sapply(allele_groups, length) >= cutoff]
@@ -609,10 +612,11 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #' by chance have been mutated to look like another allele) can be removed.
 #' 
 #' @param    clip_db              a \code{data.frame} containing V allele
-#'                                calls from a single subject under
-#'                                \code{"V_CALL"}. If
+#'                                calls from a single subject. If
 #'                                \code{find_unmutated} is \code{TRUE}, then
 #'                                the sample IMGT-gapped V(D)J sequence should 
+#' @param    v_call               column in \code{clip_db} with V allele calls.
+#'                                Default is \code{"V_CALL"}                               
 #'                                be provided in a column \code{"SEQUENCE_IMGT"}
 #' @param    fraction_to_explain  the portion of each gene that must be
 #'                                explained by the alleles that will be included
@@ -664,12 +668,12 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
 #'          \link{genotypeFasta} to convert the genotype to nucleotide sequences.
 #' 
 #' @export
-inferGenotype <- function(clip_db, fraction_to_explain = 0.875,
+inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
                           gene_cutoff = 1e-4, find_unmutated = TRUE,
                           germline_db = NA, novel_df = NA){
   
   . = NULL
-  allele_calls = getAllele(clip_db$V_CALL, first=FALSE, strip_d=FALSE)
+  allele_calls = getAllele(clip_db[[v_call]], first=FALSE, strip_d=FALSE)
   # Find the unmutated subset, if requested
   if(find_unmutated){
     if(is.na(germline_db[1])){
@@ -935,12 +939,14 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' based on a simple alignment to the sample sequence.
 #' 
 #' @param    clip_db       a \code{data.frame} containing V allele calls from a
-#'                         single subject under \code{"V_CALL"} and the sample
+#'                         single subject and the sample
 #'                         IMGT-gapped V(D)J sequences under
 #'                         \code{"SEQUENCE_IMGT"}
 #' @param    genotype_db   a vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #'                         and personalized to the subject
+#' @param    v_call        name of the column in \code{clip_db} with V allele
+#'                         calls. Default is \code{"V_CALL"}                         
 #' @param    method        the method to be used when realigning sequences to
 #'                         the genotype_db sequences. Currently only "hammming"
 #'                         (for Hamming distance) is implemented.
@@ -971,12 +977,13 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
 #' 
 #' @export
-reassignAlleles <- function(clip_db, genotype_db, method="hamming", path=NA,
+reassignAlleles <- function(clip_db, genotype_db, v_call="V_CALL",
+                            method="hamming", path=NA,
                             keep_gene=TRUE){
   
   # Extract data subset and prepare output vector
   v_sequences = as.character(clip_db$SEQUENCE_IMGT)
-  v_calls = getAllele(clip_db$V_CALL, first=FALSE, strip_d=FALSE)
+  v_calls = getAllele(clip_db[[v_call]], first=FALSE, strip_d=FALSE)
   v_genes = getGene(v_calls, first = TRUE, strip_d=FALSE)
   V_CALL_GENOTYPED = rep("", length(v_calls))
   
