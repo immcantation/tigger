@@ -432,7 +432,9 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' @param    novel_df_row   a single row from a data frame as output by
 #'                          \link{findNovelAlleles} that contains a
 #'                          polymorphism-containing germline allele
-#' @param    ncol           number of columns to use when laying out the plots            
+#' @param    ncol           number of columns to use when laying out the plots  
+#' @param    v_call         name of the column in \code{clip_db} with V allele
+#'                          calls. Default is "V_CALL"
 #' @return   NULL
 #' 
 #' @examples
@@ -448,7 +450,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' plotNovel(sample_db, novel[1,])
 #' 
 #' @export
-plotNovel <- function(clip_db, novel_df_row, ncol = 1){
+plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL"){
   . = NULL
     
   # Use the data frame
@@ -474,8 +476,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1){
   # have an appropriate range of mutations, and find the mutation
   # frequency of each position
   db_subset = clip_db %>%
-    select_(~SEQUENCE_IMGT, ~V_CALL, ~J_CALL, ~JUNCTION_LENGTH) %>%
-    filter_(~grepl(names(germline), V_CALL, fixed=TRUE))
+    select_(~SEQUENCE_IMGT, v_call, ~J_CALL, ~JUNCTION_LENGTH) %>%
+    filter_(~grepl(names(germline),  clip_db[[v_call]], fixed=TRUE))
   pos_db = db_subset %>%  
     mutationRangeSubset(germline, mut_range, pos_range)
   if (nrow(pos_db) == 0) {
