@@ -58,12 +58,9 @@
 #' high-throughput B cell sequencing data reveals a high frequency of novel
 #' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
 #' 
+#' @import      ggplot2
 #' @importFrom  alakazam    getAllele getGene getFamily DNA_COLORS
-#' @import      doParallel
-#' @importFrom  graphics    plot
-#' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
-#'                          confint lm
-#' @importFrom  tidyr       gather gather_ spread spread_
+#' @importFrom  doParallel  registerDoParallel
 #' @importFrom  dplyr       do n desc %>%
 #'                          glimpse distinct distinct_
 #'                          as_data_frame data_frame data_frame_
@@ -73,11 +70,13 @@
 #'                          mutate mutate_ transmute transmute_
 #'                          rename rename_ summarise summarise_
 #'                          slice slice_
-#' @import      foreach
-#' @import      ggplot2
+#' @importFrom  foreach     foreach %dopar% registerDoSEQ
+#' @importFrom  graphics    plot
 #' @importFrom  grid        grid.layout grid.newpage pushViewport viewport
-#' @import      iterators
+#' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
-#' @import      parallel
-#' 
+#' @importFrom  parallel    clusterEvalQ clusterExport makeCluster stopCluster
+#' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
+#'                          confint lm
+#' @importFrom  tidyr       gather gather_ spread spread_
 NULL

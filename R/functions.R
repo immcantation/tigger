@@ -144,24 +144,30 @@ findNovelAlleles <- function(clip_db, germline_db,
                                 "alpha",
                                 "j_max",
                                 "germline_min",
-                                "min_frac"), 
-                   envir=environment())
-    clusterEvalQ(cluster, library(tigger))
+                                "min_frac",
+                                "findLowerY",
+                                "getMutatedPositions",
+                                "getPopularMutationCount",
+                                "insertPolymorphisms",
+                                "mutationRangeSubset",
+                                "positionMutations",
+                                "superSubstring"), 
+                  envir=environment())
     registerDoParallel(cluster)
   }
   
-  df_out <- foreach(a=icount(length(allele_groups)), .combine=rbind) %dopar% {
+  df_out <- foreach(a=icount(length(allele_groups)), .combine=dplyr::bind_rows) %dopar% {
     
     allele_name = names(allele_groups)[a]
     
     # Subset of data being analyzed
     germline = germlines[allele_name]
     indicies = allele_groups[[allele_name]]
-    db_subset = slice_(clip_db, ~indicies)
+    db_subset = dplyr::slice_(clip_db, ~indicies)
     
     # If mutrange is auto, find most popular mutation count and start from there
     gpm = db_subset %>%
-      mutate_(V_CALL = ~allele_name) %>%
+      dplyr::mutate_(V_CALL = ~allele_name) %>%
       getPopularMutationCount(germline,
                               gene_min=0, seq_min=min_seqs,
                               seq_p_of_max=1/8, full_return=TRUE)
@@ -198,7 +204,7 @@ findNovelAlleles <- function(clip_db, germline_db,
       if (mut_min == rev(mut_mins)[1]){
         df_run = df_run_empty
       } else {
-        df_run = bind_rows(df_run_empty, df_run)
+        df_run = dplyr::bind_rows(df_run_empty, df_run)
       }
       mut_max = mut_min + diff(range(mut_range))
       df_run$MUT_MIN[1] = mut_min
@@ -233,18 +239,18 @@ findNovelAlleles <- function(clip_db, germline_db,
       
       # Find positional mut freq vs seq mut count
       pos_muts = pos_db %>%
-        group_by_(~POSITION) %>%
-        mutate_(PASS = ~mean(OBSERVED) >= min_frac) %>%
-        group_by_(~MUT_COUNT, ~POSITION) %>%
-        summarise_(POS_MUT_RATE = ~ mean(MUTATED)*unique(PASS) ) %>% 
-        ungroup()   
+        dplyr::group_by_(~POSITION) %>%
+        dplyr::mutate_(PASS = ~mean(OBSERVED) >= min_frac) %>%
+        dplyr::group_by_(~MUT_COUNT, ~POSITION) %>%
+        dplyr::summarise_(POS_MUT_RATE = ~ mean(MUTATED)*unique(PASS) ) %>% 
+        dplyr::ungroup()   
       
       # Calculate y intercepts, find which pass the test
       pass_y = pos_muts %>%
-        group_by_(~POSITION) %>%
-        summarise_(Y_INT_MIN = ~findLowerY(POS_MUT_RATE, MUT_COUNT,
+        dplyr::group_by_(~POSITION) %>%
+        dplyr::summarise_(Y_INT_MIN = ~findLowerY(POS_MUT_RATE, MUT_COUNT,
                                                   mut_min, alpha)) %>%
-        filter_(~Y_INT_MIN > y_intercept)
+        dplyr::filter_(~Y_INT_MIN > y_intercept)
       
       if(nrow(pass_y) < 1){
         df_run$NOTE[1] = "No positions pass y-intercept test."
@@ -262,13 +268,13 @@ findNovelAlleles <- function(clip_db, germline_db,
       # Find the potential SNP positions and remove anything that matches
       # the germline at all those positions or any combo that is too rare
       db_y_subset_mm = db_subset_mm %>%
-        group_by(1:n()) %>%
-        mutate_(SNP_STRING = ~superSubstring(SEQUENCE_IMGT,
+        dplyr::group_by(1:n()) %>%
+        dplyr::mutate_(SNP_STRING = ~superSubstring(SEQUENCE_IMGT,
                                                     pass_y$POSITION)) %>%
-        filter_(~SNP_STRING != gl_substring) %>%
-        group_by_(~SNP_STRING) %>%
-        mutate_(STRING_COUNT = ~n()) %>%
-        filter_(~STRING_COUNT >= min_seqs)
+        dplyr::filter_(~SNP_STRING != gl_substring) %>%
+        dplyr::group_by_(~SNP_STRING) %>%
+        dplyr::mutate_(STRING_COUNT = ~n()) %>%
+        dplyr::filter_(~STRING_COUNT >= min_seqs)
       
       if (nrow(db_y_subset_mm) < 1 ){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
@@ -294,13 +300,13 @@ findNovelAlleles <- function(clip_db, germline_db,
       # junction length for each of the SNP strings, and then check to
       # see which pass the j/junction and count requirements
       db_y_summary0 = db_y_subset_mm %>%
-        filter_(~MUT_COUNT_MINUS_SUBSTRING == 0) %>%
-        mutate_(J_GENE = ~getGene(J_CALL)) %>%
-        group_by_(~SNP_STRING, ~J_GENE, ~JUNCTION_LENGTH) %>%
-        summarise_(COUNT = ~n()) %>%
-        group_by_(~SNP_STRING) %>%
-        mutate_(FRACTION = ~COUNT/sum(COUNT)) %>%
-        summarise_(TOTAL_COUNT = ~sum(COUNT), MAX_FRAC = ~max(FRACTION))
+        dplyr::filter_(~MUT_COUNT_MINUS_SUBSTRING == 0) %>%
+        dplyr::mutate_(J_GENE = ~getGene(J_CALL)) %>%
+        dplyr::group_by_(~SNP_STRING, ~J_GENE, ~JUNCTION_LENGTH) %>%
+        dplyr::summarise_(COUNT = ~n()) %>%
+        dplyr::group_by_(~SNP_STRING) %>%
+        dplyr::mutate_(FRACTION = ~COUNT/sum(COUNT)) %>%
+        dplyr::summarise_(TOTAL_COUNT = ~sum(COUNT), MAX_FRAC = ~max(FRACTION))
         
         if(nrow(db_y_summary0) < 1){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
@@ -353,7 +359,7 @@ findNovelAlleles <- function(clip_db, germline_db,
       germ_nts = unlist(strsplit(gl_substring,""))
       for (r in 1:nrow(db_y_summary)) {
         if (r > 1){
-          df_run = bind_rows(df_run[1,], df_run)
+          df_run = dplyr::bind_rows(df_run[1,], df_run)
         }
         # Create the new germline
         snp_nts = unlist(strsplit(db_y_summary$SNP_STRING[r],""))
@@ -376,8 +382,11 @@ findNovelAlleles <- function(clip_db, germline_db,
       
     } # end for each starting mutation counts
     return(df_run)
+    
   } # end foreach allele
+  
   if(nproc > 1) { stopCluster(cluster) }
+  
   return(df_out)
 }
 
