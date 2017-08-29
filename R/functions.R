@@ -146,9 +146,6 @@ findNovelAlleles <- function(clip_db, germline_db,
                                 "germline_min",
                                 "min_frac",
                                 "findLowerY",
-                                "getMutatedPositions",
-                                "getPopularMutationCount",
-                                "insertPolymorphisms",
                                 "mutationRangeSubset",
                                 "positionMutations",
                                 "superSubstring"), 
@@ -156,14 +153,14 @@ findNovelAlleles <- function(clip_db, germline_db,
     registerDoParallel(cluster)
   }
   
-  df_out <- foreach(a=icount(length(allele_groups)), .combine=dplyr::bind_rows) %dopar% {
+  out_list <- foreach(a=icount(length(allele_groups))) %dopar% {
     
     allele_name = names(allele_groups)[a]
     
     # Subset of data being analyzed
     germline = germlines[allele_name]
     indicies = allele_groups[[allele_name]]
-    db_subset = dplyr::slice_(clip_db, ~indicies)
+    db_subset = clip_db[indicies, ]
     
     # If mutrange is auto, find most popular mutation count and start from there
     gpm = db_subset %>%
@@ -387,7 +384,9 @@ findNovelAlleles <- function(clip_db, germline_db,
   
   if(nproc > 1) { stopCluster(cluster) }
   
-  return(df_out)
+  out_df <- dplyr::bind_rows(out_list)
+  
+  return(out_df)
 }
 
 #' Select rows containing novel alleles
