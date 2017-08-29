@@ -132,7 +132,7 @@ findNovelAlleles <- function(clip_db, germline_db,
   if(nproc == 1) {
     registerDoSEQ()
   } else {
-    cluster <- parallel::makeCluster(nproc, type="PSOCK")
+    cluster <- parallel::makeCluster(nproc, type="PSOCK", outfile="")
     clusterExport(cluster, list("allele_groups",
                                 "germlines",
                                 "clip_db",
