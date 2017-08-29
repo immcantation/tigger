@@ -87,7 +87,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                               j_max = 0.15,
                               min_frac = 0.75,
                               nproc = 1) {
-  . = a = NULL
+  . = idx = NULL
   # Keep only the columns we need and clean up the sequences
   missing = c("SEQUENCE_IMGT", v_call, "J_CALL", "JUNCTION_LENGTH") %>%
     setdiff(colnames(clip_db))
@@ -130,10 +130,10 @@ findNovelAlleles <- function(clip_db, germline_db,
     min(nproc, . - 1) %>%
     max(1, .)
   if(nproc == 1) {
-    registerDoSEQ()
+    foreach::registerDoSEQ()
   } else {
-    cluster <- parallel::makeCluster(nproc, type="PSOCK", outfile="")
-    clusterExport(cluster, list("allele_groups",
+    cluster <- parallel::makeCluster(nproc, type="PSOCK")
+    parallel::clusterExport(cluster, list("allele_groups",
                                 "germlines",
                                 "clip_db",
                                 "min_seqs",
@@ -148,16 +148,14 @@ findNovelAlleles <- function(clip_db, germline_db,
                                 "findLowerY",
                                 "mutationRangeSubset",
                                 "positionMutations",
-                                "superSubstring"), 
+                                "superSubstring"),
                   envir=environment())
-    registerDoParallel(cluster)
+    doParallel::registerDoParallel(cluster)
   }
   
-  out_list <- foreach(a=icount(length(allele_groups))) %dopar% {
-    
-    allele_name = names(allele_groups)[a]
-    
+  out_list <- foreach(idx=iterators::icount(length(allele_groups))) %dopar% {
     # Subset of data being analyzed
+    allele_name = names(allele_groups)[idx]
     germline = germlines[allele_name]
     indicies = allele_groups[[allele_name]]
     db_subset = clip_db[indicies, ]
