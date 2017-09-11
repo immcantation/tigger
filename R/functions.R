@@ -88,6 +88,11 @@ findNovelAlleles <- function(clip_db, germline_db,
                               min_frac = 0.75,
                               nproc = 1) {
   . = idx = NULL
+  
+  # Keep only the db columns needed
+  clip_db <- clip_db %>% 
+      dplyr::select_('SEQUENCE_IMGT', v_call, 'J_CALL', 'JUNCTION_LENGTH')
+  
   # Keep only the columns we need and clean up the sequences
   missing = c("SEQUENCE_IMGT", v_call, "J_CALL", "JUNCTION_LENGTH") %>%
     setdiff(colnames(clip_db))
