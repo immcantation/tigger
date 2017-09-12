@@ -137,6 +137,8 @@ findNovelAlleles <- function(clip_db, germline_db,
   if(nproc == 1) {
     foreach::registerDoSEQ()
   } else {
+    cluster_type = ifelse(Sys.info()['sysname'] == "Windows",
+                    "PSOCK", "FORK")
     cluster <- parallel::makeCluster(nproc, type="PSOCK")
     parallel::clusterExport(cluster, list("allele_groups",
                                 "germlines",
@@ -157,8 +159,11 @@ findNovelAlleles <- function(clip_db, germline_db,
                   envir=environment())
     doParallel::registerDoParallel(cluster)
   }
-  
+
   out_list <- foreach(idx=iterators::icount(length(allele_groups))) %dopar% {
+  # out_list <- lapply(1:length(allele_groups), function(idx) {  
+    gc() 
+    # message(paste0("idx=",idx))
     # Subset of data being analyzed
     allele_name = names(allele_groups)[idx]
     germline = germlines[allele_name]
@@ -198,9 +203,9 @@ findNovelAlleles <- function(clip_db, germline_db,
                               J_MAX = j_max,
                               MIN_FRAC = min_frac,
                               stringsAsFactors = FALSE)
-    
     for (mut_min in rev(mut_mins)) {
-      
+      gc()
+      # message(paste0("|-- mut_min=",mut_min))
       if (mut_min == rev(mut_mins)[1]){
         df_run = df_run_empty
       } else {
@@ -244,6 +249,9 @@ findNovelAlleles <- function(clip_db, germline_db,
         dplyr::group_by_(~MUT_COUNT, ~POSITION) %>%
         dplyr::summarise_(POS_MUT_RATE = ~ mean(MUTATED)*unique(PASS) ) %>% 
         dplyr::ungroup()   
+      
+      rm(pos_db)
+      gc()
       
       # Calculate y intercepts, find which pass the test
       pass_y = pos_muts %>%
@@ -386,9 +394,9 @@ findNovelAlleles <- function(clip_db, germline_db,
   } # end foreach allele
   
   if(nproc > 1) { stopCluster(cluster) }
-  
+  rm(clip_db)
+  gc()
   out_df <- dplyr::bind_rows(out_list)
-  
   return(out_df)
 }
 
