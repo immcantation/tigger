@@ -25,4 +25,4 @@ The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.
 
 ## Contact ##
 
-For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](http://bitbucket.org/kleinstein/tigger/issues).
+For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](https://bitbucket.org/kleinstein/tigger/issues?status=new&status=open).
