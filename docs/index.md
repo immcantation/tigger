@@ -25,20 +25,20 @@ The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.
 
 ## Contact ##
 
-For help, questions, or suggestions, please contact [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) or use the [issue tracker](http://bitbucket.org/kleinstein/tigger/issues).
+For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](http://bitbucket.org/kleinstein/tigger/issues).
 
 Dependencies
 ---------------
 
 **Depends:** ggplot2  
-**Imports:** alakazam, tidyr, dplyr, doParallel, foreach, graphics, grid, iterators, parallel, stats  
+**Imports:** alakazam, tidyr, dplyr, doParallel, foreach, graphics, grid, iterators, lazyeval, parallel, stats  
 **Suggests:** knitr, testthat
 
 Authors
 ---------------
 
-[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut, cre)  
-[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (ctb)  
+[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (ctb, cre)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 Citing

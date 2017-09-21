@@ -58,7 +58,7 @@ in your own fasta file using `readIgFasta`.
 ```r
 library(tigger)
 library(dplyr)
-# Load example Rep-Seq data and example germline database
+# Load example sequence data and example germline database
 data(sample_db, germline_ighv)
 ```
 
@@ -85,31 +85,19 @@ changed in `findNovelAlleles`).
 
 ```r
 # Detect novel alleles
-novel_df = findNovelAlleles(sample_db, germline_ighv, nproc=1)
+novel_df <- findNovelAlleles(sample_db, germline_ighv, nproc=1)
+```
+
+
+```r
 # Extract and view the rows that contain successful novel allele calls
-novel = selectNovel(novel_df)
-glimpse(novel)
+novel <- selectNovel(novel_df)
+novel[1:3]
 ```
 
 ```
-## Observations: 1
-## Variables: 16
-## $ GERMLINE_CALL       <chr> "IGHV1-8*02"
-## $ NOTE                <chr> "Novel allele found!"
-## $ POLYMORPHISM_CALL   <chr> "IGHV1-8*02_G234T"
-## $ NOVEL_IMGT          <chr> "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
-## $ PERFECT_MATCH_COUNT <int> 661
-## $ GERMLINE_CALL_COUNT <int> 906
-## $ MUT_MIN             <int> 1
-## $ MUT_MAX             <int> 10
-## $ GERMLINE_IMGT       <chr> "CAGGTGCAGCTGGTGCAGTCTGGGGCT---GAGGTGAAGAA...
-## $ POS_MIN             <int> 1
-## $ POS_MAX             <int> 312
-## $ Y_INTERCEPT         <dbl> 0.125
-## $ ALPHA               <dbl> 0.05
-## $ MIN_SEQS            <dbl> 50
-## $ J_MAX               <dbl> 0.15
-## $ MIN_FRAC            <dbl> 0.75
+##   GERMLINE_CALL                NOTE POLYMORPHISM_CALL
+## 1    IGHV1-8*02 Novel allele found!  IGHV1-8*02_G234T
 ```
 
 The TIgGER procedure for identifying novel alleles (see citation above) involves
@@ -143,10 +131,10 @@ made by `findNovelAlleles` using the function `plotNovel`.
 
 ```r
 # Plot evidence of the first (and only) novel allele from the example data
-plotNovel(sample_db, novel[1,])
+plotNovel(sample_db, novel[1, ])
 ```
 
-![plot of chunk Tigger-Vignette-3](figure/Tigger-Vignette-3-1.png)
+![plot of chunk Tigger-Vignette-4](figure/Tigger-Vignette-4-1.png)
 
 ### Genotype
 An individual's genotype can be inferred using the function `inferGenotype`.
@@ -167,10 +155,10 @@ a fasta file, `writeFasta` may be used.
 ```r
 # Infer the individual's genotype, using only unmutated sequences and checking
 # for the use of the novel alleles inferred in the earlier step.
-geno = inferGenotype(sample_db, find_unmutated = TRUE,
-                     germline_db = germline_ighv, novel_df = novel_df)
+geno <- inferGenotype(sample_db, find_unmutated = TRUE,
+                      germline_db = germline_ighv, novel_df = novel_df)
 # Save the genotype sequences to a vector
-genotype_seqs = genotypeFasta(geno, germline_ighv, novel_df)
+genotype_seqs <- genotypeFasta(geno, germline_ighv, novel_df)
 # Visualize the genotype and sequence counts
 print(geno)
 ```
@@ -193,12 +181,12 @@ print(geno)
 plotGenotype(geno, text_size = 10)
 ```
 
-![plot of chunk Tigger-Vignette-4](figure/Tigger-Vignette-4-1.png)
+![plot of chunk Tigger-Vignette-5](figure/Tigger-Vignette-5-1.png)
 
 ### Corrected Allele Calls
 
 Finally, the original V allele calls may be limited to only those within the 
-inferred genotype. this can be done by using the function `reassignAlleles`.
+inferred genotype. This can be done by using the function `reassignAlleles`.
 By corrected the calls in this manner, the user can greatly reduce the numer of
 ambiguous allele calls (where a single sample sequences is assigned to multiple
 V alleles, thus preventing the mutations analysis of allele-differentiating
@@ -208,9 +196,9 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 
 ```r
 # Use the personlized genotype to determine corrected allele assignments
-V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)
+V_CALL_GENOTYPED <- reassignAlleles(sample_db, genotype_seqs)
 # Append the corrected calls to the original data.frame
-sample_db = bind_cols(sample_db, V_CALL_GENOTYPED)
+sample_db <- bind_cols(sample_db, V_CALL_GENOTYPED)
 ```
 
 From here, one may proceed with further downstream analyses, but with the
@@ -222,21 +210,21 @@ can be seen below.
 
 ```r
 # Find the set of alleles in the original calls that were not in the genotype
-not_in_genotype = sample_db$V_CALL %>%
+not_in_genotype <- sample_db$V_CALL %>%
   strsplit(",") %>%
   unlist() %>%
   unique() %>%
   setdiff(names(genotype_seqs))
+
 # Determine the fraction of calls that were ambigious before/after correction
 # and the fraction that contained original calls to non-genotype alleles. Note
 # that by design, only genotype alleles are allowed in "after" calls.
-data.frame(
-  Ambiguous = c(mean(grepl(",",sample_db$V_CALL)),
-  mean(grepl(",",sample_db$V_CALL_GENOTYPED))),
-  NotInGenotype = c(mean(sample_db$V_CALL %in% not_in_genotype),
-  mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
-  row.names = c("Before", "After")
-  ) %>% t() %>% round(3)
+data.frame(Ambiguous = c(mean(grepl(",",sample_db$V_CALL)),
+           mean(grepl(",",sample_db$V_CALL_GENOTYPED))),
+           NotInGenotype = c(mean(sample_db$V_CALL %in% not_in_genotype),
+           mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
+           row.names = c("Before", "After")) %>% 
+    t() %>% round(3)
 ```
 
 ```

@@ -16,7 +16,7 @@ alleles found using [findNovelAlleles](findNovelAlleles.md).
 Usage
 --------------------
 ```
-plotNovel(clip_db, novel_df_row, ncol = 1)
+plotNovel(clip_db, novel_df_row, ncol = 1, v_call = "V_CALL")
 ```
 
 Arguments
@@ -33,6 +33,10 @@ polymorphism-containing germline allele
 
 ncol
 :   number of columns to use when laying out the plots
+
+v_call
+:   name of the column in `clip_db` with V allele
+calls. Default is "V_CALL"
 
 
 

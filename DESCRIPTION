@@ -1,15 +1,13 @@
 Package: tigger
 Type: Package
-Version: 0.2.10.999
-Date: 2017-09-14
+Version: 0.2.11
+Date: 2017-09-21
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
-             person("Jason", "Vander Heiden", role=c("ctb"), 
+             person("Jason", "Vander Heiden", role=c("ctb", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
-             person("Steven", "Kleinstein", role=c("aut"), 
-                    email="steven.kleinstein@yale.edu"),
-             person("Kleinstein Lab", role=c("cre", "cph"), 
-                    email="immcantation@googlegroups.com"))
+             person("Steven", "Kleinstein", role=c("aut", "cph"), 
+                    email="steven.kleinstein@yale.edu"))
 Title: R Tools for Inferring New Immunoglobulin Alleles from Rep-Seq Data
 Description: Infers the V genotype of an individual from immunoglobulin (Ig)
     repertoire-sequencing (Rep-Seq) data, including detection of any novel

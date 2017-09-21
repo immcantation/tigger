@@ -20,8 +20,9 @@ by chance have been mutated to look like another allele) can be removed.
 Usage
 --------------------
 ```
-inferGenotype(clip_db, fraction_to_explain = 0.875, gene_cutoff = 1e-04,
-find_unmutated = TRUE, germline_db = NA, novel_df = NA)
+inferGenotype(clip_db, v_call = "V_CALL", fraction_to_explain = 0.875,
+gene_cutoff = 1e-04, find_unmutated = TRUE, germline_db = NA,
+novel_df = NA)
 ```
 
 Arguments
@@ -29,10 +30,13 @@ Arguments
 
 clip_db
 :   a `data.frame` containing V allele
-calls from a single subject under
-`"V_CALL"`. If
+calls from a single subject. If
 `find_unmutated` is `TRUE`, then
-the sample IMGT-gapped V(D)J sequence should 
+the sample IMGT-gapped V(D)J sequence should
+
+v_call
+:   column in `clip_db` with V allele calls.
+Default is `"V_CALL"`
 be provided in a column `"SEQUENCE_IMGT"`
 
 fraction_to_explain

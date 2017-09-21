@@ -17,8 +17,8 @@ from a single subject.
 Usage
 --------------------
 ```
-reassignAlleles(clip_db, genotype_db, method = "hamming", path = NA,
-keep_gene = TRUE)
+reassignAlleles(clip_db, genotype_db, v_call = "V_CALL", method = "hamming",
+path = NA, keep_gene = TRUE)
 ```
 
 Arguments
@@ -26,7 +26,7 @@ Arguments
 
 clip_db
 :   a `data.frame` containing V allele calls from a
-single subject under `"V_CALL"` and the sample
+single subject and the sample
 IMGT-gapped V(D)J sequences under
 `"SEQUENCE_IMGT"`
 
@@ -34,6 +34,10 @@ genotype_db
 :   a vector of named nucleotide germline sequences
 matching the calls detailed in `allele_calls`
 and personalized to the subject
+
+v_call
+:   name of the column in `clip_db` with V allele
+calls. Default is `"V_CALL"`
 
 method
 :   the method to be used when realigning sequences to

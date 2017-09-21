@@ -1,4 +1,4 @@
-Version 0.2.10.999 September 14, 2017
+Version 0.2.11 September 21, 2017
 -------------------------------------------------------------------------------
 
 + Improved memory utilization in `findNovelAlleles`.
