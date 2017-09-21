@@ -107,7 +107,7 @@ the `data.frame`. Additionally, the result will contain metadata on the
 parameters used when searching for novel alleles (which can be optionally
 changed in `findNovelAlleles`).
 
-```{r, eval=FALSE, warning=FALSE}
+```{r, eval=TRUE, warning=FALSE}
 # Detect novel alleles
 novel_df <- findNovelAlleles(sample_db, germline_ighv, nproc=1)
 ```
