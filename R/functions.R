@@ -61,6 +61,24 @@
 #' either a note as to where the polymorphism-finding algorithm exited or a
 #' nucleotide sequence for the predicted novel allele.
 #' 
+#' Messages in the field \code{NOTE}:
+#' 
+#' \itemize{
+#'    \item \emph{Novel allele found!} 
+#'    \item \emph{Plurality sequence too rare}: No sequence is frequent 
+#'                  enough to pass the J test (\code{j_max}).
+#'    \item \emph{a J-junction combination is too prevalent}: Not enough
+#'                   J diversity (\code{j_max}).
+#'    \item \emph{No positions pass y-intercept test}. No positions above
+#'                    \code{y_intercept}.
+#'    \item \emph{Insufficient sequences in desired mutational range}. 
+#'                    \code{mut_range} and \code{pos_range}.
+#'    \item \emph{not enough sequences}:  not enough sequences in the 
+#'                          desired mutational range and nucleotide range.
+#'                          \code{min_seqs_pass}
+#'    \item \emph{no unmutated versions of novel allele found}
+#' }
+#' 
 #' @seealso \link{plotNovel} to visualize the data supporting any
 #' novel alleles hypothesized to be present in the data and
 #' \link{inferGenotype} to determine if the novel alleles are frequent
