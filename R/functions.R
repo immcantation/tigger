@@ -1319,13 +1319,15 @@ getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
                                     full_return = FALSE){
   modified_db = sample_db %>%
     mutate_(V_GENE = ~getGene(V_CALL)) %>%
+    group_by_(~V_GENE) %>%
+    mutate_(V_GENE_N = ~n()) %>%
     group_by_(~1:n()) %>%
     mutate_(V_SEQUENCE_IMGT = ~substring(SEQUENCE_IMGT, 1, 312)) %>%
     # Count occurence of each unique IMGT-gapped V sequence
     group_by_(~V_GENE, ~V_SEQUENCE_IMGT) %>%
     mutate_(V_SEQUENCE_IMGT_N = ~n()) %>%
-    # Count occurence of each gene and determine count of most common sequence
-    mutate_(V_GENE_N = ~n()) %>%
+    # Determine count of most common sequence
+    group_by_(~V_GENE) %>%
     mutate_(V_SEQUENCE_IMGT_N_MAX = ~max(V_SEQUENCE_IMGT_N)) %>%
     # Remove rare V genes, rare sequences, and sequences not making up a
     # sufficient proportion of sequences as compared to the most common
