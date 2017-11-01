@@ -247,7 +247,7 @@ findNovelAlleles <- function(clip_db, germline_db,
       db_subset_mm = mutationRangeSubset(db_subset, germline,
                                          mut_min:mut_max, pos_range)
       
-      if(nrow(db_subset_mm) < germline_min){
+      if(nrow(db_subset_mm) < min_seqs){
         df_run$NOTE[1] = paste0("Insufficient sequences (",nrow(db_subset_mm),") in desired mutational range.")
         if(mut_mins[1] == mut_min){
           return(df_run)
