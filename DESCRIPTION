@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
 Version: 0.2.11.999
-Date: 2017-11-01
+Date: 2017-11-15
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Jason", "Vander Heiden", role=c("ctb", "cre"), 
@@ -13,6 +13,8 @@ Description: Infers the V genotype of an individual from immunoglobulin (Ig)
     repertoire-sequencing (Rep-Seq) data, including detection of any novel
     alleles. This information is then used to correct existing V allele calls
     from among the sample sequences.
+    Citations:
+    Gadala-Maria, et al (2015) <doi:10.1073/pnas.1417683112>.
 License: CC BY-SA 4.0
 URL: http://tigger.readthedocs.io
 BugReports: https://bitbucket.org/kleinstein/tigger/issues
