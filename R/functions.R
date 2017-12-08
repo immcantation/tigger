@@ -462,7 +462,24 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' Visualize evidence of novel V alleles
 #'
 #' \code{plotNovel} is be used to visualize the evidence of any novel V
-#' alleles found using \link{findNovelAlleles}.
+#' alleles found using \link{findNovelAlleles}. It can also be used to
+#' visualize the results for alleles that did
+#' 
+#' @details 
+#' 
+#' The first panel in the plot shows, for all sequences which align to a particular 
+#' germline allele, the mutation frequency at each postion along the aligned 
+#' sequece as a function of the sequence-wide mutation. Sequences that pass 
+#' the novel allele test are colored red, while sequences that don't pass
+#' the test are colored yellow.
+#' 
+#' The second panel shows the nucleotide usage at the positions 
+#' as a function of sequence-wide mutation count. 
+#' 
+#' To avoid cases where a clonal expansion might lead to a false positive, tigger examines
+#' the combinations of J gene and junction length among sequences which perfectly match the proposed
+#' germline allele.
+
 #' 
 #' @param    clip_db        a \code{data.frame} in Change-O format. See
 #'                          \link{findNovelAlleles} for details.
