@@ -184,7 +184,7 @@ plotGenotype(geno, text_size = 10)
 
 Finally, the original V allele calls may be limited to only those within the 
 inferred genotype. This can be done by using the function `reassignAlleles`.
-By corrected the calls in this manner, the user can greatly reduce the numer of
+By correcting the calls in this manner, the user can greatly reduce the numer of
 ambiguous allele calls (where a single sample sequences is assigned to multiple
 V alleles, thus preventing the mutations analysis of allele-differentiating
 positions). Additionally, assignments to erroneous not-in-genotype alleles
@@ -199,7 +199,7 @@ sample_db <- bind_cols(sample_db, V_CALL_GENOTYPED)
 
 From here, one may proceed with further downstream analyses, but with the
 advantage of having much-improved allele calls. Besides having discovered
-alleles not in the IGMT database, the calls made by IMGT have been tailored to
+alleles not in the IMGT database, the calls made by IMGT have been tailored to
 the subject's genotype, greatly reducing the number of problematic calls, as
 can be seen below.
 
