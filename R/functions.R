@@ -1068,9 +1068,17 @@ reassignAlleles <- function(clip_db, genotype_db, v_call="V_CALL",
         } else {
           stop("Only Hamming distance is currently supported as a method.")
         }
-        best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
-        best_alleles = sapply(best_match, function(x) het_alleles[x])   
-        V_CALL_GENOTYPED[ind] = sapply(best_alleles, paste, collapse=",")
+        # The sapply-apply approach could become problematic when nrow(dist_mat)
+        # is 1 and min(best_match) has multiple values, due to the fact that R 
+        # does not always keep data structures unmutable
+        # Explicitly specifying a list and subsequently keeping it as a list by
+        # using lapply avoids that problem
+        best_match = vector("list", length=nrow(dist_mat))
+        for (i in 1:nrow(dist_mat)) {
+            best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
+        }
+        best_alleles = lapply(best_match, function(x) het_alleles[x])
+        V_CALL_GENOTYPED[ind] = unlist(lapply(best_alleles, paste, collapse=","))
       }
     }
     
@@ -1086,9 +1094,17 @@ reassignAlleles <- function(clip_db, genotype_db, v_call="V_CALL",
       } else {
         stop("Only Hamming distance is currently supported as a method.")
       }
-      best_match = apply(dist_mat, 1, function(x) which(x == min(x)))
-      best_alleles = sapply(best_match, function(x) names(genotype_db[x])) 
-      V_CALL_GENOTYPED[not_called] = sapply(best_alleles, paste, collapse=",")
+      # The sapply-apply approach could become problematic when nrow(dist_mat)
+      # is 1 and min(best_match) has multiple values, due to the fact that R 
+      # does not always keep data structures unmutable
+      # Explicitly specifying a list and subsequently keeping it as a list by
+      # using lapply avoids that problem
+      best_match = vector("list", length=nrow(dist_mat))
+      for (i in 1:nrow(dist_mat)) {
+            best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
+      }
+      best_alleles = lapply(best_match, function(x) names(genotype_db[x]))
+      V_CALL_GENOTYPED[not_called] = unlist(lapply(best_alleles, paste, collapse=","))
     }
   } else {
     stop("Complete realignment is currently not supported.")
