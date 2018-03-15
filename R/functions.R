@@ -85,12 +85,14 @@
 #' enought to be included in the subject's genotype
 #' 
 #' @examples
+#' \dontrun{
 #' # Load example data and germlines
 #' data(sample_db)
 #' data(germline_ighv)
 #' 
 #' # Find novel alleles and return relevant data
-#' \dontrun{novel_df = findNovelAlleles(sample_db, germline_ighv)}
+#' novel_df <- findNovelAlleles(sample_db, germline_ighv)
+#' }
 #' 
 #' @export
 findNovelAlleles <- function(clip_db, germline_db,
@@ -441,7 +443,7 @@ findNovelAlleles <- function(clip_db, germline_db,
 #' 
 #' @examples
 #' data(novel_df)
-#' novel = selectNovel(novel_df)
+#' novel <- selectNovel(novel_df)
 #' 
 #' @export
 selectNovel <- function(novel_df, keep_alleles=FALSE) {
@@ -492,19 +494,23 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' @return   NULL
 #' 
 #' @examples
+#' \dontrun{
 #' # Load example data and germlines
 #' data(sample_db)
 #' data(germline_ighv)
 #' 
 #' # Find novel alleles and return relevant data
-#' \dontrun{novel_df = findNovelAlleles(sample_db, germline_ighv)}
-#' data(novel_df)
+#' novel_df = findNovelAlleles(sample_db, germline_ighv)
+#' }
+#' 
 #' # Plot the evidence for the first (and only) novel allele in the example data
-#' novel = selectNovel(novel_df)
+#' data(novel_df)
+#' data(sample_db)
+#' novel <- selectNovel(novel_df)
 #' plotNovel(sample_db, novel[1,])
 #' 
 #' @export
-plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL"){
+plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
   . = NULL
     
   # Use the data frame
@@ -873,10 +879,10 @@ inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
 #' plotGenotype(genotype)
 #' 
 #' # Facet by subject
-#' genotypea = genotypeb = genotype
-#' genotypea$SUBJECT = "A"
-#' genotypeb$SUBJECT = "B"
-#' geno_sub = rbind(genotypea, genotypeb)
+#' genotypea <- genotypeb <- genotype
+#' genotypea$SUBJECT <- "A"
+#' genotypeb$SUBJECT <- "B"
+#' geno_sub <- rbind(genotypea, genotypeb)
 #' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #' 
 #' @export
@@ -954,7 +960,7 @@ plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position")
 #' data(genotype)
 #'                      
 #' # Find the sequences that correspond to the genotype
-#' genotype_seqs = genotypeFasta(genotype, germline_ighv, novel_df)
+#' genotype_seqs <- genotypeFasta(genotype, germline_ighv, novel_df)
 #' 
 #' 
 #' @export
@@ -994,7 +1000,7 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' the allele calls are chosen from among those provided in \code{genotype_db},
 #' based on a simple alignment to the sample sequence.
 #' 
-#' @param    clip_db       a \code{data.frame} containing V allele calls from a
+#' @param    db            a \code{data.frame} containing V allele calls from a
 #'                         single subject and the sample
 #'                         IMGT-gapped V(D)J sequences under
 #'                         \code{"SEQUENCE_IMGT"}
@@ -1014,9 +1020,9 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #'                         minimizing required number of alignments. Currently
 #'                         only "TRUE" is implemented.
 #' 
-#' @return   a single-column \code{data.frame} corresponding to \code{clip.db}
-#'           and containing the best allele call from among the sequences
-#'           listed in \code{genotype_db}
+#' @return   A modifed input \code{data.frame} containing the best allele call from 
+#'           among the sequences listed in \code{genotype_db} in the 
+#'           \code{V_CALL_GENOTYPED} column.
 #' 
 #' @examples
 #' # Load example data
@@ -1026,20 +1032,19 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' data(novel_df)
 #'                      
 #' # Extract the database sequences that correspond to the genotype
-#' genotype_seqs = genotypeFasta(genotype, germline_ighv, novel_df)
+#' genotype_seqs <- genotypeFasta(genotype, germline_ighv, novel_df)
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
-#' V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)
-#' sample_db = cbind(sample_db, V_CALL_GENOTYPED)
+#' output_db <- reassignAlleles(sample_db, genotype_seqs)
 #' 
 #' @export
-reassignAlleles <- function(clip_db, genotype_db, v_call="V_CALL",
+reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
                             method="hamming", path=NA,
                             keep_gene=TRUE){
   
   # Extract data subset and prepare output vector
-  v_sequences = as.character(clip_db$SEQUENCE_IMGT)
-  v_calls = getAllele(clip_db[[v_call]], first=FALSE, strip_d=FALSE)
+  v_sequences = as.character(db$SEQUENCE_IMGT)
+  v_calls = getAllele(db[[v_call]], first=FALSE, strip_d=FALSE)
   v_genes = getGene(v_calls, first = TRUE, strip_d=FALSE)
   V_CALL_GENOTYPED = rep("", length(v_calls))
   
@@ -1110,7 +1115,9 @@ reassignAlleles <- function(clip_db, genotype_db, v_call="V_CALL",
     stop("Complete realignment is currently not supported.")
   }
   
-  return(data.frame(V_CALL_GENOTYPED,stringsAsFactors=FALSE))
+  db$V_CALL_GENOTYPED <- V_CALL_GENOTYPED
+  
+  return(db)
 }
 
 
@@ -1137,8 +1144,8 @@ reassignAlleles <- function(clip_db, genotype_db, v_call="V_CALL",
 #' 
 #' @examples
 #' # Create strings to act as a sample sequences and a reference sequence
-#' seqs = c("----GATA","GAGAGAGA","TANA")
-#' ref = "GATAGATA"
+#' seqs <- c("----GATA", "GAGAGAGA", "TANA")
+#' ref <- "GATAGATA"
 #' 
 #' # Find the differences between the two
 #' getMutatedPositions(seqs, ref)
@@ -1195,21 +1202,23 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
 #'           each element of \code{samples}
 #' 
 #' @examples
+#' \dontrun{
 #' # Load germline database
 #' data(germline_ighv)
 #' 
 #' # Use createGermlines to insert a mutation into a germline sequence
-#' #sample_seqs = c(germline_ighv[2],
-#' #                createGermlines(germline_ighv[1], 103, "G"),
-#' #                createGermlines(germline_ighv[1], 107, "C"))
+#' sample_seqs <- c(germline_ighv[2],
+#'                  createGermlines(germline_ighv[1], 103, "G"),
+#'                  createGermlines(germline_ighv[1], 107, "C"))
 #' 
 #' # Pretend that one sample sequence has received an ambiguous allele call
-#' #sample_alleles = c(paste(names(germline_ighv[1:2]), collapse=","),
-#' #                  names(germline_ighv[2]),
-#' #                  names(germline_ighv[1]))
+#' sample_alleles <- c(paste(names(germline_ighv[1:2]), collapse=","),
+#'                     names(germline_ighv[2]),
+#'                     names(germline_ighv[1]))
 #' 
 #' # Compare each sequence to its assigned germline(s) to determine the distance
-#' #getMutCount(sample_seqs, sample_alleles, germline_ighv)
+#' getMutCount(sample_seqs, sample_alleles, germline_ighv)
+#' }
 #' 
 #' @export
 getMutCount <- function(samples, allele_calls, germline_db){
@@ -1504,7 +1513,7 @@ writeFasta <- function(named_sequences, file, width=60, append=FALSE){
 #' 
 #' @examples
 #' # Create a vector that uses old gene/allele names.
-#' alleles = c("IGHV1-c*01", "IGHV1-f*02", "IGHV2-5*07")
+#' alleles <- c("IGHV1-c*01", "IGHV1-f*02", "IGHV2-5*07")
 #' 
 #' # Update the alleles to the new names
 #' updateAlleleNames(alleles)
@@ -1556,9 +1565,9 @@ updateAlleleNames <- function(allele_calls){
 #' 
 #' @examples
 #' # Create a list of allele names
-#' alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
-#'             "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
-#'             "IGHV1-2", "IGHV1-2*02", "IGHV1-69*02")
+#' alleles <- c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
+#'              "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
+#'              "IGHV1-2", "IGHV1-2*02", "IGHV1-69*02")
 #' 
 #' # Sort the alleles by name
 #' sortAlleles(alleles)
@@ -1613,8 +1622,8 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
 #' 
 #' @examples
 #' # Create messy nucleotide sequences
-#' seqs = c("AGAT.taa-GAG...ATA",
-#'          "GATACAGTXXXXXAGNNNPPPACA")
+#' seqs <- c("AGAT.taa-GAG...ATA",
+#'           "GATACAGTXXXXXAGNNNPPPACA")
 #' # Clean them up
 #' cleanSeqs(seqs)
 #' 

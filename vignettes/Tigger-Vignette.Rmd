@@ -192,9 +192,8 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 
 ```{r, eval=TRUE, warning=FALSE}
 # Use the personlized genotype to determine corrected allele assignments
-V_CALL_GENOTYPED <- reassignAlleles(sample_db, genotype_seqs)
-# Append the corrected calls to the original data.frame
-sample_db <- bind_cols(sample_db, V_CALL_GENOTYPED)
+# Updated genotype will be placed in the V_CALL_GENOTYPED column
+sample_db <- reassignAlleles(sample_db, genotype_seqs)
 ```
 
 From here, one may proceed with further downstream analyses, but with the
