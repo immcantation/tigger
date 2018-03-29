@@ -209,6 +209,7 @@ findNovelAlleles <- function(clip_db, germline_db,
     df_run_empty = data.frame(GERMLINE_CALL = names(germline),
                               NOTE = "",
                               POLYMORPHISM_CALL = NA,
+                              MU_SPEC=NA,
                               NOVEL_IMGT = NA,
                               PERFECT_MATCH_COUNT = NA,
                               GERMLINE_CALL_COUNT = length(indicies),
@@ -417,6 +418,19 @@ findNovelAlleles <- function(clip_db, germline_db,
   rm(clip_db)
   gc()
   out_df <- dplyr::bind_rows(out_list)
+  getMuSpec <- function(poly_call) {
+      MU_SPEC <- poly_call
+      idx <- which(!is.na(poly_call))
+      if (length(idx)>0) {
+          MU_SPEC[idx] <- sapply(poly_call[idx], function(p){
+              p <- strsplit(p,"_")[[1]][-1]
+              m <- gsub("([[:alpha:]])([[:digit:]]*)([[:alpha:]])", "\\2\\1>\\3", p)
+              paste(m, collapse=",")
+          })
+      } 
+      MU_SPEC
+  }
+  out_df$MU_SPEC <- getMuSpec(out_df$POLYMORPHISM_CALL)
   return(out_df)
 }
 
