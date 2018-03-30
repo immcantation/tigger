@@ -59,7 +59,8 @@
 #' @return   a \code{data.frame} with a row for each known allele analyzed.
 #' Besides metadata on the the parameters used in the search, each row will have
 #' either a note as to where the polymorphism-finding algorithm exited or a
-#' nucleotide sequence for the predicted novel allele.
+#' nucleotide sequence for the predicted novel allele, along with columns providing
+#' additional evidence.
 #' 
 #' Messages in the field \code{NOTE}:
 #' 
@@ -77,6 +78,40 @@
 #'                          desired mutational range and nucleotide range.
 #'                          \code{min_seqs_pass}
 #'    \item \emph{no unmutated versions of novel allele found}
+#' }
+#' 
+#' Other fields:
+#' \itemize{
+#' \item \emph{GERMLINE_CALL}:
+#' \item \emph{POLYMORPHISM_CALL}:
+#' \item \emph{MU_SPEC}:
+#' \item \emph{NOVEL_IMGT}:
+#' \item \emph{NOVEL_IMGT_COUNT}:  the number of times the inferred germline
+#'                       sequence is found in the input data \code{clip_db}
+#' \item \emph{PERFECT_MATCH_COUNT}:
+#' \item \emph{GERMLINE_CALL_COUNT}: the number of sequences with the particular
+#'                       germline allele call considered for the analysis
+#' \item \emph{MUT_MIN}: Minimum mutation considered by the algorithm
+#' \item \emph{MUT_MAX}: Maximum mutation considered by the algorithm
+#' \item \emph{MUT_PASS_COUNT}:
+#' \item \emph{GERMLINE_IMGT}:
+#' \item \emph{POS_MIN}: First position of the sequence considered by the
+#'                   algorithm (IMGT numbering)
+#' \item \emph{POS_MAX}: Last position of the sequence considered by the 
+#'                   algorithm (IMGT numbering)
+#' \item \emph{Y_INTERCEPT}: The y-intercept above which positions were 
+#'                  considered potentially polymorphic
+#' \item \emph{ALPHA}: Significance cutoff to be used when constructing the 
+#'                  confidence interval for the y-intercept
+#' \item \emph{MIN_SEQS}: the minimum number of total sequences (within the 
+#'                  desired mutational range and nucleotide range) required 
+#'                  for the samples to be considered
+#' \item \emph{J_MAX}: The maximum fraction of sequences perfectly aligning to 
+#'                  a potential novel allele that are allowed to utilize to a 
+#'                  particular combination of junction length and J gene
+#' \item \emph{MIN_FRAC}: The minimum fraction of sequences that must have 
+#'                  usable nucleotides in a given position for that position to 
+#'                  be considered
 #' }
 #' 
 #' @seealso \link{plotNovel} to visualize the data supporting any
@@ -211,6 +246,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                               POLYMORPHISM_CALL = NA,
                               MU_SPEC=NA,
                               NOVEL_IMGT = NA,
+                              NOVEL_IMGT_COUNT=NA,
                               PERFECT_MATCH_COUNT = NA,
                               GERMLINE_CALL_COUNT = length(indicies),
                               MUT_MIN = NA,
@@ -415,22 +451,30 @@ findNovelAlleles <- function(clip_db, germline_db,
   } # end foreach allele
   
   if(nproc > 1) { stopCluster(cluster) }
-  rm(clip_db)
-  gc()
   out_df <- dplyr::bind_rows(out_list)
   getMuSpec <- function(poly_call) {
-      MU_SPEC <- poly_call
-      idx <- which(!is.na(poly_call))
-      if (length(idx)>0) {
-          MU_SPEC[idx] <- sapply(poly_call[idx], function(p){
-              p <- strsplit(p,"_")[[1]][-1]
-              m <- gsub("([[:alpha:]])([[:digit:]]*)([[:alpha:]])", "\\2\\1>\\3", p)
-              paste(m, collapse=",")
-          })
-      } 
-      MU_SPEC
+      sapply(poly_call, function(p){
+          p <- strsplit(p,"_")[[1]][-1]
+          m <- gsub("([[:alpha:]])([[:digit:]]*)([[:alpha:]])", "\\2\\1>\\3", p)
+          paste(m, collapse=",")
+      })
   }
-  out_df$MU_SPEC <- getMuSpec(out_df$POLYMORPHISM_CALL)
+  
+  # The number of records in the sequence dataset matching 
+  # each exact NOVEL_IMGT sequence
+  getDbMatch <- function(novel_imgt) {
+      sapply(novel_imgt, function(n) {
+          sum(grepl(n,clip_db$SEQUENCE_IMGT))
+      })
+  }
+  
+  idx <- which(!is.na(out_df$NOVEL_IMGT))
+  if (length(idx)>0) {
+      out_df$MU_SPEC[idx] <- getMuSpec(out_df$POLYMORPHISM_CALL[idx])
+      out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
+  }
+  rm(clip_db)
+  gc()
   return(out_df)
 }
 
