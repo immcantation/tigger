@@ -82,25 +82,38 @@
 #' 
 #' Other fields:
 #' \itemize{
-#' \item \emph{GERMLINE_CALL}:
-#' \item \emph{POLYMORPHISM_CALL}:
-#' \item \emph{MU_SPEC}:
-#' \item \emph{NOVEL_IMGT}:
-#' \item \emph{NOVEL_IMGT_COUNT}:  the number of times the inferred germline
-#'                       sequence is found in the input data \code{clip_db}
-#' \item \emph{PERFECT_MATCH_COUNT}:
+#' \item \emph{GERMLINE_CALL}: The input V call
+#' \item \emph{POLYMORPHISM_CALL}: The new allele call
+#' \item \emph{MU_SPEC}: Mutations identified in the new allele, relative
+#'                       to the reference germline (\code{GERMLINE_CALL})
+#' \item \emph{NOVEL_IMGT}: New allele
+#' \item \emph{NOVEL_IMGT_COUNT}:  the number of times the sequence 
+#'                      \code{NOVEL_IMGT} is found in the input data 
+#'                      \code{clip_db}.
+#' \item \emph{PERFECT_MATCH_COUNT}: Final number of sequences retained to call 
+#'                       the new allele
 #' \item \emph{GERMLINE_CALL_COUNT}: the number of sequences with the particular
-#'                       germline allele call considered for the analysis
+#'                       \code{GERMLINE_CALL} in \code{clip_db} initially
+#'                       considered for the analysis.
+#' \item \emph{GERMLINE_CALL_PERC}: the percent of sequences with the particular
+#'                       \code{GERMLINE_CALL} in \code{clip_db} initially      
+#'                       considered for the analysis.              
+#' \item \emph{GERMLINE_IMGT}: Germline sequence for \code{GERMLINE_CALL}                          
 #' \item \emph{MUT_MIN}: Minimum mutation considered by the algorithm
 #' \item \emph{MUT_MAX}: Maximum mutation considered by the algorithm
-#' \item \emph{MUT_PASS_COUNT}:
-#' \item \emph{GERMLINE_IMGT}:
+#' \item \emph{MUT_PASS_COUNT}: Number of sequences in the mutation range
 #' \item \emph{POS_MIN}: First position of the sequence considered by the
 #'                   algorithm (IMGT numbering)
 #' \item \emph{POS_MAX}: Last position of the sequence considered by the 
 #'                   algorithm (IMGT numbering)
 #' \item \emph{Y_INTERCEPT}: The y-intercept above which positions were 
 #'                  considered potentially polymorphic
+#' \item \emph{Y_INTERCEPT_PASS}: Number of positions that pass Y_INTERCEPT  
+#' \item \emph{SNP_PASS}: Number of sequences that pass Y_INTERCEPT and are
+#'                    within the desired nucleotide range (\code{min_seqs})   
+#' \item \emph{UNMUTATED_COUNT}: Number of unmutated sequences
+#' \item \emph{UNMUTATED_SNP_J_GENE_LENGTH_COUNT}: Number of distinct combinations
+#'                  of SNP, J gene and junction length.                                  
 #' \item \emph{ALPHA}: Significance cutoff to be used when constructing the 
 #'                  confidence interval for the y-intercept
 #' \item \emph{MIN_SEQS}: the minimum number of total sequences (within the 
@@ -249,14 +262,21 @@ findNovelAlleles <- function(clip_db, germline_db,
                               NOVEL_IMGT_COUNT=NA,
                               PERFECT_MATCH_COUNT = NA,
                               GERMLINE_CALL_COUNT = length(indicies),
+                              GERMLINE_CALL_PERC = 100*round(length(indicies)/nrow(clip_db),3),
                               MUT_MIN = NA,
                               MUT_MAX = NA,
+                              MUT_PASS_COUNT=NA,
                               GERMLINE_IMGT = as.character(germline),
                               POS_MIN = min(pos_range),
                               POS_MAX = max(pos_range),
                               Y_INTERCEPT = y_intercept,
+                              Y_INTERCEPT_PASS = NA,
+                              SNP_PASS=NA,
+                              UNMUTATED_COUNT=NA,
+                              UNMUTATED_SNP_J_GENE_LENGTH_COUNT=NA,
                               ALPHA = alpha,
                               MIN_SEQS = min_seqs,
+                              MIN_SEQS_PASS=NA,
                               J_MAX = j_max,
                               MIN_FRAC = min_frac,
                               stringsAsFactors = FALSE)
@@ -285,6 +305,7 @@ findNovelAlleles <- function(clip_db, germline_db,
       # Add a mutation count column and filter out sequences not in our range
       db_subset_mm = mutationRangeSubset(db_subset, germline,
                                          mut_min:mut_max, pos_range)
+      df_run$MUT_PASS_COUNT[1] <- nrow(db_subset_mm)
       
       if(nrow(db_subset_mm) < min_seqs){
         df_run$NOTE[1] = paste0("Insufficient sequences (",nrow(db_subset_mm),") in desired mutational range.")
@@ -316,6 +337,8 @@ findNovelAlleles <- function(clip_db, germline_db,
         dplyr::summarise_(Y_INT_MIN = ~findLowerY(POS_MUT_RATE, MUT_COUNT,
                                                   mut_min, alpha)) %>%
         dplyr::filter_(~Y_INT_MIN > y_intercept)
+
+      df_run$Y_INTERCEPT_PASS[1] <- nrow(pass_y)
       
       if(nrow(pass_y) < 1){
         df_run$NOTE[1] = "No positions pass y-intercept test."
@@ -341,6 +364,8 @@ findNovelAlleles <- function(clip_db, germline_db,
         dplyr::mutate_(STRING_COUNT = ~n()) %>%
         dplyr::filter_(~STRING_COUNT >= min_seqs)
       
+      df_run$SNP_PASS[1] <- nrow(db_y_subset_mm)
+      
       if (nrow(db_y_subset_mm) < 1 ){
         df_run$NOTE[1] = paste("Position(s) passed y-intercept (",
                                paste(pass_y$POSITION, collapse = ","),
@@ -365,10 +390,18 @@ findNovelAlleles <- function(clip_db, germline_db,
       # junction length for each of the SNP strings, and then check to
       # see which pass the j/junction and count requirements
       db_y_summary0 = db_y_subset_mm %>%
-        dplyr::filter_(~MUT_COUNT_MINUS_SUBSTRING == 0) %>%
+        dplyr::filter_(~MUT_COUNT_MINUS_SUBSTRING == 0)
+      
+      df_run$UNMUTATED_COUNT[1] <- nrow(db_y_summary0)
+      
+      db_y_summary0 <- db_y_summary0 %>%
         dplyr::mutate_(J_GENE = ~getGene(J_CALL)) %>%
         dplyr::group_by_(~SNP_STRING, ~J_GENE, ~JUNCTION_LENGTH) %>%
-        dplyr::summarise_(COUNT = ~n()) %>%
+        dplyr::summarise_(COUNT = ~n())
+      
+      df_run$UNMUTATED_SNP_J_GENE_LENGTH_COUNT[1] <- nrow(db_y_summary0)
+      
+      db_y_summary0 <- db_y_summary0 %>%
         dplyr::group_by_(~SNP_STRING) %>%
         dplyr::mutate_(FRACTION = ~COUNT/sum(COUNT)) %>%
         dplyr::summarise_(TOTAL_COUNT = ~sum(COUNT), MAX_FRAC = ~max(FRACTION))
