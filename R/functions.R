@@ -76,7 +76,7 @@
 #'                    \code{mut_range} and \code{pos_range}.
 #'    \item \emph{not enough sequences}:  not enough sequences in the 
 #'                          desired mutational range and nucleotide range.
-#'                          \code{min_seqs_pass}
+#'                          \code{min_seqs}
 #'    \item \emph{no unmutated versions of novel allele found}
 #' }
 #' 
@@ -113,7 +113,9 @@
 #'                    within the desired nucleotide range (\code{min_seqs})   
 #' \item \emph{UNMUTATED_COUNT}: Number of unmutated sequences
 #' \item \emph{UNMUTATED_SNP_J_GENE_LENGTH_COUNT}: Number of distinct combinations
-#'                  of SNP, J gene and junction length.                                  
+#'                  of SNP, J gene and junction length.     
+#' \item \emph{SNP_MIN_SEQS_J_MAX_PASS}: Number of SNP strings that pass both the 
+#'                  \code{min_seqs} and \code{j_max} thresholds                                                  
 #' \item \emph{ALPHA}: Significance cutoff to be used when constructing the 
 #'                  confidence interval for the y-intercept
 #' \item \emph{MIN_SEQS}: the minimum number of total sequences (within the 
@@ -274,9 +276,9 @@ findNovelAlleles <- function(clip_db, germline_db,
                               SNP_PASS=NA,
                               UNMUTATED_COUNT=NA,
                               UNMUTATED_SNP_J_GENE_LENGTH_COUNT=NA,
+                              SNP_MIN_SEQS_J_MAX_PASS=NA,
                               ALPHA = alpha,
                               MIN_SEQS = min_seqs,
-                              MIN_SEQS_PASS=NA,
                               J_MAX = j_max,
                               MIN_FRAC = min_frac,
                               stringsAsFactors = FALSE)
@@ -423,8 +425,10 @@ findNovelAlleles <- function(clip_db, germline_db,
       
       min_seqs_pass <- db_y_summary0$TOTAL_COUNT >= min_seqs
       j_max_pass <- db_y_summary0$MAX_FRAC <= j_max
-
+      
       db_y_summary <- db_y_summary0[min_seqs_pass & j_max_pass, , drop=FALSE]
+      
+      df_run$SNP_MIN_SEQS_J_MAX_PASS[1] <- nrow(db_y_summary)
       
       if(nrow(db_y_summary) < 1){
         msg <- c(NA, NA)
@@ -497,7 +501,8 @@ findNovelAlleles <- function(clip_db, germline_db,
   # each exact NOVEL_IMGT sequence
   getDbMatch <- function(novel_imgt) {
       sapply(novel_imgt, function(n) {
-          sum(grepl(n,clip_db$SEQUENCE_IMGT))
+          sum(grepl(gsub("-","",n),
+                    gsub("-","",clip_db$SEQUENCE_IMGT)))
       })
   }
   
