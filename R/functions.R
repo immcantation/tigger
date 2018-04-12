@@ -90,6 +90,10 @@
 #' \item \emph{NOVEL_IMGT_COUNT}:  the number of times the sequence 
 #'                      \code{NOVEL_IMGT} is found in the input data 
 #'                      \code{clip_db}.
+#' \item \emph{NOVEL_IMGT_NUM_J}: Number of disctinct J calls associated
+#'                      to \code{NOVEL_IMGT} in \code{clip_db}       
+#' \item \emph{NOVEL_IMGT_NUM_CDR3}: Number of disctinct CDR3 associated
+#'                      to \code{NOVEL_IMGT} in \code{clip_db}                                           
 #' \item \emph{PERFECT_MATCH_COUNT}: Final number of sequences retained to call 
 #'                       the new allele
 #' \item \emph{GERMLINE_CALL_COUNT}: the number of sequences with the particular
@@ -161,7 +165,7 @@ findNovelAlleles <- function(clip_db, germline_db,
   
   # Keep only the db columns needed
   clip_db <- clip_db %>% 
-      dplyr::select_('SEQUENCE_IMGT', v_call, 'J_CALL', 'JUNCTION_LENGTH')
+      dplyr::select_('SEQUENCE_IMGT', v_call, 'J_CALL', 'JUNCTION_LENGTH', 'JUNCTION')
   
   # Keep only the columns we need and clean up the sequences
   missing = c("SEQUENCE_IMGT", v_call, "J_CALL", "JUNCTION_LENGTH") %>%
@@ -262,6 +266,8 @@ findNovelAlleles <- function(clip_db, germline_db,
                               MU_SPEC=NA,
                               NOVEL_IMGT = NA,
                               NOVEL_IMGT_COUNT=NA,
+                              NOVEL_IMGT_NUM_J=NA,
+                              NOVEL_IMGT_NUM_CDR3=NA,
                               PERFECT_MATCH_COUNT = NA,
                               GERMLINE_CALL_COUNT = length(indicies),
                               GERMLINE_CALL_PERC = 100*round(length(indicies)/nrow(clip_db),3),
@@ -506,10 +512,35 @@ findNovelAlleles <- function(clip_db, germline_db,
       })
   }
   
+  # The number of distinct J in the sequence dataset associated 
+  # with the exact NOVEL_IMGT sequence
+  getNumJ <- function(novel_imgt) {
+      sapply(novel_imgt, function(n) {
+          imgt_idx <- grepl(gsub("[-.]","",n),
+                    gsub("[-.]","",clip_db$SEQUENCE_IMGT))
+          length(unique(getGene(clip_db[['J_CALL']][imgt_idx])))
+      })
+  }
+  
+  
+  # The number of distinct CDR3 in the sequence dataset associated 
+  # with the exact NOVEL_IMGT sequence
+  getNumCDR3 <- function(novel_imgt) {
+      sapply(novel_imgt, function(n) {
+          imgt_idx <- grepl(gsub("[-.]","",n),
+                            gsub("[-.]","",clip_db$SEQUENCE_IMGT))
+          length(unique(translateDNA(clip_db[['JUNCTION']][imgt_idx], trim=TRUE)))
+      })
+  }
+  
   idx <- which(!is.na(out_df$NOVEL_IMGT))
   if (length(idx)>0) {
       out_df$MU_SPEC[idx] <- getMuSpec(out_df$POLYMORPHISM_CALL[idx])
       out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
+      out_df$NOVEL_IMGT_NUM_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
+      if ("JUNCTION" %in% colnames(clip_db)) {
+          out_df$NOVEL_IMGT_NUM_CDR3[idx] <- getNumCDR3(out_df$NOVEL_IMGT[idx])
+      }
   }
   rm(clip_db)
   gc()
