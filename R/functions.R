@@ -530,7 +530,7 @@ findNovelAlleles <- function(clip_db, germline_db,
       sapply(novel_imgt, function(n) {
           imgt_idx <- grepl(gsub("[-.]","",n),
                             gsub("[-.]","",clip_db$SEQUENCE_IMGT))
-          length(unique(translateDNA(clip_db[['JUNCTION']][imgt_idx], trim=TRUE)))
+          length(unique(alakazam::translateDNA(clip_db[['JUNCTION']][imgt_idx], trim=TRUE)))
       })
   }
   
