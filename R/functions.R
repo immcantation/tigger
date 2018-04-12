@@ -40,9 +40,10 @@
 #'                          be considered by the algorithm
 #' @param    pos_range      the range of IMGT-numbered positions that should be
 #'                          considered by the algorithm
-#' @param    alpha          the alpha cutoff to be used when constructing the
-#'                          confidence interval for the y-intercept           
-#' @param    y_intercept    the y-intercept above which positions should be
+#' @param    alpha          the alpha value used for determining whether the 
+#'                          fit y-intercept is greater than the \code{y_intercept}
+#'                          threshold
+#' @param    y_intercept    the y-intercept threshold above which positions should be
 #'                          considered potentially polymorphic
 #' @param    j_max          the maximum fraction of sequences perfectly aligning
 #'                          to a potential novel allele that are allowed to
@@ -1854,8 +1855,8 @@ mutationRangeSubset <- function(clip_db, germline, mut_range, pos_range){
 # of mutation
 #
 findLowerY = function(x, y, mut_min, alpha){
-  y = y+1-mut_min
-  lowerY = suppressWarnings(confint(lm(x ~ y),level=1-2*alpha)[[1]])
+  y = y + 1 - mut_min
+  lowerY = suppressWarnings(confint(lm(x ~ y), level=1 - 2*alpha)[[1]])
   return(lowerY)
 }
 
