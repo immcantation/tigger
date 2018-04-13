@@ -531,7 +531,7 @@ findNovelAlleles <- function(clip_db, germline_db,
           imgt_idx <- grepl(gsub("[-.]","",n),
                             gsub("[-.]","",clip_db$SEQUENCE_IMGT))
           seq <- clip_db[['JUNCTION']][imgt_idx]
-          seq <- substr(seq, 4, stri_length(seq) - 3)
+          seq <- substr(seq, 4, stringi::stri_length(seq) - 3)
           length(unique(seq))
       })
   }
