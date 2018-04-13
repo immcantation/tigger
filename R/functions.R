@@ -123,13 +123,13 @@
 #'                  \code{min_seqs} and \code{j_max} thresholds                                                  
 #' \item \emph{ALPHA}: Significance cutoff to be used when constructing the 
 #'                  confidence interval for the y-intercept
-#' \item \emph{MIN_SEQS}: the minimum number of total sequences (within the 
+#' \item \emph{MIN_SEQS}: Input \code{min_seqs}. The minimum number of total sequences (within the 
 #'                  desired mutational range and nucleotide range) required 
 #'                  for the samples to be considered
-#' \item \emph{J_MAX}: The maximum fraction of sequences perfectly aligning to 
+#' \item \emph{J_MAX}: Input \code{j_max}. The maximum fraction of sequences perfectly aligning to 
 #'                  a potential novel allele that are allowed to utilize to a 
 #'                  particular combination of junction length and J gene
-#' \item \emph{MIN_FRAC}: The minimum fraction of sequences that must have 
+#' \item \emph{MIN_FRAC}: Input \code{min_frac}. The minimum fraction of sequences that must have 
 #'                  usable nucleotides in a given position for that position to 
 #'                  be considered
 #' }
