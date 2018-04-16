@@ -90,11 +90,16 @@
 #' \item \emph{NOVEL_IMGT}: New allele
 #' \item \emph{NOVEL_IMGT_COUNT}:  the number of times the sequence 
 #'                      \code{NOVEL_IMGT} is found in the input data 
-#'                      \code{clip_db}.
+#'                      \code{clip_db}. Considers the subsequence of 
+#'                      \code{NOVEL_IMGT} in the range \code{pos_range}.  
 #' \item \emph{NOVEL_IMGT_NUM_J}: Number of disctinct J calls associated
-#'                      to \code{NOVEL_IMGT} in \code{clip_db}       
+#'                      to \code{NOVEL_IMGT} in \code{clip_db}. Considers
+#'                      the subsequence of \code{NOVEL_IMGT} in the range 
+#'                      \code{pos_range}.       
 #' \item \emph{NOVEL_IMGT_NUM_CDR3}: Number of disctinct CDR3 associated
-#'                      to \code{NOVEL_IMGT} in \code{clip_db}                                           
+#'                      to \code{NOVEL_IMGT} in \code{clip_db}. Considers
+#'                      the subsequence of \code{NOVEL_IMGT} in the range 
+#'                      \code{pos_range}.                                              
 #' \item \emph{PERFECT_MATCH_COUNT}: Final number of sequences retained to call 
 #'                       the new allele
 #' \item \emph{GERMLINE_CALL_COUNT}: the number of sequences with the particular
@@ -104,6 +109,9 @@
 #'                       \code{GERMLINE_CALL} in \code{clip_db} initially      
 #'                       considered for the analysis.              
 #' \item \emph{GERMLINE_IMGT}: Germline sequence for \code{GERMLINE_CALL}                          
+#' \item \emph{GERMLINE_IMGT_COUNT}:  the number of times the sequence sequence
+#'                       \code{GERMLINE_IMGT} is found in the input data 
+#'                       \code{clip_db}.     
 #' \item \emph{MUT_MIN}: Minimum mutation considered by the algorithm
 #' \item \emph{MUT_MAX}: Maximum mutation considered by the algorithm
 #' \item \emph{MUT_PASS_COUNT}: Number of sequences in the mutation range
@@ -276,6 +284,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                               MUT_MAX = NA,
                               MUT_PASS_COUNT=NA,
                               GERMLINE_IMGT = as.character(germline),
+                              GERMLINE_IMGT_COUNT=NA,
                               POS_MIN = min(pos_range),
                               POS_MAX = max(pos_range),
                               Y_INTERCEPT = y_intercept,
@@ -508,8 +517,9 @@ findNovelAlleles <- function(clip_db, germline_db,
   # each exact NOVEL_IMGT sequence
   getDbMatch <- function(novel_imgt) {
       sapply(novel_imgt, function(n) {
-          sum(grepl(gsub("-","",n),
-                    gsub("-","",clip_db$SEQUENCE_IMGT)))
+          n <- substr(n, min(pos_range), max(pos_range))
+          sum(grepl(gsub("-.","",n),
+                    gsub("-.","",clip_db$SEQUENCE_IMGT)))
       })
   }
   
@@ -517,6 +527,7 @@ findNovelAlleles <- function(clip_db, germline_db,
   # with the exact NOVEL_IMGT sequence
   getNumJ <- function(novel_imgt) {
       sapply(novel_imgt, function(n) {
+          n <- substr(n, min(pos_range), max(pos_range))
           imgt_idx <- grepl(gsub("[-.]","",n),
                     gsub("[-.]","",clip_db$SEQUENCE_IMGT))
           length(unique(getGene(clip_db[['J_CALL']][imgt_idx])))
@@ -528,6 +539,7 @@ findNovelAlleles <- function(clip_db, germline_db,
   # with the exact NOVEL_IMGT sequence
   getNumCDR3 <- function(novel_imgt) {
       sapply(novel_imgt, function(n) {
+          n <- substr(n, min(pos_range), max(pos_range))
           imgt_idx <- grepl(gsub("[-.]","",n),
                             gsub("[-.]","",clip_db$SEQUENCE_IMGT))
           seq <- clip_db[['JUNCTION']][imgt_idx]
@@ -545,6 +557,7 @@ findNovelAlleles <- function(clip_db, germline_db,
           out_df$NOVEL_IMGT_NUM_CDR3[idx] <- getNumCDR3(out_df$NOVEL_IMGT[idx])
       }
   }
+  out_df$GERMLINE_IMGT_COUNT <- getDbMatch(out_df$GERMLINE_IMGT)
   rm(clip_db)
   gc()
   return(out_df)
