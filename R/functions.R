@@ -518,8 +518,8 @@ findNovelAlleles <- function(clip_db, germline_db,
   getDbMatch <- function(novel_imgt) {
       sapply(novel_imgt, function(n) {
           n <- substr(n, min(pos_range), max(pos_range))
-          sum(grepl(gsub("-.","",n),
-                    gsub("-.","",clip_db$SEQUENCE_IMGT)))
+          sum(grepl(gsub("[-\\.]","",n),
+                    gsub("[-\\.]","",clip_db$SEQUENCE_IMGT)))
       })
   }
   
@@ -528,8 +528,8 @@ findNovelAlleles <- function(clip_db, germline_db,
   getNumJ <- function(novel_imgt) {
       sapply(novel_imgt, function(n) {
           n <- substr(n, min(pos_range), max(pos_range))
-          imgt_idx <- grepl(gsub("[-.]","",n),
-                    gsub("[-.]","",clip_db$SEQUENCE_IMGT))
+          imgt_idx <- grepl(gsub("[-\\.]","",n),
+                    gsub("[-\\.]","",clip_db$SEQUENCE_IMGT))
           length(unique(getGene(clip_db[['J_CALL']][imgt_idx])))
       })
   }
@@ -540,8 +540,8 @@ findNovelAlleles <- function(clip_db, germline_db,
   getNumCDR3 <- function(novel_imgt) {
       sapply(novel_imgt, function(n) {
           n <- substr(n, min(pos_range), max(pos_range))
-          imgt_idx <- grepl(gsub("[-.]","",n),
-                            gsub("[-.]","",clip_db$SEQUENCE_IMGT))
+          imgt_idx <- grepl(gsub("[-\\.]","",n),
+                            gsub("[-\\.]","",clip_db$SEQUENCE_IMGT))
           seq <- clip_db[['JUNCTION']][imgt_idx]
           seq <- substr(seq, 4, stringi::stri_length(seq) - 3)
           length(unique(seq))
