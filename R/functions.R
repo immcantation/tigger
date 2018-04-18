@@ -102,6 +102,7 @@
 #'                      \code{pos_range}.                                              
 #' \item \emph{PERFECT_MATCH_COUNT}: Final number of sequences retained to call 
 #'                       the new allele
+#' \item \emph{PERFECT_MATCH_FREQ}: \code{PERFECT_MATCH_COUNT}/\code{GERMLINE_CALL_COUNT}
 #' \item \emph{GERMLINE_CALL_COUNT}: the number of sequences with the particular
 #'                       \code{GERMLINE_CALL} in \code{clip_db} initially
 #'                       considered for the analysis.
@@ -125,6 +126,8 @@
 #' \item \emph{SNP_PASS}: Number of sequences that pass Y_INTERCEPT and are
 #'                    within the desired nucleotide range (\code{min_seqs})   
 #' \item \emph{UNMUTATED_COUNT}: Number of unmutated sequences
+#' \item \emph{UNMUTATED_FREQ}: Number of unmutated sequences over 
+#'                    \code{GERMLINE_IMGT_COUNT}
 #' \item \emph{UNMUTATED_SNP_J_GENE_LENGTH_COUNT}: Number of distinct combinations
 #'                  of SNP, J gene and junction length.     
 #' \item \emph{SNP_MIN_SEQS_J_MAX_PASS}: Number of SNP strings that pass both the 
@@ -278,6 +281,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                               NOVEL_IMGT_NUM_J=NA,
                               NOVEL_IMGT_NUM_CDR3=NA,
                               PERFECT_MATCH_COUNT = NA,
+                              PERFECT_MATCH_FREQ = NA,                              
                               GERMLINE_CALL_COUNT = length(indicies),
                               GERMLINE_CALL_PERC = 100*round(length(indicies)/nrow(clip_db),3),
                               MUT_MIN = NA,
@@ -291,6 +295,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                               Y_INTERCEPT_PASS = NA,
                               SNP_PASS=NA,
                               UNMUTATED_COUNT=NA,
+                              UNMUTATED_FREQ=NA,
                               UNMUTATED_SNP_J_GENE_LENGTH_COUNT=NA,
                               SNP_MIN_SEQS_J_MAX_PASS=NA,
                               ALPHA = alpha,
@@ -467,6 +472,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                                ") but ",
                                msg,".", sep="")
         df_run$PERFECT_MATCH_COUNT[1] = max(db_y_summary0$TOTAL_COUNT)
+        df_run$PERFECT_MATCH_FREQ[1] <- df_run$PERFECT_MATCH_COUNT[1]/df_run$GERMLINE_CALL_COUNT[1]
         if(mut_mins[1] == mut_min){
           return(df_run)
         } else {
@@ -495,6 +501,7 @@ findNovelAlleles <- function(clip_db, germline_db,
         df_run$POLYMORPHISM_CALL[1] = names(germ)
         df_run$NOVEL_IMGT[1] =  as.character(germ)
         df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
+        df_run$PERFECT_MATCH_FREQ[1] <- df_run$PERFECT_MATCH_COUNT[1]/df_run$GERMLINE_CALL_COUNT[1]
         df_run$NOTE[1] = "Novel allele found!"
       }
       
@@ -558,6 +565,7 @@ findNovelAlleles <- function(clip_db, germline_db,
       }
   }
   out_df$GERMLINE_IMGT_COUNT <- getDbMatch(out_df$GERMLINE_IMGT)
+  out_df$UNMUTATED_FREQ = out_df$UNMUTATED_COUNT/out_df$GERMLINE_CALL_COUNT
   rm(clip_db)
   gc()
   return(out_df)
