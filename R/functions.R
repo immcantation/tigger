@@ -85,7 +85,7 @@
 #' \itemize{
 #' \item \emph{GERMLINE_CALL}: The input V call
 #' \item \emph{POLYMORPHISM_CALL}: The new allele call
-#' \item \emph{MU_SPEC}: Mutations identified in the new allele, relative
+#' \item \emph{NT_SUBSTITUTIONS}: Mutations identified in the new allele, relative
 #'                       to the reference germline (\code{GERMLINE_CALL})
 #' \item \emph{NOVEL_IMGT}: New allele
 #' \item \emph{NOVEL_IMGT_COUNT}:  the number of times the sequence 
@@ -272,7 +272,7 @@ findNovelAlleles <- function(clip_db, germline_db,
     df_run_empty = data.frame(GERMLINE_CALL = names(germline),
                               NOTE = "",
                               POLYMORPHISM_CALL = NA,
-                              MU_SPEC=NA,
+                              NT_SUBSTITUTIONS=NA,
                               NOVEL_IMGT = NA,
                               NOVEL_IMGT_COUNT=NA,
                               NOVEL_IMGT_NUM_J=NA,
@@ -550,7 +550,7 @@ findNovelAlleles <- function(clip_db, germline_db,
   
   idx <- which(!is.na(out_df$NOVEL_IMGT))
   if (length(idx)>0) {
-      out_df$MU_SPEC[idx] <- getMuSpec(out_df$POLYMORPHISM_CALL[idx])
+      out_df$NT_SUBSTITUTIONS[idx] <- getMuSpec(out_df$POLYMORPHISM_CALL[idx])
       out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
       out_df$NOVEL_IMGT_NUM_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
       if ("JUNCTION" %in% colnames(clip_db)) {
