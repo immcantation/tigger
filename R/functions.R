@@ -96,7 +96,7 @@
 #'                      to \code{NOVEL_IMGT} in \code{clip_db}. Considers
 #'                      the subsequence of \code{NOVEL_IMGT} in the range 
 #'                      \code{pos_range}.       
-#' \item \emph{NOVEL_IMGT_NUM_CDR3}: Number of disctinct CDR3 associated
+#' \item \emph{NOVEL_IMGT_UNIQUE_CDR3}: Number of disctinct CDR3 associated
 #'                      to \code{NOVEL_IMGT} in \code{clip_db}. Considers
 #'                      the subsequence of \code{NOVEL_IMGT} in the range 
 #'                      \code{pos_range}.                                              
@@ -279,7 +279,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                               NOVEL_IMGT = NA,
                               NOVEL_IMGT_COUNT=NA,
                               NOVEL_IMGT_UNIQUE_J=NA,
-                              NOVEL_IMGT_NUM_CDR3=NA,
+                              NOVEL_IMGT_UNIQUE_CDR3=NA,
                               PERFECT_MATCH_COUNT = NA,
                               PERFECT_MATCH_FREQ = NA,                              
                               GERMLINE_CALL_COUNT = length(indicies),
@@ -561,7 +561,7 @@ findNovelAlleles <- function(clip_db, germline_db,
       out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
       out_df$NOVEL_IMGT_UNIQUE_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
       if ("JUNCTION" %in% colnames(clip_db)) {
-          out_df$NOVEL_IMGT_NUM_CDR3[idx] <- getNumCDR3(out_df$NOVEL_IMGT[idx])
+          out_df$NOVEL_IMGT_UNIQUE_CDR3[idx] <- getNumCDR3(out_df$NOVEL_IMGT[idx])
       }
   }
   out_df$GERMLINE_IMGT_COUNT <- getDbMatch(out_df$GERMLINE_IMGT)
