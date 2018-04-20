@@ -92,7 +92,7 @@
 #'                      \code{NOVEL_IMGT} is found in the input data 
 #'                      \code{clip_db}. Considers the subsequence of 
 #'                      \code{NOVEL_IMGT} in the range \code{pos_range}.  
-#' \item \emph{NOVEL_IMGT_NUM_J}: Number of disctinct J calls associated
+#' \item \emph{NOVEL_IMGT_UNIQUE_J}: Number of disctinct J calls associated
 #'                      to \code{NOVEL_IMGT} in \code{clip_db}. Considers
 #'                      the subsequence of \code{NOVEL_IMGT} in the range 
 #'                      \code{pos_range}.       
@@ -278,7 +278,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                               NT_SUBSTITUTIONS=NA,
                               NOVEL_IMGT = NA,
                               NOVEL_IMGT_COUNT=NA,
-                              NOVEL_IMGT_NUM_J=NA,
+                              NOVEL_IMGT_UNIQUE_J=NA,
                               NOVEL_IMGT_NUM_CDR3=NA,
                               PERFECT_MATCH_COUNT = NA,
                               PERFECT_MATCH_FREQ = NA,                              
@@ -559,7 +559,7 @@ findNovelAlleles <- function(clip_db, germline_db,
   if (length(idx)>0) {
       out_df$NT_SUBSTITUTIONS[idx] <- getMuSpec(out_df$POLYMORPHISM_CALL[idx])
       out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
-      out_df$NOVEL_IMGT_NUM_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
+      out_df$NOVEL_IMGT_UNIQUE_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
       if ("JUNCTION" %in% colnames(clip_db)) {
           out_df$NOVEL_IMGT_NUM_CDR3[idx] <- getNumCDR3(out_df$NOVEL_IMGT[idx])
       }
