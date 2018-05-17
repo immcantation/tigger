@@ -232,7 +232,7 @@ where the input data has information for different subjects or samples, the para
 `fields` you be set to split the input data.frame in subsets to be processed independently.
 
 ```{r}
-i_novel_df <- tigger(sample_db, germline_ighv, 
+i_novel_df <- itigger(sample_db, germline_ighv, 
                      fields=NULL,
                      nproc=1, max.iter=Inf)
 names(i_novel_df)
@@ -246,17 +246,17 @@ i_novel_df[["final"]]
 i_novel_df[["new_germlines"]]
 ```
 
-The function `plotTigger` will take the output of `tigger` and generate figures 
-for the newly identified alleles. The figures are sotre in a list and can be printed 
+The function `plotTigger` will take the output of `itigger` and generate figures 
+for the newly identified alleles. The figures are stored in a list and can be printed 
 independently or arranged in panels.
-In this example, `tigger` identified `r  length(i_novel_df$new_germlines)` new germline in the input dataset.
+In this example, `itigger` identified `r  length(i_novel_df$new_germlines)` new germline in the input dataset.
 
 ```{r, fig.width=6, fig.width=9, fig.height=7}
 i_novel_plots <- plotTigger(i_novel_df)
 names(i_novel_plots)
 # Note:
 # Polymorphisms:
-# - The first "1" refers to the groups created with the `fields` in `tigger`.
+# - The first "1" refers to the groups created with the `fields` in `itigger`.
 #   In this example we didn't group, there's only one group.
 # - The second one refers to the polymorphism. In this example, only one was identified,
 #   and this is the one shown in the figure .

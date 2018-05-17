@@ -1,12 +1,20 @@
-#' Iteratively run TIgGER to find novel alleles, infer subject-specific genotypes
-#' and use it to correct allele calls.
+#' Iterative TIgGER 
+#' 
+#'  
+#' Iteratively run the TIgGER pipeline to find novel alleles, infer subject-specific genotypes
+#' and use it to correct allele calls. 
+#' This wrapper function will run \link{findNovelAlleles}, \link{inferGenotype}
+#' and \link{reassignAlleles} while new germlines are found and until the maximun 
+#' number of iterations specified by the user is reached. With each iteration, 
+#' \code{v_call} and \code{germline} are updated so that the next iteration will
+#' use as input the corrected \code{v_call} (\code{V_CALL_GENOTYPED}) and the
+#' \code{germline} database that includes the new alleles germlines.
 #'
-#' \code{tigger} 
+#' \code{itigger} 
 #' 
 #' @param    db             a \code{data.frame} in Change-O format. See details.
 #' @param    germline       a vector of named nucleotide germline sequences
-#'                          matching the V calls in \code{db}. tigger needs v;
-#'                          but CreateGermlines all.
+#'                          matching the V calls in \code{db}.
 #' @param    v_call         name of the column in db with V allele calls. 
 #'                          Default is V_CALL.   
 #' @param    fields         name of the column(s) in \code{db} that will be 
@@ -15,33 +23,19 @@
 #' @param    verbose        whether to keep the results for all iterations (TRUE)
 #'                          or just the last one (FALSE)       
 #' @param    max.iter       maximum number of iterations
+#' @param    ...            additional arguments for \link{findNovelAlleles}
+#' @seealso \link{findNovelAlleles},  \link{inferGenotype} and  \link{reassignAlleles}
 #' @examples
 #' \dontrun{
-#' library(dplyr)
-#' library(alakazam)
-#' library(tigger)
-#' mg67_db <- readChangeoDb("mg67.tsv")
-#' mg67_dir <- "../../inference_tool_testing/data/MG67"
-#' mg67_germlines <- list.files(file.path(mg67_dir,"germlines_2015-07-07"), pattern="fasta$", full.names = T)
-#' if (length(mg67_germlines)<1) {
-#'     mg67_germlines <- list.files(file.path(mg67_dir, "germlines_2015-07-07"), pattern="fasta$", full.names = T)
-#' }
-#' mg67_germline_db <- unlist(lapply(mg67_germlines, readIgFasta))
-#' 
-#' 
-#' tigger_list <- tigger::tigger(mg67_db, mg67_germline_db, fields="SUBJECT", max.iter=1)
-#' plotTigger(tigger_list)
-#' tigger_list_2 <- tigger::tigger(mg67_db, mg67_germline_db, fields="SAMPLE", max.iter=4)
-#' plotTigger(tigger_list_2)
-#' 
 #' data(sample_db)
 #' data(germline_ighv)
 
 #' # Find novel alleles and return relevant data
-#' novel_df <- findNovelAlleles(mg67_db, mg67_germline_db)
+#' novel_alleles <- itiger(sample_db, germline_ighv, max.iter=Inf)
+#' novel_alleles$final
 #' }
 #' @export
-tigger <- function(db, germline, 
+itigger <- function(db, germline, 
                    v_call="V_CALL",
                    fields=NULL, 
                    max.iter=1, 
@@ -257,7 +251,7 @@ tigger <- function(db, germline,
 
 #' Visualize genotypes and evidence of novel V alleles
 #'
-#' \code{plotTigger} takes the output of \link{tigger} and uses
+#' \code{plotTigger} takes the output of \link{itiger} and uses
 #' \link{findNovelAlleles} and \link{plotGenotype} to visualize genotypes
 #' and evidence of the final novel V alleles (\code{tigger_list$final}).
 #' 
@@ -271,7 +265,7 @@ tigger <- function(db, germline,
 #'         with \link{plotGenotype}. As before, the names are made 
 #'         from the groupings created with \code{tigger_list$fields}. 
 #' 
-#' @param    tigger_list    a \code{list} generated with \link{tigger}
+#' @param    tigger_list    a \code{list} generated with \link{itiger}
 #' 
 #' @examples
 #' \dontrun{
@@ -280,9 +274,9 @@ tigger <- function(db, germline,
 #' data(germline_ighv)
 #' 
 #' # Find novel alleles and return relevant data
-#' tigger <- tigger(sample_db, germline_ighv)
+#' novel_alleles <- itigger(sample_db, germline_ighv)
 #' # Plot the evidence for the first (and only) novel allele in the example data
-#' plots <- plotTigger(tigger)
+#' plots <- plotTigger(novel_alleles)
 #' # plots is a list of 2 elements, with one plot each (in this example)
 #' tigger:::multiplot(plots$polymorphisms[[1]], plots$genotypes[[1]], cols=2)
 #' }
