@@ -72,7 +72,7 @@
 #'                          slice slice_
 #' @importFrom  foreach     foreach %dopar% registerDoSEQ
 #' @importFrom  graphics    plot
-#' @importFrom  grid        grid.layout grid.newpage pushViewport viewport
+#' @importFrom  gridExtra   arrangeGrob
 #' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
 #' @importFrom  parallel    clusterEvalQ clusterExport makeCluster stopCluster
