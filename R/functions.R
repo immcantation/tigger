@@ -101,7 +101,9 @@
 #'                      the subsequence of \code{NOVEL_IMGT} in the range 
 #'                      \code{pos_range}.                                              
 #' \item \emph{PERFECT_MATCH_COUNT}: Final number of sequences retained to call 
-#'                       the new allele
+#'                       the new allele. These are unique sequences that have 
+#'                       Vs that perfect match the predicted germline in the 
+#'                       range \code{pos_range}.
 #' \item \emph{PERFECT_MATCH_FREQ}: \code{PERFECT_MATCH_COUNT}/\code{GERMLINE_CALL_COUNT}
 #' \item \emph{GERMLINE_CALL_COUNT}: the number of sequences with the particular
 #'                       \code{GERMLINE_CALL} in \code{clip_db} initially
@@ -812,7 +814,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
   p2_height = length(unique(p2_data$POSITION))
   if (p2_height>1) { p2_height = 0.5 * p2_height}
   heights = c(1, p2_height, 1)
-  multiplot(p1, p2, p3, cols = ncol, heights=heights)
+  multiplot(p1, p2, p3, cols = ncol, heights=heights)      
 }
 
 #' Infer a subject-specific genotype
@@ -1037,7 +1039,7 @@ inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
 #' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #' 
 #' @export
-plotGenotype = function(genotype, facet_by=NULL, gene_sort=c("name", "position"), 
+plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"), 
                         text_size=12, silent=FALSE, ...) {
   # Check arguments
   gene_sort <- match.arg(gene_sort)
@@ -1948,4 +1950,3 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
         scale_y_continuous(expand=c(0,0))
     p
 }
-
