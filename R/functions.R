@@ -1915,40 +1915,37 @@ superSubstring = function(string, positions){
 #                     describing the heights of the rows in the layout. Will
 #                     be passed to grid.layout. Default is all plots have 
 #                     the same height.
-multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL, heights=NULL) {
-  
-  # Make a list from the ... arguments and plotlist
-  plots <- c(list(...), plotlist)
-  
-  numPlots = length(plots)
-  if (is.null(heights)) { heights = rep(1,numPlots) }
-  
-  # If layout is NULL, then use 'cols' to determine layout
-  if (is.null(layout)) {
-    # Make the panel
-    # ncol: Number of columns of plots
-    # nrow: Number of rows needed, calculated from # of cols
-    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
-                     ncol = cols, nrow = ceiling(numPlots/cols))
-  }
-  
-  if (numPlots==1) {
-    print(plots[[1]])
-    
-  } else {
-    # Set up the page
-    grid.newpage()
-    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout),
-                                                 heights=heights)))
-    
-    # Make each plot, in the correct location
-    for (i in 1:numPlots) {
-      # Get the i,j matrix positions of the regions that contain this subplot
-      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
-      
-      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
-                                      layout.pos.col = matchidx$col))
+multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
+    # Make a list from the ... arguments and plotlist
+    plots <- c(list(...), plotlist)
+    numPlots <- length(plots)
+    ncol <- cols
+    nrow <- ceiling(numPlots/cols)
+    if (is.null(heights)) { heights = rep(1,nrow) }
+    if (is.null(layout)) {
+        # Make the panel
+        # ncol: Number of columns of plots
+        # nrow: Number of rows needed, calculated from # of cols
+        layout <- matrix(seq(1, cols * nrow),
+                         ncol = cols, nrow = nrow)
     }
-  }
+    grob <- gridExtra::arrangeGrob(grobs=plots, 
+                                   nrow=nrow, ncol=ncol, layout_matrix = layout,
+                                   heights=heights)
+    p <- ggplot() + 
+        layer(data = data.frame(x = NA),
+              stat = StatIdentity, 
+              position = PositionIdentity, 
+              # geom = GeomDrawGrob, 
+              geom = GeomCustomAnn,
+              inherit.aes = FALSE, 
+              params = list(grob = grob, 
+                            xmin = 0,
+                            xmax = 1, 
+                            ymin = 0, 
+                            ymax = 1)) +
+        scale_x_continuous(expand=c(0,0)) +
+        scale_y_continuous(expand=c(0,0))
+    p
 }
 

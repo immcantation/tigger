@@ -1,11 +1,13 @@
 Package: tigger
 Type: Package
 Version: 0.2.11.999
-Date: 2018-04-20
+Date: 2018-05-17
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Jason", "Vander Heiden", role=c("ctb", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
+             person("Susanna", "Marquez", role=c("ctb"), 
+                                email="susanna.marquez@yale.edu"),                    
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: R Tools for Inferring New Immunoglobulin Alleles from Rep-Seq Data
@@ -31,7 +33,7 @@ Imports:
     doParallel,
     foreach,
     graphics,
-    grid,
+    gridExtra,
     iterators,
     lazyeval,
     parallel,
