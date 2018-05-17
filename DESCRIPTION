@@ -37,6 +37,7 @@ Imports:
     iterators,
     lazyeval,
     parallel,
+    shazam,
     stats
 Suggests:
     knitr,

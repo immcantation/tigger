@@ -76,6 +76,7 @@
 #' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
 #' @importFrom  parallel    clusterEvalQ clusterExport makeCluster stopCluster
+#' @importFrom  shazam      calcObservedMutations
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
 #'                          confint lm
 #' @importFrom  tidyr       gather gather_ spread spread_
