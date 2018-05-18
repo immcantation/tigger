@@ -39,7 +39,7 @@ imports <- strsplit(d, ",\n")[[1]]
 
 # Install
 idx <- sapply(c("alakazam", "shazam"), grep, imports)
-for (i in idx) {
+for (i in 1:length(idx)) {
     this_package_name <-  names(idx)[[i]]
     this_package_version <-  imports[idx[[i]]]
     installDep(pkg_version, this_package_name, this_package_version)
