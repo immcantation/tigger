@@ -37,6 +37,10 @@ d <- read.dcf("DESCRIPTION", fields="Imports")
 d <- sub("^\\n", "", d)
 imports <- strsplit(d, ",\n")[[1]]
 
-# Install alakazam
-alakazam_version <- imports[grep("alakazam", imports)]
-installDep(pkg_version, "alakazam", alakazam_version)
+# Install
+idx <- sapply(c("alakazam", "shazam"), grep, imports)
+for (i in 1:idx) {
+    this_package_name <-  names(idx)[[i]]
+    this_package_version <-  imports[idx[[i]]]
+    installDep(pkg_version, this_package_name, this_package_version)
+}

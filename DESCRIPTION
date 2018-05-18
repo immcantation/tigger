@@ -27,7 +27,7 @@ Depends:
     R (>= 3.2.5),
     ggplot2 (>= 2.0.0)
 Imports:
-    alakazam (>= 0.2.6),
+    alakazam (>= 0.2.10),
     tidyr,
     dplyr (>= 0.5.0),
     doParallel,
@@ -37,7 +37,7 @@ Imports:
     iterators,
     lazyeval,
     parallel,
-    shazam,
+    shazam (>= 0.1.9),
     stats
 Suggests:
     knitr,
