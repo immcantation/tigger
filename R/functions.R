@@ -514,8 +514,9 @@ findNovelAlleles <- function(clip_db, germline_db,
   
   if(nproc > 1) { stopCluster(cluster) }
   out_df <- dplyr::bind_rows(out_list)
-  getMuSpec <- function(poly_call) {
-      sapply(poly_call, function(p){
+  getMuSpec <- function(poly_call, germ_call) {
+      sapply(1:length(poly_call), function(i){
+          p <- gsub(germ_call[i], "", poly_call[i], fixed = T)
           p <- strsplit(p,"_")[[1]][-1]
           m <- gsub("([[:alpha:]])([[:digit:]]*)([[:alpha:]])", "\\2\\1>\\3", p)
           paste(m, collapse=",")
@@ -559,7 +560,8 @@ findNovelAlleles <- function(clip_db, germline_db,
   
   idx <- which(!is.na(out_df$NOVEL_IMGT))
   if (length(idx)>0) {
-      out_df$NT_SUBSTITUTIONS[idx] <- getMuSpec(out_df$POLYMORPHISM_CALL[idx])
+      out_df$NT_SUBSTITUTIONS[idx] <- getMuSpec(out_df$POLYMORPHISM_CALL[idx],
+                                                out_df$GERMLINE_CALL[idx])
       out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
       out_df$NOVEL_IMGT_UNIQUE_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
       if ("JUNCTION" %in% colnames(clip_db)) {
