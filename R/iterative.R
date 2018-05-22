@@ -24,15 +24,28 @@
 #'                          or just the last one (FALSE)       
 #' @param    max.iter       maximum number of iterations
 #' @param    ...            additional arguments for \link{findNovelAlleles}
-#' @seealso \link{findNovelAlleles},  \link{inferGenotype} and  \link{reassignAlleles}
+#' 
+#' @return Returns a named list with the fields:
+#' \itemize{
+#'    \item \code{db} 
+#'    \item \code{fields} 
+#'    \item \code{v_call} 
+#'    \item \code{nv} 
+#'    \item \code{gt} 
+#'    \item \code{new_germlines} 
+#'    \item \code{germline} 
+#'    \item \code{summary} 
+#' }
+#'         
+#' @seealso \link{findNovelAlleles},  \link{inferGenotype}, \link{reassignAlleles}, and \link{plotTigger}.
 #' @examples
 #' \dontrun{
 #' data(sample_db)
 #' data(germline_ighv)
 
 #' # Find novel alleles and return relevant data
-#' novel_alleles <- itiger(sample_db, germline_ighv, max.iter=Inf)
-#' novel_alleles$final
+#' novel_alleles <- itigger(sample_db, germline_ighv, max.iter=Inf)
+#' novel_alleles$summary
 #' }
 #' @export
 itigger <- function(db, germline, 
@@ -80,6 +93,7 @@ itigger <- function(db, germline,
         i <- 0
         while (i < max.iter) {
             i <- i+1
+            i_char <- as.character(i)
             message(paste0("   Iteration ",i, " of ", max.iter))
             message(paste0("   |- v_call: ",v_call_idx))
             
@@ -95,9 +109,9 @@ itigger <- function(db, germline,
             # save nv even if no new alleles
             # this implies nv can be one iteration ahead of genotyping 
             if (verbose) {
-                all_nv[[i]] <- nv
+                all_nv[[i_char]] <- nv
             } else {
-                all_nv[[1]] <- nv
+                all_nv[[i_char]] <- nv
             }
             selected <- selectNovel(nv)
             
@@ -108,9 +122,9 @@ itigger <- function(db, germline,
                 gt <- inferGenotype(db_idx, germline_db=germline_idx, 
                                     novel_df=nv, v_call=v_call_idx)
                 if (verbose) {
-                    all_gt[[i]] <- gt
+                    all_gt[[i_char]] <- gt
                 } else {
-                    all_gt[[1]] <- gt
+                    all_gt[["1"]] <- gt
                 }
                 genotype_seqs <- genotypeFasta(gt, germline_idx, nv)
                 novel_alleles_found <- any(genotype_seqs %in% germline_idx == F)
@@ -182,8 +196,11 @@ itigger <- function(db, germline,
     all_nv <- bind_rows(lapply(foundAlleles, '[[', "nv"))
     all_gt <- bind_rows(lapply(foundAlleles, '[[', "gt"))
     
+    # TODO: check this when 0 novel alleles found
+    # Subset to last iteration with novel alleles
     final_gt <- all_gt %>%
         dplyr::group_by_(.dots=c("FIELD_ID")) %>%
+        dplyr::filter(duplicated(ALLELES) == FALSE) %>%
         dplyr::filter(ITERATION==max(ITERATION)) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(
@@ -194,15 +211,38 @@ itigger <- function(db, germline,
         dplyr::rename(ALLELE=ALLELES) %>%
         dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELE))
     
-    # add additional evidence to final table
+    final_gt <- merge(final_gt %>% 
+                          dplyr::rename(NOTE_GT=NOTE), 
+                      all_nv, 
+                      by=c("FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL")) 
+    
+    # Find closest reference in original germline
+    findClosestReference <- function(seq, allele_calls) {
+        closest <- getMutCount(seq,
+                               paste(allele_calls, collapse=","),
+                               all_germ)
+        min_dist <- min(unlist(closest))
+        closest_idx <- which(unlist(closest) == min_dist)
+        if (length(closest_idx) > 1) {
+            stop("More than one closest reference found")
+        }
+        paste(unique(allele_calls[closest_idx]), collapse=",")
+
+    }
+    
+    
+    # Add additional evidence to final table
     addEvidence <- function(dfr) {
         for (i in 1:nrow(dfr)) {
             this_field <- as.character(dfr[["FIELD_ID"]][i])
             polymorphism <- dfr[['POLYMORPHISM_CALL']][i]
+            novel_imgt <- dfr[["NOVEL_IMGT"]][i]
             gene <- dfr[['GENE']][i]
-            allele <- dfr[['ALLELE']]
-            germline <- foundAlleles[[this_field]][['germline']]
+            allele <- dfr[['ALLELE']][i]
+            germline_call <- dfr[['GERMLINE_CALL']][i]
+            this_germline <- foundAlleles[[this_field]][['germline']]
             V_CALL_GENOTYPED <- foundAlleles[[this_field]][['db']][["V_CALL_GENOTYPED"]]
+            
             SEQUENCES_AMB <- sum(grepl(polymorphism, V_CALL_GENOTYPED, fixed = T))
             dfr[["SEQUENCES_AMB"]][i] <- SEQUENCES_AMB
             SEQUENCES <- sum(V_CALL_GENOTYPED==polymorphism)
@@ -213,28 +253,98 @@ itigger <- function(db, germline,
             dfr[["SEQUENCES_AMB"]][i] <- SEQUENCES_AMB
             TOTAL_AMB <- sum(grepl(gene, V_CALL_GENOTYPED, fixed = T))    
             dfr[["TOTAL_AMB"]][i] <- TOTAL_AMB
-            # TODO: check this works if closest is a new allele
-            closest_ref <- strsplit(polymorphism, "_")[[1]][1]
-            NT_DIFF <- length(strsplit(polymorphism, "_")[[1]])-1
-            dfr[["NT_DIFF"]][i] <- NT_DIFF
-            ## TODO: calcObservedMutations
-            dfr[["AA_DIF"]][i] <- sum(calcObservedMutations(germline[[polymorphism]], 
-                                   germline[[closest_ref]],
-                                   regionDefinition = NULL,
-                                   mutationDefinition = NULL))
-            dfr[["AA_SUBSTITUTIONS"]][i] <- calcObservedMutations(germline[[polymorphism]], 
-                                                         germline[[closest_ref]],
-                                                         regionDefinition = NULL,
-                                                         mutationDefinition = NULL)[["SEQ_S"]]
+            
+            closest_ref_input <- findClosestReference(novel_imgt,
+                                                names(germline))
+            closest_ref <- findClosestReference(novel_imgt,
+                                                names(all_germ))
+            
+            if (getGene(closest_ref_input) != getGene(closest_ref)) {
+                warning("closest reference gene difference")
+            }
+            
+            if (closest_ref != polymorphism) {
+                warning(paste0("closest reference (",
+                               getAllele(closest_ref)
+                               ,") different from POLYMORPHISM_CALL (",
+                               getAllele(polymorphism),")"))
+            }
+            
+            ## TODO: this still not clear.
+            ## Any diff using sequence_imgt instead of germline[[polymorphism]]?
+            dfr[["CLOSEST_REFERENCE"]][i] <- closest_ref_input
+            
+            nt_diff <- unlist(getMutatedPositions(novel_imgt, all_germ[[closest_ref_input]]))
+            nt_diff_string <- paste(paste(
+                nt_diff, 
+                strsplit(all_germ[[closest_ref_input]],"")[[1]][nt_diff], 
+                ">",
+                strsplit(all_germ[[polymorphism]],"")[[1]][nt_diff],
+                sep=""), collapse=",")
+                
+            dfr[["NT_DIFF"]][i] <- length(nt_diff)
+            dfr[["NT_SUBSTITUTIONS"]][i] <- nt_diff_string
+            
+            aa_substitutions <- calcObservedMutations(
+                                        all_germ[[polymorphism]], 
+                                        all_germ[[closest_ref_input]],
+                                        regionDefinition = NULL,
+                                        mutationDefinition = NULL,
+                                        returnRaw = T)
+            
+            pos_R <- aa_substitutions$pos %>%
+                dplyr::filter(R > 0) %>%
+                dplyr::select(position) %>%
+                c()
+            
+            dfr[["AA_DIFF"]][i] <- length(pos_R$position)
+
+            
+            poly_aa <- strsplit(translateDNA(all_germ[[polymorphism]]),"")[[1]]
+            germ_aa <- strsplit(translateDNA(all_germ[[closest_ref_input]]),"")[[1]]
+            
+            dfr[["AA_SUBSTITUTIONS"]][i] <- paste(paste(
+                                                    pos_R$position/3, 
+                                                    germ_aa[pos_R$position/3], 
+                                                    ">",
+                                                    poly_aa[pos_R$position/3],
+                                                    sep=""), collapse=",")
+            dfr[["UNMUTATED_SEQUENCES"]][i] <- as.numeric(dfr[["COUNTS"]][i])
+            dfr[["UNMUTATED_FREQUENCY"]][i] <- as.numeric(dfr[["COUNTS"]][i])/sum(
+                grepl(polymorphism,
+                        foundAlleles[[this_field]]$db$V_CALL_GENOTYPED,
+                      fixed = T)) 
+            dfr[["ALLELIC_PERCENTAGE"]][i] <- 100*dfr[["UNMUTATED_SEQUENCES"]][i]/as.numeric(dfr[["TOTAL"]][i])
+            
+            dfr[["UNIQUE_JS"]][i] <- foundAlleles[[this_field]]$db %>%
+                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
+                dplyr::distinct(J_CALL) %>% nrow()
+            dfr[["UNIQUE_CDR3S"]][i] <- foundAlleles[[this_field]]$db %>%
+                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
+                dplyr::distinct(translateDNA(JUNCTION, trim=TRUE)) %>% 
+                nrow()
         }
         dfr
     }
-    final_gt <- addEvidence(final_gt)
-    final_gt <- merge(final_gt %>% 
-              dplyr::rename(NOTE_GT=NOTE), 
-          all_nv, 
-          by=c("FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL")) 
     
+    final_gt <- addEvidence(final_gt)
+    
+    ## Filter, reorder,...
+    final_gt <- final_gt %>%
+        dplyr::select_(.dots=c(
+            "FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL",
+            "CLOSEST_REFERENCE",
+            "NT_DIFF", "NT_SUBSTITUTIONS",
+            "AA_DIFF", "AA_SUBSTITUTIONS",
+            "UNMUTATED_SEQUENCES", "UNMUTATED_FREQUENCY",
+            "ALLELIC_PERCENTAGE",
+            "UNIQUE_JS", "UNIQUE_CDR3S",
+            "NOVEL_IMGT",
+            "GERMLINE_CALL", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
+            "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC")
+        ) %>% 
+        dplyr::rename(POLYMORPHISM=POLYMORPHISM_CALL)
+
     list(
          db=bind_rows(lapply(foundAlleles, '[[', "db")),
          fields=fields,
@@ -244,7 +354,7 @@ itigger <- function(db, germline,
          gt=all_gt,
          new_germlines=new_germlines,
          germline=lapply(foundAlleles, '[[', "germline"),
-         final=final_gt
+         summary=final_gt
     )        
 }
 
@@ -253,12 +363,12 @@ itigger <- function(db, germline,
 #'
 #' \code{plotTigger} takes the output of \link{itiger} and uses
 #' \link{findNovelAlleles} and \link{plotGenotype} to visualize genotypes
-#' and evidence of the final novel V alleles (\code{tigger_list$final}).
+#' and evidence of the final novel V alleles (\code{tigger_list$summary}).
 #' 
 #' @return a list of length 2, with elements named \code{polymorphisms} and
 #'         \code{genotypes}. \code{polymorphisms} contains a list of figures 
 #'         generated by \link{plotNovel}. The names in the list start with a 
-#'         number that matches the row from \code{tigger_list$final} used to make
+#'         number that matches the row from \code{tigger_list$summary} used to make
 #'         the figure. The following number and characters are delimit groupings
 #'         generated with \code{tigger_list$fields}. 
 #'         \code{genotypes} contains a list of figures generated 
@@ -301,7 +411,7 @@ plotTigger <- function(tigger_list) {
     }
     
     
-    nv <- tigger_list$final %>%
+    nv <- tigger_list$summary %>%
         dplyr::mutate(ROW_ID=1:n(),
                       LABEL=paste(c(FIELD_ID, tigger_list$fields), collapse="_"))
     if (nrow(nv) > 0 ){

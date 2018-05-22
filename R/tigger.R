@@ -59,7 +59,7 @@
 #' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
 #' 
 #' @import      ggplot2
-#' @importFrom  alakazam    getAllele getGene getFamily DNA_COLORS
+#' @importFrom  alakazam    getAllele getGene getFamily translateDNA DNA_COLORS
 #' @importFrom  doParallel  registerDoParallel
 #' @importFrom  dplyr       do n desc %>%
 #'                          glimpse distinct distinct_
