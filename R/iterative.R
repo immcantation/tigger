@@ -360,7 +360,7 @@ itigger <- function(db, germline,
 
 #' Visualize genotypes and evidence of novel V alleles
 #'
-#' \code{plotTigger} takes the output of \link{itiger} and uses
+#' \code{plotTigger} takes the output of \link{itigger} and uses
 #' \link{findNovelAlleles} and \link{plotGenotype} to visualize genotypes
 #' and evidence of the final novel V alleles (\code{tigger_list$summary}).
 #' 
@@ -374,7 +374,7 @@ itigger <- function(db, germline,
 #'         with \link{plotGenotype}. As before, the names are made 
 #'         from the groupings created with \code{tigger_list$fields}. 
 #' 
-#' @param    tigger_list    a \code{list} generated with \link{itiger}
+#' @param    tigger_list    a \code{list} generated with \link{itigger}
 #' 
 #' @examples
 #' \dontrun{
