@@ -340,16 +340,15 @@ itigger <- function(db, germline,
             "ALLELIC_PERCENTAGE",
             "UNIQUE_JS", "UNIQUE_CDR3S",
             "NOVEL_IMGT",
-            "GERMLINE_CALL", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
-            "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC")
-        ) %>% 
-        dplyr::rename(POLYMORPHISM=POLYMORPHISM_CALL)
+            "GERMLINE_CALL", "GERMLINE_IMGT", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
+            "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC",
+            "NOTE")
+        ) 
 
     list(
          db=bind_rows(lapply(foundAlleles, '[[', "db")),
          fields=fields,
          v_call=v_call,
-         # db_id=digest(db),
          nv=all_nv,
          gt=all_gt,
          new_germlines=new_germlines,
@@ -386,9 +385,9 @@ itigger <- function(db, germline,
 #' # Find novel alleles and return relevant data
 #' novel_alleles <- itigger(sample_db, germline_ighv)
 #' # Plot the evidence for the first (and only) novel allele in the example data
-#' plots <- plotTigger(novel_alleles)
-#' # plots is a list of 2 elements, with one plot each (in this example)
-#' tigger:::multiplot(plots$polymorphisms[[1]], plots$genotypes[[1]], cols=2)
+#' tigger_plots <- plotTigger(novel_alleles)
+#' # plots is a list of 2 elements, with one plot each in this example.
+#' tigger:::multiplot(tigger_plots$polymorphisms[[1]][[1]], tigger_plots$genotypes[[1]], cols=2)
 #' }
 #' @export
 plotTigger <- function(tigger_list) {
