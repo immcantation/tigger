@@ -302,10 +302,8 @@ itigger <- function(db, germline,
                                                     poly_aa[pos_R$position/3],
                                                     sep=""), collapse=",")
             dfr[["UNMUTATED_SEQUENCES"]][i] <- as.numeric(dfr[["COUNTS"]][i])
-            dfr[["UNMUTATED_FREQUENCY"]][i] <- as.numeric(dfr[["COUNTS"]][i])/sum(
-                grepl(polymorphism,
-                        foundAlleles[[this_field]]$db$V_CALL_GENOTYPED,
-                      fixed = T)) 
+            dfr[["UNMUTATED_FREQUENCY"]][i] <- as.numeric(dfr[["COUNTS"]][i])/SEQUENCES
+            
             dfr[["ALLELIC_PERCENTAGE"]][i] <- 100*dfr[["UNMUTATED_SEQUENCES"]][i]/as.numeric(dfr[["TOTAL"]][i])
             
             dfr[["UNIQUE_JS"]][i] <- foundAlleles[[this_field]]$db %>%
@@ -328,7 +326,7 @@ itigger <- function(db, germline,
             "CLOSEST_REFERENCE",
             "NT_DIFF", "NT_SUBSTITUTIONS",
             "AA_DIFF", "AA_SUBSTITUTIONS",
-            "UNMUTATED_SEQUENCES", "UNMUTATED_FREQUENCY",
+            "SEQUENCES", "UNMUTATED_SEQUENCES", "UNMUTATED_FREQUENCY",
             "ALLELIC_PERCENTAGE",
             "UNIQUE_JS", "UNIQUE_CDR3S",
             "NOVEL_IMGT",
