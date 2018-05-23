@@ -27,14 +27,59 @@
 #' 
 #' @return Returns a named list with the fields:
 #' \itemize{
-#'    \item \code{db} 
-#'    \item \code{fields} 
-#'    \item \code{v_call} 
-#'    \item \code{nv} 
-#'    \item \code{gt} 
-#'    \item \code{new_germlines} 
-#'    \item \code{germline} 
-#'    \item \code{summary} 
+#'    \item \code{db} The input \code{db} with the additional column
+#'                    \code{V_CALL_GENOTYPED}, which has the the correctd \code{V_CALL}.
+#'                    If \code{verbose} was set to \code{TRUE}, there will be as many
+#'                    \code{V_CALL_GENOTYPED_X} (where X is a number) columns as iterations.
+#'    \item \code{fields} The input \code{fields}
+#'    \item \code{v_call} The input \code{v_call}
+#'    \item \code{nv} A \code{data.frame} with the results of \code{findNovelAlleles} obtained 
+#'                    after all iterations.
+#'    \item \code{gt} A \code{data.frame} with the results of \code{inferGenotype} obtained 
+#'                    after all iterations.
+#'    \item \code{new_germlines} A \code{character} vector with the new germlines.
+#'    \item \code{germline} A \code{character} with all germlines, old (input) and new.
+#'    \item \code{summary} A \code{data.frame} with information on each inferred allele in 
+#'                         the last iteration.
+#'    \itemize{
+#'       \item \code{FIELD_ID} Data subset identifier, defined with the input paramter \code{fields}.
+#'       \item A variable number of columns, specified with the input parameter \code{fields}.
+#'       \item{ITERATION} The iteration number.
+#'       \item{POLYMORPHISM_CALL} The new allele call.
+#'       \item{CLOSEST_REFERENCE} The closest reference gene and allele in the input germline 
+#'                                database (\code{germline}).
+#'       \item{NT_DIFF} Number of nucleotides that differ between the new allele and
+#'                      the closest reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
+#'       \item{NT_SUBSTITUTIONS} A \code{character) with specific nucleotide differences (e.g. G112A),
+#'                               comma separated.
+#'       \item{AA_DIFF} Number of aminoacids that differ between the new allele and the closest 
+#'                      reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
+#'       \item{AA_SUBSTITUTIONS} A \code{character) with specific aminoacid differences (e.g. A96N),
+#'                               comma separated.
+#'       \item{SEQUENCES} Number of sequences unambiguosly assigned to this allele.
+#'       \item{UNMUTATED_SEQUENCES} Number of records with the unmutated new allele sequence.
+#'       \item{UNMUTATED_FREQUENCY} Proportion of records with the unmutated new allele 
+#'                                  sequence. \code{UNMUTATED_SEQUENCES}/\code{SEQUENCE}
+#'       \item{ALLELIC_PERCENTAGE} Percentage at which this (unmutated) allele is observed in the 
+#'                                 sequence dataset, compared  to other (unmutated) alleles.
+#'       \item{UNIQUE_JS} Number of unique J sequences found associated with the new allele. The sequences
+#'                        are those who have been unambiguously assigned the new alelle (\item{POLYMORPHISM_CALL})
+#'       \item{UNIQUE_CDR3S}
+#'       \item{GERMLINE_CALL}
+#'       \item{MUT_MIN}
+#'       \item{MUT_MAX}
+#'       \item{POS_MIN}
+#'       \item{POS_MAX}
+#'       \item{Y_INTERCEPT}
+#'       \item{ALPHA}
+#'       \item{MIN_SEQS}
+#'       \item{J_MAX}
+#'       \item{MIN_FRAC}
+#'       \item{NOVEL_IMGT}
+#'       \item{CLOSEST_GERMLINE_IMGT}
+#'       \item{GERMLINE_IMGT}
+#'       \item{NOTE}
+#'    }
 #' }
 #'         
 #' @seealso \link{findNovelAlleles},  \link{inferGenotype}, \link{reassignAlleles}, and \link{plotTigger}.
@@ -313,6 +358,8 @@ itigger <- function(db, germline,
                 dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
                 dplyr::distinct(translateDNA(JUNCTION, trim=TRUE)) %>% 
                 nrow()
+            # Add closest germline
+            dfr[["CLOSEST_GERMLINE_IMGT"]][i] <- cleanSeqs(all_germ[[closest_ref_input]])
         }
         dfr
     }
@@ -329,9 +376,9 @@ itigger <- function(db, germline,
             "SEQUENCES", "UNMUTATED_SEQUENCES", "UNMUTATED_FREQUENCY",
             "ALLELIC_PERCENTAGE",
             "UNIQUE_JS", "UNIQUE_CDR3S",
-            "NOVEL_IMGT",
-            "GERMLINE_CALL", "GERMLINE_IMGT", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
+            "GERMLINE_CALL", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
             "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC",
+            "NOVEL_IMGT", "CLOSEST_GERMLINE_IMGT", "GERMLINE_IMGT",
             "NOTE")
         ) 
 
@@ -373,7 +420,7 @@ itigger <- function(db, germline,
 #' data(germline_ighv)
 #' 
 #' # Find novel alleles and return relevant data
-#' novel_alleles <- itigger(sample_db, germline_ighv)
+#' novel_alleles <- itigger(sample_db, germline_ighv, max.iter=2)
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' tigger_plots <- plotTigger(novel_alleles)
 #' # plots is a list of 2 elements, with one plot each in this example.
