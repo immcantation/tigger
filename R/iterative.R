@@ -243,17 +243,9 @@ itigger <- function(db, germline,
             this_germline <- foundAlleles[[this_field]][['germline']]
             V_CALL_GENOTYPED <- foundAlleles[[this_field]][['db']][["V_CALL_GENOTYPED"]]
             
-            SEQUENCES_AMB <- sum(grepl(polymorphism, V_CALL_GENOTYPED, fixed = T))
-            dfr[["SEQUENCES_AMB"]][i] <- SEQUENCES_AMB
             SEQUENCES <- sum(V_CALL_GENOTYPED==polymorphism)
-            GENE_COUNT <- sum(grepl(gene, V_CALL_GENOTYPED, fixed = T))
-            ALLELIC_PERCENTAGE <- 100*SEQUENCES/GENE_COUNT
-            ALLELIC_AMB_PERCENTAGE <- 100*SEQUENCES_AMB/GENE_COUNT  
             dfr[["SEQUENCES"]][i] <- SEQUENCES
-            dfr[["SEQUENCES_AMB"]][i] <- SEQUENCES_AMB
-            TOTAL_AMB <- sum(grepl(gene, V_CALL_GENOTYPED, fixed = T))    
-            dfr[["TOTAL_AMB"]][i] <- TOTAL_AMB
-            
+
             closest_ref_input <- findClosestReference(novel_imgt,
                                                 names(germline))
             closest_ref <- findClosestReference(novel_imgt,
