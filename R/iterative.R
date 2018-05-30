@@ -64,21 +64,22 @@
 #'                                 sequence dataset, compared  to other (unmutated) alleles.
 #'       \item{UNIQUE_JS} Number of unique J sequences found associated with the new allele. The sequences
 #'                        are those who have been unambiguously assigned the new alelle (\item{POLYMORPHISM_CALL})
-#'       \item{UNIQUE_CDR3S}
-#'       \item{GERMLINE_CALL}
-#'       \item{MUT_MIN}
-#'       \item{MUT_MAX}
-#'       \item{POS_MIN}
-#'       \item{POS_MAX}
-#'       \item{Y_INTERCEPT}
-#'       \item{ALPHA}
-#'       \item{MIN_SEQS}
-#'       \item{J_MAX}
-#'       \item{MIN_FRAC}
-#'       \item{NOVEL_IMGT}
-#'       \item{CLOSEST_GERMLINE_IMGT}
-#'       \item{GERMLINE_IMGT}
-#'       \item{NOTE}
+#'       \item{UNIQUE_CDR3S} Number of unique CDR3s associated with the inferred allele
+#'       \item{GERMLINE_CALL} See \link{findNovelAlleles}
+#'       \item{MUT_MIN} See \link{findNovelAlleles}
+#'       \item{MUT_MAX} See \link{findNovelAlleles}
+#'       \item{POS_MIN} See \link{findNovelAlleles}
+#'       \item{POS_MAX} See \link{findNovelAlleles}
+#'       \item{Y_INTERCEPT} See \link{findNovelAlleles}
+#'       \item{ALPHA} See \link{findNovelAlleles}
+#'       \item{MIN_SEQS} See \link{findNovelAlleles}
+#'       \item{J_MAX} See \link{findNovelAlleles}
+#'       \item{MIN_FRAC} See \link{findNovelAlleles} 
+#'       \item{NOVEL_IMGT} See \link{findNovelAlleles} 
+#'       \item{CLOSEST_REFERENCE_IMGT} Sequence of the closest reference gene and 
+#'                          allele in the input germline database (\code{germline}).
+#'       \item{GERMLINE_IMGT} See \link{findNovelAlleles}
+#'       \item{NOTE} See \link{findNovelAlleles}
 #'    }
 #' }
 #'         
@@ -359,7 +360,7 @@ itigger <- function(db, germline,
                 dplyr::distinct(translateDNA(JUNCTION, trim=TRUE)) %>% 
                 nrow()
             # Add closest germline
-            dfr[["CLOSEST_GERMLINE_IMGT"]][i] <- cleanSeqs(all_germ[[closest_ref_input]])
+            dfr[["CLOSEST_REFERENCE_IMGT"]][i] <- cleanSeqs(all_germ[[closest_ref_input]])
         }
         dfr
     }
@@ -378,7 +379,7 @@ itigger <- function(db, germline,
             "UNIQUE_JS", "UNIQUE_CDR3S",
             "GERMLINE_CALL", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
             "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC",
-            "NOVEL_IMGT", "CLOSEST_GERMLINE_IMGT", "GERMLINE_IMGT",
+            "NOVEL_IMGT", "CLOSEST_REFERENCE_IMGT", "GERMLINE_IMGT",
             "NOTE")
         ) 
 
