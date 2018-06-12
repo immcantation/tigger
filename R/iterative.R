@@ -3,14 +3,14 @@
 #'  
 #' Iteratively run the TIgGER pipeline to find novel alleles, infer subject-specific genotypes
 #' and use it to correct allele calls. 
-#' This wrapper function will run \link{findNovelAlleles}, \link{inferGenotype}
+#' 
+#' The wrapper function \code{itigger} will run \link{findNovelAlleles}, \link{inferGenotype}
 #' and \link{reassignAlleles} while new germlines are found and until the maximun 
 #' number of iterations specified by the user is reached. With each iteration, 
 #' \code{v_call} and \code{germline} are updated so that the next iteration will
 #' use as input the corrected \code{v_call} (\code{V_CALL_GENOTYPED}) and the
 #' \code{germline} database that includes the new alleles germlines.
 #'
-#' \code{itigger} 
 #' 
 #' @param    db             a \code{data.frame} in Change-O format. See details.
 #' @param    germline       a vector of named nucleotide germline sequences
@@ -44,42 +44,42 @@
 #'    \itemize{
 #'       \item \code{FIELD_ID} Data subset identifier, defined with the input paramter \code{fields}.
 #'       \item A variable number of columns, specified with the input parameter \code{fields}.
-#'       \item{ITERATION} The iteration number.
-#'       \item{POLYMORPHISM_CALL} The new allele call.
-#'       \item{CLOSEST_REFERENCE} The closest reference gene and allele in the input germline 
+#'       \item \code{ITERATION} The iteration number.
+#'       \item \code{POLYMORPHISM_CALL} The new allele call.
+#'       \item \code{CLOSEST_REFERENCE} The closest reference gene and allele in the input germline 
 #'                                database (\code{germline}).
-#'       \item{NT_DIFF} Number of nucleotides that differ between the new allele and
+#'       \item \code{NT_DIFF} Number of nucleotides that differ between the new allele and
 #'                      the closest reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
-#'       \item{NT_SUBSTITUTIONS} A \code{character) with specific nucleotide differences (e.g. G112A),
+#'       \item \code{NT_SUBSTITUTIONS} A \code{character} with specific nucleotide differences (e.g. G112A),
 #'                               comma separated.
-#'       \item{AA_DIFF} Number of aminoacids that differ between the new allele and the closest 
+#'       \item \code{AA_DIFF} Number of aminoacids that differ between the new allele and the closest 
 #'                      reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
-#'       \item{AA_SUBSTITUTIONS} A \code{character) with specific aminoacid differences (e.g. A96N),
+#'       \item \code{AA_SUBSTITUTIONS} A \code{character} with specific aminoacid differences (e.g. A96N),
 #'                               comma separated.
-#'       \item{SEQUENCES} Number of sequences unambiguosly assigned to this allele.
-#'       \item{UNMUTATED_SEQUENCES} Number of records with the unmutated new allele sequence.
-#'       \item{UNMUTATED_FREQUENCY} Proportion of records with the unmutated new allele 
+#'       \item \code{SEQUENCES} Number of sequences unambiguosly assigned to this allele.
+#'       \item \code{UNMUTATED_SEQUENCES} Number of records with the unmutated new allele sequence.
+#'       \item \code{UNMUTATED_FREQUENCY} Proportion of records with the unmutated new allele 
 #'                                  sequence. \code{UNMUTATED_SEQUENCES}/\code{SEQUENCE}
-#'       \item{ALLELIC_PERCENTAGE} Percentage at which this (unmutated) allele is observed in the 
+#'       \item \code{ALLELIC_PERCENTAGE} Percentage at which this (unmutated) allele is observed in the 
 #'                                 sequence dataset, compared  to other (unmutated) alleles.
-#'       \item{UNIQUE_JS} Number of unique J sequences found associated with the new allele. The sequences
-#'                        are those who have been unambiguously assigned the new alelle (\item{POLYMORPHISM_CALL})
-#'       \item{UNIQUE_CDR3S} Number of unique CDR3s associated with the inferred allele
-#'       \item{GERMLINE_CALL} See \link{findNovelAlleles}
-#'       \item{MUT_MIN} See \link{findNovelAlleles}
-#'       \item{MUT_MAX} See \link{findNovelAlleles}
-#'       \item{POS_MIN} See \link{findNovelAlleles}
-#'       \item{POS_MAX} See \link{findNovelAlleles}
-#'       \item{Y_INTERCEPT} See \link{findNovelAlleles}
-#'       \item{ALPHA} See \link{findNovelAlleles}
-#'       \item{MIN_SEQS} See \link{findNovelAlleles}
-#'       \item{J_MAX} See \link{findNovelAlleles}
-#'       \item{MIN_FRAC} See \link{findNovelAlleles} 
-#'       \item{NOVEL_IMGT} See \link{findNovelAlleles} 
-#'       \item{CLOSEST_REFERENCE_IMGT} Sequence of the closest reference gene and 
+#'       \item \code{UNIQUE_JS} Number of unique J sequences found associated with the new allele. The sequences
+#'                        are those who have been unambiguously assigned the new alelle (\code{POLYMORPHISM_CALL})
+#'       \item \code{UNIQUE_CDR3S} Number of unique CDR3s associated with the inferred allele
+#'       \item \code{GERMLINE_CALL} See \link{findNovelAlleles}
+#'       \item \code{MUT_MIN} See \link{findNovelAlleles}
+#'       \item \code{MUT_MAX} See \link{findNovelAlleles}
+#'       \item \code{POS_MIN} See \link{findNovelAlleles}
+#'       \item \code{POS_MAX} See \link{findNovelAlleles}
+#'       \item \code{Y_INTERCEPT} See \link{findNovelAlleles}
+#'       \item \code{ALPHA} See \link{findNovelAlleles}
+#'       \item \code{MIN_SEQS} See \link{findNovelAlleles}
+#'       \item \code{J_MAX} See \link{findNovelAlleles}
+#'       \item \code{MIN_FRAC} See \link{findNovelAlleles} 
+#'       \item \code{NOVEL_IMGT} See \link{findNovelAlleles} 
+#'       \item \code{CLOSEST_REFERENCE_IMGT} Sequence of the closest reference gene and 
 #'                          allele in the input germline database (\code{germline}).
-#'       \item{GERMLINE_IMGT} See \link{findNovelAlleles}
-#'       \item{NOTE} See \link{findNovelAlleles}
+#'       \item \code{GERMLINE_IMGT} See \link{findNovelAlleles}
+#'       \item \code{NOTE} See \link{findNovelAlleles}
 #'    }
 #' }
 #'         
