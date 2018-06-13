@@ -152,26 +152,27 @@ itigger <- function(db, germline,
                                 return(data.frame( NOTE=m,stringsAsFactors = FALSE))
                             })
             
-            # save nv even if no new alleles
-            # this implies nv can be one iteration ahead of genotyping 
+            # save nv and gt even if no new alleles
             if (verbose) {
                 all_nv[[i_char]] <- nv
             } else {
-                all_nv[[i_char]] <- nv
+                all_nv[["1"]] <- nv
             }
+            
+            message("     ... infer genotype")
+            gt <- inferGenotype(db_idx, germline_db=germline_idx, 
+                                novel_df=nv, v_call=v_call_idx)
+            if (verbose) {
+                all_gt[[i_char]] <- gt
+            } else {
+                all_gt[["1"]] <- gt
+            }
+            
             selected <- selectNovel(nv)
             
             message(paste0("   |- selectNovel: ", nrow(selected)," rows"))
             if (nrow(selected) > 0) {
             
-                message("     ... infer genotype")
-                gt <- inferGenotype(db_idx, germline_db=germline_idx, 
-                                    novel_df=nv, v_call=v_call_idx)
-                if (verbose) {
-                    all_gt[[i_char]] <- gt
-                } else {
-                    all_gt[["1"]] <- gt
-                }
                 genotype_seqs <- genotypeFasta(gt, germline_idx, nv)
                 novel_alleles_found <- any(genotype_seqs %in% germline_idx == F)
                 
