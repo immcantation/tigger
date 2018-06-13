@@ -220,7 +220,8 @@ itigger <- function(db, germline,
         all_gt <- bind_rows(all_gt, .id="ITERATION")
         if (nrow(all_gt)>0) {
             all_gt <- cbind(label, all_gt)
-        }
+        } 
+        
         foundAlleles[[as.character(idx)]] <- list(
             db=db_idx,
             nv=all_nv,
@@ -366,23 +367,25 @@ itigger <- function(db, germline,
         dfr
     }
     
-    final_gt <- addEvidence(final_gt)
-    
-    ## Filter, reorder,...
-    final_gt <- final_gt %>%
-        dplyr::select_(.dots=c(
-            "FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL",
-            "CLOSEST_REFERENCE",
-            "NT_DIFF", "NT_SUBSTITUTIONS",
-            "AA_DIFF", "AA_SUBSTITUTIONS",
-            "SEQUENCES", "UNMUTATED_SEQUENCES", "UNMUTATED_FREQUENCY",
-            "ALLELIC_PERCENTAGE",
-            "UNIQUE_JS", "UNIQUE_CDR3S",
-            "GERMLINE_CALL", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
-            "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC",
-            "NOVEL_IMGT", "CLOSEST_REFERENCE_IMGT", "GERMLINE_IMGT",
-            "NOTE")
-        ) 
+    if (nrow(final_gt)>0) {
+        final_gt <- addEvidence(final_gt)
+        
+        ## Filter, reorder,...
+        final_gt <- final_gt %>%
+            dplyr::select_(.dots=c(
+                "FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL",
+                "CLOSEST_REFERENCE",
+                "NT_DIFF", "NT_SUBSTITUTIONS",
+                "AA_DIFF", "AA_SUBSTITUTIONS",
+                "SEQUENCES", "UNMUTATED_SEQUENCES", "UNMUTATED_FREQUENCY",
+                "ALLELIC_PERCENTAGE",
+                "UNIQUE_JS", "UNIQUE_CDR3S",
+                "GERMLINE_CALL", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
+                "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC",
+                "NOVEL_IMGT", "CLOSEST_REFERENCE_IMGT", "GERMLINE_IMGT",
+                "NOTE")
+            ) 
+    }
 
     list(
          db=bind_rows(lapply(foundAlleles, '[[', "db")),
