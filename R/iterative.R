@@ -451,11 +451,14 @@ plotTigger <- function(tigger_list) {
         names(plot_list[["genotypes"]]) <- apply(FIELD_IDs, 1, paste, collapse="_")
     }
     
+    nv <- tigger_list$summary
     
-    nv <- tigger_list$summary %>%
-        dplyr::mutate(ROW_ID=1:n(),
-                      LABEL=paste(c(FIELD_ID, tigger_list$fields), collapse="_"))
     if (nrow(nv) > 0 ){
+
+        nv <- nv %>%
+            dplyr::mutate(ROW_ID=1:n(),
+                          LABEL=paste(c(FIELD_ID, tigger_list$fields), collapse="_"))
+        
         for (i in 1:nrow(nv)) {
             this_field <- nv[['LABEL']][i]
             this_db <- merge(nv[i,], tigger_list[['db']], by="FIELD_ID")
