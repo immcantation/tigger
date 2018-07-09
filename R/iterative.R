@@ -280,7 +280,7 @@ itigger <- function(db, germline,
                                                unlist(strsplit(getAllele(db$V_CALL, first=F),","))]
             if (length(closest_names) > 1 ) {
                 stop("Multiple of the closest reference calls are being used in db")
-            } els e{
+            } else {
                 warning("Using: ", closest_names)
             }
         }
