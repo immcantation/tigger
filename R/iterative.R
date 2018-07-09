@@ -271,12 +271,20 @@ itigger <- function(db, germline,
                                all_germ)
         min_dist <- min(unlist(closest))
         closest_idx <- which(unlist(closest) == min_dist)
-        closest_names <- paste(unique(allele_calls[closest_idx]), collapse=",")
+        closest_names <- unique(allele_calls[closest_idx])
         if (length(closest_idx) > 1) {
-            stop(paste0("More than one closest reference found for ", 
+            warning(paste0("More than one closest reference found for ", 
                         seq,": ", closest_names))
+            # Keep calls used in original db
+            closest_names <- closest_names[closest_names %in% 
+                                               unlist(strsplit(getAllele(db$V_CALL, first=F),","))]
+            if (length(closest_names) > 1 ) {
+                stop("Multiple of the closest reference calls are being used in db")
+            } els e{
+                warning("Using: ", closest_names)
+            }
         }
-        closest_names        
+        paste(closest_names, collapse=",")        
     }
     
     
