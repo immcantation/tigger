@@ -108,8 +108,8 @@ itigger <- function(db, germline,
     
     db[['FIELD_ID']] <- db %>%
         dplyr::group_by_(.dots=fields) %>%
-        dplyr::group_indices()
-    db <- db %>% dplyr::ungroup()
+        dplyr::group_indices() %>% 
+        dplyr::ungroup()
     
     FIELD_ID_label <- db %>%
         dplyr::select_(.dots=c(fields, "FIELD_ID")) %>%
@@ -201,7 +201,7 @@ itigger <- function(db, germline,
             }
         }  # end iteration loop    
         
-        # If verbose=TRUE, add column V_CALL_GEBOTYPED with last iteration
+        # If verbose=TRUE, add column V_CALL_GENOTYPED with last iteration
         genotype_cols <- grep("V_CALL_GENOTYPED_", colnames(db_idx))
         if (length(genotype_cols)>0) {
             iterations <- as.numeric(gsub(".*_","",colnames(db_idx)[genotype_cols]))
@@ -264,7 +264,7 @@ itigger <- function(db, germline,
                       all_nv, 
                       by=c("FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL")) 
     
-    # Find closest reference in original germline
+    # Find closest reference
     findClosestReference <- function(seq, allele_calls) {
         closest <- getMutCount(seq,
                                paste(allele_calls, collapse=","),
@@ -275,13 +275,14 @@ itigger <- function(db, germline,
         if (length(closest_idx) > 1) {
             warning(paste0("More than one closest reference found for ", 
                         seq,": ", closest_names))
-            # Keep calls used in original db
-            closest_names <- closest_names[closest_names %in% 
-                                               unlist(strsplit(getAllele(db$V_CALL, first=F),","))]
+            # Keep the one with less mutated positions
+            mut_pos_count <- sapply(gsub("[^_]","",closest_names), nchar)
+            closest_names <- closest_names[which.min(mut_pos_count)]
+            # If still more than one, err and TODO
             if (length(closest_names) > 1 ) {
                 stop("Multiple of the closest reference calls are being used in db")
             } else {
-                warning("Using: ", closest_names)
+                warning(paste0("Use: ", closest_names, " (less mutated positions)"))
             }
         }
         paste(closest_names, collapse=",")        
