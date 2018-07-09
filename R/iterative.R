@@ -271,11 +271,12 @@ itigger <- function(db, germline,
                                all_germ)
         min_dist <- min(unlist(closest))
         closest_idx <- which(unlist(closest) == min_dist)
+        closest_names <- paste(unique(allele_calls[closest_idx]), collapse=",")
         if (length(closest_idx) > 1) {
-            stop("More than one closest reference found")
+            stop(paste0("More than one closest reference found for ", 
+                        seq,": ", closest_names))
         }
-        paste(unique(allele_calls[closest_idx]), collapse=",")
-
+        closest_names        
     }
     
     
