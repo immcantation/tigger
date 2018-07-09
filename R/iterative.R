@@ -108,7 +108,9 @@ itigger <- function(db, germline,
     
     db[['FIELD_ID']] <- db %>%
         dplyr::group_by_(.dots=fields) %>%
-        dplyr::group_indices() %>% 
+        dplyr::group_indices()
+    
+    db <- db %>%
         dplyr::ungroup()
     
     FIELD_ID_label <- db %>%
