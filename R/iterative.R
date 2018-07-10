@@ -274,9 +274,10 @@ itigger <- function(db, germline,
         min_dist <- min(unlist(closest))
         closest_idx <- which(unlist(closest) == min_dist)
         closest_names <- unique(allele_calls[closest_idx])
-        if (length(closest_idx) > 1) {
+        closest_names <- closest_names[closest_names!=names(seq)] # not self
+        if (length(closest_names) > 1) {
             warning(paste0("More than one closest reference found for ", 
-                        seq,": ", closest_names))
+                        seq,": ", paste(closest_names, collapse=",")))
             # Keep the one with less mutated positions
             mut_pos_count <- sapply(gsub("[^_]","",closest_names), nchar)
             closest_names <- closest_names[which.min(mut_pos_count)]
@@ -297,6 +298,7 @@ itigger <- function(db, germline,
             this_field <- as.character(dfr[["FIELD_ID"]][i])
             polymorphism <- dfr[['POLYMORPHISM_CALL']][i]
             novel_imgt <- dfr[["NOVEL_IMGT"]][i]
+            names(novel_imgt) <- polymorphism
             gene <- dfr[['GENE']][i]
             allele <- dfr[['ALLELE']][i]
             germline_call <- dfr[['GERMLINE_CALL']][i]
@@ -305,7 +307,6 @@ itigger <- function(db, germline,
             
             SEQUENCES <- sum(V_CALL_GENOTYPED==polymorphism)
             dfr[["SEQUENCES"]][i] <- SEQUENCES
-
             closest_ref_input <- findClosestReference(novel_imgt,
                                                 names(germline))
             closest_ref <- findClosestReference(novel_imgt,
@@ -316,9 +317,9 @@ itigger <- function(db, germline,
             }
             
             if (closest_ref != polymorphism) {
-                warning(paste0("closest reference (",
+                warning(paste0("closest reference allele (",
                                getAllele(closest_ref)
-                               ,") different from POLYMORPHISM_CALL (",
+                               ,") different from POLYMORPHISM_CALL allele (",
                                getAllele(polymorphism),")"))
             }
             
@@ -344,23 +345,27 @@ itigger <- function(db, germline,
                                         mutationDefinition = NULL,
                                         returnRaw = T)
             
-            pos_R <- aa_substitutions$pos %>%
-                dplyr::filter(R > 0) %>%
-                dplyr::select(position) %>%
-                c()
-            
-            dfr[["AA_DIFF"]][i] <- length(pos_R$position)
-
+            if (!is.na(aa_substitutions$pos)) {
+                pos_R <- aa_substitutions$pos %>%
+                    dplyr::filter(R > 0) %>%
+                    dplyr::select(position) %>%
+                    c()   
+                dfr[["AA_DIFF"]][i] <- length(pos_R$position)
+                dfr[["AA_SUBSTITUTIONS"]][i] <- paste(paste(
+                    pos_R$position/3, 
+                    germ_aa[pos_R$position/3], 
+                    ">",
+                    poly_aa[pos_R$position/3],
+                    sep=""), collapse=",")
+            } else {
+                dfr[["AA_DIFF"]][i] <- 0
+                dfr[["AA_SUBSTITUTIONS"]][i] <- 0
+            }
             
             poly_aa <- strsplit(translateDNA(all_germ[[polymorphism]]),"")[[1]]
             germ_aa <- strsplit(translateDNA(all_germ[[closest_ref_input]]),"")[[1]]
             
-            dfr[["AA_SUBSTITUTIONS"]][i] <- paste(paste(
-                                                    pos_R$position/3, 
-                                                    germ_aa[pos_R$position/3], 
-                                                    ">",
-                                                    poly_aa[pos_R$position/3],
-                                                    sep=""), collapse=",")
+
             dfr[["UNMUTATED_SEQUENCES"]][i] <- as.numeric(dfr[["COUNTS"]][i])
             dfr[["UNMUTATED_FREQUENCY"]][i] <- as.numeric(dfr[["COUNTS"]][i])/SEQUENCES
             
