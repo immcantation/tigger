@@ -348,7 +348,7 @@ itigger <- function(db, germline,
             poly_aa <- strsplit(translateDNA(all_germ[[polymorphism]]),"")[[1]]
             germ_aa <- strsplit(translateDNA(all_germ[[closest_ref_input]]),"")[[1]]
             
-            if (!is.na(aa_substitutions$pos)) {
+            if (is.data.frame(aa_substitutions$pos)) {
                 pos_R <- aa_substitutions$pos %>%
                     dplyr::filter(R > 0) %>%
                     dplyr::select(position) %>%
