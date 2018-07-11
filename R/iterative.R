@@ -459,7 +459,8 @@ plotTigger <- function(tigger_list) {
 
     gt <- tigger_list$gt %>%
         dplyr::group_by_(.dots=c("FIELD_ID")) %>%
-        dplyr::filter(ITERATION==max(ITERATION))
+        dplyr::filter(ITERATION==max(ITERATION)) %>%
+        dplyr::ungroup()
     
     if (nrow(gt) > 0 ){
         FIELD_IDs <- unique(gt[,c("FIELD_ID", tigger_list$fields), drop=F])
