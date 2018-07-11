@@ -242,7 +242,7 @@ A table with the final set of new alleles and the supporting information is
 available in `final` and the new germlines in `new_germlines`.
 
 ```{r}
-i_novel_df[["final"]]
+i_novel_df[["summary"]]
 i_novel_df[["new_germlines"]]
 ```
 
