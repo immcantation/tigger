@@ -454,7 +454,8 @@ plotTigger <- function(tigger_list) {
     # subset to last iteration 
     # then visualize evidence
     plot_list <- list(polymorphisms=list(), 
-                      genotypes=list())
+                      genotypes=list(),
+                      all_genotypes=NA)
 
     gt <- tigger_list$gt %>%
         dplyr::group_by_(.dots=c("FIELD_ID")) %>%
@@ -466,6 +467,7 @@ plotTigger <- function(tigger_list) {
             plotGenotype(merge(FIELD_IDs[i,], gt, by=c("FIELD_ID", tigger_list$fields)), silent=T)
         })
         names(plot_list[["genotypes"]]) <- apply(FIELD_IDs, 1, paste, collapse="_")
+        plot_list[["all_genotypes"]] <- plotGenotype(gt, facet_by = "FIELD_ID", silent=T)
     }
     
     nv <- tigger_list$summary
