@@ -49,6 +49,7 @@ if (FALSE) {
         arrange(desc(V_CALL_FREQ)) %>%
         select(-V_CALL_FREQ) %>%
         sample_n(1) %>%
+        ungroup() %>%
         right_join(sample_db %>% select(-V_CALL))
     germline_subset <- germline_ighv[unique(sample_db$V_CALL)]
     
@@ -104,4 +105,36 @@ if (FALSE) {
     expect_equivalent(sort(names(inv$germline[["1"]])),sort(names(germdb2)))
     expect_equivalent(sort(names(inv$germline[["1"]])),sort(names(germdb2)))
     })
+    
+    test_that("Test itigger PGP1 MiSeq",{ 
+        
+        load(file.path("..", "tests-data", "pgp1.RData"))
+        load(file.path("..", "tests-data", "pgp1_germlines.RData"))
+        
+        allele_count <- sapply(names(pgp1_germlines), function(g) {
+            sum(grepl(pgp1_germlines[g], pgp1$SEQUENCE_IMGT, fixed = T))
+        })
+        allele_count <- data.frame(
+            allele=names(allele_count),
+            count=allele_count,
+            family=alakazam::getFamily(names(allele_count)))
+        germ_alleles <- allele_count %>%
+            dplyr::arrange(desc(count)) %>%
+            dplyr::filter(family != "IGHV1") %>%
+            dplyr::group_by(family) %>%
+            dplyr::slice(1) %>%
+            dplyr::ungroup() %>%
+            select(allele) %>%
+            rbind(.,"IGHV1-18*01")
+            
+        germlines <- pgp1_germlines[germ_alleles[['allele']]]
+        
+        tigger_results <- itigger(pgp1, germlines[], max.iter=Inf)
+        names(pgp1_germlines)[match(tigger_results$new_germlines, cleanSeqs(pgp1_germlines))]
+        
+        tigger_results_50_25 <- itigger(pgp1, germlines[], max.iter=Inf, germline_min=50, min_seqs=25)
+        names(pgp1_germlines)[match(tigger_results_50_25$new_germlines, cleanSeqs(pgp1_germlines))]
+    })
 }
+
+    
