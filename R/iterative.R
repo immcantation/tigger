@@ -277,13 +277,13 @@ itigger <- function(db, germline,
         closest_names <- closest_names[closest_names!=names(seq)] # not self
         if (length(closest_names) > 1) {
             warning(paste0("More than one closest reference found for ", 
-                        seq,": ", paste(closest_names, collapse=",")))
+                        names(seq),": ", paste(closest_names, collapse=",")))
             # Keep the one with less mutated positions
             mut_pos_count <- sapply(gsub("[^_]","",closest_names), nchar)
             closest_names <- closest_names[mut_pos_count==min(mut_pos_count)]
             # If still more than one, err and TODO
             if (length(closest_names) > 1 ) {
-                stop("Multiple of the closest reference calls are being used in db")
+                stop("Multiple closest reference")
             } else {
                 warning(paste0("Use: ", closest_names, " (less mutated positions)"))
             }
