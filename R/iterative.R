@@ -316,7 +316,7 @@ itigger <- function(db, germline,
                 warning("closest reference gene difference")
             }
             
-            if (closest_ref != polymorphism) {
+            if (getAllele(closest_ref) != getAllele(polymorphism)) {
                 warning(paste0("closest reference allele (",
                                getAllele(closest_ref)
                                ,") different from POLYMORPHISM_CALL allele (",
