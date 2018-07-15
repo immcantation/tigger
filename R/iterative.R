@@ -267,14 +267,17 @@ itigger <- function(db, germline,
                       by=c("FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL")) 
     
     # Find closest reference
-    findClosestReference <- function(seq, allele_calls) {
+    findClosestReference <- function(seq, allele_calls, exclude_self=F) {
         closest <- getMutCount(seq,
                                paste(allele_calls, collapse=","),
                                all_germ)
         min_dist <- min(unlist(closest))
         closest_idx <- which(unlist(closest) == min_dist)
         closest_names <- unique(allele_calls[closest_idx])
-        closest_names <- closest_names[closest_names!=names(seq)] # not self
+        if (exclude_self & names(seq) %in% closest_names) {
+            warning("Excluding self")
+            closest_names <- closest_names[closest_names!=names(seq)] # not self
+        }        
         if (length(closest_names) > 1) {
             warning(paste0("More than one closest reference found for ", 
                         names(seq),": ", paste(closest_names, collapse=",")))
@@ -308,19 +311,19 @@ itigger <- function(db, germline,
             SEQUENCES <- sum(V_CALL_GENOTYPED==polymorphism)
             dfr[["SEQUENCES"]][i] <- SEQUENCES
             closest_ref_input <- findClosestReference(novel_imgt,
-                                                names(germline))
+                                                names(germline), exclude_self=F)
             closest_ref <- findClosestReference(novel_imgt,
-                                                names(all_germ))
+                                                names(all_germ), exclude_self=F)
             
             if (getGene(closest_ref_input) != getGene(closest_ref)) {
                 warning("closest reference gene difference")
             }
             
-            if (getAllele(closest_ref) != getAllele(polymorphism)) {
+            if (closest_ref != polymorphism) {
                 warning(paste0("closest reference allele (",
-                               getAllele(closest_ref)
+                               closest_ref
                                ,") different from POLYMORPHISM_CALL allele (",
-                               getAllele(polymorphism),")"))
+                               polymorphism,")"))
             }
             
             ## TODO: this still not clear.
@@ -328,12 +331,15 @@ itigger <- function(db, germline,
             dfr[["CLOSEST_REFERENCE"]][i] <- closest_ref_input
             
             nt_diff <- unlist(getMutatedPositions(novel_imgt, all_germ[[closest_ref_input]]))
-            nt_diff_string <- paste(paste(
-                nt_diff, 
-                strsplit(all_germ[[closest_ref_input]],"")[[1]][nt_diff], 
-                ">",
-                strsplit(all_germ[[polymorphism]],"")[[1]][nt_diff],
-                sep=""), collapse=",")
+            nt_diff_string <- ""
+            if (length(nt_diff) > 0 ) {
+                nt_diff_string <- paste(paste(
+                    nt_diff, 
+                    strsplit(all_germ[[closest_ref_input]],"")[[1]][nt_diff], 
+                    ">",
+                    strsplit(all_germ[[polymorphism]],"")[[1]][nt_diff],
+                    sep=""), collapse=",")    
+            } 
                 
             dfr[["NT_DIFF"]][i] <- length(nt_diff)
             dfr[["NT_SUBSTITUTIONS"]][i] <- nt_diff_string
@@ -354,12 +360,16 @@ itigger <- function(db, germline,
                     dplyr::select(position) %>%
                     c()   
                 dfr[["AA_DIFF"]][i] <- length(pos_R$position)
-                dfr[["AA_SUBSTITUTIONS"]][i] <- paste(paste(
-                    pos_R$position/3, 
-                    germ_aa[pos_R$position/3], 
-                    ">",
-                    poly_aa[pos_R$position/3],
-                    sep=""), collapse=",")
+                if (dfr[["AA_DIFF"]][i] > 0) {
+                    dfr[["AA_SUBSTITUTIONS"]][i] <- paste(paste(
+                        pos_R$position/3, 
+                        germ_aa[pos_R$position/3], 
+                        ">",
+                        poly_aa[pos_R$position/3],
+                        sep=""), collapse=",")   
+                } else {
+                    dfr[["AA_SUBSTITUTIONS"]][i] <- "" 
+                }
             } else {
                 dfr[["AA_DIFF"]][i] <- 0
                 dfr[["AA_SUBSTITUTIONS"]][i] <- 0
