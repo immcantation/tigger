@@ -353,7 +353,8 @@ itigger <- function(db, germline,
             
             poly_aa <- strsplit(translateDNA(all_germ[[polymorphism]]),"")[[1]]
             germ_aa <- strsplit(translateDNA(all_germ[[closest_ref_input]]),"")[[1]]
-            
+            diff_aa <- which(poly_aa != germ_aa)
+            # TODO: this needs refactor
             if (is.data.frame(aa_substitutions$pos)) {
                 pos_R <- aa_substitutions$pos %>%
                     dplyr::filter(R > 0) %>%
@@ -361,14 +362,11 @@ itigger <- function(db, germline,
                     c()   
                 dfr[["AA_DIFF"]][i] <- length(pos_R$position)
                 if (dfr[["AA_DIFF"]][i] > 0) {
-                    dfr[["AA_SUBSTITUTIONS"]][i] <- paste(paste(
-                        pos_R$position/3, 
-                        germ_aa[pos_R$position/3], 
-                        ">",
-                        poly_aa[pos_R$position/3],
-                        sep=""), collapse=",")   
+                    dfr[["AA_SUBSTITUTIONS"]][i] <- paste(
+                        paste(poly_aa[diff_aa], diff_aa, germ_aa[diff_aa], sep=""),
+                        collapse="_")
                 } else {
-                    dfr[["AA_SUBSTITUTIONS"]][i] <- "" 
+                    dfr[["AA_SUBSTITUTIONS"]][i] <- 0
                 }
             } else {
                 dfr[["AA_DIFF"]][i] <- 0
