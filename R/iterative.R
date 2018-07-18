@@ -50,11 +50,11 @@
 #'                                database (\code{germline}).
 #'       \item \code{NT_DIFF} Number of nucleotides that differ between the new allele and
 #'                      the closest reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
-#'       \item \code{NT_SUBSTITUTIONS} A \code{character} with specific nucleotide differences (e.g. G112A),
+#'       \item \code{NT_SUBSTITUTIONS} A \code{character} with specific nucleotide differences (e.g. 112G>A),
 #'                               comma separated.
 #'       \item \code{AA_DIFF} Number of aminoacids that differ between the new allele and the closest 
 #'                      reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
-#'       \item \code{AA_SUBSTITUTIONS} A \code{character} with specific aminoacid differences (e.g. A96N),
+#'       \item \code{AA_SUBSTITUTIONS} A \code{character} with specific aminoacid differences (e.g. 96A>N),
 #'                               comma separated.
 #'       \item \code{SEQUENCES} Number of sequences unambiguosly assigned to this allele.
 #'       \item \code{UNMUTATED_SEQUENCES} Number of records with the unmutated new allele sequence.
@@ -348,33 +348,18 @@ itigger <- function(db, germline,
             dfr[["NT_DIFF"]][i] <- length(nt_diff)
             dfr[["NT_SUBSTITUTIONS"]][i] <- nt_diff_string
             
-            aa_substitutions <- calcObservedMutations(
-                                        all_germ[[polymorphism]], 
-                                        all_germ[[closest_ref_input]],
-                                        regionDefinition = NULL,
-                                        mutationDefinition = NULL,
-                                        returnRaw = T)
-            
             poly_aa <- strsplit(translateDNA(all_germ[[polymorphism]]),"")[[1]]
             germ_aa <- strsplit(translateDNA(all_germ[[closest_ref_input]]),"")[[1]]
             diff_aa <- which(poly_aa != germ_aa)
-            # TODO: this needs refactor
-            if (is.data.frame(aa_substitutions$pos)) {
-                pos_R <- aa_substitutions$pos %>%
-                    dplyr::filter(R > 0) %>%
-                    dplyr::select(position) %>%
-                    c()   
-                dfr[["AA_DIFF"]][i] <- length(pos_R$position)
-                if (dfr[["AA_DIFF"]][i] > 0) {
-                    dfr[["AA_SUBSTITUTIONS"]][i] <- paste(
-                        paste(poly_aa[diff_aa], diff_aa, germ_aa[diff_aa], sep=""),
-                        collapse="_")
-                } else {
-                    dfr[["AA_SUBSTITUTIONS"]][i] <- 0
-                }
+            
+            if (length(diff_aa)>0) {
+                dfr[["AA_DIFF"]][i] <- length(diff_aa)
+                dfr[["AA_SUBSTITUTIONS"]][i] <- paste(
+                    paste(diff_aa,germ_aa[diff_aa],">",poly_aa[diff_aa], sep=""),
+                    collapse=",")
             } else {
                 dfr[["AA_DIFF"]][i] <- 0
-                dfr[["AA_SUBSTITUTIONS"]][i] <- 0
+                dfr[["AA_SUBSTITUTIONS"]][i] <- ""
             }
             
 
