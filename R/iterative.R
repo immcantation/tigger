@@ -284,11 +284,15 @@ itigger <- function(db, germline,
             # Keep the one with less mutated positions
             mut_pos_count <- sapply(gsub("[^_]","",closest_names), nchar)
             closest_names <- closest_names[mut_pos_count==min(mut_pos_count)]
+            # Pick not duplicated
+            if (length(closest_names) > 1 ) {
+                closest_names <- closest_names[!grepl("D\\*", closest_names)]
+            }
             # If still more than one, err and TODO
             if (length(closest_names) > 1 ) {
-                stop("Multiple closest reference")
+                stop(paste0("Multiple closest reference found for ", names(seq)))
             } else {
-                warning(paste0("Use: ", closest_names, " (less mutated positions)"))
+                warning(paste0("Use: ", closest_names, " (not D, less mutated positions)"))
             }
         }
         paste(closest_names, collapse=",")        
