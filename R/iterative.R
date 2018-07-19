@@ -348,15 +348,11 @@ itigger <- function(db, germline,
             dfr[["NT_DIFF"]][i] <- length(nt_diff)
             dfr[["NT_SUBSTITUTIONS"]][i] <- nt_diff_string
             
-            poly_aa <- strsplit(translateDNA(all_germ[[polymorphism]]),"")[[1]]
-            germ_aa <- strsplit(translateDNA(all_germ[[closest_ref_input]]),"")[[1]]
-            diff_aa <- which(poly_aa != germ_aa)
+            diff_aa <- getMutatedAA(all_germ[[closest_ref_input]], all_germ[[polymorphism]])
             
             if (length(diff_aa)>0) {
                 dfr[["AA_DIFF"]][i] <- length(diff_aa)
-                dfr[["AA_SUBSTITUTIONS"]][i] <- paste(
-                    paste(diff_aa,germ_aa[diff_aa],">",poly_aa[diff_aa], sep=""),
-                    collapse=",")
+                dfr[["AA_SUBSTITUTIONS"]][i] <- paste(diff_aa,collapse=",")
             } else {
                 dfr[["AA_DIFF"]][i] <- 0
                 dfr[["AA_SUBSTITUTIONS"]][i] <- ""
@@ -487,4 +483,43 @@ plotTigger <- function(tigger_list) {
     }
     
     plot_list
+}
+
+# Find non triplet gaps in a nucleotide sequence
+hasNonImgtGaps <- function (seq) {
+    len <- ceiling(nchar(seq)/3)*3
+    codons <- substring(seq, seq(1, len-2, 3), seq(3, len, 3))
+    gaps_lengths <- nchar(gsub("[^\\.\\-]", "", codons))
+    if (any(gaps_lengths %% 3 != 0)) {
+        TRUE
+    } else {
+        FALSE
+    }
+}
+
+# Compare two IMGT gapped sequences and find AA mutations
+getMutatedAA <- function(ref_imgt, novel_imgt) {
+    if (grepl("N", ref_imgt)) {
+        stop("Unexpected N in ref_imgt")
+    }     
+    if (grepl("N", novel_imgt)) {
+        stop("Unexpected N in novel_imgt")
+    }          
+    
+    if (hasNonImgtGaps(ref_imgt)) {
+        warning("Non IMGT gaps found in ref_imgt")
+    }
+    
+    if (hasNonImgtGaps(novel_imgt)) {
+        warning("Non IMGT gaps found in novel_imgt")
+    }
+    
+    ref_imgt <- strsplit(alakazam::translateDNA(ref_imgt),"")[[1]]
+    novel_imgt <- strsplit(alakazam::translateDNA(novel_imgt),"")[[1]]
+    mutations <- c()
+    diff_idx <- which(ref_imgt != novel_imgt)
+    if (length(diff_idx)>0) {
+        mutations <- paste0(diff_idx, ref_imgt[diff_idx],">",novel_imgt[diff_idx])
+    }
+    mutations
 }
