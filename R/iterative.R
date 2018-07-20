@@ -288,11 +288,16 @@ itigger <- function(db, germline,
             if (length(closest_names) > 1 ) {
                 closest_names <- closest_names[!grepl("D\\*", closest_names)]
             }
+            # Pick same length
+            if (length(closest_names) > 1 ) {
+                idx <- which(sapply(all_germ[closest_names],nchar) == nchar(all_germ[names(seq)]))
+                closest_names <- closest_names[idx]
+            }            
             # If still more than one, err and TODO
             if (length(closest_names) > 1 ) {
                 stop(paste0("Multiple closest reference found for ", names(seq)))
             } else {
-                warning(paste0("Use: ", closest_names, " (not D, less mutated positions)"))
+                warning(paste0("Use: ", closest_names, " (less mutated positions, not D, same length)"))
             }
         }
         paste(closest_names, collapse=",")        
