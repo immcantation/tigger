@@ -292,12 +292,18 @@ itigger <- function(db, germline,
             if (length(closest_names) > 1 ) {
                 idx <- which(sapply(all_germ[closest_names],nchar) == nchar(all_germ[names(seq)]))
                 closest_names <- closest_names[idx]
-            }            
+            }         
+            # Pick same allele
+            if (length(closest_names) > 1 ) {
+                idx <- which(getAllele(closest_names) == getAllele(names(seq)))
+                closest_names <- closest_names[idx]
+            } 
+            
             # If still more than one, err and TODO
             if (length(closest_names) > 1 ) {
-                stop(paste0("Multiple closest reference found for ", names(seq)))
+                stop(paste0("Multiple closest reference found for ", names(seq),":\n", paste(closest_names, collapse=",")))
             } else {
-                warning(paste0("Use: ", closest_names, " (less mutated positions, not D, same length)"))
+                warning(paste0("Use: ", closest_names, " (less mutated positions, not D, same length, same allele)"))
             }
         }
         paste(closest_names, collapse=",")        
