@@ -295,7 +295,7 @@ itigger <- function(db, germline,
             }         
             # Pick same allele
             if (length(closest_names) > 1 ) {
-                idx <- which(getAllele(closest_names) == getAllele(names(seq)))
+                idx <- which(getAllele(closest_names) == gsub("_.+", "", getAllele(names(seq))))
                 closest_names <- closest_names[idx]
             } 
             
