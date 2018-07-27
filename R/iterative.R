@@ -151,7 +151,7 @@ itigger <- function(db, germline,
                                 m <- gsub("\\\n","", geterrmessage())
                                 message(e)
                                 message("")
-                                return(data.frame( NOTE=m,stringsAsFactors = FALSE))
+                                return(data.frame(NOVEL_IMGT="",NOTE=m,stringsAsFactors = FALSE))
                             })
             
             # save nv and gt even if no new alleles
@@ -161,9 +161,13 @@ itigger <- function(db, germline,
                 all_nv[["1"]] <- nv
             }
             
-            message("     ... infer genotype")
-            gt <- inferGenotype(db_idx, germline_db=germline_idx, 
-                                novel_df=nv, v_call=v_call_idx)
+            if (ncol(nv)>2) {
+                message("     ... infer genotype")
+                gt <- inferGenotype(db_idx, germline_db=germline_idx, 
+                                    novel_df=nv, v_call=v_call_idx)
+            } else {
+                gt <- data.frame(stringsAsFactors = F)
+            }
             if (verbose) {
                 all_gt[[i_char]] <- gt
             } else {
