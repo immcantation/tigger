@@ -151,7 +151,7 @@ itigger <- function(db, germline,
                                 m <- gsub("\\\n","", geterrmessage())
                                 message(e)
                                 message("")
-                                return(data.frame(NOVEL_IMGT="",NOTE=m,stringsAsFactors = FALSE))
+                                return(data.frame(NOVEL_IMGT=NA,NOTE=m,stringsAsFactors = FALSE))
                             })
             
             # save nv and gt even if no new alleles
