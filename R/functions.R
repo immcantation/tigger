@@ -501,21 +501,15 @@ findNovelAlleles <- function(clip_db, germline_db,
                                  snp_nts[remain_mut], sep="") %>%
                 paste(collapse="_") %>%
                 paste(names(germline), ., sep="_")
-            # Save the new germline to our data frame               
-            df_run$POLYMORPHISM_CALL[1] = names(germ)
-            df_run$NOVEL_IMGT[1] =  as.character(germ)
-            df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
-            df_run$PERFECT_MATCH_FREQ[1] <- df_run$PERFECT_MATCH_COUNT[1]/df_run$GERMLINE_CALL_COUNT[1]
-            df_run$NOTE[1] = "Novel allele found!"
         } else {
             names(germ) = names(germlines)[is_known_allele]
-            # Save the new germline to our data frame               
-            df_run$POLYMORPHISM_CALL[1] = names(germ)
-            df_run$NOVEL_IMGT[1] =  as.character(germ)
-            df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
-            df_run$PERFECT_MATCH_FREQ[1] <- df_run$PERFECT_MATCH_COUNT[1]/df_run$GERMLINE_CALL_COUNT[1]
-            df_run$NOTE[1] = "Novel allele found!"
         }
+        # Save the new germline to our data frame               
+        df_run$POLYMORPHISM_CALL[1] = names(germ)
+        df_run$NOVEL_IMGT[1] =  as.character(germ)
+        df_run$PERFECT_MATCH_COUNT[1] = db_y_summary$TOTAL_COUNT[r]
+        df_run$PERFECT_MATCH_FREQ[1] <- df_run$PERFECT_MATCH_COUNT[1]/df_run$GERMLINE_CALL_COUNT[1]
+        df_run$NOTE[1] = "Novel allele found!"
       }
       
     } # end for each starting mutation counts
