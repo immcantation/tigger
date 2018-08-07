@@ -23,6 +23,7 @@ BugReports: https://bitbucket.org/kleinstein/tigger/issues
 LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr
+Encoding: UTF-8
 Depends:
     R (>= 3.2.5),
     ggplot2 (>= 2.0.0)
