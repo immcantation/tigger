@@ -824,13 +824,14 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
   multiplot(p1, p2, p3, cols = ncol, heights=heights)      
 }
 
-#' Infer a subject-specific genotype
+#' Infer a subject-specific genotype using a frequency method
 #'
-#' \code{inferGenotype} infers an subject's genotype by finding the minimum
-#' number set of alleles that can explain the majority of each gene's calls. The
-#' most common allele of each gene is included in the genotype first, and the
-#' next most common allele is added until the desired fraction of alleles can be
-#' explained. In this way, mistaken allele calls (resulting from sequences which
+#' \code{inferGenotype} infers an subject's genotype using a frequency method.
+#' The genotype is inferred by finding the minimum number set of alleles that 
+#' can explain the majority of each gene's calls. The most common allele of 
+#' each gene is included in the genotype first, and the next most common allele 
+#' is added until the desired fraction of alleles can be explained. In this 
+#' way, mistaken allele calls (resulting from sequences which
 #' by chance have been mutated to look like another allele) can be removed.
 #' 
 #' @param    clip_db              a \code{data.frame} containing V allele
