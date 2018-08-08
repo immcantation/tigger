@@ -73,6 +73,7 @@
 #' @importFrom  foreach     foreach %dopar% registerDoSEQ
 #' @importFrom  graphics    plot
 #' @importFrom  gridExtra   arrangeGrob
+#' @importFrom  gtools      ddirichlet
 #' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
 #' @importFrom  parallel    clusterEvalQ clusterExport makeCluster stopCluster
