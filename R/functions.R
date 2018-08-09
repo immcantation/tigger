@@ -889,6 +889,8 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
 #' 
 #' @seealso \link{plotGenotype} for a colorful visualization and
 #'          \link{genotypeFasta} to convert the genotype to nucleotide sequences.
+#'          See \link{inferGenotypeBayesian} to infer a subject-specific genotype 
+#'          using a Bayesian approach.
 #' 
 #' @export
 inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,

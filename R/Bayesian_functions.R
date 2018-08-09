@@ -63,7 +63,8 @@
 #' 
 #' @seealso \link{plotGenotype} for a colorful visualization and
 #'          \link{genotypeFasta} to convert the genotype to nucleotide sequences.
-#' 
+#'          See \link{inferGenotype} to infer a subject-specific genotype using 
+#'          a frequency method
 #' @export
 inferGenotypeBayesian <- function(clip_db, v_call = 'V_CALL', find_unmutated = TRUE,
                                   germline_db = NA, novel_df = NA,
