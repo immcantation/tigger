@@ -152,19 +152,28 @@ plotNovel(sample_db, novel[1, ])
 ```
 
 ### Genotype
-An individual's genotype can be inferred using the function `inferGenotype`.
-This function will remove from the genotype rare/erroneous allele calls which
-may result from mutations in allele-differentiating regions. This is done by
-determining the fewest alleles that account for nearly all (default is 7/8) of 
-the allele calls made. The user may opt to only use sequences which perfectly
-match germline alleles, and may opt to include potential novel alleles.
-(The genotype output is designed to be human readable, though `plotGenotype`
-can be used to make a colorful visualization.) For each allele, the
-number of sequences which  match the germline are listed in the same order as
-the alleles are listed. The total number of sequences that match any allele of
-that gene is also given. To output these alleles as a names vector of nucleotide
-sequences, the user may use the function `genotypeFasta`. To save this vector to
-a fasta file, `writeFasta` may be used.
+
+An individual's genotype can be inferred using the functions `inferGenotype` or 
+`inferGenotypeBayesian`. Using one of this functions allows to remove from the
+genotype rare/erroneous allele calls which may result from mutations in 
+allele-differentiating regions. `inferGenotype` uses a frequency method to 
+decide which alleles belong to the subjects genotype whereas 
+`inferGenotypeBayesian` infers an subject's genotype applying a Bayesian 
+framework and provides a confidence estimate associated with 
+the genotype calls.
+
+
+`inferGenotype` identifies the fewest alleles that account for 
+nearly all (default is 7/8) of the allele calls made. The user may opt to only
+use sequences which perfectly match germline alleles, and may opt to include 
+potential novel alleles. (The genotype output is designed to be human readable, 
+though `plotGenotype` can be used to make a colorful visualization.) For each 
+allele, the number of sequences which  match the germline are listed in the same
+order as the alleles are listed. The total number of sequences that match any 
+allele of that gene is also given. To output these alleles as a names vector of 
+nucleotide sequences, the user may use the function `genotypeFasta`. To save 
+this vector to a fasta file, `writeFasta` may be used.
+
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
 # Infer the individual's genotype, using only unmutated sequences and checking
@@ -177,7 +186,28 @@ genotype_seqs <- genotypeFasta(geno, germline_ighv, novel_df)
 print(geno)
 # Make a colorful visualization. Bars indicate presence, not proportion.
 plotGenotype(geno, text_size = 10)
+```
 
+The method `inferGenotypeBayesian` analyzes the posterior probabilities of 
+possible allele distributions, considering up to four distinct alleles per 
+V gene, corresponding to a gene duplication with both loci being heterozygous 
+(i.e., homozygous, heterozygous with one copy of each allele, etc.). The 
+posterior probabilities for these four possible models are compared and a Bayes
+factor is calculated for the two most probable models. This Bayes factor 
+reflects the confidence in the genotyping call of the method. The bayesian 
+method doesn't use the strict cutoff criterion `fraction_to_explain` that 
+`inferGenotype` uses wherein only the minimum set of alleles explaining 
+88% (7/8) of apparently-unmutated sequences are included in the genotype.
+
+
+```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
+# Infer the individual's genotype, using the bayesian method
+geno_bayesian <- inferGenotypeBayesian(sample_db, find_unmutated = TRUE,
+                      germline_db = germline_ighv, novel_df = novel_df)
+# Visualize the genotype and sequence counts
+print(geno_bayesian)
+# Make a colorful visualization. Bars indicate presence, not proportion.
+plotGenotype(geno_bayesian, text_size = 10)
 ```
 
 ### Corrected Allele Calls
