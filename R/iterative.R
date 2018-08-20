@@ -253,9 +253,8 @@ itigger <- function(db, germline,
     # TODO: check this when 0 novel alleles found
     # Subset to last iteration with novel alleles
     final_gt <- all_gt %>%
-        dplyr::group_by_(.dots=c("FIELD_ID")) %>%
+        dplyr::group_by_(.dots=c("FIELD_ID", "GENE")) %>%
         dplyr::filter(duplicated(ALLELES) == FALSE) %>%
-        dplyr::filter(ITERATION==max(ITERATION)) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(
             ALLELES=strsplit(as.character(ALLELES),","),
@@ -269,6 +268,19 @@ itigger <- function(db, germline,
                           dplyr::rename(NOTE_GT=NOTE), 
                       all_nv, 
                       by=c("FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL")) 
+    
+    # Add message if the same novel img sequence found from
+    # different starting alleles, these will be novel imgt sequences
+    # with more than one polymorphism call
+    final_gt <- final_gt %>%
+        dplyr::group_by(NOVEL_IMGT) %>%
+        dplyr::mutate(NUM_CALLS=length(unique(POLYMORPHISM_CALL))) %>%
+        dplyr::ungroup()
+    idx_mult <- which(final_gt$NUM_CALLS > 1)
+    if (length(idx_mult)>0) {
+        final_gt$NOTE_GT[idx_mult] <- paste(final_gt$NOTE_GT[idx_mult],
+                                            " Multiple polymorphism calls.", sep="")
+    }
     
     # Find closest reference
     findClosestReference <- function(seq, allele_calls, exclude_self=F) {
@@ -288,10 +300,6 @@ itigger <- function(db, germline,
             # Keep the one with less mutated positions
             mut_pos_count <- sapply(gsub("[^_]","",closest_names), nchar)
             closest_names <- closest_names[mut_pos_count==min(mut_pos_count)]
-            # Pick not duplicated
-            if (length(closest_names) > 1 ) {
-                closest_names <- closest_names[!grepl("D\\*", closest_names)]
-            }
             # Pick same length
             if (length(closest_names) > 1 ) {
                 idx <- which(sapply(all_germ[closest_names],nchar) == nchar(all_germ[names(seq)]))
@@ -302,7 +310,10 @@ itigger <- function(db, germline,
                 idx <- which(getAllele(closest_names) == gsub("_.+", "", getAllele(names(seq))))
                 closest_names <- closest_names[idx]
             } 
-            
+            # Pick not duplicated
+            if (length(closest_names) > 1 ) {
+                closest_names <- closest_names[!grepl("D\\*", closest_names)]
+            }            
             # If still more than one, err and TODO
             if (length(closest_names) > 1 ) {
                 stop(paste0("Multiple closest reference found for ", names(seq),":\n", paste(closest_names, collapse=",")))
