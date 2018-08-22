@@ -297,16 +297,16 @@ itigger <- function(db, germline,
 #' }
 #' @export
 plotTigger <- function(tigger_list) {
-    # For each field
-    # subset to last iteration 
+    # For each field and allele
+    # subset to first iteration 
     # then visualize evidence
     plot_list <- list(polymorphisms=list(), 
                       genotypes=list(),
                       all_genotypes=NA)
 
     gt <- tigger_list$gt %>%
-        dplyr::group_by_(.dots=c("FIELD_ID")) %>%
-        dplyr::filter(ITERATION==max(ITERATION)) %>%
+        dplyr::group_by_(.dots=c("FIELD_ID", "GENE", "ALLELES")) %>%
+        dplyr::filter(ITERATION==min(ITERATION)) %>%
         dplyr::ungroup()
     
     if (nrow(gt) > 0 ){
