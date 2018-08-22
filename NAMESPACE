@@ -3,6 +3,7 @@
 export(cleanSeqs)
 export(findNovelAlleles)
 export(findUnmutatedCalls)
+export(generateEvidence)
 export(genotypeFasta)
 export(getMutCount)
 export(getMutatedPositions)

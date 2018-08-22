@@ -39,51 +39,12 @@
 #'                    after all iterations.
 #'    \item \code{new_germlines} A \code{character} vector with the new germlines.
 #'    \item \code{germline} A \code{character} with all germlines, old (input) and new.
-#'    \item \code{summary} A \code{data.frame} with information on each inferred allele in 
-#'                         the last iteration.
-#'    \itemize{
-#'       \item \code{FIELD_ID} Data subset identifier, defined with the input paramter \code{fields}.
-#'       \item A variable number of columns, specified with the input parameter \code{fields}.
-#'       \item \code{ITERATION} The iteration number.
-#'       \item \code{POLYMORPHISM_CALL} The new allele call.
-#'       \item \code{CLOSEST_REFERENCE} The closest reference gene and allele in the input germline 
-#'                                database (\code{germline}).
-#'       \item \code{NT_DIFF} Number of nucleotides that differ between the new allele and
-#'                      the closest reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
-#'       \item \code{NT_SUBSTITUTIONS} A \code{character} with specific nucleotide differences (e.g. 112G>A),
-#'                               comma separated.
-#'       \item \code{AA_DIFF} Number of aminoacids that differ between the new allele and the closest 
-#'                      reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
-#'       \item \code{AA_SUBSTITUTIONS} A \code{character} with specific aminoacid differences (e.g. 96A>N),
-#'                               comma separated.
-#'       \item \code{SEQUENCES} Number of sequences unambiguosly assigned to this allele.
-#'       \item \code{UNMUTATED_SEQUENCES} Number of records with the unmutated new allele sequence.
-#'       \item \code{UNMUTATED_FREQUENCY} Proportion of records with the unmutated new allele 
-#'                                  sequence. \code{UNMUTATED_SEQUENCES}/\code{SEQUENCE}
-#'       \item \code{ALLELIC_PERCENTAGE} Percentage at which this (unmutated) allele is observed in the 
-#'                                 sequence dataset, compared  to other (unmutated) alleles.
-#'       \item \code{UNIQUE_JS} Number of unique J sequences found associated with the new allele. The sequences
-#'                        are those who have been unambiguously assigned the new alelle (\code{POLYMORPHISM_CALL})
-#'       \item \code{UNIQUE_CDR3S} Number of unique CDR3s associated with the inferred allele
-#'       \item \code{GERMLINE_CALL} See \link{findNovelAlleles}
-#'       \item \code{MUT_MIN} See \link{findNovelAlleles}
-#'       \item \code{MUT_MAX} See \link{findNovelAlleles}
-#'       \item \code{POS_MIN} See \link{findNovelAlleles}
-#'       \item \code{POS_MAX} See \link{findNovelAlleles}
-#'       \item \code{Y_INTERCEPT} See \link{findNovelAlleles}
-#'       \item \code{ALPHA} See \link{findNovelAlleles}
-#'       \item \code{MIN_SEQS} See \link{findNovelAlleles}
-#'       \item \code{J_MAX} See \link{findNovelAlleles}
-#'       \item \code{MIN_FRAC} See \link{findNovelAlleles} 
-#'       \item \code{NOVEL_IMGT} See \link{findNovelAlleles} 
-#'       \item \code{CLOSEST_REFERENCE_IMGT} Sequence of the closest reference gene and 
-#'                          allele in the input germline database (\code{germline}).
-#'       \item \code{GERMLINE_IMGT} See \link{findNovelAlleles}
-#'       \item \code{NOTE} See \link{findNovelAlleles}
-#'    }
+#'    \item \code{summary} A \code{data.frame} generated with \code{generateEvidence} 
+#'                    providing supporting evidence on each inferred allele.
 #' }
 #'         
-#' @seealso \link{findNovelAlleles},  \link{inferGenotype}, \link{reassignAlleles}, and \link{plotTigger}.
+#' @seealso \link{findNovelAlleles},  \link{inferGenotype}, \link{reassignAlleles}, 
+#'          \link{generateEvidence} and \link{plotTigger}.
 #' @examples
 #' \dontrun{
 #' data(sample_db)
@@ -100,9 +61,14 @@ itigger <- function(db, germline,
                    max.iter=1, 
                    verbose=TRUE,
                    ...) {
+    
+    warning("\n\nThis function is under active development and not fully tested.\n\n", 
+            immediate.=TRUE)
+    
     gt_cols <- grepl("V_CALL_GENOTYPED(_*)", colnames(db))
     if ( any(gt_cols) ) {
-        warning(paste0("Column ", paste(colnames(db)[gt_cols], sep=", "), " removed\n"))
+        warning(paste0("Column ", paste(colnames(db)[gt_cols], sep=", "), " removed\n"),
+                immediate.=TRUE)
         db[,gt_cols] <- NULL
     }
     
@@ -136,7 +102,7 @@ itigger <- function(db, germline,
             dplyr::filter(FIELD_ID==idx) %>%
             data.frame()
         
-        all_nv <- all_gt <- list()
+        all_nv <- all_gt <- all_germline_input <- list()
         
         i <- 0
         while (i < max.iter) {
@@ -160,6 +126,9 @@ itigger <- function(db, germline,
             } else {
                 all_nv[["1"]] <- nv
             }
+            
+            # save input germlines, used by generateEvidence
+            all_germline_input[[i_char]] <- germline_idx
             
             if (ncol(nv)>2) {
                 message("     ... infer genotype")
@@ -233,7 +202,8 @@ itigger <- function(db, germline,
             nv=all_nv,
             gt=all_gt,
             germline=germline_idx,
-            new_germlines=new_germlines 
+            new_germlines=new_germlines,
+            germline_input=all_germline_input
         )
         
     } # end fields loop
@@ -249,11 +219,12 @@ itigger <- function(db, germline,
     
     all_nv <- bind_rows(lapply(foundAlleles, '[[', "nv"))
     all_gt <- bind_rows(lapply(foundAlleles, '[[', "gt"))
-    
-    # TODO: check this when 0 novel alleles found
-    # Subset to last iteration with novel alleles
+
+    # Arrange by ITERATION for generateEvidence to keep the first time
+    # the novel allele was found
     final_gt <- all_gt %>%
-        dplyr::group_by_(.dots=c("FIELD_ID", "GENE")) %>%
+        dplyr::arrange(as.numeric(ITERATION)) %>%
+        dplyr::group_by_(.dots=c("FIELD_ID",fields, "GENE")) %>%
         dplyr::filter(duplicated(ALLELES) == FALSE) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(
@@ -263,168 +234,25 @@ itigger <- function(db, germline,
         dplyr::filter(grepl("_",ALLELES)) %>%
         dplyr::rename(ALLELE=ALLELES) %>%
         dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELE))
+    genotyped_db <- bind_rows(lapply(foundAlleles, '[[', "db"))
     
-    final_gt <- merge(final_gt %>% 
-                          dplyr::rename(NOTE_GT=NOTE), 
-                      all_nv, 
-                      by=c("FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL")) 
+    final_gt <- bind_rows(lapply(1:nrow(final_gt), function(i) {
+        this_field <- final_gt[['FIELD_ID']][i]
+        this_iteration <- final_gt[['ITERATION']][i]
+        this_germline <- foundAlleles[[this_field]][['germline_input']][[this_iteration]]
+        generateEvidence(all_gt %>% 
+                             dplyr::filter(FIELD_ID==this_field & ITERATION==this_iteration), 
+                         all_nv %>%
+                             dplyr::filter(FIELD_ID==this_field & ITERATION==this_iteration),
+                         germline_nv=all_germ,
+                         germline_input = this_germline,
+                         db = genotyped_db %>%
+                             dplyr::filter(FIELD_ID==this_field),
+                         iteration_id = "ITERATION")
+    }), .id="FIELD_ID")
     
-    # Add message if the same novel img sequence found from
-    # different starting alleles, these will be novel imgt sequences
-    # with more than one polymorphism call
-    final_gt <- final_gt %>%
-        dplyr::group_by(NOVEL_IMGT) %>%
-        dplyr::mutate(NUM_CALLS=length(unique(POLYMORPHISM_CALL))) %>%
-        dplyr::ungroup()
-    idx_mult <- which(final_gt$NUM_CALLS > 1)
-    if (length(idx_mult)>0) {
-        final_gt$NOTE_GT[idx_mult] <- paste(final_gt$NOTE_GT[idx_mult],
-                                            " Multiple polymorphism calls.", sep="")
-    }
-    
-    # Find closest reference
-    findClosestReference <- function(seq, allele_calls, exclude_self=F) {
-        closest <- getMutCount(seq,
-                               paste(allele_calls, collapse=","),
-                               all_germ)
-        min_dist <- min(unlist(closest))
-        closest_idx <- which(unlist(closest) == min_dist)
-        closest_names <- unique(allele_calls[closest_idx])
-        if (exclude_self & names(seq) %in% closest_names) {
-            warning("Excluding self")
-            closest_names <- closest_names[closest_names!=names(seq)] # not self
-        }        
-        if (length(closest_names) > 1) {
-            warning(paste0("More than one closest reference found for ", 
-                        names(seq),": ", paste(closest_names, collapse=",")))
-            # Keep the one with less mutated positions
-            mut_pos_count <- sapply(gsub("[^_]","",closest_names), nchar)
-            closest_names <- closest_names[mut_pos_count==min(mut_pos_count)]
-            # Pick same length
-            if (length(closest_names) > 1 ) {
-                idx <- which(sapply(all_germ[closest_names],nchar) == nchar(all_germ[names(seq)]))
-                closest_names <- closest_names[idx]
-            }         
-            # Pick same allele
-            if (length(closest_names) > 1 ) {
-                idx <- which(getAllele(closest_names) == gsub("_.+", "", getAllele(names(seq))))
-                closest_names <- closest_names[idx]
-            } 
-            # Pick not duplicated
-            if (length(closest_names) > 1 ) {
-                closest_names <- closest_names[!grepl("D\\*", closest_names)]
-            }            
-            # If still more than one, err and TODO
-            if (length(closest_names) > 1 ) {
-                stop(paste0("Multiple closest reference found for ", names(seq),":\n", paste(closest_names, collapse=",")))
-            } else {
-                warning(paste0("Use: ", closest_names, " (less mutated positions, not D, same length, same allele)"))
-            }
-        }
-        paste(closest_names, collapse=",")        
-    }
-    
-    
-    # Add additional evidence to final table
-    addEvidence <- function(dfr) {
-        for (i in 1:nrow(dfr)) {
-            this_field <- as.character(dfr[["FIELD_ID"]][i])
-            polymorphism <- dfr[['POLYMORPHISM_CALL']][i]
-            novel_imgt <- dfr[["NOVEL_IMGT"]][i]
-            names(novel_imgt) <- polymorphism
-            gene <- dfr[['GENE']][i]
-            allele <- dfr[['ALLELE']][i]
-            germline_call <- dfr[['GERMLINE_CALL']][i]
-            this_germline <- foundAlleles[[this_field]][['germline']]
-            V_CALL_GENOTYPED <- foundAlleles[[this_field]][['db']][["V_CALL_GENOTYPED"]]
-            
-            SEQUENCES <- sum(V_CALL_GENOTYPED==polymorphism)
-            dfr[["SEQUENCES"]][i] <- SEQUENCES
-            closest_ref_input <- findClosestReference(novel_imgt,
-                                                names(germline), exclude_self=F)
-            closest_ref <- findClosestReference(novel_imgt,
-                                                names(all_germ), exclude_self=F)
-            
-            if (getGene(closest_ref_input) != getGene(closest_ref)) {
-                warning("closest reference gene difference")
-            }
-            
-            if (closest_ref != polymorphism) {
-                warning(paste0("closest reference allele (",
-                               closest_ref
-                               ,") different from POLYMORPHISM_CALL allele (",
-                               polymorphism,")"))
-            }
-            
-            ## TODO: this still not clear.
-            ## Any diff using sequence_imgt instead of germline[[polymorphism]]?
-            dfr[["CLOSEST_REFERENCE"]][i] <- closest_ref_input
-            
-            nt_diff <- unlist(getMutatedPositions(novel_imgt, all_germ[[closest_ref_input]]))
-            nt_diff_string <- ""
-            if (length(nt_diff) > 0 ) {
-                nt_diff_string <- paste(paste(
-                    nt_diff, 
-                    strsplit(all_germ[[closest_ref_input]],"")[[1]][nt_diff], 
-                    ">",
-                    strsplit(all_germ[[polymorphism]],"")[[1]][nt_diff],
-                    sep=""), collapse=",")    
-            } 
-                
-            dfr[["NT_DIFF"]][i] <- length(nt_diff)
-            dfr[["NT_SUBSTITUTIONS"]][i] <- nt_diff_string
-            
-            diff_aa <- getMutatedAA(all_germ[[closest_ref_input]], all_germ[[polymorphism]])
-            
-            if (length(diff_aa)>0) {
-                dfr[["AA_DIFF"]][i] <- length(diff_aa)
-                dfr[["AA_SUBSTITUTIONS"]][i] <- paste(diff_aa,collapse=",")
-            } else {
-                dfr[["AA_DIFF"]][i] <- 0
-                dfr[["AA_SUBSTITUTIONS"]][i] <- ""
-            }
-            
-
-            dfr[["UNMUTATED_SEQUENCES"]][i] <- as.numeric(dfr[["COUNTS"]][i])
-            dfr[["UNMUTATED_FREQUENCY"]][i] <- as.numeric(dfr[["COUNTS"]][i])/SEQUENCES
-            
-            dfr[["ALLELIC_PERCENTAGE"]][i] <- 100*dfr[["UNMUTATED_SEQUENCES"]][i]/as.numeric(dfr[["TOTAL"]][i])
-            
-            dfr[["UNIQUE_JS"]][i] <- foundAlleles[[this_field]]$db %>%
-                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
-                dplyr::distinct(J_CALL) %>% nrow()
-            dfr[["UNIQUE_CDR3S"]][i] <- foundAlleles[[this_field]]$db %>%
-                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
-                dplyr::distinct(translateDNA(JUNCTION, trim=TRUE)) %>% 
-                nrow()
-            # Add closest germline
-            dfr[["CLOSEST_REFERENCE_IMGT"]][i] <- cleanSeqs(all_germ[[closest_ref_input]])
-        }
-        dfr
-    }
-    
-    if (nrow(final_gt)>0) {
-        final_gt <- addEvidence(final_gt)
-        
-        ## Filter, reorder,...
-        final_gt <- final_gt %>%
-            dplyr::select_(.dots=c(
-                "FIELD_ID", fields, "ITERATION", "POLYMORPHISM_CALL",
-                "CLOSEST_REFERENCE",
-                "NT_DIFF", "NT_SUBSTITUTIONS",
-                "AA_DIFF", "AA_SUBSTITUTIONS",
-                "SEQUENCES", "UNMUTATED_SEQUENCES", "UNMUTATED_FREQUENCY",
-                "ALLELIC_PERCENTAGE",
-                "UNIQUE_JS", "UNIQUE_CDR3S",
-                "GERMLINE_CALL", "MUT_MIN", "MUT_MAX", "POS_MIN", "POS_MAX",
-                "Y_INTERCEPT", "ALPHA", "MIN_SEQS", "J_MAX", "MIN_FRAC",
-                "NOVEL_IMGT", "CLOSEST_REFERENCE_IMGT", "GERMLINE_IMGT",
-                "NOTE")
-            ) 
-    }
-
     list(
-         db=bind_rows(lapply(foundAlleles, '[[', "db")),
+         db=genotyped_db,
          fields=fields,
          v_call=v_call,
          nv=all_nv,
@@ -548,4 +376,255 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
         mutations <- paste0(diff_idx, ref_imgt[diff_idx],">",novel_imgt[diff_idx])
     }
     mutations
+}
+
+
+#' Generate evidence
+#'
+#' Generate evidence of the final novel V alleles.
+#' 
+#' @return a data.frame
+#' 
+#' @param gt  A table of alleles generated with \link{inferGenotype} denoting 
+#'            the genotype of the subject.
+#' @param nv  A data.frame returned by \link{findNovelAlleles}.
+#' @param germline_nv A vector of named nucleotide germline sequences 
+#'            matching the V calls in clip_db. This is an extended version of 
+#'            \code{germline_db} in that includes the original reference datatabase
+#'            and any novel alleles identified after running 
+#'            \link{findNovelAlleles} and \link{inferGenotype}.
+#' @param germline_db The original input germline database used to by
+#'            \link{findNovelAlleles} to identify novel alleles in 
+#'            \code{db}.
+#' @param iteration_id Column name that identifies iterations from 
+#'            if \link{itigger} was used.
+#' @return   Returns \code{gt} with additional columns providing supporting evidence
+#'           for each inferred allele.
+#'    \itemize{
+#'       \item \code{FIELD_ID} Data subset identifier, defined with the input paramter \code{fields}.
+#'       \item A variable number of columns, specified with the input parameter \code{fields}.
+#'       \item \code{ITERATION} The iteration number.
+#'       \item \code{POLYMORPHISM_CALL} The new allele call.
+#'       \item \code{CLOSEST_REFERENCE} The closest reference gene and allele in the input germline 
+#'                                database (\code{germline}).
+#'       \item \code{NT_DIFF} Number of nucleotides that differ between the new allele and
+#'                      the closest reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
+#'       \item \code{NT_SUBSTITUTIONS} A \code{character} with specific nucleotide differences (e.g. 112G>A),
+#'                               comma separated.
+#'       \item \code{AA_DIFF} Number of aminoacids that differ between the new allele and the closest 
+#'                      reference (\code{CLOSEST_REFERENCE}) in the input (\code{germline}).
+#'       \item \code{AA_SUBSTITUTIONS} A \code{character} with specific aminoacid differences (e.g. 96A>N),
+#'                               comma separated.
+#'       \item \code{SEQUENCES} Number of sequences unambiguosly assigned to this allele.
+#'       \item \code{UNMUTATED_SEQUENCES} Number of records with the unmutated new allele sequence.
+#'       \item \code{UNMUTATED_FREQUENCY} Proportion of records with the unmutated new allele 
+#'                                  sequence. \code{UNMUTATED_SEQUENCES}/\code{SEQUENCE}
+#'       \item \code{ALLELIC_PERCENTAGE} Percentage at which this (unmutated) allele is observed in the 
+#'                                 sequence dataset, compared  to other (unmutated) alleles.
+#'       \item \code{UNIQUE_JS} Number of unique J sequences found associated with the new allele. The sequences
+#'                        are those who have been unambiguously assigned the new alelle (\code{POLYMORPHISM_CALL})
+#'       \item \code{UNIQUE_CDR3S} Number of unique CDR3s associated with the inferred allele
+#'       \item \code{GERMLINE_CALL} See \link{findNovelAlleles}
+#'       \item \code{MUT_MIN} See \link{findNovelAlleles}
+#'       \item \code{MUT_MAX} See \link{findNovelAlleles}
+#'       \item \code{POS_MIN} See \link{findNovelAlleles}
+#'       \item \code{POS_MAX} See \link{findNovelAlleles}
+#'       \item \code{Y_INTERCEPT} See \link{findNovelAlleles}
+#'       \item \code{ALPHA} See \link{findNovelAlleles}
+#'       \item \code{MIN_SEQS} See \link{findNovelAlleles}
+#'       \item \code{J_MAX} See \link{findNovelAlleles}
+#'       \item \code{MIN_FRAC} See \link{findNovelAlleles} 
+#'       \item \code{NOVEL_IMGT} See \link{findNovelAlleles} 
+#'       \item \code{CLOSEST_REFERENCE_IMGT} Sequence of the closest reference gene and 
+#'                          allele in the input germline database (\code{germline}).
+#'       \item \code{GERMLINE_IMGT} See \link{findNovelAlleles}
+#'       \item \code{NOTE} See \link{findNovelAlleles}
+#'    }     
+#' @export
+generateEvidence <- function(gt, nv, germline_nv, germline_input,
+                             db, iteration_id=NULL) {
+    
+    # Find closest reference
+    .findClosestReference <- function(seq, allele_calls, ref_germ, 
+                                      exclude_self=F) {
+        closest <- getMutCount(seq,
+                               paste(allele_calls, collapse=","),
+                               ref_germ)
+        min_dist <- min(unlist(closest))
+        closest_idx <- which(unlist(closest) == min_dist)
+        closest_names <- unique(allele_calls[closest_idx])
+        if (exclude_self & names(seq) %in% closest_names) {
+            warning("Excluding self")
+            closest_names <- closest_names[closest_names!=names(seq)] # not self
+        }        
+        if (length(closest_names) > 1) {
+            warning(paste0("More than one closest reference found for ", 
+                           names(seq),": ", 
+                           paste(closest_names, collapse=",")))
+            # Keep the one with less mutated positions
+            mut_pos_count <- sapply(gsub("[^_]","",closest_names), nchar)
+            closest_names <- closest_names[mut_pos_count==min(mut_pos_count)]
+            # Pick same length
+            if (length(closest_names) > 1 ) {
+                idx <- which(
+                    sapply(ref_germ[closest_names],nchar) == nchar(ref_germ[names(seq)])
+                )
+                if (length(idx) > 0 ) {
+                    closest_names <- closest_names[idx]   
+                }
+            }         
+            # Pick same allele
+            if (length(closest_names) > 1 ) {
+                idx <- which(
+                    getAllele(closest_names) == gsub("_.+", "", getAllele(names(seq)))
+                )
+                if (length(idx) > 0 ) {
+                    closest_names <- closest_names[idx]
+                }
+            } 
+            # Pick not duplicated
+            if (length(closest_names) > 1 ) {
+                idx <- !grepl("D\\*", closest_names)
+                if (any(idx)) {
+                    closest_names <- closest_names[idx]   
+                }
+            }            
+            # If still more than one, err and TODO
+            if (length(closest_names) > 1 ) {
+                stop(paste0("Multiple closest reference found for ", 
+                            names(seq),":\n", 
+                            paste(closest_names, collapse=",")))
+            } else {
+                warning(paste0("Use: ", 
+                               closest_names, 
+                               " (less mutated positions, not D, same length, same allele)"))
+            }
+        }
+        paste(closest_names, collapse=",")        
+    }
+    
+    
+    # Subset to novel alleles
+    final_gt <- gt %>%
+        dplyr::group_by(GENE) %>%
+        dplyr::filter(duplicated(ALLELES) == FALSE) %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(
+            ALLELES=strsplit(as.character(ALLELES),","),
+            COUNTS=strsplit(as.character(COUNTS),",")) %>%
+        tidyr::unnest(ALLELES, COUNTS) %>%
+        dplyr::filter(grepl("_",ALLELES)) %>%
+        dplyr::rename(ALLELE=ALLELES) %>%
+        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELE))
+    
+    # Add info from nv
+    final_gt <- merge(final_gt %>% 
+                          dplyr::rename(NOTE_GT=NOTE), 
+                      nv, 
+                      by=c(iteration_id, "POLYMORPHISM_CALL"))
+    
+    # Add message if the same novel img sequence found from
+    # different starting alleles, these will be novel imgt sequences
+    # with more than one polymorphism call
+    final_gt <- final_gt %>%
+        dplyr::group_by(NOVEL_IMGT) %>%
+        dplyr::mutate(NUM_CALLS=length(unique(POLYMORPHISM_CALL))) %>%
+        dplyr::ungroup()
+    idx_mult <- which(final_gt$NUM_CALLS > 1)
+    final_gt$NUM_CALLS <- NULL
+    if (length(idx_mult)>0) {
+        final_gt$NOTE_GT[idx_mult] <- paste(
+            final_gt$NOTE_GT[idx_mult],
+            " Found multiple polymorphism calls for the same NOVEL_IMGT.", 
+            sep="")
+    }
+    
+    
+    if (nrow(final_gt)>0) {
+        
+        .addEvidence <- function(df, germline_nv, germline_input) { 
+            polymorphism <- df[['POLYMORPHISM_CALL']]
+            novel_imgt <- df[["NOVEL_IMGT"]]
+            names(novel_imgt) <- polymorphism
+            gene <- df[['GENE']]
+            allele <- df[['ALLELE']]
+            germline_call <- df[['GERMLINE_CALL']]
+            this_germline <- germline_input
+            V_CALL_GENOTYPED <- db[["V_CALL_GENOTYPED"]]
+            
+            SEQUENCES <- sum(V_CALL_GENOTYPED==polymorphism)
+            df[["SEQUENCES"]] <- SEQUENCES
+            closest_ref_input <- .findClosestReference(novel_imgt,
+                                                       names(germline_input), 
+                                                       germline_input,
+                                                       exclude_self=F)
+            closest_ref <- .findClosestReference(novel_imgt,
+                                                 names(germline_nv), 
+                                                 germline_nv,
+                                                 exclude_self=F)
+            
+            if (getGene(closest_ref_input) != getGene(closest_ref)) {
+                warning("closest reference gene difference")
+            }
+            
+            if (closest_ref != polymorphism) {
+                warning(paste0("closest reference allele (",
+                               closest_ref
+                               ,") different from POLYMORPHISM_CALL allele (",
+                               polymorphism,")"))
+            }
+            
+            ## TODO: this still not clear.
+            ## Any diff using sequence_imgt instead of germline[[polymorphism]]?
+            df[["CLOSEST_REFERENCE"]] <- closest_ref_input
+            
+            nt_diff <- unlist(getMutatedPositions(novel_imgt, germline_nv[[closest_ref_input]]))
+            nt_diff_string <- ""
+            if (length(nt_diff) > 0 ) {
+                nt_diff_string <- paste(paste(
+                    nt_diff, 
+                    strsplit(germline_nv[[closest_ref_input]],"")[[1]][nt_diff], 
+                    ">",
+                    strsplit(germline_nv[[polymorphism]],"")[[1]][nt_diff],
+                    sep=""), collapse=",")    
+            } 
+            
+            df[["NT_DIFF"]] <- length(nt_diff)
+            df[["NT_SUBSTITUTIONS"]] <- nt_diff_string
+            
+            diff_aa <- getMutatedAA(germline_nv[[closest_ref_input]], germline_nv[[polymorphism]])
+            
+            if (length(diff_aa)>0) {
+                df[["AA_DIFF"]] <- length(diff_aa)
+                df[["AA_SUBSTITUTIONS"]] <- paste(diff_aa,collapse=",")
+            } else {
+                df[["AA_DIFF"]] <- 0
+                df[["AA_SUBSTITUTIONS"]] <- ""
+            }
+            
+            
+            df[["UNMUTATED_SEQUENCES"]] <- as.numeric(df[["COUNTS"]])
+            df[["UNMUTATED_FREQUENCY"]] <- as.numeric(df[["COUNTS"]])/SEQUENCES
+            
+            df[["ALLELIC_PERCENTAGE"]] <- 100*df[["UNMUTATED_SEQUENCES"]]/as.numeric(df[["TOTAL"]])
+            
+            df[["UNIQUE_JS"]] <- db %>%
+                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
+                dplyr::distinct(J_CALL) %>% nrow()
+            df[["UNIQUE_CDR3S"]] <- db %>%
+                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
+                dplyr::distinct(translateDNA(JUNCTION, trim=TRUE)) %>% 
+                nrow()
+            # Add closest germline
+            df[["CLOSEST_REFERENCE_IMGT"]] <- cleanSeqs(germline_nv[[closest_ref_input]])
+            
+            data.frame(df, stringsAsFactors = F)
+        }
+        
+        final_gt <- final_gt %>%
+            dplyr::rowwise() %>%
+            do(.addEvidence(., germline_nv=germline_nv, germline_input=germline_input))
+        
+    }
+    final_gt
 }
