@@ -743,6 +743,10 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
   db_subset = db_subset %>%
     filter_(~MUT_COUNT_NOVEL == 0) %>%
     mutate_(J_GENE = ~getGene(J_CALL))
+  if (nrow(db_subset) == 0) {
+      warning(paste0("Insufficient sequences (",nrow(db_subset),") with MUT_COUNT_NOVEL == 0"))
+      return (invisible(NULL))
+  }
   db_subset$JUNCTION_LENGTH = db_subset$JUNCTION_LENGTH %>%
     factor(levels=min(db_subset$JUNCTION_LENGTH):max(db_subset$JUNCTION_LENGTH))
   pos_muts$Polymorphic = pos_muts$Polymorphic %>%
