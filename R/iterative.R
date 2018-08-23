@@ -249,7 +249,7 @@ itigger <- function(db, germline,
                          db = genotyped_db %>%
                              dplyr::filter(FIELD_ID==this_field),
                          iteration_id = "ITERATION", fields=fields)
-    bi}))
+    }))
     
     list(
          db=genotyped_db,
