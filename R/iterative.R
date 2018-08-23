@@ -248,8 +248,8 @@ itigger <- function(db, germline,
                          germline_input = this_germline,
                          db = genotyped_db %>%
                              dplyr::filter(FIELD_ID==this_field),
-                         iteration_id = "ITERATION")
-    }), .id="FIELD_ID")
+                         iteration_id = "ITERATION", fields=fields)
+    bi}))
     
     list(
          db=genotyped_db,
@@ -324,7 +324,8 @@ plotTigger <- function(tigger_list) {
 
         nv <- nv %>%
             dplyr::mutate(ROW_ID=1:n(),
-                          LABEL=paste(c(FIELD_ID, tigger_list$fields), collapse="_"))
+                          LABEL=paste(c(FIELD_ID, tigger_list$fields), collapse="_"),
+                          FIELD_ID=as.character(FIELD_ID))
         
         for (i in 1:nrow(nv)) {
             this_field <- nv[['LABEL']][i]
@@ -398,6 +399,7 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #'            \code{db}.
 #' @param iteration_id Column name that identifies iterations from 
 #'            if \link{itigger} was used.
+#' @param fields  Column names of fields used to split the data in \link{itigger}
 #' @return   Returns \code{gt} with additional columns providing supporting evidence
 #'           for each inferred allele.
 #'    \itemize{
@@ -442,7 +444,7 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #'    }     
 #' @export
 generateEvidence <- function(gt, nv, germline_nv, germline_input,
-                             db, iteration_id=NULL) {
+                             db, iteration_id=NULL, fields=NULL) {
     
     # Find closest reference
     .findClosestReference <- function(seq, allele_calls, ref_germ, 
@@ -521,7 +523,7 @@ generateEvidence <- function(gt, nv, germline_nv, germline_input,
     final_gt <- merge(final_gt %>% 
                           dplyr::rename(NOTE_GT=NOTE), 
                       nv, 
-                      by=c(iteration_id, "POLYMORPHISM_CALL"))
+                      by=c(iteration_id, fields, "POLYMORPHISM_CALL"))
     
     # Add message if the same novel img sequence found from
     # different starting alleles, these will be novel imgt sequences
