@@ -232,24 +232,34 @@ itigger <- function(db, germline,
             COUNTS=strsplit(as.character(COUNTS),",")) %>%
         tidyr::unnest(ALLELES, COUNTS) %>%
         dplyr::filter(grepl("_",ALLELES)) %>%
-        dplyr::rename(ALLELE=ALLELES) %>%
-        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELE))
+        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELES))
     genotyped_db <- bind_rows(lapply(foundAlleles, '[[', "db"))
-    
-    final_gt <- bind_rows(lapply(1:nrow(final_gt), function(i) {
-        this_field <- final_gt[['FIELD_ID']][i]
-        this_iteration <- final_gt[['ITERATION']][i]
-        this_germline <- foundAlleles[[this_field]][['germline_input']][[this_iteration]]
-        generateEvidence(all_gt %>% 
-                             dplyr::filter(FIELD_ID==this_field & ITERATION==this_iteration), 
-                         all_nv %>%
-                             dplyr::filter(FIELD_ID==this_field & ITERATION==this_iteration),
-                         germline_nv=all_germ,
-                         germline_input = this_germline,
-                         db = genotyped_db %>%
-                             dplyr::filter(FIELD_ID==this_field),
-                         iteration_id = "ITERATION", fields=c("FIELD_ID", fields))
-    }))
+
+    # Group by field and iteration
+    # (the input germline changes with each iteration, as
+    # it is expanded with new alleles found)
+    # then generate evidence
+    final_gt$FIELD_ITERATION_ID <- final_gt %>%
+        dplyr::group_by(FIELD_ID, ITERATION) %>%
+        dplyr::group_indices()
+    final_gt <- bind_rows(lapply(
+        unique(final_gt$FIELD_ITERATION_ID), 
+        function(f_i_id) {
+            this_gt <- final_gt %>%
+                dplyr::filter(FIELD_ITERATION_ID==f_i_id)
+            this_field <- this_gt[['FIELD_ID']][1]
+            this_iteration <- this_gt[['ITERATION']][1]
+            this_germline <- foundAlleles[[this_field]][['germline_input']][[this_iteration]]
+            generateEvidence(this_gt, 
+                             all_nv %>%
+                                 dplyr::filter(FIELD_ID==this_field & ITERATION==this_iteration),
+                             germline_nv=all_germ,
+                             germline_input = this_germline,
+                             db = genotyped_db %>%
+                                 dplyr::filter(FIELD_ID==this_field),
+                             iteration_id = "ITERATION", fields=c("FIELD_ID", fields))
+        })) %>%
+        dplyr::select(-FIELD_ITERATION_ID)
     
     list(
          db=genotyped_db,
