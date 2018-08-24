@@ -248,7 +248,7 @@ itigger <- function(db, germline,
                          germline_input = this_germline,
                          db = genotyped_db %>%
                              dplyr::filter(FIELD_ID==this_field),
-                         iteration_id = "ITERATION", fields=fields)
+                         iteration_id = "ITERATION", fields=c("FIELD_ID", fields))
     }))
     
     list(
