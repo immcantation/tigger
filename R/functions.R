@@ -502,7 +502,11 @@ findNovelAlleles <- function(clip_db, germline_db,
                 paste(collapse="_") %>%
                 paste(names(germline), ., sep="_")
         } else {
-            names(germ) = names(germlines)[is_known_allele]
+            # If the match is with duplicated sequences in the reference germlines,
+            # use the first
+            known_allele_names <- sortAlleles(names(germlines)[is_known_allele],
+                                             method="position")
+            names(germ) = known_allele_names[1]
         }
         # Save the new germline to our data frame               
         df_run$POLYMORPHISM_CALL[1] = names(germ)
