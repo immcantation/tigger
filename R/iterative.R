@@ -149,7 +149,10 @@ itigger <- function(db, germline,
             if (nrow(selected) > 0) {
             
                 genotype_seqs <- genotypeFasta(gt, germline_idx, nv)
-                novel_alleles_found <- any(genotype_seqs %in% germline_idx == F)
+                #novel_alleles_found <- any(genotype_seqs %in% germline_idx == F)
+                novel_alleles_found <- any(
+                    gsub("[\\.-]","",genotype_seqs) %in% 
+                        gsub("[\\.-]","",nv$NOVEL_IMGT))
                 
                 if (novel_alleles_found) {
                     
