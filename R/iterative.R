@@ -526,9 +526,9 @@ generateEvidence <- function(gt, nv, germline_nv, germline_input,
             ALLELES=strsplit(as.character(ALLELES),","),
             COUNTS=strsplit(as.character(COUNTS),",")) %>%
         tidyr::unnest(ALLELES, COUNTS) %>%
-        dplyr::filter(grepl("_",ALLELES)) %>%
         dplyr::rename(ALLELE=ALLELES) %>%
-        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELE))
+        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELE)) %>%
+        dplyr::filter(POLYMORPHISM_CALL %in% nv$POLYMORPHISM_CALL)
     
     # Add info from nv
     final_gt <- merge(final_gt %>% 
