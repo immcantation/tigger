@@ -231,8 +231,9 @@ itigger <- function(db, germline,
             ALLELES=strsplit(as.character(ALLELES),","),
             COUNTS=strsplit(as.character(COUNTS),",")) %>%
         tidyr::unnest(ALLELES, COUNTS) %>%
-        dplyr::filter(grepl("_",ALLELES)) %>%
-        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELES))
+        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELES)) %>%
+        dplyr::filter(POLYMORPHISM_CALL %in% all_nv$POLYMORPHISM_CALL)
+    
     genotyped_db <- bind_rows(lapply(foundAlleles, '[[', "db"))
 
     # Group by field and iteration
