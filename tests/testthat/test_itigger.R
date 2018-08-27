@@ -9,7 +9,7 @@ load(germline_ighv)
 
 # Run 3 iterations manually and compare results using itigger
 # This test takes a long time, skip on CRAN
-if (TRUE) {
+if (FALSE) {
     test_that("itigger and findNovelAlleles find same alleles",{ 
         skip_on_cran()
         sample_db$FAMILY <- getFamily(sample_db$V_CALL, first=TRUE)
@@ -27,9 +27,9 @@ if (TRUE) {
             mutate(V_CALL_FREQ=V_CALL_FREQ/sum(V_CALL_FREQ)) %>%
             arrange(desc(V_CALL_FREQ)) %>%
             select(-V_CALL_FREQ) %>%
-            sample_n(1) %>%
+            dplyr::sample_n(1) %>%
             ungroup() %>%
-            right_join(sample_db %>% select(-V_CALL))
+            dplyr::right_join(sample_db %>% select(-V_CALL))
         germline_subset <- germline_ighv[unique(sample_db$V_CALL)]
         
         ## Three iterations manually
