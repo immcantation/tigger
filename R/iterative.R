@@ -51,7 +51,7 @@
 #' data(germline_ighv)
 
 #' # Find novel alleles and return relevant data
-#' novel_alleles <- itigger(sample_db, germline_ighv, max.iter=Inf)
+#' novel_alleles <- itigger(sample_db, germline_ighv, max.iter=5)
 #' novel_alleles$summary
 #' }
 #' @export
@@ -103,6 +103,7 @@ itigger <- function(db, germline,
             data.frame()
         
         all_nv <- all_gt <- all_germline_input <- list()
+        genotyped_alleles <- c()
         
         i <- 0
         while (i < max.iter) {
@@ -149,16 +150,17 @@ itigger <- function(db, germline,
             if (nrow(selected) > 0) {
             
                 genotype_seqs <- genotypeFasta(gt, germline_idx, nv)
-                #novel_alleles_found <- any(genotype_seqs %in% germline_idx == F)
-                novel_alleles_found <- any(
-                    gsub("[\\.-]","",genotype_seqs) %in% 
-                        gsub("[\\.-]","",nv$NOVEL_IMGT))
+                # novel_alleles_found <- any(genotype_seqs %in% germline_idx == F)
+                novel_alleles_found <- any(names(genotype_seqs) %in% genotyped_alleles == F)
+                # update seen genotyped alleles
+                genotyped_alleles <- unique(c(genotyped_alleles, names(genotype_seqs)))
                 
                 if (novel_alleles_found) {
                     
                     message("     ... reassign alleles")
                     new_v_call <- reassignAlleles(db_idx, genotype_seqs, 
-                                                  v_call=v_call_idx)[['V_CALL_GENOTYPED']]
+                                                  v_call=v_call_idx, 
+                                                  keep_gene = "family")[['V_CALL_GENOTYPED']]
                     ## append new calls to db
                     if (verbose) {
                         v_call_idx <- paste0("V_CALL_GENOTYPED_",i)

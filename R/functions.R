@@ -1186,10 +1186,10 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' @param    path          directory containing the tool used in the
 #'                         realignment method, if needed. Hamming distance does
 #'                         not require a path to a tool.
-#' @param    keep_gene     logical indicating if gene assignments should be
+#' @param    keep_gene     logical indicating if gene or family assignments should be
 #'                         maintained when possible. Increases speed by
 #'                         minimizing required number of alignments. Currently
-#'                         only "TRUE" is implemented.
+#'                         only "TRUE" (or "gene") and "family" are implemented.
 #' 
 #' @return   A modifed input \code{data.frame} containing the best allele call from 
 #'           among the sequences listed in \code{genotype_db} in the 
@@ -1211,64 +1211,79 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' @export
 reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
                             method="hamming", path=NA,
-                            keep_gene=TRUE){
+                            keep_gene=c(TRUE, "gene", "family")){
   
+  keep_gene <- as.character(keep_gene)
+  keep_gene <- match.arg(keep_gene)
+
   # Extract data subset and prepare output vector
   v_sequences = as.character(db$SEQUENCE_IMGT)
   v_calls = getAllele(db[[v_call]], first=FALSE, strip_d=FALSE)
-  v_genes = getGene(v_calls, first = TRUE, strip_d=FALSE)
   V_CALL_GENOTYPED = rep("", length(v_calls))
   
+  if (keep_gene %in% c("TRUE", "gene")) { 
+      keep_gene <- "gene"
+      v = getGene(v_calls, first = TRUE, strip_d=FALSE)
+      geno = getGene(names(genotype_db),strip_d=TRUE)
+      names(geno) = names(genotype_db)
+  } else if (keep_gene == "family") {
+      v <- getFamily(v_genes)
+      geno = getFamily(names(genotype_db),strip_d=TRUE)
+      names(geno) = names(genotype_db)
+  } else if (keep_gene == "repertoire" ){
+      stop("Complete realignment is currently not supported.")
+  } else {
+      stop(paste0("Unknown 'keep_gene':", keep_gene))
+  }
   
-  if(keep_gene){
-    # Find which genotype genes are homozygous and assign those alleles first
-    geno_genes = getGene(names(genotype_db),strip_d=TRUE)
-    names(geno_genes) = names(genotype_db)
-    hetero_genes = unique(geno_genes[which(duplicated(geno_genes))])
-    homo_genes = geno_genes[!(geno_genes %in% hetero_genes)]
-    homo_alleles = names(homo_genes); names(homo_alleles) = homo_genes
-    homo_calls_i = which(v_genes %in% homo_genes)
-    V_CALL_GENOTYPED[homo_calls_i] = homo_alleles[v_genes[homo_calls_i]]
-    
-    # Now realign the heterozygote sequences to each allele of that gene
-    for (het_gene in hetero_genes){
-      ind = which(v_genes %in% het_gene)
+  # keep_gene == FALSE
+  # Find which genotype genes/families are homozygous and assign those alleles first
+  hetero = unique(geno[which(duplicated(geno))])
+  homo = geno[!(geno %in% hetero)]
+  homo_alleles = names(homo)
+  names(homo_alleles) = homo
+  homo_calls_i = which(v %in% homo)
+  V_CALL_GENOTYPED[homo_calls_i] = homo_alleles[v[homo_calls_i]]
+  
+  # Now realign the heterozygote sequences to each allele of that gene
+  for (het in hetero){
+      ind = which(v %in% het)
       if (length(ind) > 0){
-        het_alleles = names(geno_genes[which(geno_genes == het_gene)])
-        het_seqs = genotype_db[het_alleles]
-        if(method == "hamming"){
-        dists = lapply(het_seqs, function(x)
-          sapply(getMutatedPositions(v_sequences[ind], x, match_instead=FALSE),
-                 length))
-        dist_mat = matrix(unlist(dists), ncol = length(het_seqs))
-        } else {
-          stop("Only Hamming distance is currently supported as a method.")
-        }
-        # The sapply-apply approach could become problematic when nrow(dist_mat)
-        # is 1 and min(best_match) has multiple values, due to the fact that R 
-        # does not always keep data structures unmutable
-        # Explicitly specifying a list and subsequently keeping it as a list by
-        # using lapply avoids that problem
-        best_match = vector("list", length=nrow(dist_mat))
-        for (i in 1:nrow(dist_mat)) {
-            best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
-        }
-        best_alleles = lapply(best_match, function(x) het_alleles[x])
-        V_CALL_GENOTYPED[ind] = unlist(lapply(best_alleles, paste, collapse=","))
+          het_alleles = names(geno[which(geno == het)])
+          het_seqs = genotype_db[het_alleles]
+          if(method == "hamming"){
+              dists = lapply(het_seqs, function(x)
+                  sapply(getMutatedPositions(v_sequences[ind], x, match_instead=FALSE),
+                         length))
+              dist_mat = matrix(unlist(dists), ncol = length(het_seqs))
+          } else {
+              stop("Only Hamming distance is currently supported as a method.")
+          }
+          # The sapply-apply approach could become problematic when nrow(dist_mat)
+          # is 1 and min(best_match) has multiple values, due to the fact that R 
+          # does not always keep data structures unmutable
+          # Explicitly specifying a list and subsequently keeping it as a list by
+          # using lapply avoids that problem
+          best_match = vector("list", length=nrow(dist_mat))
+          for (i in 1:nrow(dist_mat)) {
+              best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
+          }
+          best_alleles = lapply(best_match, function(x) het_alleles[x])
+          V_CALL_GENOTYPED[ind] = unlist(lapply(best_alleles, paste, collapse=","))
       }
-    }
-    
-    # Now realign the gene-not-in-genotype calls to every genotype allele
-    hetero_calls_i = which(v_genes %in% hetero_genes)
-    not_called = setdiff(1:length(v_genes), c(homo_calls_i, hetero_calls_i))
-    if(length(not_called)>1){
+  }
+  
+  # Now realign the gene-not-in-genotype calls to every genotype allele
+  hetero_calls_i = which(v %in% hetero)
+  not_called = setdiff(1:length(v), c(homo_calls_i, hetero_calls_i))
+  if(length(not_called)>1){
       if(method ==  "hamming"){
-      dists = lapply(genotype_db, function(x)
-        sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=FALSE),
-               length))
-      dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
+          dists = lapply(genotype_db, function(x)
+              sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=FALSE),
+                     length))
+          dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
       } else {
-        stop("Only Hamming distance is currently supported as a method.")
+          stop("Only Hamming distance is currently supported as a method.")
       }
       # The sapply-apply approach could become problematic when nrow(dist_mat)
       # is 1 and min(best_match) has multiple values, due to the fact that R 
@@ -1277,13 +1292,10 @@ reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
       # using lapply avoids that problem
       best_match = vector("list", length=nrow(dist_mat))
       for (i in 1:nrow(dist_mat)) {
-            best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
+          best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
       }
       best_alleles = lapply(best_match, function(x) names(genotype_db[x]))
       V_CALL_GENOTYPED[not_called] = unlist(lapply(best_alleles, paste, collapse=","))
-    }
-  } else {
-    stop("Complete realignment is currently not supported.")
   }
   
   db$V_CALL_GENOTYPED <- V_CALL_GENOTYPED
