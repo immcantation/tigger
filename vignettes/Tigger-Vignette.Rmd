@@ -264,7 +264,7 @@ where the input data has information for different subjects or samples, the para
 ```{r}
 i_novel_df <- itigger(sample_db, germline_ighv, 
                      fields=NULL,
-                     nproc=1, max.iter=Inf)
+                     nproc=1, max.iter=5)
 names(i_novel_df)
 ```
 
