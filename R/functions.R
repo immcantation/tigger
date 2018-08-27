@@ -1222,12 +1222,11 @@ reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
   V_CALL_GENOTYPED = rep("", length(v_calls))
   
   if (keep_gene %in% c("TRUE", "gene")) { 
-      keep_gene <- "gene"
       v = getGene(v_calls, first = TRUE, strip_d=FALSE)
       geno = getGene(names(genotype_db),strip_d=TRUE)
       names(geno) = names(genotype_db)
   } else if (keep_gene == "family") {
-      v <- getFamily(v_genes)
+      v <- getFamily(v_calls, first = TRUE, strip_d = FALSE)
       geno = getFamily(names(genotype_db),strip_d=TRUE)
       names(geno) = names(genotype_db)
   } else if (keep_gene == "repertoire" ){
