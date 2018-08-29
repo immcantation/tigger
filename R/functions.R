@@ -1186,10 +1186,12 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' @param    path          directory containing the tool used in the
 #'                         realignment method, if needed. Hamming distance does
 #'                         not require a path to a tool.
-#' @param    keep_gene     logical indicating if gene or family assignments should be
-#'                         maintained when possible. Increases speed by
-#'                         minimizing required number of alignments. Currently
-#'                         only "TRUE" (or "gene") and "family" are implemented.
+#' @param    keep_gene     logical indicating if gene, family or complete repertoire
+#'                         assignments should be performed. Use of 'gene' 
+#'                         (or TRUE, for backward compatibility)
+#'                         increases speed by minimizing required number of 
+#'                         alignments, as gene assignments will be
+#'                         maintained when possible.
 #' 
 #' @return   A modifed input \code{data.frame} containing the best allele call from 
 #'           among the sequences listed in \code{genotype_db} in the 
@@ -1211,7 +1213,7 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' @export
 reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
                             method="hamming", path=NA,
-                            keep_gene=c(TRUE, "gene", "family")){
+                            keep_gene=c(TRUE, "gene", "family", "repertoire")){
   
   keep_gene <- as.character(keep_gene)
   keep_gene <- match.arg(keep_gene)
@@ -1222,6 +1224,7 @@ reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
   V_CALL_GENOTYPED = rep("", length(v_calls))
   
   if (keep_gene %in% c("TRUE", "gene")) { 
+      keep_gene <- "gene"
       v = getGene(v_calls, first = TRUE, strip_d=FALSE)
       geno = getGene(names(genotype_db),strip_d=TRUE)
       names(geno) = names(genotype_db)
@@ -1229,8 +1232,10 @@ reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
       v <- getFamily(v_calls, first = TRUE, strip_d = FALSE)
       geno = getFamily(names(genotype_db),strip_d=TRUE)
       names(geno) = names(genotype_db)
-  } else if (keep_gene == "repertoire" ){
-      stop("Complete realignment is currently not supported.")
+  } else if (keep_gene == "repertoire") {
+      v <- rep(v_call,length(v_calls))
+      geno = rep(v_call,length(genotype_db))
+      names(geno) = names(genotype_db)      
   } else {
       stop(paste0("Unknown 'keep_gene':", keep_gene))
   }
@@ -1295,6 +1300,17 @@ reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
       }
       best_alleles = lapply(best_match, function(x) names(genotype_db[x]))
       V_CALL_GENOTYPED[not_called] = unlist(lapply(best_alleles, paste, collapse=","))
+  }
+  
+  if (all(V_CALL_GENOTYPED == db[[v_call]])) {
+     msg <- ("No allele assignment corrections made.") 
+     if (all(v %in% homo) & length(hetero)>0 ) {
+         keep_opt <- eval(formals(reassignAlleles)$keep_gene)[-1]
+         i <- match(keep_gene, keep_opt)
+         rec_opt <- paste(keep_opt[(i+1):length(keep_opt)], collapse = ", ")
+         msg <- paste(msg, "Consider `keep_gene`:", rec_opt, sep=" ")
+     }
+     warning(msg)
   }
   
   db$V_CALL_GENOTYPED <- V_CALL_GENOTYPED
