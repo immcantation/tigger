@@ -1,4 +1,5 @@
 site_name: tigger
+site_favicon: img/immcantation.ico
 theme: readthedocs
 markdown_extensions:
   - def_list
