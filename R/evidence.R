@@ -262,7 +262,8 @@ generateEvidence <- function(gt, nv, germline_nv, germline_input,
                 df[["AA_SUBSTITUTIONS"]] <- ""
             }
             
-            
+            df[["COUNTS"]] <- as.numeric(df[["COUNTS"]])
+            df[["TOTAL"]] <- as.numeric(df[["TOTAL"]])
             df[["UNMUTATED_SEQUENCES"]] <- as.numeric(df[["COUNTS"]])
             df[["UNMUTATED_FREQUENCY"]] <- as.numeric(df[["COUNTS"]])/SEQUENCES
             
