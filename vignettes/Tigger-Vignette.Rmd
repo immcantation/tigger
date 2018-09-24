@@ -71,20 +71,19 @@ Column Name           | Description
 `J_CALL`              | (Comma separated) name(s) of the nearest J allele(s) 
 `JUNCTION_LENGTH`     | Length of the junction region of the V(D)J sample
 
-An example dataset is provided with the `tigger` package. It contains unique 
-functional sequences assigned to IGHV1 family genes isolated from individual 
-PGP1 (referenced in Gadala-Maria *et al.* 2015).
+An example dataset is provided with the `tigger` package as `SampleDb`. It 
+contains unique functional sequences assigned to IGHV1 family genes isolated 
+from individual PGP1 (referenced in Gadala-Maria *et al.* 2015).
 
 The database of germline sequences should be provided in FASTA format with 
 sequences gapped according to the IMGT numbering scheme ([[3]][3]). IGHV alleles in
-the IMGT database (build 201408-4) are provided with this package. You may read 
-in your own fasta file using `readIgFasta`.
+the IMGT database (build 201408-4) are provided with this package as `GermlineIGHV`. 
+You may read in your own fasta file using `readIgFasta`.
 
 ```{r, eval=TRUE, message=FALSE, warning=FALSE}
+# Load packages required for this example
 library(tigger)
 library(dplyr)
-# Load example sequence data and example germline database
-data(sample_db, germline_ighv)
 ```
 
 ## Running TIgGER
@@ -109,7 +108,7 @@ changed in `findNovelAlleles`).
 
 ```{r, eval=TRUE, warning=FALSE}
 # Detect novel alleles
-novel_df <- findNovelAlleles(sample_db, germline_ighv, nproc=1)
+novel_df <- findNovelAlleles(SampleDb, GermlineIGHV, nproc=1)
 ```
 
 ```{r, eval=TRUE, warning=FALSE}
@@ -148,7 +147,7 @@ made by `findNovelAlleles` using the function `plotNovel`.
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=8}
 # Plot evidence of the first (and only) novel allele from the example data
-plotNovel(sample_db, novel[1, ])
+plotNovel(SampleDb, novel[1, ])
 ```
 
 ### Genotype
@@ -178,10 +177,10 @@ this vector to a fasta file, `writeFasta` may be used.
 ```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
 # Infer the individual's genotype, using only unmutated sequences and checking
 # for the use of the novel alleles inferred in the earlier step.
-geno <- inferGenotype(sample_db, find_unmutated = TRUE,
-                      germline_db = germline_ighv, novel_df = novel_df)
+geno <- inferGenotype(SampleDb, find_unmutated=TRUE,
+                      germline_db=GermlineIGHV, novel_df=novel_df)
 # Save the genotype sequences to a vector
-genotype_seqs <- genotypeFasta(geno, germline_ighv, novel_df)
+genotype_seqs <- genotypeFasta(geno, GermlineIGHV, novel_df)
 # Visualize the genotype and sequence counts
 print(geno)
 # Make a colorful visualization. Bars indicate presence, not proportion.
@@ -202,8 +201,9 @@ method doesn't use the strict cutoff criterion `fraction_to_explain` that
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
 # Infer the individual's genotype, using the bayesian method
-geno_bayesian <- inferGenotypeBayesian(sample_db, find_unmutated = TRUE,
-                      germline_db = germline_ighv, novel_df = novel_df)
+geno_bayesian <- inferGenotypeBayesian(SampleDb, find_unmutated=TRUE,
+                                       germline_db=GermlineIGHV, 
+                                       novel_df=novel_df)
 # Visualize the genotype and sequence counts
 print(geno_bayesian)
 # Make a colorful visualization. Bars indicate presence, not proportion.
@@ -223,7 +223,7 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 ```{r, eval=TRUE, warning=FALSE}
 # Use the personlized genotype to determine corrected allele assignments
 # Updated genotype will be placed in the V_CALL_GENOTYPED column
-sample_db <- reassignAlleles(sample_db, genotype_seqs)
+sample_db <- reassignAlleles(SampleDb, genotype_seqs)
 ```
 
 From here, one may proceed with further downstream analyses, but with the

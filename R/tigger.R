@@ -3,8 +3,6 @@
 # @author     Daniel Gadala-Maria
 # @copyright  Copyright 2016 Kleinstein Lab, Yale University. All rights reserved
 # @license    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported
-# @version    0.3.0
-# @date       2017.05.29
 
 
 #' tigger
@@ -77,8 +75,10 @@
 #' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
 #' @importFrom  parallel    clusterEvalQ clusterExport makeCluster stopCluster
+#' @importFrom  rlang       .data
 #' @importFrom  shazam      calcObservedMutations
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
 #'                          confint lm
+#' @importFrom  stringi     stri_length
 #' @importFrom  tidyr       gather gather_ spread spread_
 NULL
