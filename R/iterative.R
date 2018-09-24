@@ -75,7 +75,8 @@ itigger <- function(db, germline,
     
     db[['FIELD_ID']] <- db %>%
         dplyr::group_by_(.dots=fields) %>%
-        dplyr::group_indices()
+        dplyr::group_indices() %>%
+        as.character()
     
     db <- db %>%
         dplyr::ungroup()
@@ -213,7 +214,7 @@ itigger <- function(db, germline,
         )
         
     } # end fields loop
-    
+
     # Final unique germlines, considering all fields
     all_germ_names <- unlist(lapply(lapply(foundAlleles, '[[', "germline"), names))
     all_germ <- unlist(lapply(foundAlleles, '[[', "germline"), use.names = F)
