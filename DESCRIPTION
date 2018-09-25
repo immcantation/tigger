@@ -39,7 +39,6 @@ Imports:
     iterators,
     lazyeval,
     parallel,
-    rlang,
     shazam (>= 0.1.10),
     stats,
     stringi

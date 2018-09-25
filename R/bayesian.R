@@ -77,8 +77,8 @@ inferGenotypeBayesian <- function(clip_db, v_call="V_CALL", find_unmutated=TRUE,
             stop("germline_db needed if find_unmutated is TRUE")
         }
         if(!is.null(nrow(novel_df))){
-            novel_df = filter(novel_df, !is.na(.data$POLYMORPHISM_CALL)) %>%
-                select(!! c("GERMLINE_CALL", "POLYMORPHISM_CALL", "NOVEL_IMGT"))
+            novel_df = filter_(novel_df, ~!is.na(POLYMORPHISM_CALL)) %>%
+                select_(~GERMLINE_CALL, ~POLYMORPHISM_CALL, ~NOVEL_IMGT)
             if(nrow(novel_df) > 0){
                 # Extract novel alleles if any and add them to germline_db
                 novel_gl = novel_df$NOVEL_IMGT
