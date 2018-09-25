@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **plotGenotype** - *Show a colorful representation of a genotype*
 
 Description
@@ -15,8 +9,8 @@ Description
 Usage
 --------------------
 ```
-plotGenotype(genotype, facet_by = NULL, gene_sort = c("name", "position"),
-text_size = 12, silent = FALSE, ...)
+plotGenotype(genotype, facet_by = NULL, gene_sort = c("name",
+"position"), text_size = 12, silent = FALSE, ...)
 ```
 
 Arguments
@@ -60,12 +54,8 @@ Examples
 -------------------
 
 ```R
-# Load example data
-data(novel_df)
-data(genotype)
-
 # Plot genotype
-plotGenotype(genotype)
+plotGenotype(SampleGenotype)
 
 ```
 
@@ -74,10 +64,10 @@ plotGenotype(genotype)
 ```R
 
 # Facet by subject
-genotypea = genotypeb = genotype
-genotypea$SUBJECT = "A"
-genotypeb$SUBJECT = "B"
-geno_sub = rbind(genotypea, genotypeb)
+genotype_a <- genotype_b <- SampleGenotype
+genotype_a$SUBJECT <- "A"
+genotype_b$SUBJECT <- "B"
+geno_sub <- rbind(genotype_a, genotype_b)
 plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 ```
 

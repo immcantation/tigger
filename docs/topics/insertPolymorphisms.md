@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **insertPolymorphisms** - *Insert polymorphisms into a nucleotide sequence*
 
 Description
@@ -23,14 +17,14 @@ Arguments
 -------------------
 
 sequence
-:   the starting nucletide sequence
+:   starting nucletide sequence.
 
 positions
-:   a vector of positions which to be changed
+:   numeric vector of positions which to be changed.
 
 nucleotides
-:   a vector of nucletides to which to change the
-positions
+:   character vector of nucletides to which to change the
+positions.
 
 
 
@@ -38,7 +32,7 @@ positions
 Value
 -------------------
 
-a sequence with the desired nucleotides in provided locations
+A sequence with the desired nucleotides in provided locations
 
 
 

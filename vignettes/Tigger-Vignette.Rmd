@@ -30,39 +30,45 @@ vignette: >
 
 ## Introduction 
 
-Immunoglobulin Repertoire-Sequencing (Rep-Seq) data is currently the subject of 
-much study. A key step in analyzing these data involves assigning the closest 
-known V(D)J germline alleles to the (often somatically mutated) sample sequences
-using a tool such as IMGT/HighV-QUEST ([[1]][1]). However, if the sample utilizes 
-alleles not in the germline database used for alignment, this step will fail. 
-Additionally, this alignment has an associated error rate of ~5% ([[2]][2]), 
-notably among sequences carrying a large number of somatic mutations.
+Adapative immune receptor repertoire sequencing (AIRR-Seq, Rep-Seq) data is 
+currently the subject of much study. A key step in analyzing these data involves 
+assigning the closest known V(D)J germline alleles to the (often somatically mutated) 
+sample sequences using a tool such as IMGT/HighV-QUEST ([[1]][1]). However, 
+if the sample utilizes alleles not in the germline database used for alignment, 
+this step will fail. Additionally, this alignment has an associated error rate 
+of ~5% ([[2]][2]), notably among sequences carrying a large number of somatic 
+mutations.
 
 Here we provide a **T**ool for **I**mmuno**g**lobulin **G**enotype 
 **E**lucidation via **R**ep-Seq (TIgGER). TIgGER addresses these issues by 
-inferring the set of Ig alleles carried by an individual (including any novel 
-alleles) and then using this set of alleles to correct the initial assignments 
-given to sample sequences by existing tools.
+inferring the set of Immunoglobulin (Ig) alleles carried by an individual 
+(including any novel alleles) and then using this set of alleles to correct 
+the initial assignments given to sample sequences by existing tools. 
 
-Additional information is available in:
+This vignette covers the following tasks:
+
+1. Inferring the presence of novel IGHV alleles not in the germline database.
+2. Inferring the personalized IGHV genotype of a sample.
+3. Correcting the IGHV allele calls of a sample based on the IGHV genotype.
+
+Additional information about the methods used by TIgGER is available in:
 
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated analysis of 
 high-throughput B cell sequencing data reveals a high frequency of novel 
 immunoglobulin V gene segment alleles. *PNAS* 
 112(8):E862-70](http://www.pnas.org/content/early/2015/02/05/1417683112).
 
-
 ## Input
 
 TIgGER requires two main inputs:
 
-1. Pre-processed Rep-Seq data
+1. Pre-processed Ig sequence data
 2. Database germline sequences
 
-Rep-seq data is input as a data frame where each row represents a unique 
-observation and and columns represent data about that observation. The required
-names of the required columns are provided below along with a description of 
-each.
+AIRR-seq data is input as a data frame following the Change-O standard where 
+each row represents a unique observation and and columns represent data about 
+that observation. The required names of the required columns are provided below 
+along with a description of each.
 
 Column Name           | Description 
 ----------------------|---------------------------------------------------------
@@ -86,16 +92,7 @@ library(tigger)
 library(dplyr)
 ```
 
-## Running TIgGER
-
-The functions provided by this package can be used to perform any combination of
-the following:
-
-1. Infer the presence of novel IGHV alleles not in the germline database
-2. Infer the individual's IGHV genotype
-3. Correct the IGHV allele calls of the samples based on the IGHV genotype
-
-### Novel Alleles
+## Novel allele detection
 
 Potential novel alleles can be detected by TIgGER. Some of these may be included
 in the genotype later (see below). `findNovelAlleles` will return a `data.frame`
@@ -150,7 +147,7 @@ made by `findNovelAlleles` using the function `plotNovel`.
 plotNovel(SampleDb, novel[1, ])
 ```
 
-### Genotype
+## Inferring genotypes
 
 An individual's genotype can be inferred using the functions `inferGenotype` or 
 `inferGenotypeBayesian`. Using one of this functions allows to remove from the
@@ -162,6 +159,8 @@ framework and provides a confidence estimate associated with
 the genotype calls.
 
 
+### Frequency genotyping approach
+
 `inferGenotype` identifies the fewest alleles that account for 
 nearly all (default is 7/8) of the allele calls made. The user may opt to only
 use sequences which perfectly match germline alleles, and may opt to include 
@@ -172,7 +171,6 @@ order as the alleles are listed. The total number of sequences that match any
 allele of that gene is also given. To output these alleles as a names vector of 
 nucleotide sequences, the user may use the function `genotypeFasta`. To save 
 this vector to a fasta file, `writeFasta` may be used.
-
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=4, fig.height=3}
 # Infer the individual's genotype, using only unmutated sequences and checking
@@ -186,6 +184,8 @@ print(geno)
 # Make a colorful visualization. Bars indicate presence, not proportion.
 plotGenotype(geno, text_size = 10)
 ```
+
+### Bayesian genotyping approach
 
 The method `inferGenotypeBayesian` analyzes the posterior probabilities of 
 possible allele distributions, considering up to four distinct alleles per 
@@ -207,10 +207,10 @@ geno_bayesian <- inferGenotypeBayesian(SampleDb, find_unmutated=TRUE,
 # Visualize the genotype and sequence counts
 print(geno_bayesian)
 # Make a colorful visualization. Bars indicate presence, not proportion.
-plotGenotype(geno_bayesian, text_size = 10)
+plotGenotype(geno_bayesian, text_size=10)
 ```
 
-### Corrected Allele Calls
+## Correcting allele calls
 
 Finally, the original V allele calls may be limited to only those within the 
 inferred genotype. This can be done by using the function `reassignAlleles`.
@@ -235,21 +235,20 @@ can be seen below.
 ```{r, eval=TRUE, warning=FALSE}
 # Find the set of alleles in the original calls that were not in the genotype
 not_in_genotype <- sample_db$V_CALL %>%
-  strsplit(",") %>%
-  unlist() %>%
-  unique() %>%
-  setdiff(names(genotype_seqs))
+    strsplit(",") %>%
+    unlist() %>%
+    unique() %>%
+    setdiff(names(genotype_seqs))
 
 # Determine the fraction of calls that were ambigious before/after correction
 # and the fraction that contained original calls to non-genotype alleles. Note
 # that by design, only genotype alleles are allowed in "after" calls.
-data.frame(Ambiguous = c(mean(grepl(",",sample_db$V_CALL)),
-           mean(grepl(",",sample_db$V_CALL_GENOTYPED))),
-           NotInGenotype = c(mean(sample_db$V_CALL %in% not_in_genotype),
-           mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
-           row.names = c("Before", "After")) %>% 
+data.frame(Ambiguous=c(mean(grepl(",", sample_db$V_CALL)),
+                       mean(grepl(",", sample_db$V_CALL_GENOTYPED))),
+           NotInGenotype=c(mean(sample_db$V_CALL %in% not_in_genotype),
+                           mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
+           row.names=c("Before", "After")) %>% 
     t() %>% round(3)
-
 ```
 
 ## References

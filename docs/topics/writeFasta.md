@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **writeFasta** - *Write to a fasta file*
 
 Description
