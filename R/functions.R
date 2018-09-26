@@ -934,7 +934,7 @@ inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
     genotype = cbind(GENE, ALLELES, COUNTS, TOTAL, NOTE)
     
     # For each gene, find which alleles to include
-    for (g in GENE){
+    for (g in GENE) {
         # Keep only the part of the allele calls that uses the gene being analyzed
         ac = allele_calls[gene_groups[[g]]] %>%
             strsplit(",") %>%
@@ -944,9 +944,8 @@ inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
         t_ac = table(ac) # table of allele calls
         potentials = unique(unlist(strsplit(names(t_ac),","))) # potential alleles
         # One allele? Easy!
-        if (length(potentials) == 1 | length(t_ac) == 1){
-            genotype[genotype[,"GENE"]==g,"ALLELES"] =
-                gsub("[^d\\*]*[d\\*]","",potentials )[1]
+        if (length(potentials) == 1 | length(t_ac) == 1) {
+            genotype[genotype[,"GENE"]==g,"ALLELES"] = gsub("[^d\\*]*[d\\*]","",potentials )[1]
             genotype[genotype[,"GENE"]==g,"COUNTS"] = t_ac
         } else {
             # More alleles? Let's find the fewest that can explain the needed fraction
@@ -975,12 +974,12 @@ inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
             genotype[genotype[,"GENE"]==g,"COUNTS"] =
                 paste(counts,collapse=",")
         }
-        
     }
+    
     geno = as.data.frame(genotype, stringsAsFactors = FALSE)
     
     # Check for indistinguishable calls
-    if(find_unmutated == TRUE){
+    if (find_unmutated == TRUE) {
         seqs = genotypeFasta(geno, germline_db)
         dist_mat = seqs %>%
             sapply(function(x) sapply((getMutatedPositions(seqs, x)), length)) %>%
@@ -998,6 +997,7 @@ inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
         }
     }
     rownames(geno) = NULL
+    
     return(geno)
 }
 
@@ -1593,7 +1593,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #'                            from the strings fasta file's sequence names
 #' @param    force_caps       if \code{TRUE}, will force nucleotides to
 #'                            uppercase
-#' @return   a named vector of strings respresenting Ig alleles
+#' @return   Named vector of strings respresenting Ig alleles.
 #' 
 #' @seealso  \link{writeFasta} to do the inverse.
 #' 
@@ -1766,30 +1766,30 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
 
 #' Clean up nucleotide sequences
 #'
-#' \code{cleanSeqs} capitalizes nucleotides, replaces "." with "-", and then
-#' replaces all characters besides ACGT- with "N". 
+#' \code{cleanSeqs} capitalizes nucleotides and replaces all characters 
+#' besides \code{c("A", "C", "G", "T", "-", ".")} with \code{"N"}. 
 #' 
 #' @param    seqs  a vector of nucleotide sequences
-#' @return   A vector of nucleotide sequences
+#' @return   A modified vector of nucleotide sequences
 #' 
 #' @seealso \link{sortAlleles} and \link{updateAlleleNames} can
 #'          help format a list of allele names.
 #' 
 #' @examples
-#' # Create messy nucleotide sequences
-#' seqs <- c("AGAT.taa-GAG...ATA",
-#'           "GATACAGTXXXXXAGNNNPPPACA")
-#' # Clean them up
+#' # Clean messy nucleotide sequences
+#' seqs <- c("AGAT.taa-GAG...ATA", "GATACAGTXXZZAGNNPPACA")
 #' cleanSeqs(seqs)
 #' 
 #' @export
-cleanSeqs <- function(seqs){
-    . = NULL
-    seqs %>%
-        toupper %>%
-        gsub(".", "-", . , fixed = TRUE) %>%
-        gsub("[^ACGT-]", "N", .) %>%
-        return
+cleanSeqs <- function(seqs) {
+    # . = NULL
+    # seqs %>%
+    #     toupper %>%
+    #     gsub(".", "-", . , fixed = TRUE) %>%
+    #     gsub("[^ACGT-]", "N", .) %>%
+    #     return
+
+    return (gsub("[^ACGT\\.\\-]", "N", toupper(seqs)))
 }
 
 
