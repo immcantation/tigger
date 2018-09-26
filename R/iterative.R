@@ -249,7 +249,8 @@ itigger <- function(db, germline,
     # then generate evidence
     final_gt$FIELD_ITERATION_ID <- final_gt %>%
         dplyr::group_by(FIELD_ID, ITERATION) %>%
-        dplyr::group_indices()
+        dplyr::group_indices() %>%
+        as.character()
     final_gt <- bind_rows(lapply(
         unique(final_gt$FIELD_ITERATION_ID), 
         function(f_i_id) {
