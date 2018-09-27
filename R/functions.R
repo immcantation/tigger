@@ -7,14 +7,8 @@
 #' align to each germline allele in order to determine which positions
 #' might be polymorphic.
 #' 
-#' @details A \code{data.frame} in Change-O format contains the following
-#' columns:
-#' \itemize{
-#'   \item \code{"SEQUENCE_IMGT"} containing the IMGT-gapped nucleotide sequence
-#'   \item \code{"V_CALL"} containing the IMGT/V-QUEST V allele call(s)
-#'   \item \code{"J_CALL"} containing the IMGT/V-QUEST J allele call(s)
-#'   \item \code{"JUNCTION_LENGTH"} containing the junction length
-#' }
+
+#' 
 #' The TIgGER allele-finding algorithm, briefly, works as follows:
 #' Mutations are determined through comparison to the provided germline.
 #' Mutation frequency at each *position* is determined as a function of
@@ -24,10 +18,10 @@
 #' against by ensuring that sequences perfectly matching the potential novel
 #' allele utilize a wide range of combinations of J gene and junction length.
 #' 
-#' @param    clip_db        a \code{data.frame} in Change-O format. See details.
+#' @param    data_db        a \code{data.frame} in Change-O format. See details.
 #' @param    germline_db    a vector of named nucleotide germline sequences
-#'                          matching the V calls in \code{clip_db}
-#' @param    v_call         name of the column in clip_db with V allele calls. 
+#'                          matching the V calls in \code{data_db}
+#' @param    v_call         name of the column in data_db with V allele calls. 
 #'                          Default is V_CALL.                                                    
 #' @param    germline_min   the minimum number of sequences that must have a
 #'                          particular germline allele call for the allele to
@@ -57,100 +51,87 @@
 #'                          position to considered
 #' @param    nproc          the number of processors to use
 #'
-#' @return   a \code{data.frame} with a row for each known allele analyzed.
+#' @return   A \code{data.frame} with a row for each known allele analyzed.
 #' Besides metadata on the the parameters used in the search, each row will have
 #' either a note as to where the polymorphism-finding algorithm exited or a
 #' nucleotide sequence for the predicted novel allele, along with columns providing
 #' additional evidence.
 #' 
-#' Messages in the field \code{NOTE}:
-#' 
+#' The output contains the following fields:
 #' \itemize{
-#'    \item \emph{Novel allele found!} 
-#'    \item \emph{Plurality sequence too rare}: No sequence is frequent 
-#'                  enough to pass the J test (\code{j_max}).
-#'    \item \emph{a J-junction combination is too prevalent}: Not enough
-#'                   J diversity (\code{j_max}).
-#'    \item \emph{No positions pass y-intercept test}. No positions above
-#'                    \code{y_intercept}.
-#'    \item \emph{Insufficient sequences in desired mutational range}. 
-#'                    \code{mut_range} and \code{pos_range}.
-#'    \item \emph{not enough sequences}:  not enough sequences in the 
-#'                          desired mutational range and nucleotide range.
-#'                          \code{min_seqs}
-#'    \item \emph{no unmutated versions of novel allele found}
+#'   \item \code{GERMLINE_CALL}: The input V call.
+#'   \item \code{NOTE}: Comments on the inferrence.
+#'   \item \code{POLYMORPHISM_CALL}: The new allele call.
+#'   \item \code{NT_SUBSTITUTIONS}: Mutations identified in the new allele, relative
+#'         to the reference germline (\code{GERMLINE_CALL})
+#'   \item \code{NOVEL_IMGT}: New allele sequence.
+#'   \item \code{NOVEL_IMGT_COUNT}:  The number of times the sequence \code{NOVEL_IMGT} 
+#'         is found in the input data. Considers the subsequence of \code{NOVEL_IMGT} 
+#'         in the \code{pos_range}.
+#'   \item \code{NOVEL_IMGT_UNIQUE_J}: Number of distinct J calls associated to \code{NOVEL_IMGT} 
+#'         in the input data. Considers the subsequence of \code{NOVEL_IMGT} in the \code{pos_range}.       
+#'   \item \code{NOVEL_IMGT_UNIQUE_CDR3}: Number of distinct CDR3 sequences associated
+#'         with \code{NOVEL_IMGT} in the input data. Considers the subsequence of \code{NOVEL_IMGT} 
+#'         in the \code{pos_range}.                                              
+#'   \item \code{PERFECT_MATCH_COUNT}: Final number of sequences retained to call the new 
+#'         allele. These are unique sequences that have V segments that perfectly match 
+#'         the predicted germline in the \code{pos_range}.
+#'   \item \code{PERFECT_MATCH_FREQ}: \code{PERFECT_MATCH_COUNT / GERMLINE_CALL_COUNT}
+#'   \item \code{GERMLINE_CALL_COUNT}: The number of sequences with the \code{GERMLINE_CALL} 
+#'         in the input data that were initially considered for the analysis.
+#'   \item \code{GERMLINE_CALL_FREQ}: The fraction of sequences with the \code{GERMLINE_CALL} 
+#'         in the input data initially considered for the analysis.              
+#'   \item \code{GERMLINE_IMGT}: Germline sequence for \code{GERMLINE_CALL}.
+#'   \item \code{GERMLINE_IMGT_COUNT}:  The number of times the \code{GERMLINE_IMGT} 
+#'         sequence is found in the input data.
+#'   \item \code{MUT_MIN}: Minimum mutation considered by the algorithm.
+#'   \item \code{MUT_MAX}: Maximum mutation considered by the algorithm.
+#'   \item \code{MUT_PASS_COUNT}: Number of sequences in the mutation range.
+#'   \item \code{POS_MIN}: First position of the sequence considered by the algorithm (IMGT numbering).
+#'   \item \code{POS_MAX}: Last position of the sequence considered by the algorithm (IMGT numbering).
+#'   \item \code{Y_INTERCEPT}: The y-intercept above which positions were considered 
+#'         potentially polymorphic.
+#'   \item \code{Y_INTERCEPT_PASS}: Number of positions that pass the \code{Y_INTERCEPT} threshold.
+#'   \item \code{SNP_PASS}: Number of sequences that pass the \code{Y_INTERCEPT} threshold and are
+#'         within the desired nucleotide range (\code{min_seqs}).
+#'   \item \code{UNMUTATED_COUNT}: Number of unmutated sequences.
+#'   \item \code{UNMUTATED_FREQ}: Number of unmutated sequences over \code{GERMLINE_IMGT_COUNT}.
+#'   \item \code{UNMUTATED_SNP_J_GENE_LENGTH_COUNT}: Number of distinct combinations
+#'         of SNP, J gene, and junction length.     
+#'   \item \code{SNP_MIN_SEQS_J_MAX_PASS}: Number of SNPs that pass both the \code{min_seqs} 
+#'         and \code{j_max} thresholds.
+#'   \item \code{ALPHA}: Significance threshold to be used when constructing the 
+#'         confidence interval for the y-intercept.
+#'   \item \code{MIN_SEQS}: Input \code{min_seqs}. The minimum number of total sequences 
+#'         (within the desired mutational range and nucleotide range) required 
+#'         for the samples to be considered.
+#'   \item \code{J_MAX}: Input \code{j_max}. The maximum fraction of sequences perfectly 
+#'         aligning to a potential novel allele that are allowed to utilize to a particular 
+#'         combination of junction length and J gene.
+#'   \item \code{MIN_FRAC}: Input \code{min_frac}. The minimum fraction of sequences that must
+#'         have usable nucleotides in a given position for that position to be considered.
 #' }
 #' 
-#' Other fields:
+#' The following comments can appear in the \code{NOTE} field:
+#' 
 #' \itemize{
-#' \item \emph{GERMLINE_CALL}: The input V call
-#' \item \emph{POLYMORPHISM_CALL}: The new allele call
-#' \item \emph{NT_SUBSTITUTIONS}: Mutations identified in the new allele, relative
-#'                       to the reference germline (\code{GERMLINE_CALL})
-#' \item \emph{NOVEL_IMGT}: New allele
-#' \item \emph{NOVEL_IMGT_COUNT}:  the number of times the sequence 
-#'                      \code{NOVEL_IMGT} is found in the input data 
-#'                      \code{clip_db}. Considers the subsequence of 
-#'                      \code{NOVEL_IMGT} in the range \code{pos_range}.  
-#' \item \emph{NOVEL_IMGT_UNIQUE_J}: Number of disctinct J calls associated
-#'                      to \code{NOVEL_IMGT} in \code{clip_db}. Considers
-#'                      the subsequence of \code{NOVEL_IMGT} in the range 
-#'                      \code{pos_range}.       
-#' \item \emph{NOVEL_IMGT_UNIQUE_CDR3}: Number of disctinct CDR3 associated
-#'                      to \code{NOVEL_IMGT} in \code{clip_db}. Considers
-#'                      the subsequence of \code{NOVEL_IMGT} in the range 
-#'                      \code{pos_range}.                                              
-#' \item \emph{PERFECT_MATCH_COUNT}: Final number of sequences retained to call 
-#'                       the new allele. These are unique sequences that have 
-#'                       Vs that perfect match the predicted germline in the 
-#'                       range \code{pos_range}.
-#' \item \emph{PERFECT_MATCH_FREQ}: \code{PERFECT_MATCH_COUNT}/\code{GERMLINE_CALL_COUNT}
-#' \item \emph{GERMLINE_CALL_COUNT}: the number of sequences with the particular
-#'                       \code{GERMLINE_CALL} in \code{clip_db} initially
-#'                       considered for the analysis.
-#' \item \emph{GERMLINE_CALL_PERC}: the percent of sequences with the particular
-#'                       \code{GERMLINE_CALL} in \code{clip_db} initially      
-#'                       considered for the analysis.              
-#' \item \emph{GERMLINE_IMGT}: Germline sequence for \code{GERMLINE_CALL}                          
-#' \item \emph{GERMLINE_IMGT_COUNT}:  the number of times the sequence sequence
-#'                       \code{GERMLINE_IMGT} is found in the input data 
-#'                       \code{clip_db}.     
-#' \item \emph{MUT_MIN}: Minimum mutation considered by the algorithm
-#' \item \emph{MUT_MAX}: Maximum mutation considered by the algorithm
-#' \item \emph{MUT_PASS_COUNT}: Number of sequences in the mutation range
-#' \item \emph{POS_MIN}: First position of the sequence considered by the
-#'                   algorithm (IMGT numbering)
-#' \item \emph{POS_MAX}: Last position of the sequence considered by the 
-#'                   algorithm (IMGT numbering)
-#' \item \emph{Y_INTERCEPT}: The y-intercept above which positions were 
-#'                  considered potentially polymorphic
-#' \item \emph{Y_INTERCEPT_PASS}: Number of positions that pass Y_INTERCEPT  
-#' \item \emph{SNP_PASS}: Number of sequences that pass Y_INTERCEPT and are
-#'                    within the desired nucleotide range (\code{min_seqs})   
-#' \item \emph{UNMUTATED_COUNT}: Number of unmutated sequences
-#' \item \emph{UNMUTATED_FREQ}: Number of unmutated sequences over 
-#'                    \code{GERMLINE_IMGT_COUNT}
-#' \item \emph{UNMUTATED_SNP_J_GENE_LENGTH_COUNT}: Number of distinct combinations
-#'                  of SNP, J gene and junction length.     
-#' \item \emph{SNP_MIN_SEQS_J_MAX_PASS}: Number of SNP strings that pass both the 
-#'                  \code{min_seqs} and \code{j_max} thresholds                                                  
-#' \item \emph{ALPHA}: Significance cutoff to be used when constructing the 
-#'                  confidence interval for the y-intercept
-#' \item \emph{MIN_SEQS}: Input \code{min_seqs}. The minimum number of total sequences (within the 
-#'                  desired mutational range and nucleotide range) required 
-#'                  for the samples to be considered
-#' \item \emph{J_MAX}: Input \code{j_max}. The maximum fraction of sequences perfectly aligning to 
-#'                  a potential novel allele that are allowed to utilize to a 
-#'                  particular combination of junction length and J gene
-#' \item \emph{MIN_FRAC}: Input \code{min_frac}. The minimum fraction of sequences that must have 
-#'                  usable nucleotides in a given position for that position to 
-#'                  be considered
+#'   \item \emph{Novel allele found}: A novel allele was detected.
+#'   \item \emph{Plurality sequence too rare}: No sequence is frequent enough to pass 
+#'         the J test (\code{j_max}).
+#'   \item \emph{A J-junction combination is too prevalent}: Not enough J diversity (\code{j_max}).
+#'   \item \emph{No positions pass y-intercept test}: No positions above \code{y_intercept}.
+#'   \item \emph{Insufficient sequences in desired mutational range}: 
+#'         \code{mut_range} and \code{pos_range}.
+#'   \item \emph{Not enough sequences}: Not enough sequences in the desired mutational 
+#'         range and nucleotide range (\code{min_seqs}).
+#'   \item \emph{No unmutated versions of novel allele found}: All observed variants of the 
+#'         allele are mutated.
 #' }
 #' 
 #' @seealso \link{plotNovel} to visualize the data supporting any
 #' novel alleles hypothesized to be present in the data and
 #' \link{inferGenotype} to determine if the novel alleles are frequent
-#' enought to be included in the subject's genotype
+#' enought to be included in the subject's genotype.
 #' 
 #' @examples
 #' \dontrun{
@@ -159,45 +140,45 @@
 #' }
 #' 
 #' @export
-findNovelAlleles <- function(clip_db, germline_db,
+findNovelAlleles <- function(data_db, germline_db,
                              v_call="V_CALL",
-                             germline_min = 200,
-                             min_seqs = 50,
-                             auto_mutrange = TRUE,
-                             mut_range = 1:10,
-                             pos_range = 1:312,
-                             y_intercept = 0.125,
-                             alpha = 0.05,
-                             j_max = 0.15,
-                             min_frac = 0.75,
-                             nproc = 1) {
+                             germline_min=200,
+                             min_seqs=50,
+                             auto_mutrange=TRUE,
+                             mut_range=1:10,
+                             pos_range=1:312,
+                             y_intercept=0.125,
+                             alpha=0.05,
+                             j_max=0.15,
+                             min_frac=0.75,
+                             nproc=1) {
     . = idx = NULL
     
     # Keep only the db columns needed
-    clip_db <- clip_db %>% 
+    data_db <- data_db %>% 
         dplyr::select_('SEQUENCE_IMGT', v_call, 'J_CALL', 'JUNCTION_LENGTH', 'JUNCTION')
     
     # Keep only the columns we need and clean up the sequences
     missing = c("SEQUENCE_IMGT", v_call, "J_CALL", "JUNCTION_LENGTH") %>%
-        setdiff(colnames(clip_db))
+        setdiff(colnames(data_db))
     if (length(missing) != 0) {
-        stop("Could not find required columns in clip_db:\n  ",
+        stop("Could not find required columns in the input data:\n  ",
              paste(missing, collapse="\n  "))
     }
-    empty_junctions = sum(clip_db$JUNCTION_LENGTH == 0, na.rm=TRUE)
+    empty_junctions = sum(data_db$JUNCTION_LENGTH == 0, na.rm=TRUE)
     if (empty_junctions > 0) {
         stop(empty_junctions, " sequences have junction ", "length of zero. ",
              "Please remove these sequences.")
     }
     germlines = cleanSeqs(germline_db)
     names(germlines) = getAllele(names(germlines), first=FALSE, strip_d=FALSE)
-    clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
+    data_db$SEQUENCE_IMGT = cleanSeqs(data_db$SEQUENCE_IMGT)
     
     
     # Find which rows' calls contain which germline alleles
     cutoff =
-        ifelse(germline_min < 1, round(nrow(clip_db)*germline_min), germline_min)
-    allele_groups = sapply(names(germlines), grep, clip_db[[v_call]], fixed=TRUE,
+        ifelse(germline_min < 1, round(nrow(data_db)*germline_min), germline_min)
+    allele_groups = sapply(names(germlines), grep, data_db[[v_call]], fixed=TRUE,
                            simplify=FALSE)
     names(allele_groups) = names(germlines)
     allele_groups = allele_groups[sapply(allele_groups, length) >= cutoff]
@@ -226,7 +207,7 @@ findNovelAlleles <- function(clip_db, germline_db,
         cluster <- parallel::makeCluster(nproc, type="PSOCK")
         parallel::clusterExport(cluster, list("allele_groups",
                                               "germlines",
-                                              "clip_db",
+                                              "data_db",
                                               "min_seqs",
                                               "auto_mutrange",
                                               "mut_range",
@@ -252,7 +233,7 @@ findNovelAlleles <- function(clip_db, germline_db,
         allele_name = names(allele_groups)[idx]
         germline = germlines[allele_name]
         indicies = allele_groups[[allele_name]]
-        db_subset = clip_db[indicies, ]
+        db_subset = data_db[indicies, ]
         
         # If mutrange is auto, find most popular mutation count and start from there
         gpm = db_subset %>%
@@ -281,7 +262,7 @@ findNovelAlleles <- function(clip_db, germline_db,
                                   PERFECT_MATCH_COUNT = NA,
                                   PERFECT_MATCH_FREQ = NA,                              
                                   GERMLINE_CALL_COUNT = length(indicies),
-                                  GERMLINE_CALL_PERC = 100*round(length(indicies)/nrow(clip_db),3),
+                                  GERMLINE_CALL_FREQ = round(length(indicies)/nrow(data_db), 3),
                                   MUT_MIN = NA,
                                   MUT_MAX = NA,
                                   MUT_PASS_COUNT=NA,
@@ -454,14 +435,14 @@ findNovelAlleles <- function(clip_db, germline_db,
                 names(msg) <- c("j_max", "min_seqs")
                 
                 if (sum(min_seqs_pass) == 0) {
-                    msg['min_seqs'] <- paste0("not enough sequences (maximum total count is ",
+                    msg['min_seqs'] <- paste0("Not enough sequences (maximum total count is ",
                                               max(db_y_summary0$TOTAL_COUNT),
-                                              ")")
+                                              ").")
                 }
                 
                 if (sum(j_max_pass) == 0) {
-                    msg['j_max'] <- paste0("a J-junction combination is too prevalent (",
-                                           round(100*max(db_y_summary0$MAX_FRAC),1),"% of sequences)")
+                    msg['j_max'] <- paste0("A J-junction combination is too prevalent (",
+                                           round(100*max(db_y_summary0$MAX_FRAC),1),"% of sequences).")
                 }
                 
                 msg <- paste(na.omit(msg), collapse=" and ")
@@ -534,7 +515,7 @@ findNovelAlleles <- function(clip_db, germline_db,
         sapply(novel_imgt, function(n) {
             n <- substr(n, min(pos_range), max(pos_range))
             sum(grepl(gsub("[-\\.]","",n),
-                      gsub("[-\\.]","",clip_db$SEQUENCE_IMGT)))
+                      gsub("[-\\.]","",data_db$SEQUENCE_IMGT)))
         })
     }
     
@@ -544,8 +525,8 @@ findNovelAlleles <- function(clip_db, germline_db,
         sapply(novel_imgt, function(n) {
             n <- substr(n, min(pos_range), max(pos_range))
             imgt_idx <- grepl(gsub("[-\\.]","",n),
-                              gsub("[-\\.]","",clip_db$SEQUENCE_IMGT))
-            length(unique(getGene(clip_db[['J_CALL']][imgt_idx])))
+                              gsub("[-\\.]","",data_db$SEQUENCE_IMGT))
+            length(unique(getGene(data_db[['J_CALL']][imgt_idx])))
         })
     }
     
@@ -556,8 +537,8 @@ findNovelAlleles <- function(clip_db, germline_db,
         sapply(novel_imgt, function(n) {
             n <- substr(n, min(pos_range), max(pos_range))
             imgt_idx <- grepl(gsub("[-\\.]","",n),
-                              gsub("[-\\.]","",clip_db$SEQUENCE_IMGT))
-            seq <- clip_db[['JUNCTION']][imgt_idx]
+                              gsub("[-\\.]","",data_db$SEQUENCE_IMGT))
+            seq <- data_db[['JUNCTION']][imgt_idx]
             seq <- substr(seq, 4, stringi::stri_length(seq) - 3)
             length(unique(seq))
         })
@@ -569,13 +550,13 @@ findNovelAlleles <- function(clip_db, germline_db,
                                                   out_df$GERMLINE_CALL[idx])
         out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
         out_df$NOVEL_IMGT_UNIQUE_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
-        if ("JUNCTION" %in% colnames(clip_db)) {
+        if ("JUNCTION" %in% colnames(data_db)) {
             out_df$NOVEL_IMGT_UNIQUE_CDR3[idx] <- getNumCDR3(out_df$NOVEL_IMGT[idx])
         }
     }
     out_df$GERMLINE_IMGT_COUNT <- getDbMatch(out_df$GERMLINE_IMGT)
     out_df$UNMUTATED_FREQ = out_df$UNMUTATED_COUNT/out_df$GERMLINE_CALL_COUNT
-    rm(clip_db)
+    rm(data_db)
     gc()
     return(out_df)
 }
@@ -642,13 +623,13 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' germline allele.
 
 #' 
-#' @param    clip_db        a \code{data.frame} in Change-O format. See
+#' @param    data_db        a \code{data.frame} in Change-O format. See
 #'                          \link{findNovelAlleles} for details.
 #' @param    novel_df_row   a single row from a data frame as output by
 #'                          \link{findNovelAlleles} that contains a
 #'                          polymorphism-containing germline allele
 #' @param    ncol           number of columns to use when laying out the plots  
-#' @param    v_call         name of the column in \code{clip_db} with V allele
+#' @param    v_call         name of the column in \code{data_db} with V allele
 #'                          calls. Default is "V_CALL"
 #' @return   NULL
 #' 
@@ -658,7 +639,7 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' plotNovel(SampleDb, novel[1,])
 #' 
 #' @export
-plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
+plotNovel <- function(data_db, novel_df_row, ncol = 1, v_call="V_CALL") {
     . = NULL
     
     # Use the data frame
@@ -678,18 +659,18 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
     }
     
     germline = cleanSeqs(germline)
-    clip_db$SEQUENCE_IMGT = cleanSeqs(clip_db$SEQUENCE_IMGT)
+    data_db$SEQUENCE_IMGT = cleanSeqs(data_db$SEQUENCE_IMGT)
     
     # Extract sequences assigned to the germline, determine which
     # have an appropriate range of mutations, and find the mutation
     # frequency of each position
-    db_subset = clip_db %>%
+    db_subset = data_db %>%
         select_(~SEQUENCE_IMGT, v_call, ~J_CALL, ~JUNCTION_LENGTH) %>%
-        filter_(~grepl(names(germline),  clip_db[[v_call]], fixed=TRUE))
+        filter_(~grepl(names(germline),  data_db[[v_call]], fixed=TRUE))
     pos_db = db_subset %>%  
         mutationRangeSubset(germline, mut_range, pos_range)
     if (nrow(pos_db) == 0) {
-        warning(paste0("Insufficient sequences (",nrow(pos_db),") in desired mutational range"))
+        warning(paste0("Insufficient sequences (",nrow(pos_db),") in desired mutational range."))
         return (invisible(NULL))
     }
     pos_db <- pos_db %>%
@@ -732,7 +713,7 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
         filter_(~MUT_COUNT_NOVEL == 0) %>%
         mutate_(J_GENE = ~getGene(J_CALL))
     if (nrow(db_subset) == 0) {
-        warning(paste0("Insufficient sequences (",nrow(db_subset),") with MUT_COUNT_NOVEL == 0"))
+        warning(paste0("Insufficient sequences (",nrow(db_subset),") with MUT_COUNT_NOVEL == 0."))
         return (invisible(NULL))
     }
     db_subset$JUNCTION_LENGTH = db_subset$JUNCTION_LENGTH %>%
@@ -826,11 +807,11 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
 #' way, mistaken allele calls (resulting from sequences which
 #' by chance have been mutated to look like another allele) can be removed.
 #' 
-#' @param    clip_db              a \code{data.frame} containing V allele
+#' @param    data_db              a \code{data.frame} containing V allele
 #'                                calls from a single subject. If
 #'                                \code{find_unmutated} is \code{TRUE}, then
 #'                                the sample IMGT-gapped V(D)J sequence should 
-#' @param    v_call               column in \code{clip_db} with V allele calls.
+#' @param    v_call               column in \code{data_db} with V allele calls.
 #'                                Default is \code{"V_CALL"}                               
 #'                                be provided in a column \code{"SEQUENCE_IMGT"}
 #' @param    fraction_to_explain  the portion of each gene that must be
@@ -882,12 +863,12 @@ plotNovel <- function(clip_db, novel_df_row, ncol = 1, v_call="V_CALL") {
 #'          using a Bayesian approach.
 #' 
 #' @export
-inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
+inferGenotype <- function(data_db, v_call="V_CALL", fraction_to_explain = 0.875,
                           gene_cutoff = 1e-4, find_unmutated = TRUE,
                           germline_db = NA, novel_df = NA){
     
     . = NULL
-    allele_calls = getAllele(clip_db[[v_call]], first=FALSE, strip_d=FALSE)
+    allele_calls = getAllele(data_db[[v_call]], first=FALSE, strip_d=FALSE)
     # Find the unmutated subset, if requested
     if(find_unmutated){
         if(is.na(germline_db[1])){
@@ -911,7 +892,7 @@ inferGenotype <- function(clip_db, v_call="V_CALL", fraction_to_explain = 0.875,
         }
         # Find unmutated sequences
         allele_calls = findUnmutatedCalls(allele_calls,
-                                          as.character(clip_db$SEQUENCE_IMGT),
+                                          as.character(data_db$SEQUENCE_IMGT),
                                           germline_db)
         if(length(allele_calls) == 0){
             stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
@@ -1149,7 +1130,7 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' @param    genotype_db   a vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #'                         and personalized to the subject
-#' @param    v_call        name of the column in \code{clip_db} with V allele
+#' @param    v_call        name of the column in \code{data_db} with V allele
 #'                         calls. Default is \code{"V_CALL"}                         
 #' @param    method        the method to be used when realigning sequences to
 #'                         the genotype_db sequences. Currently only "hammming"
@@ -1801,7 +1782,7 @@ cleanSeqs <- function(seqs) {
 # position to be analyzed and determines if each sample is mutated at that
 # position
 # 
-# @param  clip_db       A Change-O db data frame. See
+# @param  data_db       A Change-O db data.frame. See
 #                       \link{findNovelAlleles} for a list of required
 #                       columns.
 # @param  germline      The germline to which all the sequences should be
@@ -1813,16 +1794,16 @@ cleanSeqs <- function(seqs) {
 # analyzed and a column indicating whether the position is mutated in
 # comparison to the germline
 #
-positionMutations <- function(clip_db, germline, pos_range){
+positionMutations <- function(data_db, germline, pos_range){
     . = NULL
     pos_db = pos_range %>%
         length() %>%
-        rep("clip_db", .) %>%
+        rep("data_db", .) %>%
         paste(collapse=",") %>%
         paste("bind_rows(",., ")") %>%
         parse(text=.) %>%
         eval()
-    pos_db$POSITION = c(sapply(pos_range, rep, nrow(clip_db)))
+    pos_db$POSITION = c(sapply(pos_range, rep, nrow(data_db)))
     # Find which positions are mutated
     pos_db = pos_db %>%
         mutate_(NT = ~substring(SEQUENCE_IMGT, POSITION, POSITION)) %>%
@@ -1838,7 +1819,7 @@ positionMutations <- function(clip_db, germline, pos_range){
 # sequences and returns the subset of sequences that meet the given mutation
 # count limits
 # 
-# @param  clip_db       A Change-O db data frame. See
+# @param  data_db       A Change-O db data frame. See
 #                       \link{findNovelAlleles} for a list of required
 #                       columns.
 # @param  germline      The germline to which all the sequences should be
@@ -1851,17 +1832,17 @@ positionMutations <- function(clip_db, germline, pos_range){
 # @return  A data frame containing only the subset carrying the desired levels
 # of mutation
 #
-mutationRangeSubset <- function(clip_db, germline, mut_range, pos_range){
+mutationRangeSubset <- function(data_db, germline, mut_range, pos_range){
     . = NULL
     pads = paste(rep("-", min(pos_range)-1), collapse="")
-    clip_db$MUT_COUNT = clip_db$SEQUENCE_IMGT %>%
+    data_db$MUT_COUNT = data_db$SEQUENCE_IMGT %>%
         substring(min(pos_range), max(pos_range)) %>%
         paste(pads, ., sep="") %>%
         getMutatedPositions(germline) %>%
         sapply(length)
-    clip_db = clip_db %>%
+    data_db = data_db %>%
         filter_(~MUT_COUNT %in% mut_range)
-    return(clip_db)
+    return(data_db)
 }
 
 # Find lower range of y-intercept confidence interval
