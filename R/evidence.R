@@ -55,9 +55,8 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' @param germline_db The original input germline database used to by
 #'            \link{findNovelAlleles} to identify novel alleles in 
 #'            \code{db}.
-#' @param iteration_id Column name that identifies iterations from 
-#'            if \link{itigger} was used.
-#' @param fields  Column names of fields used to split the data in \link{itigger}
+#' @param fields  Column names of fields used to split the data.
+#' 
 #' @return   Returns \code{gt} with additional columns providing supporting evidence
 #'           for each inferred allele.
 #'    \itemize{
@@ -101,8 +100,7 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #'       \item \code{NOTE} See \link{findNovelAlleles}
 #'    }     
 #' @export
-generateEvidence <- function(gt, nv, germline_nv, germline_input,
-                             db, iteration_id=NULL, fields=NULL) {
+generateEvidence <- function(gt, nv, germline_nv, germline_input, db, fields=NULL) {
     
     # Find closest reference
     .findClosestReference <- function(seq, allele_calls, ref_germ, 
@@ -169,19 +167,17 @@ generateEvidence <- function(gt, nv, germline_nv, germline_input,
         dplyr::group_by(GENE) %>%
         dplyr::filter(duplicated(ALLELES) == FALSE) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(
-            ALLELES=strsplit(as.character(ALLELES),","),
-            COUNTS=strsplit(as.character(COUNTS),",")) %>%
+        dplyr::mutate(ALLELES=strsplit(as.character(ALLELES), ","),
+                      COUNTS=strsplit(as.character(COUNTS), ",")) %>%
         tidyr::unnest(ALLELES, COUNTS) %>%
         dplyr::rename(ALLELE=ALLELES) %>%
-        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELE)) %>%
+        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE, "*" ,ALLELE)) %>%
         dplyr::filter(POLYMORPHISM_CALL %in% nv$POLYMORPHISM_CALL)
     
     # Add info from nv
-    final_gt <- merge(final_gt %>% 
-                          dplyr::rename(NOTE_GT=NOTE), 
-                      nv, 
-                      by=c(iteration_id, fields, "POLYMORPHISM_CALL"))
+    final_gt <- dplyr::inner_join(dplyr::rename(final_gt, NOTE_GT=NOTE), 
+                                  nv, 
+                                  by=c(fields, "POLYMORPHISM_CALL"))
     
     # Add message if the same novel img sequence found from
     # different starting alleles, these will be novel imgt sequences

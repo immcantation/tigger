@@ -62,7 +62,7 @@
 #' @importFrom  dplyr       do n desc %>%
 #'                          glimpse distinct distinct_
 #'                          as_data_frame data_frame data_frame_
-#'                          bind_cols bind_rows combine
+#'                          bind_cols bind_rows combine inner_join
 #'                          filter filter_ select select_ arrange arrange_
 #'                          group_by group_by_ ungroup
 #'                          mutate mutate_ transmute transmute_
