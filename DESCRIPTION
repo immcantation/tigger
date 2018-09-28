@@ -4,17 +4,21 @@ Version: 0.2.11.999
 Date: 2018-09-24
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
+             person("Susanna", "Marquez", role=c("aut"), 
+                    email="susanna.marquez@yale.edu"),                    
+             person("Moriah", "Cohen", role=c("aut"), 
+                    email="moriah.cohen@biu.ac.il"),   
+             person("Gur", "Yaari", role=c("aut"), 
+                    email="gur.yaari@biu.ac.il"),
              person("Jason", "Vander Heiden", role=c("ctb", "cre"), 
                     email="jason.vanderheiden@yale.edu"),
-             person("Susanna", "Marquez", role=c("ctb"), 
-                                email="susanna.marquez@yale.edu"),                    
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
-Title: R Tools for Inferring New Immunoglobulin Alleles from Rep-Seq Data
+Title: Infers Novel Immunoglobulin Alleles from Sequencing Data
 Description: Infers the V genotype of an individual from immunoglobulin (Ig)
-    repertoire-sequencing (Rep-Seq) data, including detection of any novel
-    alleles. This information is then used to correct existing V allele calls
-    from among the sample sequences.
+    repertoire sequencing data (AIRR-Seq, Rep-Seq). Includes detection of 
+    any novel alleles. This information is then used to correct existing V 
+    allele calls from among the sample sequences.
     Citations:
     Gadala-Maria, et al (2015) <doi:10.1073/pnas.1417683112>.
 License: CC BY-SA 4.0
@@ -28,9 +32,9 @@ Depends:
     R (>= 3.2.5),
     ggplot2 (>= 2.0.0)
 Imports:
-    alakazam (>= 0.2.10),
+    alakazam (>= 0.2.11),
     tidyr,
-    dplyr (>= 0.5.0),
+    dplyr (>= 0.7.0),
     doParallel,
     foreach,
     graphics,
@@ -39,8 +43,9 @@ Imports:
     iterators,
     lazyeval,
     parallel,
-    shazam (>= 0.1.9),
-    stats
+    shazam (>= 0.1.10),
+    stats,
+    stringi
 Suggests:
     knitr,
     testthat

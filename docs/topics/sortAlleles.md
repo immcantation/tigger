@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **sortAlleles** - *Sort allele names*
 
 Description
@@ -50,7 +44,7 @@ Examples
 
 ```R
 # Create a list of allele names
-alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
+alleles <- c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
 "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
 "IGHV1-2", "IGHV1-2*02", "IGHV1-69*02")
 

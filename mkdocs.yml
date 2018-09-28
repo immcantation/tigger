@@ -39,8 +39,8 @@ pages:
       - topics/sortAlleles.md
       - topics/updateAlleleNames.md
     - 'Data':
-      - topics/genotype.md
-      - topics/germline_ighv.md
-      - topics/novel_df.md
-      - topics/sample_db.md
+      - topics/GermlineIGHV.md
+      - topics/SampleDb.md
+      - topics/SampleGenotype.md
+      - topics/SampleNovel.md
 

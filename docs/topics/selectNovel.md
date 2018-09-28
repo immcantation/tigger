@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **selectNovel** - *Select rows containing novel alleles*
 
 Description
@@ -57,8 +51,7 @@ Examples
 -------------------
 
 ```R
-data(novel_df)
-novel = selectNovel(novel_df)
+novel <- selectNovel(SampleNovel)
 ```
 
 

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **cleanSeqs** - *Clean up nucleotide sequences*
 
 Description
@@ -40,7 +34,7 @@ Examples
 
 ```R
 # Create messy nucleotide sequences
-seqs = c("AGAT.taa-GAG...ATA",
+seqs <- c("AGAT.taa-GAG...ATA",
 "GATACAGTXXXXXAGNNNPPPACA")
 # Clean them up
 cleanSeqs(seqs)

@@ -1,19 +1,14 @@
-
-
-
-
-
-
-**inferGenotype** - *Infer a subject-specific genotype*
+**inferGenotype** - *Infer a subject-specific genotype using a frequency method*
 
 Description
 --------------------
 
-`inferGenotype` infers an subject's genotype by finding the minimum
-number set of alleles that can explain the majority of each gene's calls. The
-most common allele of each gene is included in the genotype first, and the
-next most common allele is added until the desired fraction of alleles can be
-explained. In this way, mistaken allele calls (resulting from sequences which
+`inferGenotype` infers an subject's genotype using a frequency method.
+The genotype is inferred by finding the minimum number set of alleles that 
+can explain the majority of each gene's calls. The most common allele of 
+each gene is included in the genotype first, and the next most common allele 
+is added until the desired fraction of alleles can be explained. In this 
+way, mistaken allele calls (resulting from sequences which
 by chance have been mutated to look like another allele) can be removed.
 
 
@@ -108,11 +103,8 @@ Examples
 ```R
 # Infer the IGHV genotype, using only unmutated sequences, including any 
 # novel alleles
-data(sample_db)
-data(germline_ighv)
-data(novel_df)
-inferGenotype(sample_db, find_unmutated = TRUE, germline_db = germline_ighv,
-novel_df = novel_df)
+inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
+novel_df=SampleNovel)
 ```
 
 
@@ -137,6 +129,8 @@ See also
 
 [plotGenotype](plotGenotype.md) for a colorful visualization and
 [genotypeFasta](genotypeFasta.md) to convert the genotype to nucleotide sequences.
+See [inferGenotypeBayesian](inferGenotypeBayesian.md) to infer a subject-specific genotype 
+using a Bayesian approach.
 
 
 

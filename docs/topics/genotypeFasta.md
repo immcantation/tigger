@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **genotypeFasta** - *Return the nucleotide sequences of a genotype*
 
 Description
@@ -50,13 +44,8 @@ Examples
 -------------------
 
 ```R
-# Load example data
-data(germline_ighv)
-data(novel_df)
-data(genotype)
-
 # Find the sequences that correspond to the genotype
-genotype_seqs = genotypeFasta(genotype, germline_ighv, novel_df)
+genotype_seqs <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
 ```
 
 

@@ -1,3 +1,14 @@
+Version 0.2.11.999 September 24, 2018
+-------------------------------------------------------------------------------
+
++ Renamed sample data from `germline_ighv`, `sample_db`, `genotype` and 
+  `novel_df` to `GermlineIGHV`, `SampleDb`, `SampleGenotype` and `SampleNovel`,
+  respectively.
++ Fixed a bug in `reassignAlleles`.
++ Changed the return behavior of `reassignAlleles` so that it returns the 
+  input data.frame with the `V_CALL_GENOTYPED` column appended or overwritten.
+
+
 Version 0.2.11 September 21, 2017
 -------------------------------------------------------------------------------
 

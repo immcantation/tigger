@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **findNovelAlleles** - *Find novel alleles from repertoire sequencing data*
 
 Description
@@ -62,12 +56,13 @@ pos_range
 considered by the algorithm
 
 y_intercept
-:   the y-intercept above which positions should be
+:   the y-intercept threshold above which positions should be
 considered potentially polymorphic
 
 alpha
-:   the alpha cutoff to be used when constructing the
-confidence interval for the y-intercept
+:   the alpha value used for determining whether the 
+fit y-intercept is greater than the `y_intercept`
+threshold
 
 j_max
 :   the maximum fraction of sequences perfectly aligning
@@ -92,7 +87,92 @@ Value
 a `data.frame` with a row for each known allele analyzed.
 Besides metadata on the the parameters used in the search, each row will have
 either a note as to where the polymorphism-finding algorithm exited or a
-nucleotide sequence for the predicted novel allele.
+nucleotide sequence for the predicted novel allele, along with columns providing
+additional evidence.
+
+Messages in the field `NOTE`:
+
+
++  *Novel allele found!* 
++  *Plurality sequence too rare*: No sequence is frequent 
+enough to pass the J test (`j_max`).
++  *a J-junction combination is too prevalent*: Not enough
+J diversity (`j_max`).
++  *No positions pass y-intercept test*. No positions above
+`y_intercept`.
++  *Insufficient sequences in desired mutational range*. 
+`mut_range` and `pos_range`.
++  *not enough sequences*:  not enough sequences in the 
+desired mutational range and nucleotide range.
+`min_seqs`
++  *no unmutated versions of novel allele found*
+
+
+Other fields:
+
++  *GERMLINE_CALL*: The input V call
++  *POLYMORPHISM_CALL*: The new allele call
++  *NT_SUBSTITUTIONS*: Mutations identified in the new allele, relative
+to the reference germline (`GERMLINE_CALL`)
++  *NOVEL_IMGT*: New allele
++  *NOVEL_IMGT_COUNT*:  the number of times the sequence 
+`NOVEL_IMGT` is found in the input data 
+`clip_db`. Considers the subsequence of 
+`NOVEL_IMGT` in the range `pos_range`.  
++  *NOVEL_IMGT_UNIQUE_J*: Number of disctinct J calls associated
+to `NOVEL_IMGT` in `clip_db`. Considers
+the subsequence of `NOVEL_IMGT` in the range 
+`pos_range`.       
++  *NOVEL_IMGT_UNIQUE_CDR3*: Number of disctinct CDR3 associated
+to `NOVEL_IMGT` in `clip_db`. Considers
+the subsequence of `NOVEL_IMGT` in the range 
+`pos_range`.                                              
++  *PERFECT_MATCH_COUNT*: Final number of sequences retained to call 
+the new allele. These are unique sequences that have 
+Vs that perfect match the predicted germline in the 
+range `pos_range`.
++  *PERFECT_MATCH_FREQ*: `PERFECT_MATCH_COUNT`/`GERMLINE_CALL_COUNT`
++  *GERMLINE_CALL_COUNT*: the number of sequences with the particular
+`GERMLINE_CALL` in `clip_db` initially
+considered for the analysis.
++  *GERMLINE_CALL_PERC*: the percent of sequences with the particular
+`GERMLINE_CALL` in `clip_db` initially      
+considered for the analysis.              
++  *GERMLINE_IMGT*: Germline sequence for `GERMLINE_CALL`
++  *GERMLINE_IMGT_COUNT*:  the number of times the sequence sequence
+`GERMLINE_IMGT` is found in the input data 
+`clip_db`.     
++  *MUT_MIN*: Minimum mutation considered by the algorithm
++  *MUT_MAX*: Maximum mutation considered by the algorithm
++  *MUT_PASS_COUNT*: Number of sequences in the mutation range
++  *POS_MIN*: First position of the sequence considered by the
+algorithm (IMGT numbering)
++  *POS_MAX*: Last position of the sequence considered by the 
+algorithm (IMGT numbering)
++  *Y_INTERCEPT*: The y-intercept above which positions were 
+considered potentially polymorphic
++  *Y_INTERCEPT_PASS*: Number of positions that pass Y_INTERCEPT  
++  *SNP_PASS*: Number of sequences that pass Y_INTERCEPT and are
+within the desired nucleotide range (`min_seqs`)   
++  *UNMUTATED_COUNT*: Number of unmutated sequences
++  *UNMUTATED_FREQ*: Number of unmutated sequences over 
+`GERMLINE_IMGT_COUNT`
++  *UNMUTATED_SNP_J_GENE_LENGTH_COUNT*: Number of distinct combinations
+of SNP, J gene and junction length.     
++  *SNP_MIN_SEQS_J_MAX_PASS*: Number of SNP strings that pass both the 
+`min_seqs` and `j_max` thresholds                                                  
++  *ALPHA*: Significance cutoff to be used when constructing the 
+confidence interval for the y-intercept
++  *MIN_SEQS*: Input `min_seqs`. The minimum number of total sequences (within the 
+desired mutational range and nucleotide range) required 
+for the samples to be considered
++  *J_MAX*: Input `j_max`. The maximum fraction of sequences perfectly aligning to 
+a potential novel allele that are allowed to utilize to a 
+particular combination of junction length and J gene
++  *MIN_FRAC*: Input `min_frac`. The minimum fraction of sequences that must have 
+usable nucleotides in a given position for that position to 
+be considered
+
 
 
 Details
@@ -121,12 +201,9 @@ Examples
 -------------------
 
 ```R
-# Load example data and germlines
-data(sample_db)
-data(germline_ighv)
-
+### Not run:
 # Find novel alleles and return relevant data
-### Not run: novel_df = findNovelAlleles(sample_db, germline_ighv)
+# novel_df <- findNovelAlleles(SampleDb, GermlineIGHV)
 ```
 
 
