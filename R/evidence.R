@@ -48,14 +48,15 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #'            the genotype of the subject.
 #' @param nv  A data.frame returned by \link{findNovelAlleles}.
 #' @param germline_nv A vector of named nucleotide germline sequences 
-#'            matching the V calls in clip_db. This is an extended version of 
-#'            \code{germline_db} in that includes the original reference datatabase
-#'            and any novel alleles identified after running 
-#'            \link{findNovelAlleles} and \link{inferGenotype}.
-#' @param germline_db The original input germline database used to by
+#'            matching the V calls in clip_db. This includes the original reference
+#'            germline datatabase used to infer alleles and any novel 
+#'            alleles identified after running \link{findNovelAlleles} 
+#'            and \link{inferGenotype}.
+#' @param germline_input The original input germline database used to by
 #'            \link{findNovelAlleles} to identify novel alleles in 
 #'            \code{db}.
-#' @param fields  Column names of fields used to split the data.
+#' @param db  The data.frame used \link{findNovelAlleles}.
+#' @param fields  Column names of fields used to split the data to identify novel alleles.
 #' 
 #' @return   Returns \code{gt} with additional columns providing supporting evidence
 #'           for each inferred allele.
