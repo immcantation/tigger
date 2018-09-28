@@ -18,7 +18,7 @@ pages:
   - 'Vignettes':
     - 'Polymorphism detection and genotyping': vignettes/Tigger-Vignette.md
   - 'Help Topics':
-    - 'Core functions':
+    - 'Allele detection and genotyping':
       - topics/findNovelAlleles.md
       - topics/selectNovel.md
       - topics/plotNovel.md
@@ -26,6 +26,7 @@ pages:
       - topics/plotGenotype.md
       - topics/genotypeFasta.md
       - topics/reassignAlleles.md
+      - topics/generateEvidence.md
     - 'Mutation handling':
       - topics/getMutatedPositions.md
       - topics/getMutCount.md
