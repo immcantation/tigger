@@ -27,27 +27,28 @@ The former can be created through the use of [IMGT/HighV-QUEST](http://www.imgt.
 
 For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](https://bitbucket.org/kleinstein/tigger/issues?status=new&status=open).
 
-Dependencies
----------------
+
+# Dependencies
 
 **Depends:** ggplot2  
-**Imports:** alakazam, tidyr, dplyr, doParallel, foreach, graphics, grid, iterators, lazyeval, parallel, stats  
+**Imports:** alakazam, tidyr, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, shazam, stats, stringi  
 **Suggests:** knitr, testthat
 
-Authors
----------------
+
+# Authors
 
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
 [Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (ctb, cre)  
+[Susanna Marquez](mailto:susanna.marquez@yale.edu) (ctb)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
-Citing
----------------
+
+# Citing
 
 
-Gadala-Maria D, Yaari G, Uduman M and Kleinstein Ss (2015). “Automated analysis of high-throughput B cell sequencing data
-reveals a high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the National Academy of Sciency of
-the United States of America_, pp. E862-70.
+Gadala-Maria D, Yaari G, Uduman M, Kleinstein Ss (2015). “Automated analysis of high-throughput B cell
+sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the
+National Academy of Sciency of the United States of America_, E862-70.
 
 A BibTeX entry for LaTeX users is
 

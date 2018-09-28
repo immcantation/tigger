@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **readIgFasta** - *Read immunoglobulin sequences*
 
 Description

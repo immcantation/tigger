@@ -1,9 +1,9 @@
 #' Human IGHV germlines
 #'
 #' A \code{character} vector of all 344 human IGHV germline gene segment alleles
-#' in IMGT Gene-db release 201408-4.
+#' in IMGT/GENE-DB release 201408-4.
 #'
-#' @name germline_ighv
+#' @name GermlineIGHV
 #' @docType data
 #' @format Values correspond to IMGT-gaped nuceltoide sequences (with
 #' nucleotides capitalized and gaps represented by ".") while names correspond
@@ -23,7 +23,7 @@ NULL
 #' individual (PGP1), sequenced on the Roche 454 platform, and thought by
 #' IMGT/V-QUEST to utilize IGHV1 family alleles.
 #'
-#' @name sample_db
+#' @name SampleDb
 #' @docType data
 #' @format A \code{data.frame} where rows correspond to unique VDJ sequences and
 #' columns include:
@@ -47,7 +47,7 @@ NULL
 #' IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
 #' \link{findNovelAlleles}.
 #'
-#' @name novel_df
+#' @name SampleNovel
 #' @docType data
 #' @format A \code{data.frame} where rows correspond to alleles checked for
 #' polymorphisms and columns give results as well as paramaters used to run
@@ -66,7 +66,7 @@ NULL
 #' IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
 #' \link{findNovelAlleles} and \link{inferGenotype}
 #'
-#' @name genotype
+#' @name SampleGenotype
 #' @docType data
 #' @format A \code{data.frame} where rows correspond to genes carried by an
 #' individual and columns lists the alleles of those genes and their counts.

@@ -1,9 +1,3 @@
-
-
-
-
-
-
 **reassignAlleles** - *Correct allele calls based on a personalized genotype*
 
 Description
@@ -17,14 +11,14 @@ from a single subject.
 Usage
 --------------------
 ```
-reassignAlleles(clip_db, genotype_db, v_call = "V_CALL", method = "hamming",
-path = NA, keep_gene = TRUE)
+reassignAlleles(db, genotype_db, v_call = "V_CALL", method = "hamming",
+path = NA, keep_gene = c(TRUE, "gene", "family", "repertoire"))
 ```
 
 Arguments
 -------------------
 
-clip_db
+db
 :   a `data.frame` containing V allele calls from a
 single subject and the sample
 IMGT-gapped V(D)J sequences under
@@ -50,10 +44,12 @@ realignment method, if needed. Hamming distance does
 not require a path to a tool.
 
 keep_gene
-:   logical indicating if gene assignments should be
-maintained when possible. Increases speed by
-minimizing required number of alignments. Currently
-only "TRUE" is implemented.
+:   logical indicating if gene, family or complete repertoire
+assignments should be performed. Use of 'gene' 
+(or TRUE, for backward compatibility)
+increases speed by minimizing required number of 
+alignments, as gene assignments will be
+maintained when possible.
 
 
 
@@ -61,9 +57,9 @@ only "TRUE" is implemented.
 Value
 -------------------
 
-a single-column `data.frame` corresponding to `clip.db`
-and containing the best allele call from among the sequences
-listed in `genotype_db`
+A modifed input `data.frame` containing the best allele call from 
+among the sequences listed in `genotype_db` in the 
+`V_CALL_GENOTYPED` column.
 
 
 Details
@@ -79,18 +75,11 @@ Examples
 -------------------
 
 ```R
-# Load example data
-data(germline_ighv)
-data(sample_db)
-data(genotype)
-data(novel_df)
-
 # Extract the database sequences that correspond to the genotype
-genotype_seqs = genotypeFasta(genotype, germline_ighv, novel_df)
+genotype_seqs <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
 
 # Use the personlized genotype to determine corrected allele assignments
-V_CALL_GENOTYPED = reassignAlleles(sample_db, genotype_seqs)
-sample_db = cbind(sample_db, V_CALL_GENOTYPED)
+output_db <- reassignAlleles(SampleDb, genotype_seqs)
 ```
 
 

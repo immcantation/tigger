@@ -1,26 +1,25 @@
-
-
-
-
-
-
-**genotype** - *Example of an Inferred Genotype*
+**SampleDb** - *Example human Rep-Seq data*
 
 Description
 --------------------
 
 Example VDJ-rearranged immunoglobulin Rep-Seq sequences derived from a single
 individual (PGP1), sequenced on the Roche 454 platform, and thought by
-IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
-[findNovelAlleles](findNovelAlleles.md) and [inferGenotype](inferGenotype.md)
+IMGT/V-QUEST to utilize IGHV1 family alleles.
 
 
 
 
 Format
 -------------------
-A `data.frame` where rows correspond to genes carried by an
-individual and columns lists the alleles of those genes and their counts.
+A `data.frame` where rows correspond to unique VDJ sequences and
+columns include:
+
++  IMGT-gapped nucleotide sequence (`"SEQUENCE_IMGT"`)
++  IMGT/V-QUEST allele calls (`"V_CALL"`, `"D_CALL"`, and
+`"J_CALL"`)
++  Junction length (`"JUNCTION_LENGTH"`)
+
 
 References
 -------------------
