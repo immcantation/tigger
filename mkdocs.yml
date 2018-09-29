@@ -21,12 +21,13 @@ pages:
     - 'Allele detection and genotyping':
       - topics/findNovelAlleles.md
       - topics/selectNovel.md
-      - topics/plotNovel.md
       - topics/inferGenotype.md
-      - topics/plotGenotype.md
+      - topics/inferGenotypeBayesian.md
       - topics/genotypeFasta.md
       - topics/reassignAlleles.md
       - topics/generateEvidence.md
+      - topics/plotNovel.md
+      - topics/plotGenotype.md
     - 'Mutation handling':
       - topics/getMutatedPositions.md
       - topics/getMutCount.md
