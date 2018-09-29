@@ -10,13 +10,13 @@ selects only the rows containing unique, novel alleles.
 Usage
 --------------------
 ```
-selectNovel(novel_df, keep_alleles = FALSE)
+selectNovel(novel, keep_alleles = FALSE)
 ```
 
 Arguments
 -------------------
 
-novel_df
+novel
 :   a `data.frame` of the type returned by
 [findNovelAlleles](findNovelAlleles.md).
 

@@ -16,30 +16,20 @@ The larger the Bayes factor (K), the greater the certainty in the model.
 Usage
 --------------------
 ```
-inferGenotypeBayesian(data_db, v_call = "V_CALL",
-find_unmutated = TRUE, germline_db = NA, novel_df = NA,
-priors = c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25))
+inferGenotypeBayesian(data, germline_db = NA, novel = NA,
+v_call = "V_CALL", find_unmutated = TRUE, priors = c(0.6, 0.4, 0.4,
+0.35, 0.25, 0.25, 0.25, 0.25, 0.25))
 ```
 
 Arguments
 -------------------
 
-data_db
+data
 :   a `data.frame` containing V allele
 calls from a single subject. If
 `find_unmutated` is `TRUE`, then
 the sample IMGT-gapped V(D)J sequence should 
 be provided in a column `"SEQUENCE_IMGT"`
-
-v_call
-:   column in `data_db` with V allele calls.
-Default is `"V_CALL"`.
-
-find_unmutated
-:   if `TRUE`, use `germline_db` to
-find which samples are unmutated. Not needed
-if `allele_calls` only represent
-unmutated samples.
 
 germline_db
 :   named vector of sequences containing the
@@ -47,13 +37,23 @@ germline sequences named in
 `allele_calls`. Only required if
 `find_unmutated` is `TRUE`.
 
-novel_df
+novel
 :   an optional `data.frame` of the type
 novel returned by
 [findNovelAlleles](findNovelAlleles.md) containing
 germline sequences that will be utilized if
 `find_unmutated` is `TRUE`. See
 Details.
+
+v_call
+:   column in `data` with V allele calls.
+Default is `"V_CALL"`.
+
+find_unmutated
+:   if `TRUE`, use `germline_db` to
+find which samples are unmutated. Not needed
+if `allele_calls` only represent
+unmutated samples.
 
 priors
 :   vector of priors for the multinomial 
@@ -94,7 +94,7 @@ Allele calls representing cases where multiple alleles have been
 assigned to a single sample sequence are rare among unmutated
 sequences but may result if nucleotides for certain positions are
 not available. Calls containing multiple alleles are treated as
-belonging to all groups. If `novel_df` is provided, all
+belonging to all groups. If `novel` is provided, all
 sequences that are assigned to the same starting allele as any
 novel germline allele will have the novel germline allele appended
 to their assignent prior to searching for unmutated sequences.
@@ -123,8 +123,8 @@ Examples
 
 ```R
 # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-inferGenotypeBayesian(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
-novel_df=SampleNovel)
+inferGenotypeBayesian(SampleDb, germline_db=GermlineIGHV, novel=SampleNovel, 
+find_unmutated=TRUE)
 ```
 
 

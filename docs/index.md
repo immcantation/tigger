@@ -31,7 +31,7 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 # Dependencies
 
 **Depends:** ggplot2  
-**Imports:** alakazam, tidyr, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, shazam, stats, stringi  
+**Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, shazam, stats, stringi, tidyr  
 **Suggests:** knitr, testthat
 
 

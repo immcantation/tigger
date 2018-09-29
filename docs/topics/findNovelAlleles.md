@@ -11,7 +11,7 @@ might be polymorphic.
 Usage
 --------------------
 ```
-findNovelAlleles(data_db, germline_db, v_call = "V_CALL",
+findNovelAlleles(data, germline_db, v_call = "V_CALL",
 germline_min = 200, min_seqs = 50, auto_mutrange = TRUE,
 mut_range = 1:10, pos_range = 1:312, y_intercept = 0.125,
 alpha = 0.05, j_max = 0.15, min_frac = 0.75, nproc = 1)
@@ -20,15 +20,15 @@ alpha = 0.05, j_max = 0.15, min_frac = 0.75, nproc = 1)
 Arguments
 -------------------
 
-data_db
+data
 :   a `data.frame` in Change-O format. See details.
 
 germline_db
 :   a vector of named nucleotide germline sequences
-matching the V calls in `data_db`
+matching the V calls in `data`.
 
 v_call
-:   name of the column in data_db with V allele calls. 
+:   name of the column in `data` with V allele calls. 
 Default is V_CALL.
 
 germline_min
@@ -182,7 +182,7 @@ Examples
 ```R
 ### Not run:
 # Find novel alleles and return relevant data
-# novel_df <- findNovelAlleles(SampleDb, GermlineIGHV)
+# novel <- findNovelAlleles(SampleDb, GermlineIGHV)
 ```
 
 

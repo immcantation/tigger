@@ -11,27 +11,27 @@ visualize the results for alleles that did
 Usage
 --------------------
 ```
-plotNovel(data_db, novel_df_row, ncol = 1, v_call = "V_CALL")
+plotNovel(data, novel_row, v_call = "V_CALL", ncol = 1)
 ```
 
 Arguments
 -------------------
 
-data_db
+data
 :   a `data.frame` in Change-O format. See
 [findNovelAlleles](findNovelAlleles.md) for details.
 
-novel_df_row
+novel_row
 :   a single row from a data frame as output by
 [findNovelAlleles](findNovelAlleles.md) that contains a
 polymorphism-containing germline allele
 
+v_call
+:   name of the column in `data` with V allele
+calls. Default is "V_CALL".
+
 ncol
 :   number of columns to use when laying out the plots
-
-v_call
-:   name of the column in `data_db` with V allele
-calls. Default is "V_CALL".
 
 
 

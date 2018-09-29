@@ -79,14 +79,14 @@ changed in `findNovelAlleles`).
 
 ```r
 # Detect novel alleles
-novel_df <- findNovelAlleles(SampleDb, GermlineIGHV, nproc=1)
+novel <- findNovelAlleles(SampleDb, GermlineIGHV, nproc=1)
 ```
 
 
 ```r
 # Extract and view the rows that contain successful novel allele calls
-novel <- selectNovel(novel_df)
-novel[1:3]
+novel_rows <- selectNovel(novel)
+novel_rows[1:3]
 ```
 
 ```
@@ -159,10 +159,10 @@ this vector to a fasta file, `writeFasta` may be used.
 ```r
 # Infer the individual's genotype, using only unmutated sequences and checking
 # for the use of the novel alleles inferred in the earlier step.
-geno <- inferGenotype(SampleDb, find_unmutated=TRUE,
-                      germline_db=GermlineIGHV, novel_df=novel_df)
+geno <- inferGenotype(SampleDb, germline_db=GermlineIGHV, novel=novel,
+                      find_unmutated=TRUE)
 # Save the genotype sequences to a vector
-genotype_seqs <- genotypeFasta(geno, GermlineIGHV, novel_df)
+genotype_db <- genotypeFasta(geno, GermlineIGHV, novel)
 # Visualize the genotype and sequence counts
 print(geno)
 ```
@@ -204,9 +204,8 @@ method doesn't use the strict cutoff criterion `fraction_to_explain` that
 
 ```r
 # Infer the individual's genotype, using the bayesian method
-geno_bayesian <- inferGenotypeBayesian(SampleDb, find_unmutated=TRUE,
-                                       germline_db=GermlineIGHV, 
-                                       novel_df=novel_df)
+geno_bayesian <- inferGenotypeBayesian(SampleDb, germline_db=GermlineIGHV, 
+                                       novel=novel, find_unmutated=TRUE)
 # Visualize the genotype and sequence counts
 print(geno_bayesian)
 ```
@@ -255,7 +254,7 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 ```r
 # Use the personlized genotype to determine corrected allele assignments
 # Updated genotype will be placed in the V_CALL_GENOTYPED column
-sample_db <- reassignAlleles(SampleDb, genotype_seqs)
+sample_db <- reassignAlleles(SampleDb, genotype_db)
 ```
 
 From here, one may proceed with further downstream analyses, but with the
@@ -271,7 +270,7 @@ not_in_genotype <- sample_db$V_CALL %>%
     strsplit(",") %>%
     unlist() %>%
     unique() %>%
-    setdiff(names(genotype_seqs))
+    setdiff(names(genotype_db))
 
 # Determine the fraction of calls that were ambigious before/after correction
 # and the fraction that contained original calls to non-genotype alleles. Note

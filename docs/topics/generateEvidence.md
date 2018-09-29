@@ -10,18 +10,19 @@ allele detection and genotyping inferrences.
 Usage
 --------------------
 ```
-generateEvidence(data_db, novel_df, genotype, genotype_db, germline_db,
+generateEvidence(data, novel, genotype, genotype_db, germline_db,
 fields = NULL)
 ```
 
 Arguments
 -------------------
 
-data_db
-:   the `data.frame` containing the source data used for input to 
-[inferGenotype](inferGenotype.md) and [findNovelAlleles](findNovelAlleles.md).
+data
+:   a `data.frame` containing sequence data that has been
+passed through [reassignAlleles](reassignAlleles.md) to correct the allele 
+assignments.
 
-novel_df
+novel
 :   the `data.frame` returned by [findNovelAlleles](findNovelAlleles.md).
 
 genotype
@@ -105,14 +106,14 @@ Examples
 
 ```R
 # Generate input data
-novel_df <- findNovelAlleles(SampleDb, GermlineIGHV)
+novel <- findNovelAlleles(SampleDb, GermlineIGHV)
 genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
-novel_df=novel_df)
-genotype_db <- genotypeFasta(genotype, GermlineIGHV, novel_df)
+novel=novel)
+genotype_db <- genotypeFasta(genotype, GermlineIGHV, novel)
 data_db <- reassignAlleles(SampleDb, genotype_db)
 
 # Assemble evidence table
-evidence <- generateEvidence(data_db, novel_df, genotype, genotype_db, GermlineIGHV)
+evidence <- generateEvidence(data_db, novel, genotype, genotype_db, GermlineIGHV)
 ```
 
 

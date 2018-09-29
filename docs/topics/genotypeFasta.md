@@ -10,7 +10,7 @@ sequences.
 Usage
 --------------------
 ```
-genotypeFasta(genotype, germline_db, novel_df = NA)
+genotypeFasta(genotype, germline_db, novel = NA)
 ```
 
 Arguments
@@ -24,7 +24,7 @@ germline_db
 :   a vector of named nucleotide germline sequences
 matching the alleles detailed in `genotype`.
 
-novel_df
+novel
 :   an optional `data.frame` containing putative
 novel alleeles of the type returned by
 [findNovelAlleles](findNovelAlleles.md).

@@ -14,17 +14,17 @@
 #' assigned to a single sample sequence are rare among unmutated
 #' sequences but may result if nucleotides for certain positions are
 #' not available. Calls containing multiple alleles are treated as
-#' belonging to all groups. If \code{novel_df} is provided, all
+#' belonging to all groups. If \code{novel} is provided, all
 #' sequences that are assigned to the same starting allele as any
 #' novel germline allele will have the novel germline allele appended
 #' to their assignent prior to searching for unmutated sequences.
 #' 
-#' @param    data_db              a \code{data.frame} containing V allele
+#' @param    data                 a \code{data.frame} containing V allele
 #'                                calls from a single subject. If
 #'                                \code{find_unmutated} is \code{TRUE}, then
 #'                                the sample IMGT-gapped V(D)J sequence should 
 #'                                be provided in a column \code{"SEQUENCE_IMGT"}
-#' @param    v_call               column in \code{data_db} with V allele calls.
+#' @param    v_call               column in \code{data} with V allele calls.
 #'                                Default is \code{"V_CALL"}.                           
 #' @param    find_unmutated       if \code{TRUE}, use \code{germline_db} to
 #'                                find which samples are unmutated. Not needed
@@ -34,7 +34,7 @@
 #'                                germline sequences named in
 #'                                \code{allele_calls}. Only required if
 #'                                \code{find_unmutated} is \code{TRUE}.
-#' @param    novel_df             an optional \code{data.frame} of the type
+#' @param    novel                an optional \code{data.frame} of the type
 #'                                novel returned by
 #'                                \link{findNovelAlleles} containing
 #'                                germline sequences that will be utilized if
@@ -83,41 +83,41 @@
 #' 
 #' @examples
 #' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-#' inferGenotypeBayesian(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
-#'                       novel_df=SampleNovel)
+#' inferGenotypeBayesian(SampleDb, germline_db=GermlineIGHV, novel=SampleNovel, 
+#'                       find_unmutated=TRUE)
 #' 
 #' @export
-inferGenotypeBayesian <- function(data_db, v_call="V_CALL", find_unmutated=TRUE,
-                                  germline_db=NA, novel_df=NA,
+inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA, 
+                                  v_call="V_CALL", find_unmutated=TRUE,
                                   priors=c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)){
     # Visibility hack
     . <- NULL
     
-    allele_calls = getAllele(data_db[,v_call], first=FALSE, strip_d=FALSE)
+    allele_calls = getAllele(data[,v_call], first=FALSE, strip_d=FALSE)
     # Find the unmutated subset, if requested
     if(find_unmutated){
         if(is.na(germline_db[1])){
             stop("germline_db needed if find_unmutated is TRUE")
         }
-        if(!is.null(nrow(novel_df))){
-            novel_df = filter_(novel_df, ~!is.na(POLYMORPHISM_CALL)) %>%
+        if(!is.null(nrow(novel))){
+            novel = filter_(novel, ~!is.na(POLYMORPHISM_CALL)) %>%
                 select_(~GERMLINE_CALL, ~POLYMORPHISM_CALL, ~NOVEL_IMGT)
-            if(nrow(novel_df) > 0){
+            if(nrow(novel) > 0){
                 # Extract novel alleles if any and add them to germline_db
-                novel_gl = novel_df$NOVEL_IMGT
-                names(novel_gl) = novel_df$POLYMORPHISM_CALL
+                novel_gl = novel$NOVEL_IMGT
+                names(novel_gl) = novel$POLYMORPHISM_CALL
                 germline_db = c(germline_db, novel_gl)
                 # Add the novel allele calls to allele calls of the same starting allele
-                for(r in 1:nrow(novel_df)){
-                    ind = grep(novel_df$GERMLINE_CALL[r], allele_calls, fixed=TRUE)
+                for(r in 1:nrow(novel)){
+                    ind = grep(novel$GERMLINE_CALL[r], allele_calls, fixed=TRUE)
                     allele_calls[ind] = allele_calls[ind] %>%
-                        sapply(paste, novel_df$POLYMORPHISM_CALL[r], sep=",")
+                        sapply(paste, novel$POLYMORPHISM_CALL[r], sep=",")
                 }
             }
         }
         # Find unmutated sequences
         allele_calls = findUnmutatedCalls(allele_calls,
-                                          as.character(data_db$SEQUENCE_IMGT),
+                                          as.character(data$SEQUENCE_IMGT),
                                           germline_db)
         if(length(allele_calls) == 0){
             stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
@@ -203,9 +203,8 @@ inferGenotypeBayesian <- function(data_db, v_call="V_CALL", find_unmutated=TRUE,
         
         # Cycle through the table, including alleles to explain more sequences,
         # until we explain enough sequences
-        included = counts = character(0)
-        tot_expl = 0
-        
+        #included = counts = character(0)
+        #tot_expl = 0
         
         seqs_expl <- if(is.null(nrow(seqs_expl_single)) || nrow(seqs_expl_single) ==0 ){seqs_expl}else{seqs_expl_single}
         seqs_expl <- round(seqs_expl)

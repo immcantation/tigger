@@ -11,7 +11,7 @@ from a single subject.
 Usage
 --------------------
 ```
-reassignAlleles(data_db, genotype_db, v_call = "V_CALL",
+reassignAlleles(data, genotype_db, v_call = "V_CALL",
 method = "hamming", path = NA, keep_gene = c("gene", "family",
 "repertoire"))
 ```
@@ -19,7 +19,7 @@ method = "hamming", path = NA, keep_gene = c("gene", "family",
 Arguments
 -------------------
 
-data_db
+data
 :   a `data.frame` containing V allele calls from a
 single subject and the sample IMGT-gapped V(D)J sequences under
 `"SEQUENCE_IMGT"`.
@@ -30,7 +30,7 @@ matching the calls detailed in `allele_calls`
 and personalized to the subject
 
 v_call
-:   name of the column in `data_db` with V allele
+:   name of the column in `data` with V allele
 calls. Default is `"V_CALL"`.
 
 method
@@ -75,7 +75,7 @@ Examples
 
 ```R
 # Extract the database sequences that correspond to the genotype
-genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
+genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, novel=SampleNovel)
 
 # Use the personlized genotype to determine corrected allele assignments
 output_db <- reassignAlleles(SampleDb, genotype_db)

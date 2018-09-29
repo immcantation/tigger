@@ -43,12 +43,13 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' \code{generateEvidence} builds a table of evidence metrics for the final novel V 
 #' allele detection and genotyping inferrences.
 #' 
-#' @param data_db       the \code{data.frame} containing the source data used for input to 
-#'                      \link{inferGenotype} and \link{findNovelAlleles}.
-#' @param novel_df      the \code{data.frame} returned by \link{findNovelAlleles}.
+#' @param data          a \code{data.frame} containing sequence data that has been
+#'                      passed through \link{reassignAlleles} to correct the allele 
+#'                      assignments.
+#' @param novel         the \code{data.frame} returned by \link{findNovelAlleles}.
 #' @param genotype      the \code{data.frame} of alleles generated with \link{inferGenotype} 
 #'                      denoting the genotype of the subject.
-#' @param genotype_db  a vector of named nucleotide germline sequences in the genotype.
+#' @param genotype_db   a vector of named nucleotide germline sequences in the genotype.
 #'                      Returned by \link{genotypeFasta}. 
 #' @param germline_db   the original uncorrected germline database used to by
 #'                      \link{findNovelAlleles} to identify novel alleles.
@@ -115,19 +116,22 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' @examples
 #' \donttest{
 #' # Generate input data
-#' novel_df <- findNovelAlleles(SampleDb, GermlineIGHV)
+#' novel <- findNovelAlleles(SampleDb, GermlineIGHV)
 #' genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
-#'                           novel_df=novel_df)
-#' genotype_db <- genotypeFasta(genotype, GermlineIGHV, novel_df)
+#'                           novel=novel)
+#' genotype_db <- genotypeFasta(genotype, GermlineIGHV, novel)
 #' data_db <- reassignAlleles(SampleDb, genotype_db)
 #' 
 #' # Assemble evidence table
-#' evidence <- generateEvidence(data_db, novel_df, genotype, genotype_db, GermlineIGHV)
+#' evidence <- generateEvidence(data_db, novel, genotype, genotype_db, GermlineIGHV)
 #' }
 #' 
 #' @export
-generateEvidence <- function(data_db, novel_df, genotype, genotype_db, 
+generateEvidence <- function(data, novel, genotype, genotype_db, 
                              germline_db, fields=NULL) {
+    # Visibility hack
+    . <- NULL
+    
     # Define set of sequences containing genotype and uncorrected calls
     germline_set <- c(germline_db[!names(germline_db) %in% names(genotype_db)], 
                       genotype_db)
@@ -191,34 +195,34 @@ generateEvidence <- function(data_db, novel_df, genotype, genotype_db,
         paste(closest_names, collapse=",")        
     }
     
-    
     # Subset to novel alleles
     final_gt <- genotype %>%
-        dplyr::group_by(GENE) %>%
-        dplyr::filter(duplicated(ALLELES) == FALSE) %>%
+        dplyr::group_by(.data$GENE) %>%
+        dplyr::filter(!duplicated(.data$ALLELES)) %>%
         dplyr::ungroup() %>%
-        dplyr::mutate(ALLELES=strsplit(as.character(ALLELES), ","),
-                      COUNTS=strsplit(as.character(COUNTS), ",")) %>%
-        tidyr::unnest(ALLELES, COUNTS) %>%
-        dplyr::rename(ALLELE=ALLELES) %>%
-        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE, "*" ,ALLELE)) %>%
-        dplyr::filter(POLYMORPHISM_CALL %in% novel_df$POLYMORPHISM_CALL)
-    
-    # Add info from novel_df
-    final_gt <- dplyr::inner_join(dplyr::rename(final_gt, NOTE_GT=NOTE), 
-                                  novel_df, 
+        dplyr::mutate(ALLELES=strsplit(as.character(.data$ALLELES), ","),
+                      COUNTS=strsplit(as.character(.data$COUNTS), ",")) %>%
+        tidyr::unnest(.data$ALLELES, .data$COUNTS) %>%
+        dplyr::mutate(POLYMORPHISM_CALL=paste0(.data$GENE, "*" , .data$ALLELES)) %>%
+        dplyr::filter(.data$POLYMORPHISM_CALL %in% novel$POLYMORPHISM_CALL)  %>%
+        dplyr::rename(ALLELE="ALLELES")
+
+        
+    # Add info from novel
+    final_gt <- dplyr::inner_join(dplyr::rename(final_gt, NOTE_GT="NOTE"), 
+                                  novel, 
                                   by=c(fields, "POLYMORPHISM_CALL"))
     
     # Add message if the same novel img sequence found from
     # different starting alleles, these will be novel imgt sequences
     # with more than one polymorphism call
     final_gt <- final_gt %>%
-        dplyr::group_by(NOVEL_IMGT) %>%
-        dplyr::mutate(NUM_CALLS=length(unique(POLYMORPHISM_CALL))) %>%
+        dplyr::group_by(.data$NOVEL_IMGT) %>%
+        dplyr::mutate(NUM_CALLS=length(unique(.data$POLYMORPHISM_CALL))) %>%
         dplyr::ungroup()
     idx_mult <- which(final_gt$NUM_CALLS > 1)
     final_gt$NUM_CALLS <- NULL
-    if (length(idx_mult)>0) {
+    if (length(idx_mult) > 0) {
         final_gt$NOTE_GT[idx_mult] <- paste(
             final_gt$NOTE_GT[idx_mult],
             " Found multiple polymorphism calls for the same NOVEL_IMGT.", 
@@ -232,13 +236,13 @@ generateEvidence <- function(data_db, novel_df, genotype, genotype_db,
             polymorphism <- df[['POLYMORPHISM_CALL']]
             novel_imgt <- df[["NOVEL_IMGT"]]
             names(novel_imgt) <- polymorphism
-            gene <- df[['GENE']]
-            allele <- df[['ALLELE']]
-            germline_call <- df[['GERMLINE_CALL']]
-            this_germline <- germline_db
-            V_CALL_GENOTYPED <- data_db[["V_CALL_GENOTYPED"]]
+            #gene <- df[['GENE']]
+            #allele <- df[['ALLELE']]
+            #germline_call <- df[['GERMLINE_CALL']]
+            #this_germline <- germline_db
+            v_call_genotyped <- data[["V_CALL_GENOTYPED"]]
             
-            SEQUENCES <- sum(V_CALL_GENOTYPED==polymorphism)
+            SEQUENCES <- sum(v_call_genotyped == polymorphism)
             df[["SEQUENCES"]] <- SEQUENCES
             closest_ref_input <- .findClosestReference(novel_imgt,
                                                        names(germline_db), 
@@ -295,23 +299,24 @@ generateEvidence <- function(data_db, novel_df, genotype, genotype_db,
             
             df[["ALLELIC_PERCENTAGE"]] <- 100*df[["UNMUTATED_SEQUENCES"]]/as.numeric(df[["TOTAL"]])
             
-            df[["UNIQUE_JS"]] <- data_db %>%
-                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
-                dplyr::distinct(J_CALL) %>% nrow()
-            df[["UNIQUE_CDR3S"]] <- data_db %>%
-                dplyr::filter(V_CALL_GENOTYPED==polymorphism)  %>%
-                dplyr::distinct(translateDNA(JUNCTION, trim=TRUE)) %>% 
+            df[["UNIQUE_JS"]] <- data %>%
+                dplyr::filter(.data$V_CALL_GENOTYPED == polymorphism)  %>%
+                dplyr::distinct(.data$J_CALL) %>% 
+                nrow()
+            df[["UNIQUE_CDR3S"]] <- data %>%
+                dplyr::filter(.data$V_CALL_GENOTYPED == polymorphism)  %>%
+                dplyr::distinct(translateDNA(.data$JUNCTION, trim=TRUE)) %>% 
                 nrow()
             # Add closest germline
             df[["CLOSEST_REFERENCE_IMGT"]] <- cleanSeqs(germline_set[[closest_ref_input]])
             
-            data.frame(df, stringsAsFactors = F)
+            data.frame(df, stringsAsFactors=FALSE)
         }
         
         final_gt <- final_gt %>%
             dplyr::rowwise() %>%
             do(.addEvidence(., germline_set=germline_set, germline_db=germline_db)) %>%
-            dplyr::mutate(NOTE=trimws(paste(NOTE_GT, NOTE, sep=" "))) %>%
+            dplyr::mutate(NOTE=trimws(paste(.data$NOTE_GT, .data$NOTE, sep=" "))) %>%
             dplyr::select(-c("NOTE_GT"))
     }
     

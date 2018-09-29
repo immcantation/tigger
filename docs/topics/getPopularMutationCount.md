@@ -10,14 +10,14 @@ for each V gene and returns the mutation count of those sequences.
 Usage
 --------------------
 ```
-getPopularMutationCount(data_db, germline_db, gene_min = 0.001,
+getPopularMutationCount(data, germline_db, gene_min = 0.001,
 seq_min = 50, seq_p_of_max = 1/8, full_return = FALSE)
 ```
 
 Arguments
 -------------------
 
-data_db
+data
 :   a `data.frame` in the Change-O format. See
 [findNovelAlleles](findNovelAlleles.md) for a list of required
 columns.
@@ -38,7 +38,7 @@ seq_p_of_max
 count that a sequence must meet to avoid exclusion.
 
 full_return
-:   If `TRUE`, will return all `data_db` columns and
+:   If `TRUE`, will return all `data` columns and
 will include sequences with mutation count < 1.
 
 

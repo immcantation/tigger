@@ -82,9 +82,10 @@
 #' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
 #' @importFrom  parallel    clusterEvalQ clusterExport makeCluster stopCluster
+#' @importFrom  rlang       .data
 #' @importFrom  shazam      calcObservedMutations
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
 #'                          confint lm
 #' @importFrom  stringi     stri_length
-#' @importFrom  tidyr       gather gather_ spread spread_
+#' @importFrom  tidyr       gather gather_ spread spread_ unnest
 NULL

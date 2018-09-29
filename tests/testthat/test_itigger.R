@@ -35,7 +35,7 @@ if (FALSE) {
         ## Three iterations manually
         # 1
         nv1 <- findNovelAlleles(sample_db, germline_subset, v_call="V_CALL")
-        gt1 <- inferGenotype(sample_db, "V_CALL", germline_db = germline_subset, novel_df = nv1)
+        gt1 <- inferGenotype(sample_db, germline_db = germline_subset, novel = nv1, v_call="V_CALL")
         germdb1 <- genotypeFasta(gt1, germline_subset, nv1)
         sample_db1 <- sample_db
         sample_db1[['V_CALL_GENOTYPED']] <-  reassignAlleles(sample_db, germdb1, 
@@ -48,7 +48,7 @@ if (FALSE) {
         
         # 2
         nv2 <- findNovelAlleles(sample_db1, germdb1, v_call="V_CALL_GENOTYPED")
-        gt2 <- inferGenotype(sample_db1, "V_CALL_GENOTYPED", germline_db = germdb1, novel_df = nv2)
+        gt2 <- inferGenotype(sample_db1, germline_db = germdb1, novel = nv2, v_call="V_CALL_GENOTYPED")
         germdb2 <- genotypeFasta(gt2, germdb1, nv2)
         sample_db2 <- sample_db1
         sample_db2[['V_CALL_GENOTYPED']] <-  reassignAlleles(sample_db1, germdb2, 
@@ -61,7 +61,7 @@ if (FALSE) {
         
         # 3
         nv3 <- findNovelAlleles(sample_db2, germdb2, v_call="V_CALL_GENOTYPED")
-        gt3 <- inferGenotype(sample_db2, "V_CALL_GENOTYPED", germline_db = germdb2, novel_df = nv3)
+        gt3 <- inferGenotype(sample_db2, germline_db = germdb2, novel = nv3, v_call="V_CALL_GENOTYPED")
         germdb3 <- genotypeFasta(gt3, germdb2, nv3)
         sample_db3 <- sample_db2
         sample_db3[['V_CALL_GENOTYPED']] <-  reassignAlleles(sample_db2, germdb3, 
