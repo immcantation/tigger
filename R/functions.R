@@ -133,7 +133,7 @@
 #' enought to be included in the subject's genotype.
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Find novel alleles and return relevant data
 #' novel <- findNovelAlleles(SampleDb, GermlineIGHV)
 #' }
@@ -1352,7 +1352,7 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
 #'           each element of \code{samples}
 #' 
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' # Use createGermlines to insert a mutation into a germline sequence
 #' sample_seqs <- c(GermlineIGHV[2],
 #'                  createGermlines(GermlineIGHV[1], 103, "G"),
