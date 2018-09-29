@@ -113,6 +113,7 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' for generating the required input.
 #' 
 #' @examples
+#' \donttest{
 #' # Generate input data
 #' novel_df <- findNovelAlleles(SampleDb, GermlineIGHV)
 #' genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
@@ -122,7 +123,8 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' 
 #' # Assemble evidence table
 #' evidence <- generateEvidence(data_db, novel_df, genotype, genotype_db, GermlineIGHV)
-#'         
+#' }
+#' 
 #' @export
 generateEvidence <- function(data_db, novel_df, genotype, genotype_db, 
                              germline_db, fields=NULL) {
