@@ -11,13 +11,13 @@ visualize the results for alleles that did
 Usage
 --------------------
 ```
-plotNovel(clip_db, novel_df_row, ncol = 1, v_call = "V_CALL")
+plotNovel(data_db, novel_df_row, ncol = 1, v_call = "V_CALL")
 ```
 
 Arguments
 -------------------
 
-clip_db
+data_db
 :   a `data.frame` in Change-O format. See
 [findNovelAlleles](findNovelAlleles.md) for details.
 
@@ -30,8 +30,8 @@ ncol
 :   number of columns to use when laying out the plots
 
 v_call
-:   name of the column in `clip_db` with V allele
-calls. Default is "V_CALL"
+:   name of the column in `data_db` with V allele
+calls. Default is "V_CALL".
 
 
 
@@ -43,14 +43,12 @@ The first panel in the plot shows, for all sequences which align to a particular
 germline allele, the mutation frequency at each postion along the aligned 
 sequece as a function of the sequence-wide mutation. Sequences that pass 
 the novel allele test are colored red, while sequences that don't pass
-the test are colored yellow.
-
-The second panel shows the nucleotide usage at the positions 
-as a function of sequence-wide mutation count. 
+the test are colored yellow. The second panel shows the nucleotide usage at the 
+positions as a function of sequence-wide mutation count.
 
 To avoid cases where a clonal expansion might lead to a false positive, tigger examines
-the combinations of J gene and junction length among sequences which perfectly match the proposed
-germline allele.
+the combinations of J gene and junction length among sequences which perfectly 
+match the proposed germline allele.
 
 
 
@@ -60,7 +58,7 @@ Examples
 ```R
 # Plot the evidence for the first (and only) novel allele in the example data
 novel <- selectNovel(SampleNovel)
-plotNovel(SampleDb, novel[1,])
+plotNovel(SampleDb, novel[1, ])
 ```
 
 ![2](plotNovel-2.png)

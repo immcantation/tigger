@@ -15,7 +15,7 @@ by chance have been mutated to look like another allele) can be removed.
 Usage
 --------------------
 ```
-inferGenotype(clip_db, v_call = "V_CALL", fraction_to_explain = 0.875,
+inferGenotype(data_db, v_call = "V_CALL", fraction_to_explain = 0.875,
 gene_cutoff = 1e-04, find_unmutated = TRUE, germline_db = NA,
 novel_df = NA)
 ```
@@ -23,28 +23,28 @@ novel_df = NA)
 Arguments
 -------------------
 
-clip_db
+data_db
 :   a `data.frame` containing V allele
 calls from a single subject. If
 `find_unmutated` is `TRUE`, then
 the sample IMGT-gapped V(D)J sequence should
 
 v_call
-:   column in `clip_db` with V allele calls.
-Default is `"V_CALL"`
+:   column in `data_db` with V allele calls.
+Default is `"V_CALL"`.                            
 be provided in a column `"SEQUENCE_IMGT"`
 
 fraction_to_explain
 :   the portion of each gene that must be
 explained by the alleles that will be included
-in the genotype
+in the genotype.
 
 gene_cutoff
 :   either a number of sequences or a fraction of
 the length of `allele_calls` denoting the
 minimum number of times a gene must be
 observed in `allele_calls` to be included
-in the genotype
+in the genotype.
 
 find_unmutated
 :   if `TRUE`, use `germline_db` to
@@ -64,7 +64,7 @@ novel returned by
 [findNovelAlleles](findNovelAlleles.md) containing
 germline sequences that will be utilized if
 `find_unmutated` is `TRUE`. See
-details.
+Details.
 
 
 
@@ -72,7 +72,17 @@ details.
 Value
 -------------------
 
-A table of alleles denoting the genotype of the subject
+A `data.frame` of alleles denoting the genotype of the subject containing 
+the following columns:
+
+
++  `GENE`: The gene name without allele.
++  `ALLELES`: Comma separated list of alleles for the given `GENE`.
++  `COUNTS`: Comma separated list of observed sequences for each 
+corresponding allele in the `ALLELES` list.
++  `TOTAL`: The total count of observed sequences for the given `GENE`.
++  `NOTE`: Any comments on the inferrence.
+
 
 
 Details
@@ -101,8 +111,7 @@ Examples
 -------------------
 
 ```R
-# Infer the IGHV genotype, using only unmutated sequences, including any 
-# novel alleles
+# Infer IGHV genotype, using only unmutated sequences, including novel alleles
 inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
 novel_df=SampleNovel)
 ```

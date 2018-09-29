@@ -27,16 +27,21 @@ test_that("generateEvidence", {
                           germline_db = germline_ighv, 
                           novel_df = novel_df)
     # Save the genotype sequences to a vector
-    genotype_seqs <- genotypeFasta(geno, germline_ighv, novel_df)
+    genotype_db <- genotypeFasta(geno, germline_ighv, novel_df)
     # Visualize the genotype and sequence counts
-    sample_db <- reassignAlleles(sample_db, genotype_seqs)
-    ev <- generateEvidence(geno, 
-                     novel_df, 
-                     c(germline_ighv[!names(germline_ighv) %in% names(genotype_seqs)], 
-                       genotype_seqs),
-                     germline_ighv,
-                     sample_db)
-    
+    sample_db <- reassignAlleles(sample_db, genotype_db)
+    # ev <- generateEvidence(geno, 
+    #                  novel_df, 
+    #                  c(germline_ighv[!names(germline_ighv) %in% names(genotype_seqs)], 
+    #                    genotype_seqs),
+    #                  germline_ighv,
+    #                  sample_db)
+    ev <- generateEvidence(data_db=sample_db, 
+                           novel_df=novel_df, 
+                           genotype=geno,
+                           genotype_db=genotype_db,
+                           germline_db=germline_ighv)
+
     # Iterative, with 1 iteration, should match
     # novel_df_i <- itigger(sample_db, germline_ighv, max.iter = 1)
     # ev_i <- novel_df_i$summary
@@ -45,7 +50,6 @@ test_that("generateEvidence", {
     'POLYMORPHISM_CALL'='IGHV1-8*02_G234T',
     'GENE'='IGHV1-8',
     'TOTAL'=837,
-    'NOTE_GT'='',
     'ALLELE'='02_G234T',
     'COUNTS'=370,
     'GERMLINE_CALL'='IGHV1-8*02',

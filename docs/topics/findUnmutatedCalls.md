@@ -20,11 +20,11 @@ Arguments
 
 allele_calls
 :   a vector of strings respresenting Ig allele calls,
-where multiple calls are separated by a comma
+where multiple calls are separated by a comma.
 
 sample_seqs
 :   V(D)J-rearranged sample sequences matching the order
-of the given `allele_calls`
+of the given `allele_calls`.
 
 germline_db
 :   a vector of named nucleotide germline sequences
@@ -36,7 +36,7 @@ Value
 -------------------
 
 A vector of strings containing the members of `allele_calls`
-that represent unmutated sequences
+that represent unmutated sequences.
 
 
 

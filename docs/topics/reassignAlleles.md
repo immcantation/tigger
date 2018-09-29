@@ -11,18 +11,18 @@ from a single subject.
 Usage
 --------------------
 ```
-reassignAlleles(db, genotype_db, v_call = "V_CALL", method = "hamming",
-path = NA, keep_gene = c(TRUE, "gene", "family", "repertoire"))
+reassignAlleles(data_db, genotype_db, v_call = "V_CALL",
+method = "hamming", path = NA, keep_gene = c("gene", "family",
+"repertoire"))
 ```
 
 Arguments
 -------------------
 
-db
+data_db
 :   a `data.frame` containing V allele calls from a
-single subject and the sample
-IMGT-gapped V(D)J sequences under
-`"SEQUENCE_IMGT"`
+single subject and the sample IMGT-gapped V(D)J sequences under
+`"SEQUENCE_IMGT"`.
 
 genotype_db
 :   a vector of named nucleotide germline sequences
@@ -30,12 +30,12 @@ matching the calls detailed in `allele_calls`
 and personalized to the subject
 
 v_call
-:   name of the column in `clip_db` with V allele
-calls. Default is `"V_CALL"`
+:   name of the column in `data_db` with V allele
+calls. Default is `"V_CALL"`.
 
 method
 :   the method to be used when realigning sequences to
-the genotype_db sequences. Currently only "hammming"
+the genotype_db sequences. Currently, only `"hammming"`
 (for Hamming distance) is implemented.
 
 path
@@ -44,12 +44,11 @@ realignment method, if needed. Hamming distance does
 not require a path to a tool.
 
 keep_gene
-:   logical indicating if gene, family or complete repertoire
-assignments should be performed. Use of 'gene' 
-(or TRUE, for backward compatibility)
-increases speed by minimizing required number of 
-alignments, as gene assignments will be
-maintained when possible.
+:   a string indicating if the gene (`"gene"`), 
+family (`"family"`) or complete repertoire
+(`"repertoire"`) assignments should be performed. 
+Use of `"gene"` increases speed by minimizing required number of 
+alignments, as gene level assignments will be maintained when possible.
 
 
 
@@ -76,10 +75,10 @@ Examples
 
 ```R
 # Extract the database sequences that correspond to the genotype
-genotype_seqs <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
+genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
 
 # Use the personlized genotype to determine corrected allele assignments
-output_db <- reassignAlleles(SampleDb, genotype_seqs)
+output_db <- reassignAlleles(SampleDb, genotype_db)
 ```
 
 

@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 allele_calls
-:   a vector of strings respresenting IGHV allele names
+:   a vector of strings respresenting IGHV allele names.
 
 
 
@@ -25,28 +25,25 @@ allele_calls
 Value
 -------------------
 
-vector of strings respresenting updated IGHV allele names
-
-
-Details
--------------------
-
-The updated allele names are based on IMGT release 201408-4.
+Vector of strings respresenting updated IGHV allele names.
 
 
 Note
 -------------------
 
-IGMT has removed IGHV2-5*10 and IGHV2-5*07 as it has determined they
-are actually alleles *02 and *04, respectively.
+IGMT has removed `IGHV2-5*10` and `IGHV2-5*07` as it has determined they
+are actually alleles `02` and `04`, respectively. The updated allele 
+names are based on IMGT release 201408-4.
 
 
 References
 -------------------
 
-Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
+
+1.  Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
 and alleles: new entities, new names and implications for research and
 prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
+
 
 
 

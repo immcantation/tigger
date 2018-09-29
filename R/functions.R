@@ -57,14 +57,14 @@
 #' nucleotide sequence for the predicted novel allele, along with columns providing
 #' additional evidence.
 #' 
-#' The output contains the following fields:
+#' The output contains the following columns:
 #' \itemize{
-#'   \item \code{GERMLINE_CALL}: The input V call.
-#'   \item \code{NOTE}: Comments on the inferrence.
-#'   \item \code{POLYMORPHISM_CALL}: The new allele call.
-#'   \item \code{NT_SUBSTITUTIONS}: Mutations identified in the new allele, relative
+#'   \item \code{GERMLINE_CALL}: The input (uncorrected) V call.
+#'   \item \code{NOTE}: Comments regarding the inferrence.
+#'   \item \code{POLYMORPHISM_CALL}: The novel allele call.
+#'   \item \code{NT_SUBSTITUTIONS}: Mutations identified in the novel allele, relative
 #'         to the reference germline (\code{GERMLINE_CALL})
-#'   \item \code{NOVEL_IMGT}: New allele sequence.
+#'   \item \code{NOVEL_IMGT}: The novel allele sequence.
 #'   \item \code{NOVEL_IMGT_COUNT}:  The number of times the sequence \code{NOVEL_IMGT} 
 #'         is found in the input data. Considers the subsequence of \code{NOVEL_IMGT} 
 #'         in the \code{pos_range}.
@@ -112,7 +112,7 @@
 #'         have usable nucleotides in a given position for that position to be considered.
 #' }
 #' 
-#' The following comments can appear in the \code{NOTE} field:
+#' The following comments can appear in the \code{NOTE} column:
 #' 
 #' \itemize{
 #'   \item \emph{Novel allele found}: A novel allele was detected.
@@ -566,18 +566,19 @@ findNovelAlleles <- function(data_db, germline_db,
 #' \code{selectNovel} takes the result from \link{findNovelAlleles} and
 #' selects only the rows containing unique, novel alleles.
 #' 
-#' @param   novel_df        A \code{data.frame} of the type returned by
-#'                          \link{findNovelAlleles}
-#' @param   keep_alleles    A \code{logical} indicating if different alleles
-#'                          leading to the same novel sequence should be kept.
-#'                          See details.
-#'                          
-#' @details  If, for instance, subject has in his genome IGHV1-2*02 and a novel 
-#' allele equally close to IGHV1-2*02 and IGHV1-2*05, the novel allele may be
+#' @details
+#' If, for instance, subject has in his genome \code{IGHV1-2*02} and a novel 
+#' allele equally close to \code{IGHV1-2*02} and \code{IGHV1-2*05}, the novel allele may be
 #' detected by analyzing sequences that best align to either of these alleles.
 #' If \code{keep_alleles} is \code{TRUE}, both polymorphic allele calls will
 #' be retained. In the case that multiple mutation ranges are checked for the
 #' same allele, only one mutation range will be kept in the output.
+#' 
+#' @param   novel_df        a \code{data.frame} of the type returned by
+#'                          \link{findNovelAlleles}.
+#' @param   keep_alleles    a \code{logical} indicating if different alleles
+#'                          leading to the same novel sequence should be kept.
+#'                          See Details.
 #'                        
 #' @return  A \code{data.frame} containing only unique, novel alleles (if any)
 #' that were in the input.
@@ -607,21 +608,17 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #' alleles found using \link{findNovelAlleles}. It can also be used to
 #' visualize the results for alleles that did
 #' 
-#' @details 
-#' 
+#' @details
 #' The first panel in the plot shows, for all sequences which align to a particular 
 #' germline allele, the mutation frequency at each postion along the aligned 
 #' sequece as a function of the sequence-wide mutation. Sequences that pass 
 #' the novel allele test are colored red, while sequences that don't pass
-#' the test are colored yellow.
-#' 
-#' The second panel shows the nucleotide usage at the positions 
-#' as a function of sequence-wide mutation count. 
+#' the test are colored yellow. The second panel shows the nucleotide usage at the 
+#' positions as a function of sequence-wide mutation count.
 #' 
 #' To avoid cases where a clonal expansion might lead to a false positive, tigger examines
-#' the combinations of J gene and junction length among sequences which perfectly match the proposed
-#' germline allele.
-
+#' the combinations of J gene and junction length among sequences which perfectly 
+#' match the proposed germline allele.
 #' 
 #' @param    data_db        a \code{data.frame} in Change-O format. See
 #'                          \link{findNovelAlleles} for details.
@@ -630,16 +627,15 @@ selectNovel <- function(novel_df, keep_alleles=FALSE) {
 #'                          polymorphism-containing germline allele
 #' @param    ncol           number of columns to use when laying out the plots  
 #' @param    v_call         name of the column in \code{data_db} with V allele
-#'                          calls. Default is "V_CALL"
-#' @return   NULL
+#'                          calls. Default is "V_CALL".
 #' 
 #' @examples
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel <- selectNovel(SampleNovel)
-#' plotNovel(SampleDb, novel[1,])
+#' plotNovel(SampleDb, novel[1, ])
 #' 
 #' @export
-plotNovel <- function(data_db, novel_df_row, ncol = 1, v_call="V_CALL") {
+plotNovel <- function(data_db, novel_df_row, ncol=1, v_call="V_CALL") {
     . = NULL
     
     # Use the data frame
@@ -807,21 +803,31 @@ plotNovel <- function(data_db, novel_df_row, ncol = 1, v_call="V_CALL") {
 #' way, mistaken allele calls (resulting from sequences which
 #' by chance have been mutated to look like another allele) can be removed.
 #' 
+#' @details
+#' Allele calls representing cases where multiple alleles have been
+#' assigned to a single sample sequence are rare among unmutated
+#' sequences but may result if nucleotides for certain positions are
+#' not available. Calls containing multiple alleles are treated as
+#' belonging to all groups. If \code{novel_df} is provided, all
+#' sequences that are assigned to the same starting allele as any
+#' novel germline allele will have the novel germline allele appended
+#' to their assignent prior to searching for unmutated sequences.
+#'           
 #' @param    data_db              a \code{data.frame} containing V allele
 #'                                calls from a single subject. If
 #'                                \code{find_unmutated} is \code{TRUE}, then
 #'                                the sample IMGT-gapped V(D)J sequence should 
 #' @param    v_call               column in \code{data_db} with V allele calls.
-#'                                Default is \code{"V_CALL"}                               
+#'                                Default is \code{"V_CALL"}.                            
 #'                                be provided in a column \code{"SEQUENCE_IMGT"}
 #' @param    fraction_to_explain  the portion of each gene that must be
 #'                                explained by the alleles that will be included
-#'                                in the genotype
+#'                                in the genotype.
 #' @param    gene_cutoff          either a number of sequences or a fraction of
 #'                                the length of \code{allele_calls} denoting the
 #'                                minimum number of times a gene must be
 #'                                observed in \code{allele_calls} to be included
-#'                                in the genotype
+#'                                in the genotype.
 #' @param    find_unmutated       if \code{TRUE}, use \code{germline_db} to
 #'                                find which samples are unmutated. Not needed
 #'                                if \code{allele_calls} only represent
@@ -835,37 +841,40 @@ plotNovel <- function(data_db, novel_df_row, ncol = 1, v_call="V_CALL") {
 #'                                \link{findNovelAlleles} containing
 #'                                germline sequences that will be utilized if
 #'                                \code{find_unmutated} is \code{TRUE}. See
-#'                                details.
-#' @details  Allele calls representing cases where multiple alleles have been
-#'           assigned to a single sample sequence are rare among unmutated
-#'           sequences but may result if nucleotides for certain positions are
-#'           not available. Calls containing multiple alleles are treated as
-#'           belonging to all groups. If \code{novel_df} is provided, all
-#'           sequences that are assigned to the same starting allele as any
-#'           novel germline allele will have the novel germline allele appended
-#'           to their assignent prior to searching for unmutated sequences.
+#'                                Details.
 #' 
-#' @return   A table of alleles denoting the genotype of the subject
-#' 
-#' @note     This method works best with data derived from blood, where a large
-#'           portion of sequences are expected to be unmutated. Ideally, there
-#'           should be hundreds of allele calls per gene in the input.
-#' 
-#' @examples
-#' # Infer the IGHV genotype, using only unmutated sequences, including any 
-#' # novel alleles
-#' inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
-#'               novel_df=SampleNovel)
+#' @return
+#' A \code{data.frame} of alleles denoting the genotype of the subject containing 
+#' the following columns:
+#'           
+#' \itemize{
+#'   \item \code{GENE}: The gene name without allele.
+#'   \item \code{ALLELES}: Comma separated list of alleles for the given \code{GENE}.
+#'   \item \code{COUNTS}: Comma separated list of observed sequences for each 
+#'         corresponding allele in the \code{ALLELES} list.
+#'   \item \code{TOTAL}: The total count of observed sequences for the given \code{GENE}.
+#'   \item \code{NOTE}: Any comments on the inferrence.
+#' }
+#'           
+#' @note
+#' This method works best with data derived from blood, where a large
+#' portion of sequences are expected to be unmutated. Ideally, there
+#' should be hundreds of allele calls per gene in the input.
 #' 
 #' @seealso \link{plotGenotype} for a colorful visualization and
 #'          \link{genotypeFasta} to convert the genotype to nucleotide sequences.
 #'          See \link{inferGenotypeBayesian} to infer a subject-specific genotype 
 #'          using a Bayesian approach.
 #' 
+#' @examples
+#' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
+#' inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
+#'               novel_df=SampleNovel)
+#' 
 #' @export
-inferGenotype <- function(data_db, v_call="V_CALL", fraction_to_explain = 0.875,
-                          gene_cutoff = 1e-4, find_unmutated = TRUE,
-                          germline_db = NA, novel_df = NA){
+inferGenotype <- function(data_db, v_call="V_CALL", fraction_to_explain=0.875,
+                          gene_cutoff=1e-4, find_unmutated=TRUE,
+                          germline_db=NA, novel_df=NA){
     
     . = NULL
     allele_calls = getAllele(data_db[[v_call]], first=FALSE, strip_d=FALSE)
@@ -982,19 +991,20 @@ inferGenotype <- function(data_db, v_call="V_CALL", fraction_to_explain = 0.875,
     return(geno)
 }
 
+
 #' Show a colorful representation of a genotype
 #'
 #' \code{plotGenotype} plots a genotype table.
 #' 
-#' @param    genotype     a table of alleles denoting a genotype, as returned by
-#'                        \link{inferGenotype}
+#' @param    genotype     a \code{data.frame} of alleles denoting a genotype, 
+#'                        as returned by \link{inferGenotype}.
 #' @param    facet_by     a column name in \code{genotype} to facet the plot by. 
 #'                        If \code{NULL}, then do not facet the plot. 
 #' @param    gene_sort    a string defining the method to use when sorting alleles.
 #'                        If \code{"name"} then sort in lexicographic order. If
 #'                        \code{"position"} then sort by position in the locus, as
 #'                        determined by the final two numbers in the gene name.
-#' @param    text_size    the point size of the plotted text
+#' @param    text_size    the point size of the plotted text.
 #' @param    silent       if \code{TRUE} do not draw the plot and just return the ggplot
 #'                        object; if \code{FALSE} draw the plot.
 #' @param    ...          additional arguments to pass to ggplot2::theme.
@@ -1069,22 +1079,22 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
 #' \code{genotypeFasta} converts a genotype table into a vector of nucleotide
 #' sequences.
 #' 
-#' @param    genotype     a table of alleles denoting a genotype, as returned by
-#'                        \link{inferGenotype}
+#' @param    genotype     a \code{data.frame} of alleles denoting a genotype, 
+#'                        as returned by \link{inferGenotype}.
 #' @param    germline_db  a vector of named nucleotide germline sequences
-#'                        matching the alleles detailed in \code{genotype}
+#'                        matching the alleles detailed in \code{genotype}.
 #' @param    novel_df     an optional \code{data.frame} containing putative
 #'                        novel alleeles of the type returned by
-#'                        \link{findNovelAlleles}
+#'                        \link{findNovelAlleles}.
 #' 
 #' @return   A named vector of strings containing the germline nucleotide
-#'           sequences of the alleles in the provided genotype
+#'           sequences of the alleles in the provided genotype.
 #' 
 #' @seealso \link{inferGenotype}
 #' 
 #' @examples
 #' # Find the sequences that correspond to the genotype
-#' genotype_seqs <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
+#' genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
 #' 
 #' @export
 genotypeFasta <- function(genotype, germline_db, novel_df=NA){
@@ -1119,31 +1129,30 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' correct preliminary allele assignments of a set of sequences derived
 #' from a single subject.
 #' 
-#' @details In order to save time, initial gene assignments are preserved and
+#' @details
+#' In order to save time, initial gene assignments are preserved and
 #' the allele calls are chosen from among those provided in \code{genotype_db},
 #' based on a simple alignment to the sample sequence.
 #' 
-#' @param    db            a \code{data.frame} containing V allele calls from a
-#'                         single subject and the sample
-#'                         IMGT-gapped V(D)J sequences under
-#'                         \code{"SEQUENCE_IMGT"}
+#' @param    data_db       a \code{data.frame} containing V allele calls from a
+#'                         single subject and the sample IMGT-gapped V(D)J sequences under
+#'                         \code{"SEQUENCE_IMGT"}.
 #' @param    genotype_db   a vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #'                         and personalized to the subject
 #' @param    v_call        name of the column in \code{data_db} with V allele
-#'                         calls. Default is \code{"V_CALL"}                         
+#'                         calls. Default is \code{"V_CALL"}.                 
 #' @param    method        the method to be used when realigning sequences to
-#'                         the genotype_db sequences. Currently only "hammming"
+#'                         the genotype_db sequences. Currently, only \code{"hammming"}
 #'                         (for Hamming distance) is implemented.
 #' @param    path          directory containing the tool used in the
 #'                         realignment method, if needed. Hamming distance does
 #'                         not require a path to a tool.
-#' @param    keep_gene     logical indicating if gene, family or complete repertoire
-#'                         assignments should be performed. Use of 'gene' 
-#'                         (or TRUE, for backward compatibility)
-#'                         increases speed by minimizing required number of 
-#'                         alignments, as gene assignments will be
-#'                         maintained when possible.
+#' @param    keep_gene     a string indicating if the gene (\code{"gene"}), 
+#'                         family (\code{"family"}) or complete repertoire
+#'                         (\code{"repertoire"}) assignments should be performed. 
+#'                         Use of \code{"gene"} increases speed by minimizing required number of 
+#'                         alignments, as gene level assignments will be maintained when possible.
 #' 
 #' @return   A modifed input \code{data.frame} containing the best allele call from 
 #'           among the sequences listed in \code{genotype_db} in the 
@@ -1151,26 +1160,24 @@ genotypeFasta <- function(genotype, germline_db, novel_df=NA){
 #' 
 #' @examples
 #' # Extract the database sequences that correspond to the genotype
-#' genotype_seqs <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
+#' genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
-#' output_db <- reassignAlleles(SampleDb, genotype_seqs)
+#' output_db <- reassignAlleles(SampleDb, genotype_db)
 #' 
 #' @export
-reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
+reassignAlleles <- function(data_db, genotype_db, v_call="V_CALL",
                             method="hamming", path=NA,
-                            keep_gene=c(TRUE, "gene", "family", "repertoire")){
-    
-    keep_gene <- as.character(keep_gene)
+                            keep_gene=c("gene", "family", "repertoire")){
+    # Check arguments    
     keep_gene <- match.arg(keep_gene)
     
     # Extract data subset and prepare output vector
-    v_sequences = as.character(db$SEQUENCE_IMGT)
-    v_calls = getAllele(db[[v_call]], first=FALSE, strip_d=FALSE)
+    v_sequences = as.character(data_db$SEQUENCE_IMGT)
+    v_calls = getAllele(data_db[[v_call]], first=FALSE, strip_d=FALSE)
     V_CALL_GENOTYPED = rep("", length(v_calls))
     
-    if (keep_gene %in% c("TRUE", "gene")) { 
-        keep_gene <- "gene"
+    if (keep_gene == "gene") { 
         v = getGene(v_calls, first = TRUE, strip_d=FALSE)
         geno = getGene(names(genotype_db),strip_d=TRUE)
         names(geno) = names(genotype_db)
@@ -1248,7 +1255,7 @@ reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
         V_CALL_GENOTYPED[not_called] = unlist(lapply(best_alleles, paste, collapse=","))
     }
     
-    if (all(V_CALL_GENOTYPED == db[[v_call]])) {
+    if (all(V_CALL_GENOTYPED == data_db[[v_call]])) {
         msg <- ("No allele assignment corrections made.") 
         if (all(v %in% homo) & length(hetero)>0 ) {
             keep_opt <- eval(formals(reassignAlleles)$keep_gene)[-1]
@@ -1259,9 +1266,9 @@ reassignAlleles <- function(db, genotype_db, v_call="V_CALL",
         warning(msg)
     }
     
-    db$V_CALL_GENOTYPED <- V_CALL_GENOTYPED
+    data_db$V_CALL_GENOTYPED <- V_CALL_GENOTYPED
     
-    return(db)
+    return(data_db)
 }
 
 
@@ -1399,13 +1406,13 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' sequence, only the subset that would represent a perfect match is returned.
 #' 
 #' @param    allele_calls   a vector of strings respresenting Ig allele calls,
-#'                          where multiple calls are separated by a comma
+#'                          where multiple calls are separated by a comma.
 #' @param    germline_db    a vector of named nucleotide germline sequences
 #' @param    sample_seqs    V(D)J-rearranged sample sequences matching the order
-#'                          of the given \code{allele_calls}
+#'                          of the given \code{allele_calls}.
 #' 
 #' @return   A vector of strings containing the members of \code{allele_calls}
-#'           that represent unmutated sequences
+#'           that represent unmutated sequences.
 #' 
 #' @examples
 #' # Find which of the sample alleles are unmutated
@@ -1464,12 +1471,12 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
     
 }
 
-#' Find Frequent Sequences' Mutation Counts
+#' Find mutation counts for frequency sequences
 #'
 #' \code{getPopularMutationCount} determines which sequences occur frequently
 #' for each V gene and returns the mutation count of those sequences.
 #' 
-#' @param  sample_db     A Change-O db data frame. See
+#' @param  data_db       a \code{data.frame} in the Change-O format. See
 #'                       \link{findNovelAlleles} for a list of required
 #'                       columns.
 #' @param  germline_db   A named list of IMGT-gapped germline sequences.
@@ -1479,7 +1486,7 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'                       to avoid exclusion.
 #' @param  seq_p_of_max  For each gene, fraction of the most common V sequence's
 #'                       count that a sequence must meet to avoid exclusion.
-#' @param  full_return   If true, will return all \code{sample_db} columns and
+#' @param  full_return   If \code{TRUE}, will return all \code{data_db} columns and
 #'                       will include sequences with mutation count < 1.
 #' 
 #' @return  A data frame of genes that have a frequent sequence mutation count
@@ -1492,10 +1499,10 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #' getPopularMutationCount(SampleDb, GermlineIGHV)
 #' 
 #' @export
-getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
+getPopularMutationCount <- function(data_db, germline_db, gene_min = 1e-03,
                                     seq_min = 50, seq_p_of_max = 1/8,
                                     full_return = FALSE){
-    modified_db = sample_db %>%
+    modified_db = data_db %>%
         mutate_(V_GENE = ~getGene(V_CALL)) %>%
         group_by_(~V_GENE) %>%
         mutate_(V_GENE_N = ~n()) %>%
@@ -1511,7 +1518,7 @@ getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
         # sufficient proportion of sequences as compared to the most common
         ungroup %>%
         distinct_(~V_SEQUENCE_IMGT, .keep_all = TRUE) %>%
-        filter_(~V_GENE_N >= (nrow(sample_db)*gene_min)) %>%
+        filter_(~V_GENE_N >= (nrow(data_db)*gene_min)) %>%
         filter_(~V_SEQUENCE_IMGT_N >= seq_min) %>%
         mutate_(V_SEQUENCE_IMGT_P_MAX = ~V_SEQUENCE_IMGT_N/V_SEQUENCE_IMGT_N_MAX) %>%
         filter_(~V_SEQUENCE_IMGT_P_MAX >= seq_p_of_max)
@@ -1538,18 +1545,18 @@ getPopularMutationCount <- function(sample_db, germline_db, gene_min = 1e-03,
 #' \code{insertPolymorphisms} replaces nucleotides in the desired locations of a
 #' provided sequence.
 #' 
-#' 
 #' @param    sequence     starting nucletide sequence.
 #' @param    positions    numeric vector of positions which to be changed.
 #' @param    nucleotides  character vector of nucletides to which to change the
 #'                        positions.
-#' @return   A sequence with the desired nucleotides in provided locations
+#'                        
+#' @return   A sequence with the desired nucleotides in the provided locations.
 #' 
 #' @examples
-#' insertPolymorphisms("hugged", c(1,6,2), c("t","r","i")) 
+#' insertPolymorphisms("HUGGED", c(1, 6, 2), c("T", "R", "I")) 
 #' 
 #' @export
-insertPolymorphisms <- function(sequence, positions, nucleotides){
+insertPolymorphisms <- function(sequence, positions, nucleotides) {
     
     if(length(positions) != length(nucleotides)){
         stop("Number of nucleotides and number of positions do not match.")
@@ -1579,19 +1586,19 @@ insertPolymorphisms <- function(sequence, positions, nucleotides){
 #' @seealso  \link{writeFasta} to do the inverse.
 #' 
 #' @export
-readIgFasta <- function(fasta_file, 
-                        strip_down_name = TRUE,
-                        force_caps = TRUE){
+readIgFasta <- function(fasta_file, strip_down_name=TRUE, force_caps=TRUE) {
     all_char = readChar(fasta_file, file.info(fasta_file)$size)
     split_by_sequence = strsplit(all_char, "[ \t\r\n\v\f]?>")
     add_name_break = sapply(split_by_sequence, function(x) sub("[\r\n]",">",x))
     cleaned_up = sapply(add_name_break, function(x) gsub("[ \t\r\n\v\f]", "", x))
     broken_names = sapply(cleaned_up, strsplit, ">")
+    
     seqs = sapply(broken_names, "[", 2)
     seq_names = sapply(broken_names, "[", 1)
-    if(force_caps){ seqs = toupper(seqs) }
+    if(force_caps) { seqs = toupper(seqs) }
     if(strip_down_name){ seq_names = getAllele(seq_names, strip_d=FALSE) }
     names(seqs) = seq_names
+    
     return(seqs[which(!is.na(seqs))])
 }
 
@@ -1601,13 +1608,13 @@ readIgFasta <- function(fasta_file,
 #' format.
 #' 
 #' @param    named_sequences  a vector of named string representing sequences
-#' @param    file             the name of the output file
+#' @param    file             the name of the output file.
 #' @param    width            the number of characters to be printed per line.
-#'                            If not between 1 and 255, width with be infinite.
+#'                            if not between 1 and 255, width with be infinite.
 #' @param    append           \code{logical} indicating if the output should be
 #'                            appended to \code{file} instead of overwriting it
 #' 
-#' @return   a named vector of strings respresenting Ig alleles
+#' @return   A named vector of strings respresenting Ig alleles.
 #' 
 #' @seealso  \link{readIgFasta} to do the inverse.
 #' 
@@ -1632,17 +1639,22 @@ writeFasta <- function(named_sequences, file, width=60, append=FALSE){
 #'
 #' \code{updateAlleleNames} takes a set of IGHV allele calls and replaces any
 #' outdated names (e.g. IGHV1-f) with the new IMGT names.
-#' @details The updated allele names are based on IMGT release 201408-4.
-#' @note    IGMT has removed IGHV2-5*10 and IGHV2-5*07 as it has determined they
-#'          are actually alleles *02 and *04, respectively.
 #' 
-#' @param    allele_calls  a vector of strings respresenting IGHV allele names
+#' @param    allele_calls  a vector of strings respresenting IGHV allele names.
 #' 
-#' @return   vector of strings respresenting updated IGHV allele names
+#' @return   Vector of strings respresenting updated IGHV allele names.
 #' 
-#' @references Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
-#' and alleles: new entities, new names and implications for research and
-#' prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
+#' @note
+#' IGMT has removed \code{IGHV2-5*10} and \code{IGHV2-5*07} as it has determined they
+#' are actually alleles \code{02} and \code{04}, respectively. The updated allele 
+#' names are based on IMGT release 201408-4.
+#' 
+#' @references
+#' \enumerate{
+#'   \item Xochelli et al. (2014) Immunoglobulin heavy variable (IGHV) genes
+#'         and alleles: new entities, new names and implications for research and
+#'         prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6
+#' }
 #' 
 #' @seealso Like \code{updateAlleleNames}, \link{sortAlleles} can help
 #'          format a list of allele names.
@@ -1685,16 +1697,16 @@ updateAlleleNames <- function(allele_calls){
 #' \code{sortAlleles} returns a sorted vector of strings respresenting Ig allele
 #' names. Names are first sorted by gene family, then by gene, then by allele.
 #' Duplicated genes have their alleles are sorted as if they were part of their
-#' non-duplicated counterparts (e.g. IGHV1-69D*01 comes after IGHV1-69*01 but
-#' before IGHV1-69*02), and non-localized genes (e.g. IGHV1-NL1*01) come last
-#' within their gene family.
+#' non-duplicated counterparts (e.g. \code{IGHV1-69D*01} comes after \code{IGHV1-69*01} 
+#' but before \code{IGHV1-69*02}), and non-localized genes (e.g. \code{IGHV1-NL1*01}) 
+#' come last within their gene family.
 #' 
-#' @param    allele_calls  a vector of strings respresenting Ig allele names
+#' @param    allele_calls  a vector of strings respresenting Ig allele names.
 #' @param    method        a string defining the method to use when sorting alleles.
 #'                         If \code{"name"} then sort in lexicographic order. If
 #'                         \code{"position"} then sort by position in the locus, as
 #'                         determined by the final two numbers in the gene name.
-#' @return   A sorted vector of strings respresenting Ig allele names
+#' @return   A sorted vector of strings respresenting Ig allele names.
 #' 
 #' @seealso Like \code{sortAlleles}, \link{updateAlleleNames} can help
 #'          format a list of allele names.
@@ -1750,8 +1762,9 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
 #' \code{cleanSeqs} capitalizes nucleotides and replaces all characters 
 #' besides \code{c("A", "C", "G", "T", "-", ".")} with \code{"N"}. 
 #' 
-#' @param    seqs  a vector of nucleotide sequences
-#' @return   A modified vector of nucleotide sequences
+#' @param    seqs  a vector of nucleotide sequences.
+#' 
+#' @return   A modified vector of nucleotide sequences.
 #' 
 #' @seealso \link{sortAlleles} and \link{updateAlleleNames} can
 #'          help format a list of allele names.
@@ -1849,15 +1862,15 @@ mutationRangeSubset <- function(data_db, germline, mut_range, pos_range){
 #
 # \code{findLowerY} finds the lower range of y-intercept confidence interval
 # 
+# @details  If mut_min is 1, a y-intercept will be searched for at 0. If
+# mut_min is above 1, then the "y-intercept" will be found at x = mut_min - 1.
+#
 # @param    x         A vector of x values
 # @param    y         A vector of y values
 # @param    mut_min   The value where the the lowest mutation count should be
 #                     found. See details.
 # @param    alpha     The alpha cutoff the be used in constructing the
 #                     confidence interval
-#
-# @details  If mut_min is 1, a y-intercept will be searched for at 0. If
-# mut_min is above 1, then the "y-intercept" will be found at x = mut_min - 1.
 #
 # @return  A data frame containing only the subset carrying the desired levels
 # of mutation

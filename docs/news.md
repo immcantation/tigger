@@ -1,4 +1,4 @@
-Version 0.2.11.999 September 24, 2018
+Version 0.3.0 September 30, 2018
 -------------------------------------------------------------------------------
 
 + Renamed sample data from `germline_ighv`, `sample_db`, `genotype` and 
@@ -7,6 +7,9 @@ Version 0.2.11.999 September 24, 2018
 + Fixed a bug in `reassignAlleles`.
 + Changed the return behavior of `reassignAlleles` so that it returns the 
   input data.frame with the `V_CALL_GENOTYPED` column appended or overwritten.
++ Changed behavior of the `keep_gene` argument to `reassignAlleles` to provide
+  options for maintaining reassignments at the gene (previous `TRUE` behavior), 
+  family, or repertoire level.
 
 
 Version 0.2.11 September 21, 2017

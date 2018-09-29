@@ -1,4 +1,4 @@
-**getPopularMutationCount** - *Find Frequent Sequences' Mutation Counts*
+**getPopularMutationCount** - *Find mutation counts for frequency sequences*
 
 Description
 --------------------
@@ -10,15 +10,15 @@ for each V gene and returns the mutation count of those sequences.
 Usage
 --------------------
 ```
-getPopularMutationCount(sample_db, germline_db, gene_min = 0.001,
+getPopularMutationCount(data_db, germline_db, gene_min = 0.001,
 seq_min = 50, seq_p_of_max = 1/8, full_return = FALSE)
 ```
 
 Arguments
 -------------------
 
-sample_db
-:   A Change-O db data frame. See
+data_db
+:   a `data.frame` in the Change-O format. See
 [findNovelAlleles](findNovelAlleles.md) for a list of required
 columns.
 
@@ -38,7 +38,7 @@ seq_p_of_max
 count that a sequence must meet to avoid exclusion.
 
 full_return
-:   If true, will return all `sample_db` columns and
+:   If `TRUE`, will return all `data_db` columns and
 will include sequences with mutation count < 1.
 
 

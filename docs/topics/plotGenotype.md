@@ -17,8 +17,8 @@ Arguments
 -------------------
 
 genotype
-:   a table of alleles denoting a genotype, as returned by
-[inferGenotype](inferGenotype.md)
+:   a `data.frame` of alleles denoting a genotype, 
+as returned by [inferGenotype](inferGenotype.md).
 
 facet_by
 :   a column name in `genotype` to facet the plot by. 
@@ -31,7 +31,7 @@ If `"name"` then sort in lexicographic order. If
 determined by the final two numbers in the gene name.
 
 text_size
-:   the point size of the plotted text
+:   the point size of the plotted text.
 
 silent
 :   if `TRUE` do not draw the plot and just return the ggplot

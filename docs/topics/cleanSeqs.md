@@ -3,8 +3,8 @@
 Description
 --------------------
 
-`cleanSeqs` capitalizes nucleotides, replaces "." with "-", and then
-replaces all characters besides ACGT- with "N".
+`cleanSeqs` capitalizes nucleotides and replaces all characters 
+besides `c("A", "C", "G", "T", "-", ".")` with `"N"`.
 
 
 Usage
@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 seqs
-:   a vector of nucleotide sequences
+:   a vector of nucleotide sequences.
 
 
 
@@ -25,7 +25,7 @@ seqs
 Value
 -------------------
 
-A vector of nucleotide sequences
+A modified vector of nucleotide sequences.
 
 
 
@@ -33,16 +33,14 @@ Examples
 -------------------
 
 ```R
-# Create messy nucleotide sequences
-seqs <- c("AGAT.taa-GAG...ATA",
-"GATACAGTXXXXXAGNNNPPPACA")
-# Clean them up
+# Clean messy nucleotide sequences
+seqs <- c("AGAT.taa-GAG...ATA", "GATACAGTXXZZAGNNPPACA")
 cleanSeqs(seqs)
 ```
 
 
 ```
-[1] "AGAT-TAA-GAG---ATA"       "GATACAGTNNNNNAGNNNNNNACA"
+[1] "AGAT.TAA-GAG...ATA"    "GATACAGTNNNNAGNNNNACA"
 
 ```
 

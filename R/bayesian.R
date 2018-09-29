@@ -9,13 +9,23 @@
 #' calculated using a Bayes factor (the most likely model divided by second-most likely model). 
 #' The larger the Bayes factor (K), the greater the certainty in the model.
 #'
+#' @details
+#' Allele calls representing cases where multiple alleles have been
+#' assigned to a single sample sequence are rare among unmutated
+#' sequences but may result if nucleotides for certain positions are
+#' not available. Calls containing multiple alleles are treated as
+#' belonging to all groups. If \code{novel_df} is provided, all
+#' sequences that are assigned to the same starting allele as any
+#' novel germline allele will have the novel germline allele appended
+#' to their assignent prior to searching for unmutated sequences.
+#' 
 #' @param    data_db              a \code{data.frame} containing V allele
 #'                                calls from a single subject. If
 #'                                \code{find_unmutated} is \code{TRUE}, then
 #'                                the sample IMGT-gapped V(D)J sequence should 
-#' @param    v_call               column in \code{data_db} with V allele calls.
-#'                                Default is \code{"V_CALL"}                               
 #'                                be provided in a column \code{"SEQUENCE_IMGT"}
+#' @param    v_call               column in \code{data_db} with V allele calls.
+#'                                Default is \code{"V_CALL"}.                           
 #' @param    find_unmutated       if \code{TRUE}, use \code{germline_db} to
 #'                                find which samples are unmutated. Not needed
 #'                                if \code{allele_calls} only represent
@@ -29,28 +39,36 @@
 #'                                \link{findNovelAlleles} containing
 #'                                germline sequences that will be utilized if
 #'                                \code{find_unmutated} is \code{TRUE}. See
-#'                                details.
+#'                                Details.
 #' @param    priors               vector of priors for the multinomial 
 #'                                distribution. The first two enteries represent
 #'                                two allele priors, next three represent 
 #'                                three allele priors and the last four, four 
 #'                                allele priors. Each set of priors should sum to one.
-#'                                     
-#' @details  Allele calls representing cases where multiple alleles have been
-#'           assigned to a single sample sequence are rare among unmutated
-#'           sequences but may result if nucleotides for certain positions are
-#'           not available. Calls containing multiple alleles are treated as
-#'           belonging to all groups. If \code{novel_df} is provided, all
-#'           sequences that are assigned to the same starting allele as any
-#'           novel germline allele will have the novel germline allele appended
-#'           to their assignent prior to searching for unmutated sequences.
 #' 
-#' @return   A \code{data.frame} of alleles denoting the genotype of the subject with the log10
-#'           of the likelihood of each model and the log10 of the Bayes factor.
+#' @return
+#' A \code{data.frame} of alleles denoting the genotype of the subject with the log10
+#' of the likelihood of each model and the log10 of the Bayes factor. The output 
+#' contains the following columns:
 #' 
-#' @note     This method works best with data derived from blood, where a large
-#'           portion of sequences are expected to be unmutated. Ideally, there
-#'           should be hundreds of allele calls per gene in the input.
+#' \itemize{
+#'   \item \code{GENE}: The gene name without allele.
+#'   \item \code{ALLELES}: Comma separated list of alleles for the given \code{GENE}.
+#'   \item \code{COUNTS}: Comma separated list of observed sequences for each 
+#'         corresponding allele in the \code{ALLELES} list.
+#'   \item \code{TOTAL}: The total count of observed sequences for the given \code{GENE}.
+#'   \item \code{NOTE}: Any comments on the inferrence.
+#'   \item \code{KH}: log10 likelihood that the \code{GENE} is homozygous.
+#'   \item \code{KD}: log10 likelihood that the \code{GENE} is heterozygous.
+#'   \item \code{KT}: log10 likelihood that the \code{GENE} is trizygous
+#'   \item \code{KQ}: log10 likelihood that the \code{GENE} is quadrozygous.
+#'   \item \code{K_DIFF}: log10 ratio of the highest to second-highest zygosity likelihoods.
+#' }     
+#' 
+#' @note
+#' This method works best with data derived from blood, where a large
+#' portion of sequences are expected to be unmutated. Ideally, there
+#' should be hundreds of allele calls per gene in the input.
 #' 
 #' @seealso \link{plotGenotype} for a colorful visualization and
 #'          \link{genotypeFasta} to convert the genotype to nucleotide sequences.
@@ -64,8 +82,7 @@
 #' }
 #' 
 #' @examples
-#' # Infer the IGHV genotype, using only unmutated sequences, including any 
-#' # novel alleles
+#' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
 #' inferGenotypeBayesian(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
 #'                       novel_df=SampleNovel)
 #' 

@@ -33,7 +33,7 @@ uppercase
 Value
 -------------------
 
-a named vector of strings respresenting Ig alleles
+Named vector of strings respresenting Ig alleles.
 
 
 
