@@ -19,32 +19,36 @@
 #' novel germline allele will have the novel germline allele appended
 #' to their assignent prior to searching for unmutated sequences.
 #' 
-#' @param    data                 a \code{data.frame} containing V allele
-#'                                calls from a single subject. If
-#'                                \code{find_unmutated} is \code{TRUE}, then
-#'                                the sample IMGT-gapped V(D)J sequence should 
-#'                                be provided in a column \code{"SEQUENCE_IMGT"}
-#' @param    v_call               column in \code{data} with V allele calls.
-#'                                Default is \code{"V_CALL"}.                           
-#' @param    find_unmutated       if \code{TRUE}, use \code{germline_db} to
-#'                                find which samples are unmutated. Not needed
-#'                                if \code{allele_calls} only represent
-#'                                unmutated samples.
-#' @param    germline_db          named vector of sequences containing the
-#'                                germline sequences named in
-#'                                \code{allele_calls}. Only required if
-#'                                \code{find_unmutated} is \code{TRUE}.
-#' @param    novel                an optional \code{data.frame} of the type
-#'                                novel returned by
-#'                                \link{findNovelAlleles} containing
-#'                                germline sequences that will be utilized if
-#'                                \code{find_unmutated} is \code{TRUE}. See
-#'                                Details.
-#' @param    priors               vector of priors for the multinomial 
-#'                                distribution. The first two enteries represent
-#'                                two allele priors, next three represent 
-#'                                three allele priors and the last four, four 
-#'                                allele priors. Each set of priors should sum to one.
+#' @param    data            a \code{data.frame} containing V allele
+#'                           calls from a single subject. If \code{find_unmutated} 
+#'                           is \code{TRUE}, then the sample IMGT-gapped V(D)J sequence 
+#'                           should be provided in a column \code{"SEQUENCE_IMGT"}
+#' @param    v_call          column in \code{data} with V allele calls.
+#'                           Default is \code{"V_CALL"}.                           
+#' @param    find_unmutated  if \code{TRUE}, use \code{germline_db} to
+#'                           find which samples are unmutated. Not needed
+#'                           if \code{allele_calls} only represent
+#'                           unmutated samples.
+#' @param    germline_db     named vector of sequences containing the
+#'                           germline sequences named in \code{allele_calls}. 
+#'                           Only required if \code{find_unmutated} is \code{TRUE}.
+#' @param    novel           an optional \code{data.frame} of the type
+#'                           novel returned by \link{findNovelAlleles} containing
+#'                           germline sequences that will be utilized if
+#'                           \code{find_unmutated} is \code{TRUE}. See Details.
+#' @param    priors          a numeric vector of priors for the multinomial distribution. 
+#'                           The \code{priors} vector must be nine values that defined
+#'                           the priors for the heterozygous (two allele), 
+#'                           trizygous (three allele), and quadrozygous (four allele) 
+#'                           distributions. The first two values of \code{priors} define 
+#'                           the prior for the heterozygous case, the next three values are for
+#'                           the trizygous case, and the final four values are for the 
+#'                           quadrozygous case. Each set of priors should sum to one. 
+#'                           Note, each distribution prior is actually defined internally 
+#'                           by set of four numbers, with the unspecified final values 
+#'                           assigned to \code{0}; e.g., the heterozygous case is 
+#'                           \code{c(priors[1], priors[2], 0, 0)}. The prior for the 
+#'                           homozygous distribution is fixed at \code{c(1, 0, 0, 0)}.                           
 #' 
 #' @return
 #' A \code{data.frame} of alleles denoting the genotype of the subject with the log10
