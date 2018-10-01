@@ -43,10 +43,6 @@ test_that("generateEvidence", {
                            genotype_db=genotype_db,
                            germline_db=germline_ighv)
 
-    # Iterative, with 1 iteration, should match
-    # novel_df_i <- itigger(sample_db, germline_ighv, max.iter = 1)
-    # ev_i <- novel_df_i$summary
-
     expected_ev <- data.frame(
     'POLYMORPHISM_CALL'='IGHV1-8*02_G234T',
     'GENE'='IGHV1-8',
@@ -98,8 +94,5 @@ test_that("generateEvidence", {
     expect_equivalent(data.frame(ev[,colnames(expected_ev)], stringsAsFactors = F),
                       expected_ev)    
     
-    # expect_equivalent(data.frame(ev_i[,colnames(expected_ev)], stringsAsFactors = F),
-                      # expected_ev, tolerance=0.001)    
-
 })
 

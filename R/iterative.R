@@ -51,7 +51,7 @@
 #' data(GermlineIGHV)
 
 #' # Find novel alleles and return relevant data
-#' novel_alleles <- itigger(SampleDb, GermlineIGHV, max.iter=5)
+#' novel_alleles <- itigger(SampleDb, GermlineIGHV, max.iter=2)
 #' novel_alleles$summary
 #' }
 #' @export
@@ -265,9 +265,9 @@ itigger <- function(data, germline_db,
                 novel=all_novel %>%
                     dplyr::filter(.data$FIELD_ID==this_field & .data$ITERATION==this_iteration),
                 genotype=this_gt, 
-                germline_novel=all_germ,
-                germline_input = this_germline,
-                iteration_id = "ITERATION", fields=c("FIELD_ID", fields))
+                genotype_db=all_germ,
+                germline_db = this_germline,
+                fields=c("FIELD_ID", fields, "ITERATION"))
         })) %>%
         dplyr::select(-.data$FIELD_ITERATION_ID)
     

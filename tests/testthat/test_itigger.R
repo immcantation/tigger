@@ -6,10 +6,9 @@ load(sample_db)
 germline_ighv <- file.path("..", "tests-data", "germline_ighv.rda")
 load(germline_ighv)
 
-
 # Run 3 iterations manually and compare results using itigger
 # This test takes a long time, skip on CRAN
-if (FALSE) {
+# if (FALSE) {
     test_that("itigger and findNovelAlleles find same alleles",{ 
         skip_on_cran()
         sample_db$FAMILY <- getFamily(sample_db$V_CALL, first=TRUE)
@@ -42,6 +41,17 @@ if (FALSE) {
                                                              v_call="V_CALL")[['V_CALL_GENOTYPED']]
         germdb1 <- c(germdb1,
                      germline_subset[names(germline_subset) %in% names(germdb1) == F])
+        
+        
+        # Evidence should match evidence from itigger 1 iteration
+        ev <- generateEvidence(data=sample_db1, 
+                               novel=nv1, 
+                               genotype=gt1,
+                               genotype_db=genotypeFasta(gt1, germline_subset, nv1),
+                               germline_db=germline_subset)
+        inv <- itigger(sample_db, germline_subset, fields=NULL, nproc=1, max.iter = 1)
+        ev_obs <- inv$summary[inv$summary$ITERATION=="1",colnames(ev)]
+        expect_equivalent(ev_obs, ev1)
         
         # setdiff(germdb1, germline_subset)
         # setdiff(names(germdb1), names(germline_subset))
@@ -76,11 +86,12 @@ if (FALSE) {
         # This should stop at 3rd iteration
         inv <- itigger(sample_db, germline_subset, fields=NULL, nproc=1, max.iter = 4)
         
-        expect_equivalent(inv$nv[inv$nv$ITERATION=="1",colnames(nv1)], nv1)
-        expect_equivalent(inv$nv[inv$nv$ITERATION=="2",colnames(nv2)], nv2)
-        expect_equivalent(inv$nv[inv$nv$ITERATION=="3",colnames(nv3)], nv3)
+        expect_equivalent(inv$novel[inv$novel$ITERATION=="1",colnames(nv1)], nv1)
+        expect_equivalent(inv$novel[inv$novel$ITERATION=="2",colnames(nv2)], nv2)
+        expect_equivalent(inv$novel[inv$novel$ITERATION=="3",colnames(nv3)], nv3)
         
         expect_equivalent(sort(names(inv$germline[["1"]])),sort(names(germdb2)))
         expect_equivalent(sort(names(inv$germline[["1"]])),sort(names(germdb2)))
+        
     })
-}
+# }
