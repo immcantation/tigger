@@ -236,10 +236,7 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
             polymorphism <- df[['POLYMORPHISM_CALL']]
             novel_imgt <- df[["NOVEL_IMGT"]]
             names(novel_imgt) <- polymorphism
-            #gene <- df[['GENE']]
-            #allele <- df[['ALLELE']]
-            #germline_call <- df[['GERMLINE_CALL']]
-            #this_germline <- germline_db
+
             v_call_genotyped <- data[["V_CALL_GENOTYPED"]]
             
             SEQUENCES <- sum(v_call_genotyped == polymorphism)

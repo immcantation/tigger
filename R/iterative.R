@@ -9,16 +9,16 @@
 #' number of iterations specified by the user is reached. With each iteration, 
 #' \code{v_call} and \code{germline} are updated so that the next iteration will
 #' use as input the corrected \code{v_call} (\code{V_CALL_GENOTYPED}) and the
-#' \code{germline} database that includes the new alleles germlines.
+#' \code{germline_db} database that includes the new alleles germlines.
 #'
 #' 
-#' @param    db             a \code{data.frame} in Change-O format. See details.
-#' @param    germline       a vector of named nucleotide germline sequences
-#'                          matching the V calls in \code{db}.
-#' @param    v_call         name of the column in db with V allele calls. 
+#' @param    data             a \code{data.frame} in Change-O format. See details.
+#' @param    germline_db       a vector of named nucleotide germline sequences
+#'                          matching the V calls in \code{data}.
+#' @param    v_call         name of the column in data with V allele calls. 
 #'                          Default is V_CALL.   
-#' @param    fields         name of the column(s) in \code{db} that will be 
-#'                          used to split \code{db} in subsets to be 
+#' @param    fields         name of the column(s) in \code{data} that will be 
+#'                          used to split \code{data} in subsets to be 
 #'                          analyzed independently.         
 #' @param    verbose        whether to keep the results for all iterations (TRUE)
 #'                          or just the last one (FALSE)       
@@ -27,13 +27,13 @@
 #' 
 #' @return Returns a named list with the fields:
 #' \itemize{
-#'    \item \code{db} The input \code{db} with the additional column
+#'    \item \code{data} The input \code{data} with the additional column
 #'                    \code{V_CALL_GENOTYPED}, which has the the correctd \code{V_CALL}.
 #'                    If \code{verbose} was set to \code{TRUE}, there will be as many
 #'                    \code{V_CALL_GENOTYPED_X} (where X is a number) columns as iterations.
 #'    \item \code{fields} The input \code{fields}
 #'    \item \code{v_call} The input \code{v_call}
-#'    \item \code{nv} A \code{data.frame} with the results of \code{findNovelAlleles} obtained 
+#'    \item \code{novel} A \code{data.frame} with the results of \code{findNovelAlleles} obtained 
 #'                    after all iterations.
 #'    \item \code{gt} A \code{data.frame} with the results of \code{inferGenotype} obtained 
 #'                    after all iterations.
@@ -47,15 +47,15 @@
 #'          \link{generateEvidence} and \link{plotTigger}.
 #' @examples
 #' \dontrun{
-#' data(sample_db)
-#' data(germline_ighv)
+#' data(SampleDb)
+#' data(GermlineIGHV)
 
 #' # Find novel alleles and return relevant data
-#' novel_alleles <- itigger(sample_db, germline_ighv, max.iter=5)
+#' novel_alleles <- itigger(SampleDb, GermlineIGHV, max.iter=5)
 #' novel_alleles$summary
 #' }
 #' @export
-itigger <- function(db, germline, 
+itigger <- function(data, germline_db, 
                    v_call="V_CALL",
                    fields=NULL, 
                    max.iter=1, 
@@ -66,22 +66,22 @@ itigger <- function(db, germline,
     warning("\n\nThis function is under active development and not fully tested.\n\n", 
             immediate.=TRUE)
     
-    gt_cols <- grepl("V_CALL_GENOTYPED(_*)", colnames(db))
+    gt_cols <- grepl("V_CALL_GENOTYPED(_*)", colnames(data))
     if ( any(gt_cols) ) {
-        warning(paste0("Column ", paste(colnames(db)[gt_cols], sep=", "), " removed\n"),
+        warning(paste0("Column ", paste(colnames(data)[gt_cols], sep=", "), " removed\n"),
                 immediate.=TRUE)
-        db[,gt_cols] <- NULL
+        data[,gt_cols] <- NULL
     }
     
-    db[['FIELD_ID']] <- db %>%
+    data[['FIELD_ID']] <- data %>%
         dplyr::group_by_(.dots=fields) %>%
         dplyr::group_indices() %>%
         as.character()
     
-    db <- db %>%
+    data <- data %>%
         dplyr::ungroup()
     
-    FIELD_ID_label <- db %>%
+    FIELD_ID_label <- data %>%
         dplyr::select_(.dots=c(fields, "FIELD_ID")) %>%
         dplyr::distinct() %>%
         data.frame()
@@ -97,14 +97,14 @@ itigger <- function(db, germline,
                                          collapse="-")), collapse=", ")))
 
         # (re)set germline and v_call
-        germline_idx <- germline
+        germline_idx <- germline_db
         v_call_idx <- v_call
         
-        db_idx <- db %>%
-            dplyr::filter(FIELD_ID==idx) %>%
+        data_idx <- data %>%
+            dplyr::filter(.data$FIELD_ID==idx) %>%
             data.frame()
         
-        all_nv <- all_gt <- all_germline_input <- list()
+        all_novel <- all_gt <- all_germline_input <- list()
         genotyped_alleles <- c()
         
         i <- 0
@@ -114,7 +114,7 @@ itigger <- function(db, germline,
             message(paste0("   Iteration ",i, " of ", max.iter))
             message(paste0("   |- v_call: ",v_call_idx))
             
-            nv <- tryCatch( findNovelAlleles(db_idx, germline_db=germline_idx,
+            novel <- tryCatch( findNovelAlleles(data_idx, germline_db=germline_idx,
                                              v_call=v_call_idx,...),
                             error=function(e){
                                 m <- gsub("\\\n","", geterrmessage())
@@ -123,20 +123,20 @@ itigger <- function(db, germline,
                                 return(data.frame(NOVEL_IMGT=NA,NOTE=m,stringsAsFactors = FALSE))
                             })
             
-            # save nv and gt even if no new alleles
+            # save novel and gt even if no new alleles
             if (verbose) {
-                all_nv[[i_char]] <- nv
+                all_novel[[i_char]] <- novel
             } else {
-                all_nv[["1"]] <- nv
+                all_novel[["1"]] <- novel
             }
             
             # save input germlines, used by generateEvidence
             all_germline_input[[i_char]] <- germline_idx
             
-            if (ncol(nv)>2) {
+            if (ncol(novel)>2) {
                 message("     ... infer genotype")
-                gt <- inferGenotype(db_idx, germline_db=germline_idx, 
-                                    novel_df=nv, v_call=v_call_idx)
+                gt <- inferGenotype(data_idx, germline_db=germline_idx, 
+                                    novel=novel, v_call=v_call_idx)
             } else {
                 gt <- data.frame(stringsAsFactors = F)
             }
@@ -146,12 +146,12 @@ itigger <- function(db, germline,
                 all_gt[["1"]] <- gt
             }
             
-            selected <- selectNovel(nv)
+            selected <- selectNovel(novel)
             
             message(paste0("   |- selectNovel: ", nrow(selected)," rows"))
             if (nrow(selected) > 0) {
             
-                genotype_seqs <- genotypeFasta(gt, germline_idx, nv)
+                genotype_seqs <- genotypeFasta(gt, germline_idx, novel)
                 # novel_alleles_found <- any(genotype_seqs %in% germline_idx == F)
                 novel_alleles_found <- any(names(genotype_seqs) %in% genotyped_alleles == F)
                 # update seen genotyped alleles
@@ -160,16 +160,16 @@ itigger <- function(db, germline,
                 if (novel_alleles_found) {
                     
                     message("     ... reassign alleles")
-                    new_v_call <- reassignAlleles(db_idx, genotype_seqs, 
+                    new_v_call <- reassignAlleles(data_idx, genotype_seqs, 
                                                   v_call=v_call_idx, 
                                                   keep_gene = keep_gene)[['V_CALL_GENOTYPED']]
-                    ## append new calls to db
+                    ## append new calls to data
                     if (verbose) {
                         v_call_idx <- paste0("V_CALL_GENOTYPED_",i)
                     } else {
                         v_call_idx <- "V_CALL_GENOTYPED"
                     }
-                    db_idx[[v_call_idx]] <- new_v_call
+                    data_idx[[v_call_idx]] <- new_v_call
                     germline_idx <- c(germline_idx,
                                      genotype_seqs[names(genotype_seqs) %in% names(germline_idx) == F])
 
@@ -184,20 +184,20 @@ itigger <- function(db, germline,
         }  # end iteration loop    
         
         # If verbose=TRUE, add column V_CALL_GENOTYPED with last iteration
-        genotype_cols <- grep("V_CALL_GENOTYPED_", colnames(db_idx))
+        genotype_cols <- grep("V_CALL_GENOTYPED_", colnames(data_idx))
         if (length(genotype_cols)>0) {
-            iterations <- as.numeric(gsub(".*_","",colnames(db_idx)[genotype_cols]))
+            iterations <- as.numeric(gsub(".*_","",colnames(data_idx)[genotype_cols]))
             last_genotype_col <- genotype_cols[which.max(iterations)]
-            db_idx[["V_CALL_GENOTYPED"]] <- db_idx[[colnames(db_idx)[last_genotype_col]]]
+            data_idx[["V_CALL_GENOTYPED"]] <- data_idx[[colnames(data_idx)[last_genotype_col]]]
         } 
         
-        new_germlines <- names(germline_idx) %in% names(germline) == FALSE
+        new_germlines <- names(germline_idx) %in% names(germline_db) == FALSE
         num_new_germlines <- sum(new_germlines)
         new_germlines <- germline_idx[new_germlines]
         message(paste0(" |- ",num_new_germlines, " new germlines in field ", label))
-        all_nv <- bind_rows(all_nv, .id="ITERATION")
-        if (nrow(all_nv)>0) {
-            all_nv <- cbind(label, all_nv)
+        all_novel <- bind_rows(all_novel, .id="ITERATION")
+        if (nrow(all_novel)>0) {
+            all_novel <- cbind(label, all_novel)
         }
         all_gt <- bind_rows(all_gt, .id="ITERATION")
         if (nrow(all_gt)>0) {
@@ -205,10 +205,10 @@ itigger <- function(db, germline,
         } 
         
         foundAlleles[[as.character(idx)]] <- list(
-            db=db_idx,
-            nv=all_nv,
+            data=data_idx,
+            novel=all_novel,
             gt=all_gt,
-            germline=germline_idx,
+            germline_db=germline_idx,
             new_germlines=new_germlines,
             germline_input=all_germline_input
         )
@@ -216,68 +216,69 @@ itigger <- function(db, germline,
     } # end fields loop
 
     # Final unique germlines, considering all fields
-    all_germ_names <- unlist(lapply(lapply(foundAlleles, '[[', "germline"), names))
-    all_germ <- unlist(lapply(foundAlleles, '[[', "germline"), use.names = F)
+    all_germ_names <- unlist(lapply(lapply(foundAlleles, '[[', "germline_db"), names))
+    all_germ <- unlist(lapply(foundAlleles, '[[', "germline_db"), use.names = F)
     names(all_germ) <- all_germ_names
     all_germ <- all_germ[match(unique(names(all_germ)), names(all_germ))]
     
-    new_germlines <- all_germ[names(all_germ) %in% names(germline)== FALSE]
+    new_germlines <- all_germ[names(all_germ) %in% names(germline_db)== FALSE]
     message(paste0("\nTOTAL distinct new germlines after genotyping: ", length(new_germlines)))
     
-    all_nv <- bind_rows(lapply(foundAlleles, '[[', "nv"))
+    all_novel <- bind_rows(lapply(foundAlleles, '[[', "novel"))
     all_gt <- bind_rows(lapply(foundAlleles, '[[', "gt"))
 
     # Arrange by ITERATION for generateEvidence to keep the first time
     # the novel allele was found
-    final_gt <- all_gt %>%
-        dplyr::arrange(as.numeric(ITERATION)) %>%
+    final_gt <-     all_gt %>%
+        dplyr::arrange(as.numeric(.data$ITERATION)) %>%
         dplyr::group_by_(.dots=c("FIELD_ID",fields, "GENE")) %>%
-        dplyr::filter(duplicated(ALLELES) == FALSE) %>%
+        dplyr::filter(duplicated(.data$ALLELES) == FALSE) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(
-            ALLELES=strsplit(as.character(ALLELES),","),
-            COUNTS=strsplit(as.character(COUNTS),",")) %>%
-        tidyr::unnest(ALLELES, COUNTS) %>%
-        dplyr::mutate(POLYMORPHISM_CALL=paste0(GENE,"*" ,ALLELES)) %>%
-        dplyr::filter(POLYMORPHISM_CALL %in% all_nv$POLYMORPHISM_CALL)
+            ALLELES=strsplit(as.character(.data$ALLELES),","),
+            COUNTS=strsplit(as.character(.data$COUNTS),",")) %>%
+        tidyr::unnest(.data$ALLELES, .data$COUNTS) %>%
+        dplyr::mutate(POLYMORPHISM_CALL=paste0(.data$GENE,"*" ,.data$ALLELES)) %>%
+        dplyr::filter(.data$POLYMORPHISM_CALL %in% all_novel$POLYMORPHISM_CALL) 
     
-    genotyped_db <- bind_rows(lapply(foundAlleles, '[[', "db"))
+    genotyped_data <- bind_rows(lapply(foundAlleles, '[[', "data"))
 
     # Group by field and iteration
     # (the input germline changes with each iteration, as
     # it is expanded with new alleles found)
     # then generate evidence
     final_gt$FIELD_ITERATION_ID <- final_gt %>%
-        dplyr::group_by(FIELD_ID, ITERATION) %>%
+        dplyr::group_by(.data$FIELD_ID, .data$ITERATION) %>%
         dplyr::group_indices() %>%
         as.character()
     final_gt <- bind_rows(lapply(
         unique(final_gt$FIELD_ITERATION_ID), 
         function(f_i_id) {
             this_gt <- final_gt %>%
-                dplyr::filter(FIELD_ITERATION_ID==f_i_id)
+                dplyr::filter(.data$FIELD_ITERATION_ID==f_i_id)
             this_field <- this_gt[['FIELD_ID']][1]
             this_iteration <- this_gt[['ITERATION']][1]
             this_germline <- foundAlleles[[this_field]][['germline_input']][[this_iteration]]
-            generateEvidence(this_gt, 
-                             all_nv %>%
-                                 dplyr::filter(FIELD_ID==this_field & ITERATION==this_iteration),
-                             germline_nv=all_germ,
-                             germline_input = this_germline,
-                             db = genotyped_db %>%
-                                 dplyr::filter(FIELD_ID==this_field),
-                             iteration_id = "ITERATION", fields=c("FIELD_ID", fields))
+            generateEvidence(
+                data=genotyped_data %>%
+                    dplyr::filter(.data$FIELD_ID==this_field),
+                novel=all_novel %>%
+                    dplyr::filter(.data$FIELD_ID==this_field & .data$ITERATION==this_iteration),
+                genotype=this_gt, 
+                germline_novel=all_germ,
+                germline_input = this_germline,
+                iteration_id = "ITERATION", fields=c("FIELD_ID", fields))
         })) %>%
-        dplyr::select(-FIELD_ITERATION_ID)
+        dplyr::select(-.data$FIELD_ITERATION_ID)
     
     list(
-         db=genotyped_db,
+         data=genotyped_data,
          fields=fields,
          v_call=v_call,
-         nv=all_nv,
+         novel=all_novel,
          gt=all_gt,
          new_germlines=new_germlines,
-         germline=lapply(foundAlleles, '[[', "germline"),
+         germline_db=lapply(foundAlleles, '[[', "germline_db"),
          summary=final_gt
     )        
 }
@@ -304,11 +305,11 @@ itigger <- function(db, germline,
 #' @examples
 #' \dontrun{
 #' # Load example data and germlines
-#' data(sample_db)
-#' data(germline_ighv)
+#' data(SampleDb)
+#' data(GermlineIGHV)
 #' 
 #' # Find novel alleles and return relevant data
-#' novel_alleles <- itigger(sample_db, germline_ighv, max.iter=2)
+#' novel_alleles <- itigger(SampleDb, GermlineIGHV, max.iter=2)
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' tigger_plots <- plotTigger(novel_alleles)
 #' # plots is a list of 2 elements, with one plot each in this example.
@@ -325,7 +326,7 @@ plotTigger <- function(tigger_list) {
 
     gt <- tigger_list$gt %>%
         dplyr::group_by_(.dots=c("FIELD_ID", "GENE", "ALLELES")) %>%
-        dplyr::filter(ITERATION==min(ITERATION)) %>%
+        dplyr::filter(.data$ITERATION==min(.data$ITERATION)) %>%
         dplyr::ungroup()
     
     if (nrow(gt) > 0 ){
@@ -337,21 +338,21 @@ plotTigger <- function(tigger_list) {
         plot_list[["all_genotypes"]] <- plotGenotype(gt, facet_by = "FIELD_ID", silent=T)
     }
     
-    nv <- tigger_list$summary
+    novel <- tigger_list$summary
     
-    if (nrow(nv) > 0 ){
+    if (nrow(novel) > 0 ){
 
-        nv <- nv %>%
+        novel <- novel %>%
             dplyr::mutate(ROW_ID=1:n(),
-                          LABEL=paste(c(FIELD_ID, tigger_list$fields), collapse="_"),
-                          FIELD_ID=as.character(FIELD_ID))
+                          LABEL=paste(c(.data$FIELD_ID, tigger_list$fields), collapse="_"),
+                          FIELD_ID=as.character(.data$FIELD_ID))
         
-        for (i in 1:nrow(nv)) {
-            this_field <- nv[['LABEL']][i]
-            this_db <- merge(nv[i,], tigger_list[['db']], by="FIELD_ID")
-            row_id <- as.character(nv[["ROW_ID"]][i])
-            plot_list[["polymorphisms"]][[this_field]][[row_id]] <- plotNovel(this_db,
-                      nv[i,], v_call=tigger_list$v_call)
+        for (i in 1:nrow(novel)) {
+            this_field <- novel[['LABEL']][i]
+            this_data <- merge(novel[i,], tigger_list[['data']], by="FIELD_ID")
+            row_id <- as.character(novel[["ROW_ID"]][i])
+            plot_list[["polymorphisms"]][[this_field]][[row_id]] <- plotNovel(this_data,
+                      novel[i,], v_call=tigger_list$v_call)
         }
      
     }
