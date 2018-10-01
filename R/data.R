@@ -9,43 +9,51 @@
 #' nucleotides capitalized and gaps represented by ".") while names correspond
 #' to stripped-down IMGT allele names (e.g. "IGHV1-18*01").
 #' 
-#' @references Xochelli \emph{et al}. (2014) Immunoglobulin heavy variable
-#' (IGHV) genes and alleles: new entities, new names and implications for
-#' research and prognostication in chronic lymphocytic leukaemia.
-#' \emph{Immunogenetics}. 67(1):61-6.
+#' @references 
+#' \enumerate{
+#'   \item Xochelli, et al. (2014) Immunoglobulin heavy variable (IGHV) genes and 
+#'         alleles: new entities, new names and implications for research and 
+#'         prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6.
+#' }
+#' 
 #' @keywords data
 NULL
 
 
-#' Example human Rep-Seq data
+#' Example human immune repertoire data
 #'
-#' Example VDJ-rearranged immunoglobulin Rep-Seq sequences derived from a single
-#' individual (PGP1), sequenced on the Roche 454 platform, and thought by
-#' IMGT/V-QUEST to utilize IGHV1 family alleles.
+#' A \code{data.frame} of example V(D)J immunoglobulin sequences derived from a 
+#' single individual (PGP1), sequenced on the Roche 454 platform, and assigned by
+#' IMGT/HighV-QUEST to IGHV1 family alleles.
 #'
 #' @name SampleDb
 #' @docType data
-#' @format A \code{data.frame} where rows correspond to unique VDJ sequences and
+#' @format A \code{data.frame} where rows correspond to unique V(D)J sequences and
 #' columns include:
 #' \itemize{
-#'   \item IMGT-gapped nucleotide sequence (\code{"SEQUENCE_IMGT"})
-#'   \item IMGT/V-QUEST allele calls (\code{"V_CALL"}, \code{"D_CALL"}, and
-#'     \code{"J_CALL"})
-#'   \item Junction length (\code{"JUNCTION_LENGTH"})
+#'   \item \code{"SEQUENCE_IMGT"}: IMGT-gapped V(D)J nucleotide sequence.
+#'   \item \code{"V_CALL"}: IMGT/HighV-QUEST V segment allele calls.
+#'   \item \code{"D_CALL"}: IMGT/HighV-QUEST D segment allele calls.
+#'   \item \code{"J_CALL"}: IMGT/HighV-QUEST J segment allele calls.
+#'   \item \code{"JUNCTION_LENGTH"}: Junction region length.
 #' }
 #' 
-#' @references Gadala-Maria \emph{et al}. (2015) Automated analysis of
-#' high-throughput B cell sequencing data reveals a high frequency of novel
-#' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
+#' @references
+#' \enumerate{
+#'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
+#'         sequencing data reveals a high frequency of novel immunoglobulin V gene 
+#'         segment alleles. PNAS. 112(8):E862-70.
+#' }
+#' 
 #' @keywords data
 NULL
 
-#' Example of Analyzed Rep-Seq data
+#' Example novel allele detection results
 #'
-#' Example VDJ-rearranged immunoglobulin Rep-Seq sequences derived from a single
-#' individual (PGP1), sequenced on the Roche 454 platform, and thought by
-#' IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
-#' \link{findNovelAlleles}.
+#' A \code{data.frame} of novel allele detection results from \link{findNovelAlleles}. 
+#' Source data was a collection of V(D)J immunoglobulin sequences derived from a single
+#' individual (PGP1), sequenced on the Roche 454 platform, and assigned by
+#' IMGT/HighV-QUEST to IGHV1 family alleles.
 #'
 #' @name SampleNovel
 #' @docType data
@@ -53,26 +61,39 @@ NULL
 #' polymorphisms and columns give results as well as paramaters used to run
 #' the test.
 #' 
-#' @references Gadala-Maria \emph{et al}. (2015) Automated analysis of
-#' high-throughput B cell sequencing data reveals a high frequency of novel
-#' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
+#' @seealso See \link{findNovelAlleles} for detailed column descriptions.
+#' 
+#' @references
+#' \enumerate{
+#'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
+#'         sequencing data reveals a high frequency of novel immunoglobulin V gene 
+#'         segment alleles. PNAS. 112(8):E862-70.
+#' }
+#' 
 #' @keywords data
 NULL
 
-#' Example of an Inferred Genotype
+#' Example genotype inferrence results
 #'
-#' Example VDJ-rearranged immunoglobulin Rep-Seq sequences derived from a single
-#' individual (PGP1), sequenced on the Roche 454 platform, and thought by
-#' IMGT/V-QUEST to utilize IGHV1 family alleles, as processed by
-#' \link{findNovelAlleles} and \link{inferGenotype}
-#'
+#' A \code{data.frame} of genotype inference results from \link{inferGenotype}
+#' after novel allele detection via \link{findNovelAlleles}.
+#' Source data was a collection of V(D)J immunoglobulin sequences derived from a single
+#' individual (PGP1), sequenced on the Roche 454 platform, and assigned by
+#' IMGT/HighV-QUEST to IGHV1 family alleles.
+#' 
 #' @name SampleGenotype
 #' @docType data
 #' @format A \code{data.frame} where rows correspond to genes carried by an
 #' individual and columns lists the alleles of those genes and their counts.
 #' 
-#' @references Gadala-Maria \emph{et al}. (2015) Automated analysis of
-#' high-throughput B cell sequencing data reveals a high frequency of novel
-#' immunoglobulin V gene segment alleles. \emph{PNAS}. 112(8):E862-70.
+#' @seealso See \link{inferGenotype} for detailed column descriptions.
+#' 
+#' @references
+#' \enumerate{
+#'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
+#'         sequencing data reveals a high frequency of novel immunoglobulin V gene 
+#'         segment alleles. PNAS. 112(8):E862-70.
+#' }
+#' 
 #' @keywords data
 NULL

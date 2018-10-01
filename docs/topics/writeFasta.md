@@ -20,11 +20,11 @@ named_sequences
 :   a vector of named string representing sequences
 
 file
-:   the name of the output file
+:   the name of the output file.
 
 width
 :   the number of characters to be printed per line.
-If not between 1 and 255, width with be infinite.
+if not between 1 and 255, width with be infinite.
 
 append
 :   `logical` indicating if the output should be
@@ -36,7 +36,7 @@ appended to `file` instead of overwriting it
 Value
 -------------------
 
-a named vector of strings respresenting Ig alleles
+A named vector of strings respresenting Ig alleles.
 
 
 

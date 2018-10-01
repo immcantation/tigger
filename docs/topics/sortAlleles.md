@@ -6,9 +6,9 @@ Description
 `sortAlleles` returns a sorted vector of strings respresenting Ig allele
 names. Names are first sorted by gene family, then by gene, then by allele.
 Duplicated genes have their alleles are sorted as if they were part of their
-non-duplicated counterparts (e.g. IGHV1-69D*01 comes after IGHV1-69*01 but
-before IGHV1-69*02), and non-localized genes (e.g. IGHV1-NL1*01) come last
-within their gene family.
+non-duplicated counterparts (e.g. `IGHV1-69D*01` comes after `IGHV1-69*01` 
+but before `IGHV1-69*02`), and non-localized genes (e.g. `IGHV1-NL1*01`) 
+come last within their gene family.
 
 
 Usage
@@ -21,7 +21,7 @@ Arguments
 -------------------
 
 allele_calls
-:   a vector of strings respresenting Ig allele names
+:   a vector of strings respresenting Ig allele names.
 
 method
 :   a string defining the method to use when sorting alleles.
@@ -35,7 +35,7 @@ determined by the final two numbers in the gene name.
 Value
 -------------------
 
-A sorted vector of strings respresenting Ig allele names
+A sorted vector of strings respresenting Ig allele names.
 
 
 

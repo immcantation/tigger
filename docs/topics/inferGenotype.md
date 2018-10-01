@@ -15,42 +15,19 @@ by chance have been mutated to look like another allele) can be removed.
 Usage
 --------------------
 ```
-inferGenotype(clip_db, v_call = "V_CALL", fraction_to_explain = 0.875,
-gene_cutoff = 1e-04, find_unmutated = TRUE, germline_db = NA,
-novel_df = NA)
+inferGenotype(data, germline_db = NA, novel = NA, v_call = "V_CALL",
+fraction_to_explain = 0.875, gene_cutoff = 1e-04,
+find_unmutated = TRUE)
 ```
 
 Arguments
 -------------------
 
-clip_db
+data
 :   a `data.frame` containing V allele
 calls from a single subject. If
 `find_unmutated` is `TRUE`, then
 the sample IMGT-gapped V(D)J sequence should
-
-v_call
-:   column in `clip_db` with V allele calls.
-Default is `"V_CALL"`
-be provided in a column `"SEQUENCE_IMGT"`
-
-fraction_to_explain
-:   the portion of each gene that must be
-explained by the alleles that will be included
-in the genotype
-
-gene_cutoff
-:   either a number of sequences or a fraction of
-the length of `allele_calls` denoting the
-minimum number of times a gene must be
-observed in `allele_calls` to be included
-in the genotype
-
-find_unmutated
-:   if `TRUE`, use `germline_db` to
-find which samples are unmutated. Not needed
-if `allele_calls` only represent
-unmutated samples.
 
 germline_db
 :   named vector of sequences containing the
@@ -58,13 +35,36 @@ germline sequences named in
 `allele_calls`. Only required if
 `find_unmutated` is `TRUE`.
 
-novel_df
+novel
 :   an optional `data.frame` of the type
 novel returned by
 [findNovelAlleles](findNovelAlleles.md) containing
 germline sequences that will be utilized if
 `find_unmutated` is `TRUE`. See
-details.
+Details.
+
+v_call
+:   column in `data` with V allele calls.
+Default is `"V_CALL"`.                            
+be provided in a column `"SEQUENCE_IMGT"`
+
+fraction_to_explain
+:   the portion of each gene that must be
+explained by the alleles that will be included
+in the genotype.
+
+gene_cutoff
+:   either a number of sequences or a fraction of
+the length of `allele_calls` denoting the
+minimum number of times a gene must be
+observed in `allele_calls` to be included
+in the genotype.
+
+find_unmutated
+:   if `TRUE`, use `germline_db` to
+find which samples are unmutated. Not needed
+if `allele_calls` only represent
+unmutated samples.
 
 
 
@@ -72,7 +72,17 @@ details.
 Value
 -------------------
 
-A table of alleles denoting the genotype of the subject
+A `data.frame` of alleles denoting the genotype of the subject containing 
+the following columns:
+
+
++  `GENE`: The gene name without allele.
++  `ALLELES`: Comma separated list of alleles for the given `GENE`.
++  `COUNTS`: Comma separated list of observed sequences for each 
+corresponding allele in the `ALLELES` list.
++  `TOTAL`: The total count of observed sequences for the given `GENE`.
++  `NOTE`: Any comments on the inferrence.
+
 
 
 Details
@@ -82,7 +92,7 @@ Allele calls representing cases where multiple alleles have been
 assigned to a single sample sequence are rare among unmutated
 sequences but may result if nucleotides for certain positions are
 not available. Calls containing multiple alleles are treated as
-belonging to all groups. If `novel_df` is provided, all
+belonging to all groups. If `novel` is provided, all
 sequences that are assigned to the same starting allele as any
 novel germline allele will have the novel germline allele appended
 to their assignent prior to searching for unmutated sequences.
@@ -101,10 +111,9 @@ Examples
 -------------------
 
 ```R
-# Infer the IGHV genotype, using only unmutated sequences, including any 
-# novel alleles
-inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
-novel_df=SampleNovel)
+# Infer IGHV genotype, using only unmutated sequences, including novel alleles
+inferGenotype(SampleDb, germline_db=GermlineIGHV, novel=SampleNovel,
+find_unmutated=TRUE)
 ```
 
 

@@ -32,7 +32,7 @@ positions.
 Value
 -------------------
 
-A sequence with the desired nucleotides in provided locations
+A sequence with the desired nucleotides in the provided locations.
 
 
 
@@ -40,12 +40,12 @@ Examples
 -------------------
 
 ```R
-insertPolymorphisms("hugged", c(1,6,2), c("t","r","i"))
+insertPolymorphisms("HUGGED", c(1, 6, 2), c("T", "R", "I"))
 ```
 
 
 ```
-[1] "tigger"
+[1] "TIGGER"
 
 ```
 
