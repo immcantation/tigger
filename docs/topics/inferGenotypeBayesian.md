@@ -26,24 +26,20 @@ Arguments
 
 data
 :   a `data.frame` containing V allele
-calls from a single subject. If
-`find_unmutated` is `TRUE`, then
-the sample IMGT-gapped V(D)J sequence should 
-be provided in a column `"SEQUENCE_IMGT"`
+calls from a single subject. If `find_unmutated` 
+is `TRUE`, then the sample IMGT-gapped V(D)J sequence 
+should be provided in a column `"SEQUENCE_IMGT"`
 
 germline_db
 :   named vector of sequences containing the
-germline sequences named in
-`allele_calls`. Only required if
-`find_unmutated` is `TRUE`.
+germline sequences named in `allele_calls`. 
+Only required if `find_unmutated` is `TRUE`.
 
 novel
 :   an optional `data.frame` of the type
-novel returned by
-[findNovelAlleles](findNovelAlleles.md) containing
+novel returned by [findNovelAlleles](findNovelAlleles.md) containing
 germline sequences that will be utilized if
-`find_unmutated` is `TRUE`. See
-Details.
+`find_unmutated` is `TRUE`. See Details.
 
 v_call
 :   column in `data` with V allele calls.
@@ -56,11 +52,19 @@ if `allele_calls` only represent
 unmutated samples.
 
 priors
-:   vector of priors for the multinomial 
-distribution. The first two enteries represent
-two allele priors, next three represent 
-three allele priors and the last four, four 
-allele priors. Each set of priors should sum to one.
+:   a numeric vector of priors for the multinomial distribution. 
+The `priors` vector must be nine values that defined
+the priors for the heterozygous (two allele), 
+trizygous (three allele), and quadrozygous (four allele) 
+distributions. The first two values of `priors` define 
+the prior for the heterozygous case, the next three values are for
+the trizygous case, and the final four values are for the 
+quadrozygous case. Each set of priors should sum to one. 
+Note, each distribution prior is actually defined internally 
+by set of four numbers, with the unspecified final values 
+assigned to `0`; e.g., the heterozygous case is 
+`c(priors[1], priors[2], 0, 0)`. The prior for the 
+homozygous distribution is fixed at `c(1, 0, 0, 0)`.
 
 
 
