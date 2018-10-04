@@ -1185,11 +1185,11 @@ reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
         geno = getFamily(names(genotype_db),strip_d=TRUE)
         names(geno) = names(genotype_db)
     } else if (keep_gene == "repertoire") {
-        v <- rep(v_call,length(v_calls))
-        geno = rep(v_call,length(genotype_db))
+        v <- rep(v_call, length(v_calls))
+        geno = rep(v_call, length(genotype_db))
         names(geno) = names(genotype_db)      
     } else {
-        stop(paste0("Unknown 'keep_gene':", keep_gene))
+        stop("Unknown keep_gene value: ", keep_gene)
     }
     
     # keep_gene == FALSE
