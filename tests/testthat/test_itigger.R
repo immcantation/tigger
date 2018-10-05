@@ -51,7 +51,7 @@ load(germline_ighv)
                                germline_db=germline_subset)
         inv <- itigger(sample_db, germline_subset, fields=NULL, nproc=1, max.iter = 1)
         ev_obs <- inv$summary[inv$summary$ITERATION=="1",colnames(ev)]
-        expect_equivalent(ev_obs, ev1)
+        expect_equivalent(ev_obs, ev)
         
         # setdiff(germdb1, germline_subset)
         # setdiff(names(germdb1), names(germline_subset))
