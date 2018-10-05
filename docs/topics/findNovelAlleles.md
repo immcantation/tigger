@@ -180,9 +180,8 @@ Examples
 -------------------
 
 ```R
-### Not run:
 # Find novel alleles and return relevant data
-# novel <- findNovelAlleles(SampleDb, GermlineIGHV)
+novel <- findNovelAlleles(SampleDb, GermlineIGHV)
 ```
 
 

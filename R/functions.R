@@ -1174,7 +1174,7 @@ reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
     # Extract data subset and prepare output vector
     v_sequences = as.character(data$SEQUENCE_IMGT)
     v_calls = getAllele(data[[v_call]], first=FALSE, strip_d=FALSE)
-    V_CALL_GENOTYPED = rep("", length(v_calls))
+    v_call_genotyped = rep("", length(v_calls))
     
     if (keep_gene == "gene") { 
         v = getGene(v_calls, first = TRUE, strip_d=FALSE)
@@ -1185,11 +1185,11 @@ reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
         geno = getFamily(names(genotype_db),strip_d=TRUE)
         names(geno) = names(genotype_db)
     } else if (keep_gene == "repertoire") {
-        v <- rep(v_call,length(v_calls))
-        geno = rep(v_call,length(genotype_db))
+        v <- rep(v_call, length(v_calls))
+        geno = rep(v_call, length(genotype_db))
         names(geno) = names(genotype_db)      
     } else {
-        stop(paste0("Unknown 'keep_gene':", keep_gene))
+        stop("Unknown keep_gene value: ", keep_gene)
     }
     
     # keep_gene == FALSE
@@ -1199,7 +1199,7 @@ reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
     homo_alleles = names(homo)
     names(homo_alleles) = homo
     homo_calls_i = which(v %in% homo)
-    V_CALL_GENOTYPED[homo_calls_i] = homo_alleles[v[homo_calls_i]]
+    v_call_genotyped[homo_calls_i] = homo_alleles[v[homo_calls_i]]
     
     # Now realign the heterozygote sequences to each allele of that gene
     for (het in hetero){
@@ -1225,7 +1225,7 @@ reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
                 best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
             }
             best_alleles = lapply(best_match, function(x) het_alleles[x])
-            V_CALL_GENOTYPED[ind] = unlist(lapply(best_alleles, paste, collapse=","))
+            v_call_genotyped[ind] = unlist(lapply(best_alleles, paste, collapse=","))
         }
     }
     
@@ -1251,21 +1251,21 @@ reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
             best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
         }
         best_alleles = lapply(best_match, function(x) names(genotype_db[x]))
-        V_CALL_GENOTYPED[not_called] = unlist(lapply(best_alleles, paste, collapse=","))
+        v_call_genotyped[not_called] = unlist(lapply(best_alleles, paste, collapse=","))
     }
     
-    if (all(V_CALL_GENOTYPED == data[[v_call]])) {
+    if (all(v_call_genotyped == data[[v_call]])) {
         msg <- ("No allele assignment corrections made.") 
-        if (all(v %in% homo) & length(hetero)>0 ) {
-            keep_opt <- eval(formals(reassignAlleles)$keep_gene)[-1]
+        if (all(v %in% homo) & length(hetero) > 0) {
+            keep_opt <- eval(formals(reassignAlleles)$keep_gene)
             i <- match(keep_gene, keep_opt)
             rec_opt <- paste(keep_opt[(i+1):length(keep_opt)], collapse = ", ")
-            msg <- paste(msg, "Consider `keep_gene`:", rec_opt, sep=" ")
+            msg <- paste(msg, "Consider setting keep_gene to one of:", rec_opt)
         }
         warning(msg)
     }
     
-    data$V_CALL_GENOTYPED <- V_CALL_GENOTYPED
+    data$V_CALL_GENOTYPED <- v_call_genotyped
     
     return(data)
 }

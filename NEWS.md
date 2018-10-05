@@ -1,4 +1,10 @@
-Version 0.3.0 October 1, 2018
+Version 0.3.0.999 October 5, 2018
+-------------------------------------------------------------------------------
+
++ Fixed a fatal error in `reassignAlleles` with non-existent `v_call` column.
+
+
+Version 0.3.0 October 3, 2018
 -------------------------------------------------------------------------------
 
 Bug Fixes:
