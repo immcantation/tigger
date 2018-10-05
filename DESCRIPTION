@@ -1,6 +1,6 @@
 Package: tigger
 Type: Package
-Version: 0.3.1
+Version: 0.3.0.999
 Date: 2018-10-05
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
