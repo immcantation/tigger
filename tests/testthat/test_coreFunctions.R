@@ -6,9 +6,12 @@ load(germline_ighv)
 
 context("Core functions")
 
+nv <- findNovelAlleles(sample_db, germline_ighv)
+gt <- inferGenotype(sample_db, germline_ighv, novel=nv,
+                    find_unmutated=TRUE)
+
 test_that("Test findNovelAlleles",{ 
-    novel_df <- findNovelAlleles(sample_db, germline_ighv)
-    expect_equal(novel_df$NOTE[5], "Novel allele found!")
+    expect_equal(nv$NOTE[5], "Novel allele found!")
 })
 
 test_that("Test sortAlleles",{ 
@@ -28,3 +31,11 @@ test_that("Test sortAlleles",{
     
 })
 
+
+
+test_that("Test reassingAlleles",{ 
+    genotype_db <- genotypeFasta(gt, germline_ighv, nv)
+    sample_db <- reassignAlleles(sample_db, genotype_db, keep_gene = "gene")
+    expect_equal(sample_db$V_CALL[6], "IGHV1-46*01,IGHV1-46*03")
+    expect_equal(sample_db$V_CALL_GENOTYPED[6], "IGHV1-46*01")
+})
