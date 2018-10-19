@@ -18,6 +18,15 @@ test_that("Helper functions", {
     expect_warning(expect_equal(getMutatedAA("ATG",".A."), c("1M>X")))
 })
 
+test_that("getMutatedAA", {
+    ref <- "AAA"
+    novel <- "AAA"
+    expect_null(getMutatedAA(ref, novel))
+    
+    ref <- "AAATTT"
+    novel <- "AAA"
+    expect_equal("2F>-",getMutatedAA(ref, novel))
+})
 
 test_that("generateEvidence", {
     skip_on_cran()
