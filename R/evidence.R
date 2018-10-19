@@ -32,7 +32,8 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
     mutations <- c()
     diff_idx <- which(ref_imgt != novel_imgt)
     if (length(diff_idx)>0) {
-        mutations <- paste0(diff_idx, ref_imgt[diff_idx],">",novel_imgt[diff_idx])
+        mutations <- paste0(diff_idx, ref_imgt[diff_idx],">",
+                            replace(novel_imgt[diff_idx], is.na(novel_imgt[diff_idx]),"-"))
     }
     mutations
 }
@@ -90,6 +91,8 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #'         novel allele. The sequences are those who have been unambiguously assigned 
 #'         to the novel allelle (\code{POLYMORPHISM_CALL}).
 #'   \item \code{UNIQUE_CDR3S}: Number of unique CDR3s associated with the inferred allele.
+#'         The sequences are those who have been unambiguously assigned to the 
+#'         novel allelle (POLYMORPHISM_CALL).
 #'   \item \code{MUT_MIN}: Minimum mutation considered by the algorithm.
 #'   \item \code{MUT_MAX}: Maximum mutation considered by the algorithm.
 #'   \item \code{POS_MIN}: First position of the sequence considered by the algorithm (IMGT numbering).
@@ -138,7 +141,7 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
     
     # Find closest reference
     .findClosestReference <- function(seq, allele_calls, ref_germ, 
-                                      exclude_self=F) {
+                                      exclude_self=F, multiple=F) {
         closest <- getMutCount(seq,
                                paste(allele_calls, collapse=","),
                                ref_germ)
@@ -182,17 +185,18 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
                 }
             }            
             # If still more than one, err and TODO
-            if (length(closest_names) > 1 ) {
-                stop(paste0("Multiple closest reference found for ", 
-                            names(seq),":\n", 
-                            paste(closest_names, collapse=",")))
-            } else {
-                warning(paste0("Use: ", 
-                               closest_names, 
-                               " (less mutated positions, not D, same length, same allele)"))
-            }
+            if (length(closest_names) > 1 & multiple==FALSE) {
+                msg <- paste0("Multiple closest reference found for ", 
+                              names(seq),":\n", 
+                              paste(closest_names, collapse=","))
+                stop(msg)   
+            } 
+            warning(paste0("Use: ", 
+                           paste(closest_names, collapse=","), 
+                           " (less mutated positions, not D, same length, same allele)"))
+            
         }
-        paste(closest_names, collapse=",")        
+        closest_names
     }
     
     # Subset to novel alleles
@@ -236,10 +240,7 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
             polymorphism <- df[['POLYMORPHISM_CALL']]
             novel_imgt <- df[["NOVEL_IMGT"]]
             names(novel_imgt) <- polymorphism
-            #gene <- df[['GENE']]
-            #allele <- df[['ALLELE']]
-            #germline_call <- df[['GERMLINE_CALL']]
-            #this_germline <- germline_db
+
             v_call_genotyped <- data[["V_CALL_GENOTYPED"]]
             
             SEQUENCES <- sum(v_call_genotyped == polymorphism)
@@ -251,13 +252,13 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
             closest_ref <- .findClosestReference(novel_imgt,
                                                  names(germline_set), 
                                                  germline_set,
-                                                 exclude_self=F)
+                                                 exclude_self=F, multiple=T)
             
-            if (getGene(closest_ref_input) != getGene(closest_ref)) {
+            if (all(getGene(closest_ref_input) != getGene(closest_ref))) {
                 warning("closest reference gene difference")
             }
             
-            if (closest_ref != polymorphism) {
+            if (all(closest_ref != polymorphism)) {
                 warning(paste0("closest reference allele (",
                                closest_ref
                                ,") different from POLYMORPHISM_CALL allele (",
@@ -270,12 +271,17 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
             
             nt_diff <- unlist(getMutatedPositions(novel_imgt, germline_set[[closest_ref_input]]))
             nt_diff_string <- ""
+            if (nchar(novel_imgt) < nchar(germline_set)[[closest_ref_input]]) {
+                nt_diff <- c(nt_diff, (nchar(novel_imgt)+1):nchar(germline_set[[closest_ref_input]]))
+            }
             if (length(nt_diff) > 0 ) {
+                ref_nt <- strsplit(germline_set[[closest_ref_input]],"")[[1]][nt_diff]
+                novel_nt <- strsplit(germline_set[[polymorphism]],"")[[1]][nt_diff]
                 nt_diff_string <- paste(paste(
                     nt_diff, 
-                    strsplit(germline_set[[closest_ref_input]],"")[[1]][nt_diff], 
+                    ref_nt, 
                     ">",
-                    strsplit(germline_set[[polymorphism]],"")[[1]][nt_diff],
+                    replace(novel_nt, is.na(novel_nt), "-"),
                     sep=""), collapse=",")    
             } 
             
@@ -299,14 +305,20 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
             
             df[["ALLELIC_PERCENTAGE"]] <- 100*df[["UNMUTATED_SEQUENCES"]]/as.numeric(df[["TOTAL"]])
             
-            df[["UNIQUE_JS"]] <- data %>%
-                dplyr::filter(.data$V_CALL_GENOTYPED == polymorphism)  %>%
-                dplyr::distinct(.data$J_CALL) %>% 
-                nrow()
-            df[["UNIQUE_CDR3S"]] <- data %>%
-                dplyr::filter(.data$V_CALL_GENOTYPED == polymorphism)  %>%
-                dplyr::distinct(translateDNA(.data$JUNCTION, trim=TRUE)) %>% 
-                nrow()
+            if (SEQUENCES > 0) {
+                df[["UNIQUE_JS"]] <- data %>%
+                    dplyr::filter(.data$V_CALL_GENOTYPED == polymorphism)  %>%
+                    dplyr::distinct(.data$J_CALL) %>% 
+                    nrow()
+                df[["UNIQUE_CDR3S"]] <- data %>%
+                    dplyr::filter(.data$V_CALL_GENOTYPED == polymorphism)  %>%
+                    dplyr::distinct(translateDNA(.data$JUNCTION, trim=TRUE)) %>% 
+                    nrow()
+            } else {
+                df[["UNIQUE_JS"]]  <- NA
+                df[["UNIQUE_CDR3S"]] <- NA
+            }
+
             # Add closest germline
             df[["CLOSEST_REFERENCE_IMGT"]] <- cleanSeqs(germline_set[[closest_ref_input]])
             
