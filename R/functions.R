@@ -1822,7 +1822,7 @@ positionMutations <- function(data, germline, pos_range){
         mutate_(NT = ~substring(SEQUENCE_IMGT, POSITION, POSITION)) %>%
         mutate_(GERM_NT = ~substring(germline, POSITION, POSITION)) %>%
         mutate_(MUTATED = ~(NT != GERM_NT & NT != "N" & NT != "-" & NT != "." & NT != "")) %>%
-        mutate_(OBSERVED = ~(NT != "-" & NT != ""))
+        mutate_(OBSERVED = ~(NT != "-" & NT != "." & NT != ""))
     return(pos_db)
 }
 
