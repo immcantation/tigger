@@ -265,8 +265,6 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
                                polymorphism,")"))
             }
             
-            ## TODO: this still not clear.
-            ## Any diff using sequence_imgt instead of germline[[polymorphism]]?
             df[["CLOSEST_REFERENCE"]] <- closest_ref_input
             
             nt_diff <- unlist(getMutatedPositions(novel_imgt, germline_set[[closest_ref_input]]))
