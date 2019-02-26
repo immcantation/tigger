@@ -1729,9 +1729,12 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
     method <- match.arg(method)
     
     # Standardize format of submitted alleles, first
-    SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE, strip_d= FALSE) %>%
-        sort()
-    allele_df = data.frame(SUBMITTED_CALLS,stringsAsFactors = FALSE) %>%
+    SUBMITTED_CALLS = getAllele(allele_calls, first = FALSE, strip_d= FALSE)
+    allele_df = data.frame(
+        list("SUBMITTED_CALLS"=SUBMITTED_CALLS,
+             "SUBMITTED_NAMES"=allele_calls),
+        stringsAsFactors = FALSE) %>%
+        arrange(SUBMITTED_CALLS) %>%
         # Determine the family
         mutate_(FAMILY = ~getFamily(SUBMITTED_CALLS)) %>%
         # Determine the gene (exclude family); convert letters to numbers for sort
@@ -1754,7 +1757,7 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
         sorted_df = arrange_(allele_df, ~desc(GENE1), ~desc(GENE2), ~FAMILY, ~ALLELE)
     }
     
-    return(sorted_df$SUBMITTED_CALLS)
+    return(sorted_df$SUBMITTED_NAMES)
 }
 
 #' Clean up nucleotide sequences

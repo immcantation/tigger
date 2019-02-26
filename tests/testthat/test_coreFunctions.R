@@ -26,4 +26,7 @@ test_that("Test sortAlleles",{
                     "IGHV1-NL1*01", "IGHV1S1*01", "IGHV1S10*01",
                     "IGHV2-5*01"))
     
+    expect_equal(
+        sortAlleles(c("TRAV38-2/DV8", "TRAV38-1")),
+        c("TRAV38-1","TRAV38-2/DV8"))
 })
