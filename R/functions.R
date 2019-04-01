@@ -1107,11 +1107,10 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
             germline_db = c(germline_db, novel_gl)
         }
     }
-    
-    genotype$GENE = gsub("D$|d$","",genotype$GENE)
-    
+
+    genotype$GENE = gsub("[Dd]\\*","*",genotype$GENE)
     g_names = names(germline_db)
-    names(g_names) = gsub("D", "", names(germline_db))
+    names(g_names) = gsub("[Dd]\\*", "*", names(germline_db))
     table_calls = mapply(paste, genotype$GENE, strsplit(genotype$ALLELES, ","),
                          sep="*")
     seqs = germline_db[as.vector(g_names[unlist(table_calls)])]
