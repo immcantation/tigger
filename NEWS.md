@@ -46,6 +46,8 @@ Backwards Incompatible Refactors:
 + Changed the return behavior of `reassignAlleles` so that it returns the 
   input data.frame with the `V_CALL_GENOTYPED` column appended or overwritten.
 + `cleanSeqs` will no longer replace `.` characters with `-`.
++ Renamed `clip_db` to `data` in `findNovelAlleles`, `plotNovel`, 
+  `inferGenotype` and `reassignAlleles`.
 
 
 Version 0.2.11 September 21, 2017
