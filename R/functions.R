@@ -127,7 +127,8 @@
 #'         allele are mutated.
 #' }
 #' 
-#' @seealso \link{plotNovel} to visualize the data supporting any
+#' @seealso \link{selectNovel} to filter the results to show only novel alleles.
+#' \link{plotNovel} to visualize the data supporting any
 #' novel alleles hypothesized to be present in the data and
 #' \link{inferGenotype} to determine if the novel alleles are frequent
 #' enought to be included in the subject's genotype.
@@ -135,7 +136,12 @@
 #' @examples
 #' \donttest{
 #' # Find novel alleles and return relevant data
-#' novel <- findNovelAlleles(SampleDb, GermlineIGHV)
+#' novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
+#' selectNovel(novel)
+#' # Note: In this example, with SampleGermlineIGHV,
+#' # which contains reference germlines retrieved on August 2018,
+#' # TIgGER finds the allele IGHV1-8*02_G234T. This allele
+#' # was added to IMGT as IGHV1-8*03 on March 28, 2018.
 #' }
 #' 
 #' @export
@@ -867,7 +873,7 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
 #' 
 #' @examples
 #' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-#' inferGenotype(SampleDb, germline_db=GermlineIGHV, novel=SampleNovel,
+#' inferGenotype(SampleDb, germline_db=SampleGermlineIGHV, novel=SampleNovel,
 #'               find_unmutated=TRUE)
 #' 
 #' @export
@@ -1093,7 +1099,7 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
 #' 
 #' @examples
 #' # Find the sequences that correspond to the genotype
-#' genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, SampleNovel)
+#' genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, SampleNovel)
 #' 
 #' @export
 genotypeFasta <- function(genotype, germline_db, novel=NA){
@@ -1158,7 +1164,7 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' 
 #' @examples
 #' # Extract the database sequences that correspond to the genotype
-#' genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, novel=SampleNovel)
+#' genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNovel)
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
 #' output_db <- reassignAlleles(SampleDb, genotype_db)
@@ -1352,19 +1358,19 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
 #' 
 #' @examples
 #' # Insert a mutation into a germline sequence
-#' s2 <- s3 <- GermlineIGHV[1]
+#' s2 <- s3 <- SampleGermlineIGHV[1]
 #' stringi::stri_sub(s2, 103, 103) <- "G"
 #' stringi::stri_sub(s3, 107, 107) <- "C"
 #' 
-#' sample_seqs <- c(GermlineIGHV[2], s2, s3)
+#' sample_seqs <- c(SampleGermlineIGHV[2], s2, s3)
 #' 
 #' # Pretend that one sample sequence has received an ambiguous allele call
-#' sample_alleles <- c(paste(names(GermlineIGHV[1:2]), collapse=","),
-#'                     names(GermlineIGHV[2]),
-#'                     names(GermlineIGHV[1]))
+#' sample_alleles <- c(paste(names(SampleGermlineIGHV[1:2]), collapse=","),
+#'                     names(SampleGermlineIGHV[2]),
+#'                     names(SampleGermlineIGHV[1]))
 #' 
 #' # Compare each sequence to its assigned germline(s) to determine the distance
-#' getMutCount(sample_seqs, sample_alleles, GermlineIGHV)
+#' getMutCount(sample_seqs, sample_alleles, SampleGermlineIGHV)
 #' 
 #' @export
 getMutCount <- function(samples, allele_calls, germline_db){
@@ -1415,7 +1421,7 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' @examples
 #' # Find which of the sample alleles are unmutated
 #' calls <- findUnmutatedCalls(SampleDb$V_CALL, SampleDb$SEQUENCE_IMGT, 
-#'          germline_db=GermlineIGHV)
+#'          germline_db=SampleGermlineIGHV)
 #' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
@@ -1494,7 +1500,7 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'          of a set of sequences are mutated.
 #' 
 #' @examples
-#' getPopularMutationCount(SampleDb, GermlineIGHV)
+#' getPopularMutationCount(SampleDb, SampleGermlineIGHV)
 #' 
 #' @export
 getPopularMutationCount <- function(data, germline_db, gene_min = 1e-03,
