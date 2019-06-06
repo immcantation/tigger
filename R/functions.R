@@ -730,8 +730,10 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
     # MAKE THE FIRST PLOT
     if (!is.na(novel_imgt)) {
         POLYCOLORS <- setNames(DNA_COLORS[c(4,3)], c("False", "True"))
-        p1 <- ggplot(pos_muts, aes(factor(MUT_COUNT), POS_MUT_RATE, group=POSITION,
-                                   color=Polymorphic)) +
+        p1 <- ggplot(pos_muts, aes(factor(!!rlang::sym("MUT_COUNT")),
+                                   !!rlang::sym("POS_MUT_RATE"), 
+                                   group=!!rlang::sym("POSITION"),
+                                   color=!!rlang::sym("Polymorphic"))) +
             geom_line(size = 0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values = POLYCOLORS) +
@@ -744,8 +746,10 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
             guides(color = guide_legend(ncol = 2, reverse = TRUE))
     } else{
         POLYCOLORS = setNames(DNA_COLORS[c(4,2)], c("False", "True"))
-        p1 <- ggplot(pos_muts, aes(factor(MUT_COUNT), POS_MUT_RATE, group=POSITION,
-                                   color=Polymorphic)) +
+        p1 <- ggplot(pos_muts, aes(factor(!!rlang::sym("MUT_COUNT")),
+                                   !!rlang::sym("POS_MUT_RATE"), 
+                                   group=!!rlang::sym("POSITION"),
+                                   color=!!rlang::sym("Polymorphic"))) +
             geom_line(size = 0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values = POLYCOLORS) +
@@ -763,7 +767,8 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
                       POSITION = to_from[as.character(!!rlang::sym("POSITION"))])
     if (nrow(p2_data)) {
         p2 <- ggplot(p2_data,
-                    aes(factor(MUT_COUNT), fill=NT)) +
+                    aes(factor(!!rlang::sym("MUT_COUNT")), 
+                        fill=!!rlang::sym("NT"))) +
             geom_bar(width=0.9) +
             guides(fill = guide_legend("Nucleotide", ncol = 4)) +
             facet_grid(POSITION ~ .) +
@@ -777,7 +782,7 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
         p2_data <- mutate(filter(pos_db,
                                   !!rlang::sym("POSITION") %in% names(which.max(table(pos_db$POSITION)))),
                           POSITION = "No positions pass y-intercept test.")
-        p2 <- ggplot(p2_data, aes(factor(MUT_COUNT))) +
+        p2 <- ggplot(p2_data, aes(factor(!!rlang::sym("MUT_COUNT")))) +
             geom_bar(width=0.9) +
             facet_grid(POSITION ~ .) +
             xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
@@ -786,7 +791,8 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
                   legend.background=element_rect(fill = "transparent"))
     }
     # MAKE THE THIRD PLOT
-    p3 <- ggplot(db_subset, aes(JUNCTION_LENGTH, fill=factor(J_GENE))) +
+    p3 <- ggplot(db_subset, aes(!!rlang::sym("JUNCTION_LENGTH"),
+                                fill=factor(!!rlang::sym("J_GENE")))) +
         geom_bar(width=0.9) +
         guides(fill = guide_legend("J Gene", ncol = 2)) +
         xlab("Junction Length") + ylab("Unmutated Sequence Count") +
@@ -1054,7 +1060,7 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
                         levels=rev(sortAlleles(unique(geno2$GENE), method=gene_sort)))
     
     # Create the base plot
-    p = ggplot(geno2, aes(x=GENE, fill=ALLELES)) +
+    p = ggplot(geno2, aes(x=!!rlang::sym("GENE"), fill=!!rlang::sym("ALLELES"))) +
         theme_bw() +
         theme(axis.ticks=element_blank(),
               axis.text.x=element_blank(),
