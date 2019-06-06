@@ -67,14 +67,14 @@
 #' @importFrom  alakazam    getAllele getGene getFamily translateDNA DNA_COLORS
 #' @importFrom  doParallel  registerDoParallel
 #' @importFrom  dplyr       do n desc %>%
-#'                          glimpse distinct distinct_
-#'                          as_data_frame data_frame data_frame_
+#'                          glimpse distinct
+#'                          as_data_frame data_frame
 #'                          bind_cols bind_rows combine inner_join
-#'                          filter filter_ select select_ arrange arrange_
-#'                          group_by group_by_ ungroup
-#'                          mutate mutate_ transmute transmute_
-#'                          rename rename_ summarise summarise_
-#'                          slice slice_
+#'                          filter select arrange
+#'                          group_by ungroup
+#'                          mutate transmute
+#'                          rename summarise
+#'                          slice
 #' @importFrom  foreach     foreach %dopar% registerDoSEQ
 #' @importFrom  graphics    plot
 #' @importFrom  gridExtra   arrangeGrob
@@ -87,5 +87,5 @@
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
 #'                          confint lm
 #' @importFrom  stringi     stri_length
-#' @importFrom  tidyr       gather gather_ spread spread_ unnest
+#' @importFrom  tidyr       gather spread unnest
 NULL
