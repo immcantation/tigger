@@ -776,7 +776,7 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
     } else {
         p2_data <- mutate(filter(pos_db,
                                   !!rlang::sym("POSITION") %in% names(which.max(table(pos_db$POSITION)))),
-                          POSITION = ~"No positions pass y-intercept test.")
+                          POSITION = "No positions pass y-intercept test.")
         p2 <- ggplot(p2_data, aes(factor(MUT_COUNT))) +
             geom_bar(width=0.9) +
             facet_grid(POSITION ~ .) +

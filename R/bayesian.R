@@ -103,9 +103,9 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         if(is.na(germline_db[1])){
             stop("germline_db needed if find_unmutated is TRUE")
         }
-        if(!is.null(nrow(novel))){
+        if (!is.null(nrow(novel))) {
             novel <- filter(novel, !is.na(!!rlang::sym("POLYMORPHISM_CALL"))) %>%
-                select(!!!rlang::syms("GERMLINE_CALL", "POLYMORPHISM_CALL", "NOVEL_IMGT"))
+                select(!!!rlang::syms(c("GERMLINE_CALL", "POLYMORPHISM_CALL", "NOVEL_IMGT")))
             if(nrow(novel) > 0){
                 # Extract novel alleles if any and add them to germline_db
                 novel_gl <- novel$NOVEL_IMGT
