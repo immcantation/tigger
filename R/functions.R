@@ -693,7 +693,7 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
     p_y_t <- unlist(strsplit(names(novel_imgt), "_"))[-1] %>%
         gsub(".[0-9]+", "", .)
     # Parse the note to find positions that passed y intercept if no novel found
-    if(length(pass_y) == 0 & grepl("Position\\(s\\) passed y-intercept", note)){
+    if (length(pass_y) == 0 & grepl("Position\\(s\\) passed y-intercept", note)) {
         pass_y <- note %>% 
             gsub("Position\\(s\\) passed y-intercept \\(", "", .) %>%
             gsub("\\).*", "", .) %>% strsplit(",") %>% unlist %>% as.numeric
@@ -734,7 +734,8 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", ncol=1) {
                                    !!rlang::sym("POS_MUT_RATE"), 
                                    group=!!rlang::sym("POSITION"),
                                    color=!!rlang::sym("Polymorphic"))) +
-            geom_line(size = 0.75) +
+            geom_line(data=pos_muts %>% filter(!!rlang::sym("Polymorphic") == "False"),size = 0.75) +
+            geom_line(data=pos_muts %>% filter(!!rlang::sym("Polymorphic") == "True"),size = 0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values = POLYCOLORS) +
             ylim(0,1) +
