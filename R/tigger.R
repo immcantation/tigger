@@ -64,10 +64,10 @@
 #' }
 #' 
 #' @import      ggplot2
-#' @importFrom  alakazam    getAllele getGene getFamily translateDNA DNA_COLORS
+#' @importFrom  alakazam    getAllele getGene getFamily translateDNA DNA_COLORS checkColumns
 #' @importFrom  doParallel  registerDoParallel
 #' @importFrom  dplyr       do n desc %>%
-#'                          glimpse distinct
+#'                          glimpse distinct group_indices
 #'                          as_data_frame data_frame
 #'                          bind_cols bind_rows combine inner_join
 #'                          filter select arrange

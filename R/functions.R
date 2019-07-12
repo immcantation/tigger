@@ -1975,3 +1975,89 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
         scale_y_continuous(expand=c(0,0))
     p
 }
+
+
+#' Subsample repertoire
+#'
+#' \code{subsampleDb}
+#' 
+#' @param   data   a \code{data.frame} in Change-O format.
+#' @param   gene   name of the column in \code{data} with allele calls
+#' @param   mode   one of c("gene", "family", "allele") defining the degree of
+#'                 specificity regarding allele calls when subsetting sequences.
+#'                 Determines how \code{data} will be split into subsets from 
+#'                 which the same number of sequences will be subsampled. See 
+#'                 also \code{group}.
+#' @param   min_n  minimum number of observations to sample from each groupe. A group with 
+#'                 less observations than the minimum is excluded. 
+#' @param   max_n  maximum number of observations to sample. If \code{NULL}, it 
+#'                 will be set to the size of the smallest group.
+#' @param   group  columns containing additional grouping variables, e.g. sample_id.
+#'                 These groups will be subsampled independently. If
+#'                 \code{max_n} is \code{NULL}, a \code{max_n} will be 
+#'                 automatically set for each \code{group}.
+#' @return
+#' A \code{data.frame}
+#' @seealso \link{selectNovel}
+#' @examples
+#' subsampleDb(SampleDb)
+#' @export
+subsampleDb <- function(data, gene="V_CALL", mode=c("gene", "allele", "family"), 
+                        min_n=1, max_n=NULL,
+                        group=NULL) {
+    
+    mode <- match.arg(mode)
+    
+    # Check columns exist(can be NULL)
+    check <- checkColumns(data, c(gene, group))
+    if (check != TRUE) { stop(check) }
+    
+    # If group is set, 
+    # split by group, then call this same function without grouping, 
+    # to apply the subsample within each group independently
+    if (!is.null(group)) {
+        group_id <- data %>%
+            group_by(!!rlang::sym(group)) %>%
+            group_indices()
+        ss_data <- bind_rows(
+            lapply(split(data, group_id), subsampleDb,
+               gene=gene, mode=mode, min_n=min_n, max_n=max_n, group=NULL)
+        ) 
+        return(ss_data)
+    }
+    
+    # Extract gene, allele or family assignments
+    gene_func <- switch(mode,
+                        allele=getAllele,
+                        gene=getGene,
+                        family=getFamily)
+    
+    # Get temporary 'gene' names (SubSet Gene) used to 
+    # create subsampling groups
+    data[["SS_GENE"]] <- gene_func(data[[gene]], first=FALSE)
+    
+        
+    # Find which rows' calls contain which germline alleles
+    genes <- unique(unlist(strsplit(data[["SS_GENE"]], ",")))
+    allele_groups <- sapply(genes, grep, data[["SS_GENE"]],
+                            fixed=TRUE, simplify=FALSE)
+    allele_groups_sizes <- sapply(allele_groups, length)
+    allele_groups <- allele_groups[ allele_groups_sizes >= min_n ]
+    if(length(allele_groups) == 0){
+        stop("Not enough sample sequences (min_n) were assigned to any gene. ",
+                "Returned `NULL`")
+    }
+    
+    # Determine the number of sequences to subsample
+    if (!is.null(max_n)) {
+        n <- min(allele_groups_sizes, max_n)
+    } else {
+        n <- min(allele_groups_sizes)
+    }
+    
+    # Get indices subsampled sequences
+    ss_idx <- lapply(allele_groups, sample, size=n, replace=FALSE, prob=NULL)
+    ss_idx <- unique(unlist(ss_idx))
+    
+    data[ss_idx, ] %>% select(-!!rlang::sym("SS_GENE"))
+}
