@@ -1,3 +1,16 @@
+Version 0.3.1.999
+-------------------------------------------------------------------------------
+
+Bug fixes:
+
++ Fixed bug in `sortAlleles` that was not sorting correctly TR gene names
+
+New features:
+
++ Updated IGHV germline gene segment alleles in `GermlineIGHV` and moved
+  old annotations to `SampleGermlineIGHV`.
++ Upgraded to dplyr >= 0.8.1
+  
 Version 0.3.1 October 19, 2018
 -------------------------------------------------------------------------------
 

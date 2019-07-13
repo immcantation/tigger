@@ -2058,7 +2058,6 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #' @seealso \link{selectNovel}
 #' @examples
 #' subsampleDb(SampleDb)
-#' @export
 subsampleDb <- function(data, gene="V_CALL", mode=c("gene", "allele", "family"), 
                         min_n=1, max_n=NULL,
                         group=NULL) {
