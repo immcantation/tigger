@@ -8,7 +8,7 @@ context("Core functions")
 
 test_that("Test findNovelAlleles",{ 
     novel_df <- findNovelAlleles(sample_db, germline_ighv)
-    expect_equal(novel_df$NOTE[5], "Novel allele found!")
+    expect_equal(selectNovel(novel_df)$POLYMORPHISM_CALL, "IGHV1-8*02_G234T")
 })
 
 test_that("Test sortAlleles",{ 
@@ -59,6 +59,5 @@ test_that("subsampleDb",{
     
     set.seed(5)
     expect_equivalent(db[c(1, 3),], subsampleDb(db, min_n = 1, max_n=2))
-    
 
 })
