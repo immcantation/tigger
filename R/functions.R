@@ -175,11 +175,11 @@ findNovelAlleles <- function(data, germline_db,
     
     # Keep only the db columns needed
     data <- data %>% 
-        dplyr::select(!!!rlang::syms(c("sequence_alignment",
-                                       "v_call",
-                                       "j_call",
-                                       "junction_length",
-                                       "junction")))
+        dplyr::select(!!!rlang::syms(c(sequence_alignment,
+                                       v_call,
+                                       j_call,
+                                       junction_length,
+                                       junction)))
     gc()
     
     # Keep only the columns we need and clean up the sequences
@@ -266,7 +266,9 @@ findNovelAlleles <- function(data, germline_db,
             dplyr::mutate(!!v_call := allele_name ) %>%
             getPopularMutationCount(germline,
                                     gene_min=0, seq_min=min_seqs,
-                                    seq_p_of_max=1/8, full_return=TRUE)
+                                    seq_p_of_max=1/8, full_return=TRUE,
+                                    v_call=v_call,
+                                    sequence_alignment=sequence_alignment)
         
         # Determine the mutation range(s) to scan
         mut_mins <- min(mut_range)
@@ -579,7 +581,7 @@ findNovelAlleles <- function(data, germline_db,
                                                   out_df$GERMLINE_CALL[idx])
         out_df$NOVEL_IMGT_COUNT[idx] <- getDbMatch(out_df$NOVEL_IMGT[idx])
         out_df$NOVEL_IMGT_UNIQUE_J[idx] <- getNumJ(out_df$NOVEL_IMGT[idx])
-        if ("JUNCTION" %in% colnames(data)) {
+        if (junction %in% colnames(data)) {
             out_df$NOVEL_IMGT_UNIQUE_CDR3[idx] <- getNumCDR3(out_df$NOVEL_IMGT[idx])
         }
     }
@@ -1568,11 +1570,11 @@ getPopularMutationCount <- function(data, germline_db,
                                     seq_min = 50, seq_p_of_max = 1/8,
                                     full_return = FALSE){
     modified_db <- data %>%
-        mutate(V_GENE = getGene(!!rlang::sym("v_call"))) %>%
+        mutate(V_GENE = getGene(!!rlang::sym(v_call))) %>%
         group_by(!!rlang::sym("V_GENE")) %>%
         mutate(V_GENE_N = n()) %>%
         group_by(1:n()) %>%
-        mutate(V_SEQUENCE_IMGT = substring(!!rlang::sym("sequence_alignment"), 1, 312)) %>%
+        mutate(V_SEQUENCE_IMGT = substring(!!rlang::sym(sequence_alignment), 1, 312)) %>%
         # Count occurence of each unique IMGT-gapped V sequence
         group_by(!!!rlang::syms(c("V_GENE", "V_SEQUENCE_IMGT"))) %>%
         mutate(V_SEQUENCE_IMGT_N = n()) %>%
@@ -1893,7 +1895,7 @@ positionMutations <- function(data, germline, pos_range, sequence_alignment="SEQ
     pos_db$POSITION = c(sapply(pos_range, rep, nrow(data)))
     # Find which positions are mutated
     pos_db <- pos_db %>%
-        mutate(NT = substring(!!rlang::sym("SEQUENCE_IMGT"),
+        mutate(NT = substring(!!rlang::sym(sequence_alignment),
                               !!rlang::sym("POSITION"),
                               !!rlang::sym("POSITION"))) %>%
         mutate(GERM_NT = substring(germline, !!rlang::sym("POSITION"), !!rlang::sym("POSITION"))) %>%
@@ -2047,14 +2049,18 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #'                 also \code{group}.
 #' @param   min_n  minimum number of observations to sample from each groupe. A group with 
 #'                 less observations than the minimum is excluded. 
-#' @param   max_n  maximum number of observations to sample. If \code{NULL}, it 
-#'                 will be set to the size of the smallest group.
+#' @param   max_n  maximum number of observations to sample for all \code{mode} groups.
+#'                 If \code{NULL}, it will be set automatically to the size of 
+#'                 the smallest group. If \code{max_n} is larger than the availabe 
+#'                 number of sequences for any \code{mode} group, if will be 
+#'                 automatically adjusted and the efective \code{max_n} used 
+#'                 will be the size of the smallest \code{mode} group.
 #' @param   group  columns containing additional grouping variables, e.g. sample_id.
 #'                 These groups will be subsampled independently. If
 #'                 \code{max_n} is \code{NULL}, a \code{max_n} will be 
 #'                 automatically set for each \code{group}.
 #' @return
-#' A \code{data.frame}
+#' A \code{data.frame}, subsampled from \code{data}.
 #' @seealso \link{selectNovel}
 #' @examples
 #' subsampleDb(SampleDb)

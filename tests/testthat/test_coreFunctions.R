@@ -1,6 +1,9 @@
 sample_db <- file.path("..", "tests-data", "sample_db.rda")
 load(sample_db)
 
+airr_db <- file.path("..", "tests-data", "airr_db.rda")
+load(airr_db)
+
 germline_ighv <- file.path("..", "tests-data", "germline_ighv.rda")
 load(germline_ighv)
 
@@ -9,6 +12,13 @@ context("Core functions")
 test_that("Test findNovelAlleles",{ 
     novel_df <- findNovelAlleles(sample_db, germline_ighv)
     expect_equal(selectNovel(novel_df)$POLYMORPHISM_CALL, "IGHV1-8*02_G234T")
+        
+    novel_df_airr <- findNovelAlleles(airr_db, germline_ighv,
+                                      v_call="v_call", j_call="j_call",
+                                      sequence_alignment = "sequence_alignment",
+                                      junction="junction",
+                                      junction_length = "junction_length")
+    expect_equivalent(novel_df, novel_df_airr)
 })
 
 test_that("Test sortAlleles",{ 
