@@ -119,14 +119,16 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' @examples
 #' \donttest{
 #' # Generate input data
-#' novel <- findNovelAlleles(SampleDb, GermlineIGHV)
-#' genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
+#' novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
+#' genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, 
+#'                           germline_db=SampleGermlineIGHV,
 #'                           novel=novel)
-#' genotype_db <- genotypeFasta(genotype, GermlineIGHV, novel)
+#' genotype_db <- genotypeFasta(genotype, SampleGermlineIGHV, novel)
 #' data_db <- reassignAlleles(SampleDb, genotype_db)
 #' 
 #' # Assemble evidence table
-#' evidence <- generateEvidence(data_db, novel, genotype, genotype_db, GermlineIGHV)
+#' evidence <- generateEvidence(data_db, novel, genotype, 
+#'                              genotype_db, SampleGermlineIGHV)
 #' }
 #' 
 #' @export
@@ -265,8 +267,6 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
                                polymorphism,")"))
             }
             
-            ## TODO: this still not clear.
-            ## Any diff using sequence_imgt instead of germline[[polymorphism]]?
             df[["CLOSEST_REFERENCE"]] <- closest_ref_input
             
             nt_diff <- unlist(getMutatedPositions(novel_imgt, germline_set[[closest_ref_input]]))

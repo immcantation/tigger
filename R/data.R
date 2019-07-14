@@ -1,7 +1,8 @@
 #' Human IGHV germlines
 #'
-#' A \code{character} vector of all 344 human IGHV germline gene segment alleles
-#' in IMGT/GENE-DB release 201408-4.
+#' A \code{character} vector of all human IGHV germline gene segment alleles
+#' in IMGT/GENE-DB (2019-06-01, 372 alleles). 
+#' See IMGT data updates: http://www.imgt.org/IMGTgenedbdoc/dataupdates.html.
 #'
 #' @name GermlineIGHV
 #' @docType data
@@ -19,6 +20,26 @@
 #' @keywords data
 NULL
 
+#' Example Human IGHV germlines
+#'
+#' A \code{character} vector of all 344 human IGHV germline gene segment alleles
+#' in IMGT/GENE-DB release 201408-4.
+#'
+#' @name SampleGermlineIGHV
+#' @docType data
+#' @format Values correspond to IMGT-gaped nuceltoide sequences (with
+#' nucleotides capitalized and gaps represented by ".") while names correspond
+#' to stripped-down IMGT allele names (e.g. "IGHV1-18*01").
+#' 
+#' @references 
+#' \enumerate{
+#'   \item Xochelli, et al. (2014) Immunoglobulin heavy variable (IGHV) genes and 
+#'         alleles: new entities, new names and implications for research and 
+#'         prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6.
+#' }
+#' 
+#' @keywords data
+NULL
 
 #' Example human immune repertoire data
 #'
@@ -37,7 +58,35 @@ NULL
 #'   \item \code{"J_CALL"}: IMGT/HighV-QUEST J segment allele calls.
 #'   \item \code{"JUNCTION_LENGTH"}: Junction region length.
 #' }
+#' @seealso See \link{airrDb} for an AIRR formatted version of \code{SampleDb}.
+#' @references
+#' \enumerate{
+#'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
+#'         sequencing data reveals a high frequency of novel immunoglobulin V gene 
+#'         segment alleles. PNAS. 112(8):E862-70.
+#' }
 #' 
+#' @keywords data
+NULL
+
+#' Example human immune repertoire data
+#'
+#' A \code{data.frame} of example V(D)J immunoglobulin sequences derived from a 
+#' single individual (PGP1), sequenced on the Roche 454 platform, and assigned by
+#' IMGT/HighV-QUEST to IGHV1 family alleles.
+#'
+#' @name airrDb
+#' @docType data
+#' @format A \code{data.frame} where rows correspond to unique V(D)J sequences and
+#' columns include:
+#' \itemize{
+#'   \item \code{"sequence_alignment"}: IMGT-gapped V(D)J nucleotide sequence.
+#'   \item \code{"v_call"}: IMGT/HighV-QUEST V segment allele calls.
+#'   \item \code{"d_call"}: IMGT/HighV-QUEST D segment allele calls.
+#'   \item \code{"j_call"}: IMGT/HighV-QUEST J segment allele calls.
+#'   \item \code{"junction_length"}: Junction region length.
+#' }
+#' @seealso See \link{SampleDb} for Change-O formatted version of \code{airrDb}.
 #' @references
 #' \enumerate{
 #'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 

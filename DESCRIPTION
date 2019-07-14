@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
-Version: 0.3.0.999
-Date: 2018-10-19
+Version: 0.3.1.999
+Date: 2019-07-14
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Susanna", "Marquez", role=c("aut"), 
@@ -32,8 +32,8 @@ Depends:
     R (>= 3.2.5),
     ggplot2 (>= 2.0.0)
 Imports:
-    alakazam (>= 0.2.11),
-    dplyr (>= 0.7.0),
+    alakazam (>= 0.2.11.999),
+    dplyr (>= 0.8.1),
     doParallel,
     foreach,
     graphics,
@@ -43,11 +43,11 @@ Imports:
     lazyeval,
     parallel,
     rlang,
-    shazam (>= 0.1.10),
+    shazam (>= 0.1.11.999),
     stats,
     stringi,
     tidyr
 Suggests:
     knitr,
     testthat
-RoxygenNote: 6.1.0
+RoxygenNote: 6.1.1

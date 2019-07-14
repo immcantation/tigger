@@ -1,3 +1,11 @@
+Version 0.3.1 October 19, 2018
+-------------------------------------------------------------------------------
+
++ Fixed a fatal error in `reassignAlleles` with non-existent `v_call` column.
++ Fixed bug in `generateEvidence` that was reporting amino acids mutations as 
+  NA instead of gaps.
+  
+  
 Version 0.3.0 October 3, 2018
 -------------------------------------------------------------------------------
 

@@ -32,7 +32,9 @@ test_that("generateEvidence", {
     skip_on_cran()
     # Find novel alleles and return relevant data
     novel_df <- findNovelAlleles(sample_db, germline_ighv)
-    geno <- inferGenotype(sample_db, 
+    geno <- inferGenotype(sample_db,
+                          v_call="V_CALL",
+                          sequence_alignment = "SEQUENCE_IMGT",
                           germline_db = germline_ighv, 
                           novel = novel_df,
                           find_unmutated = TRUE)

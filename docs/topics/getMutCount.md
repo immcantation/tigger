@@ -45,15 +45,12 @@ Examples
 -------------------
 
 ```R
-# Use createGermlines to insert a mutation into a germline sequence
-sample_seqs <- c(GermlineIGHV[2],
-createGermlines(GermlineIGHV[1], 103, "G"),
-createGermlines(GermlineIGHV[1], 107, "C"))
+# Insert a mutation into a germline sequence
+s2 <- s3 <- GermlineIGHV[1]
+stringi::stri_sub(s2, 103, 103) <- "G"
+stringi::stri_sub(s3, 107, 107) <- "C"
 
-```
-
-**Error in createGermlines(GermlineIGHV[1], 103, "G")**: could not find function "createGermlines"
-```R
+sample_seqs <- c(GermlineIGHV[2], s2, s3)
 
 # Pretend that one sample sequence has received an ambiguous allele call
 sample_alleles <- c(paste(names(GermlineIGHV[1:2]), collapse=","),
@@ -64,6 +61,25 @@ names(GermlineIGHV[1]))
 getMutCount(sample_seqs, sample_alleles, GermlineIGHV)
 ```
 
-**Error in getMutatedPositions(samples[cc1], unlist(germline_list[cc1]))**: object 'sample_seqs' not found
+
+```
+[[1]]
+[[1]][[1]]
+[1] 1
+
+[[1]][[2]]
+[1] 0
+
+
+[[2]]
+[1] 2
+
+[[3]]
+[1] 1
+
+
+```
+
+
 
 

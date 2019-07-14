@@ -22,9 +22,12 @@
 #' @param    data            a \code{data.frame} containing V allele
 #'                           calls from a single subject. If \code{find_unmutated} 
 #'                           is \code{TRUE}, then the sample IMGT-gapped V(D)J sequence 
-#'                           should be provided in a column \code{"SEQUENCE_IMGT"}
+#'                           should be provided in column \code{sequence_alignment}
 #' @param    v_call          column in \code{data} with V allele calls.
-#'                           Default is \code{"V_CALL"}.                           
+#'                           Default is \code{"V_CALL"}.            
+#' @param    sequence_alignment   name of the column in \code{data} with the 
+#'                                aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#'                                Default is SEQUENCE_IMGT.                                          
 #' @param    find_unmutated  if \code{TRUE}, use \code{germline_db} to
 #'                           find which samples are unmutated. Not needed
 #'                           if \code{allele_calls} only represent
@@ -87,41 +90,43 @@
 #' 
 #' @examples
 #' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-#' inferGenotypeBayesian(SampleDb, germline_db=GermlineIGHV, novel=SampleNovel, 
+#' inferGenotypeBayesian(SampleDb, germline_db=SampleGermlineIGHV, novel=SampleNovel, 
 #'                       find_unmutated=TRUE)
 #' 
 #' @export
 inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA, 
-                                  v_call="V_CALL", find_unmutated=TRUE,
+                                  v_call="V_CALL", sequence_alignment="SEQUENCE_IMGT",
+                                  find_unmutated=TRUE,
                                   priors=c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)){
     # Visibility hack
     . <- NULL
     
-    allele_calls = getAllele(data[,v_call], first=FALSE, strip_d=FALSE)
+    allele_calls <- getAllele(data[[v_call]], first=FALSE, strip_d=FALSE)
     # Find the unmutated subset, if requested
     if(find_unmutated){
         if(is.na(germline_db[1])){
             stop("germline_db needed if find_unmutated is TRUE")
         }
-        if(!is.null(nrow(novel))){
-            novel = filter_(novel, ~!is.na(POLYMORPHISM_CALL)) %>%
-                select_(~GERMLINE_CALL, ~POLYMORPHISM_CALL, ~NOVEL_IMGT)
+        if (!is.null(nrow(novel))) {
+            novel <- novel %>%
+                filter(!is.na(!!rlang::sym("POLYMORPHISM_CALL"))) %>%
+                select(!!!rlang::syms(c("GERMLINE_CALL", "POLYMORPHISM_CALL", "NOVEL_IMGT")))
             if(nrow(novel) > 0){
                 # Extract novel alleles if any and add them to germline_db
-                novel_gl = novel$NOVEL_IMGT
-                names(novel_gl) = novel$POLYMORPHISM_CALL
-                germline_db = c(germline_db, novel_gl)
+                novel_gl <- novel$NOVEL_IMGT
+                names(novel_gl) <- novel$POLYMORPHISM_CALL
+                germline_db <- c(germline_db, novel_gl)
                 # Add the novel allele calls to allele calls of the same starting allele
                 for(r in 1:nrow(novel)){
-                    ind = grep(novel$GERMLINE_CALL[r], allele_calls, fixed=TRUE)
-                    allele_calls[ind] = allele_calls[ind] %>%
+                    ind <- grep(novel$GERMLINE_CALL[r], allele_calls, fixed=TRUE)
+                    allele_calls[ind] <- allele_calls[ind] %>%
                         sapply(paste, novel$POLYMORPHISM_CALL[r], sep=",")
                 }
             }
         }
         # Find unmutated sequences
-        allele_calls = findUnmutatedCalls(allele_calls,
-                                          as.character(data$SEQUENCE_IMGT),
+        allele_calls <- findUnmutatedCalls(allele_calls,
+                                          as.character(data[[sequence_alignment]]),
                                           germline_db)
         if(length(allele_calls) == 0){
             stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
@@ -129,47 +134,47 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
     }
     
     # Find which rows' calls contain which genes
-    gene_regex = allele_calls %>% strsplit(",") %>% unlist() %>%
+    gene_regex <- allele_calls %>% strsplit(",") %>% unlist() %>%
         getGene(strip_d=FALSE) %>%  unique() %>% paste("\\*", sep="")
-    gene_groups = sapply(gene_regex, grep, allele_calls, simplify=FALSE)
-    names(gene_groups) = gsub("\\*", "", gene_regex, fixed=TRUE)
-    gene_groups = gene_groups[sortAlleles(names(gene_groups))]
+    gene_groups <- sapply(gene_regex, grep, allele_calls, simplify=FALSE)
+    names(gene_groups) <- gsub("\\*", "", gene_regex, fixed=TRUE)
+    gene_groups <- gene_groups[sortAlleles(names(gene_groups))]
     
     # Make a table to store the resulting genotype
-    GENE = names(gene_groups)
+    GENE <- names(gene_groups)
     #   ALLELES = COUNTS = NOTE = rep("", length(GENE))
     #   TOTAL = sapply(gene_groups, length)
     #   genotype = cbind(GENE, ALLELES, COUNTS, TOTAL, NOTE)
-    ALLELES = COUNTS = KH = KD = KT = KQ = K_DIFF = NOTE = rep("", length(GENE))
-    TOTAL = sapply(gene_groups, length)
-    genotype = cbind(GENE, ALLELES, COUNTS, TOTAL, NOTE, KH, KD, KT, KQ, K_DIFF)
+    ALLELES <- COUNTS <- KH <- KD <- KT <- KQ <- K_DIFF <- NOTE <- rep("", length(GENE))
+    TOTAL <- sapply(gene_groups, length)
+    genotype <- cbind(GENE, ALLELES, COUNTS, TOTAL, NOTE, KH, KD, KT, KQ, K_DIFF)
     
     # For each gene, find which alleles to include
     for (g in GENE){
         # Keep only the part of the allele calls that uses the gene being analyzed
-        ac = allele_calls[gene_groups[[g]]] %>%
+        ac <- allele_calls[gene_groups[[g]]] %>%
             strsplit(",") %>%
             lapply(function(x) x[grep(paste(g, "\\*", sep=""), x)]) %>%
             sapply(paste, collapse=",")
-        t_ac = table(ac) # table of allele calls
-        potentials = unique(unlist(strsplit(names(t_ac),","))) # potential alleles
+        t_ac <- table(ac) # table of allele calls
+        potentials <- unique(unlist(strsplit(names(t_ac),","))) # potential alleles
         
-        regexpotentials = paste(gsub("\\*","\\\\*", potentials),"$",sep="")
-        regexpotentials = 
+        regexpotentials <- paste(gsub("\\*","\\\\*", potentials),"$",sep="")
+        regexpotentials <- 
             paste(regexpotentials,gsub("\\$",",",regexpotentials),sep="|")
-        tmat = 
+        tmat <- 
             sapply(regexpotentials, function(x) grepl(x, names(t_ac),fixed=FALSE))
         
         if (length(potentials) == 1 | length(t_ac) == 1){ 
-            seqs_expl = t(as.data.frame(apply(t(as.matrix(tmat)), 2, function(x) x * 
+            seqs_expl <- t(as.data.frame(apply(t(as.matrix(tmat)), 2, function(x) x * 
                                                   t_ac)))
-            rownames(seqs_expl)<-names(t_ac)[1]
+            rownames(seqs_expl) <- names(t_ac)[1]
         }else{
-            seqs_expl = as.data.frame(apply(tmat, 2, function(x) x * 
+            seqs_expl <- as.data.frame(apply(tmat, 2, function(x) x * 
                                                 t_ac))
         }
         #       seqs_expl = as.data.frame(apply(tmat, 2, function(x) x*t_ac))
-        colnames(seqs_expl) = potentials
+        colnames(seqs_expl) <- potentials
         # Add low (fake) counts
         sapply(colnames(seqs_expl), function(x){if(sum(rownames(seqs_expl) %in% paste(x)) == 0){
             seqs_expl <<- rbind(seqs_expl,rep(0,ncol(seqs_expl))); 
@@ -216,7 +221,7 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
             seqs_expl <- seqs_expl[rowSums(seqs_expl)!= 0, ]
         }
         
-        allele_tot = sort(apply(seqs_expl, 2, sum),decreasing=TRUE)
+        allele_tot <- sort(apply(seqs_expl, 2, sum),decreasing=TRUE)
         len=min(length(allele_tot),4);
         #print(priors)
         probs <-get_probabilites_with_priors(sort(c(allele_tot,rep(0,4-len)),decreasing = T)[1:4],priors = priors)
@@ -228,40 +233,40 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         probs<-c(probs,k[1]-k[2])
         names(probs)[5] <- "K_DIFF"
         
-        genotype[genotype[, "GENE"] == g, "ALLELES"] = paste(gsub("[^d\\*]*[d\\*]", 
+        genotype[genotype[, "GENE"] == g, "ALLELES"] <- paste(gsub("[^d\\*]*[d\\*]", 
                                                                   "", names(allele_tot)[1:len]), collapse = ",")
-        genotype[genotype[, "GENE"] == g, "COUNTS"] = paste(as.numeric(allele_tot)[1:len], 
+        genotype[genotype[, "GENE"] == g, "COUNTS"] <- paste(as.numeric(allele_tot)[1:len], 
                                                             collapse = ",")
-        genotype[genotype[, "GENE"] == g, "KH"] =probs[1];
-        genotype[genotype[, "GENE"] == g, "KD"] =probs[2];
-        genotype[genotype[, "GENE"] == g, "KT"] =probs[3];
-        genotype[genotype[, "GENE"] == g, "KQ"] =probs[4];
-        genotype[genotype[, "GENE"] == g, "K_DIFF"] =probs[5];
+        genotype[genotype[, "GENE"] == g, "KH"] <- probs[1];
+        genotype[genotype[, "GENE"] == g, "KD"] <- probs[2];
+        genotype[genotype[, "GENE"] == g, "KT"] <- probs[3];
+        genotype[genotype[, "GENE"] == g, "KQ"] <- probs[4];
+        genotype[genotype[, "GENE"] == g, "K_DIFF"] <- probs[5];
         #     }
         
     }
     
     
-    geno = as.data.frame(genotype, stringsAsFactors = FALSE)
+    geno <- as.data.frame(genotype, stringsAsFactors = FALSE)
     
     # Check for indistinguishable calls
     if(find_unmutated == TRUE){
-        seqs = genotypeFasta(geno, germline_db)
-        dist_mat = seqs %>%
+        seqs <- genotypeFasta(geno, germline_db)
+        dist_mat <- seqs %>%
             sapply(function(x) sapply((getMutatedPositions(seqs, x)), length))
-        rownames(dist_mat) = colnames(dist_mat)
+        rownames(dist_mat) <- colnames(dist_mat)
         for (i in 1:nrow(dist_mat)){ dist_mat[i,i] = NA }
-        same = which(dist_mat == 0, arr.ind=TRUE)
+        same <- which(dist_mat == 0, arr.ind=TRUE)
         if (nrow(same) > 0 ) {
             for (r in 1:nrow(same)) {
-                inds = as.vector(same[r,])
-                geno[getGene(rownames(dist_mat)[inds][1]),]$NOTE =
+                inds <- as.vector(same[r,])
+                geno[getGene(rownames(dist_mat)[inds][1]),]$NOTE <-
                     paste(rownames(dist_mat)[inds], collapse=" and ") %>%
                     paste("Cannot distinguish", .)
             }
         }
     }
-    rownames(geno) = NULL
+    rownames(geno) <- NULL
     return(geno)
 }
 
