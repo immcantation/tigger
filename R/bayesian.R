@@ -24,7 +24,10 @@
 #'                           is \code{TRUE}, then the sample IMGT-gapped V(D)J sequence 
 #'                           should be provided in a column \code{"SEQUENCE_IMGT"}
 #' @param    v_call          column in \code{data} with V allele calls.
-#'                           Default is \code{"V_CALL"}.                           
+#'                           Default is \code{"V_CALL"}.            
+#' @param    sequence_alignment   name of the column in \code{data} with the 
+#'                                aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#'                                Default is SEQUENCE_IMGT.                                          
 #' @param    find_unmutated  if \code{TRUE}, use \code{germline_db} to
 #'                           find which samples are unmutated. Not needed
 #'                           if \code{allele_calls} only represent
@@ -92,19 +95,21 @@
 #' 
 #' @export
 inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA, 
-                                  v_call="V_CALL", find_unmutated=TRUE,
+                                  v_call="V_CALL", sequence_alignment="SEQUENCE_IMGT",
+                                  find_unmutated=TRUE,
                                   priors=c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)){
     # Visibility hack
     . <- NULL
     
-    allele_calls <- getAllele(data[,v_call], first=FALSE, strip_d=FALSE)
+    allele_calls <- getAllele(data[[v_call]], first=FALSE, strip_d=FALSE)
     # Find the unmutated subset, if requested
     if(find_unmutated){
         if(is.na(germline_db[1])){
             stop("germline_db needed if find_unmutated is TRUE")
         }
         if (!is.null(nrow(novel))) {
-            novel <- filter(novel, !is.na(!!rlang::sym("POLYMORPHISM_CALL"))) %>%
+            novel <- novel %>%
+                filter(!is.na(!!rlang::sym("POLYMORPHISM_CALL"))) %>%
                 select(!!!rlang::syms(c("GERMLINE_CALL", "POLYMORPHISM_CALL", "NOVEL_IMGT")))
             if(nrow(novel) > 0){
                 # Extract novel alleles if any and add them to germline_db
@@ -121,7 +126,7 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         }
         # Find unmutated sequences
         allele_calls <- findUnmutatedCalls(allele_calls,
-                                          as.character(data$SEQUENCE_IMGT),
+                                          as.character(data[[sequence_alignment]]),
                                           germline_db)
         if(length(allele_calls) == 0){
             stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
