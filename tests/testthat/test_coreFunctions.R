@@ -19,6 +19,22 @@ test_that("Test findNovelAlleles",{
                                       junction="junction",
                                       junction_length = "junction_length")
     expect_equivalent(novel_df, novel_df_airr)
+    
+    geno <- inferGenotype(sample_db,
+                          v_call="V_CALL",
+                          sequence_alignment = "SEQUENCE_IMGT",
+                          germline_db = germline_ighv, 
+                          novel = novel_df,
+                          find_unmutated = TRUE)
+    
+    geno_airr <- inferGenotype(airr_db,
+                          v_call="v_call",
+                          sequence_alignment = "sequence_alignment",
+                          germline_db = germline_ighv, 
+                          novel = novel_df_airr,
+                          find_unmutated = TRUE)
+    expect_equivalent(geno, geno_airr)
+    
 })
 
 test_that("Test sortAlleles",{ 
