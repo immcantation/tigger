@@ -2038,7 +2038,17 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 
 #' Subsample repertoire
 #'
-#' \code{subsampleDb}
+#' \code{subsampleDb} will sample the same number of sequences for each gene, family
+#' or allele (specified with \code{mode}) in \code{data}. Samples or subjects can
+#' be subsampled indepently by setting \code{group}.
+#' 
+#' \code{data} will be split into gene, allele or family subsets (\code{mode}) from
+#' which the same number of sequences will be subsampled. If \code{mode=gene},
+#' for each gene in the field \code{gene} from \code{data}, a maximum of 
+#' \code{max_n} sequences will be subsampled. Input sequences
+#' that have multiple gene calls (ties), can be subsampled from any of their calls, 
+#' but these duplicated samplings will be removed, and the final 
+#' subsampled \code{data} will contain unique rows.
 #' 
 #' @param   data   a \code{data.frame} in Change-O format.
 #' @param   gene   name of the column in \code{data} with allele calls
