@@ -22,7 +22,7 @@
 #' @param    data            a \code{data.frame} containing V allele
 #'                           calls from a single subject. If \code{find_unmutated} 
 #'                           is \code{TRUE}, then the sample IMGT-gapped V(D)J sequence 
-#'                           should be provided in a column \code{"SEQUENCE_IMGT"}
+#'                           should be provided in column \code{sequence_alignment}
 #' @param    v_call          column in \code{data} with V allele calls.
 #'                           Default is \code{"V_CALL"}.            
 #' @param    sequence_alignment   name of the column in \code{data} with the 
