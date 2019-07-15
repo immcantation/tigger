@@ -54,8 +54,11 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #'                      Returned by \link{genotypeFasta}. 
 #' @param germline_db   the original uncorrected germline database used to by
 #'                      \link{findNovelAlleles} to identify novel alleles.
-#' @param    j_call     name of the column in \code{data} with J allele calls. 
-#'                          Default is J_CALL.
+#' @param j_call        name of the column in \code{data} with J allele calls. 
+#'                      Default is J_CALL.
+#' @param junction      Junction region nucleotide sequence, which includes
+#'                      the CDR3 and the two flanking conserved codons. Default
+#'                      is JUNCTION
 #' @param fields        character vector of column names used to split the data to 
 #'                      identify novel alleles, if any. If \code{NULL} then the data is 
 #'                      not divided by grouping variables.
@@ -135,7 +138,8 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' 
 #' @export
 generateEvidence <- function(data, novel, genotype, genotype_db, 
-                             germline_db, j_call="J_CALL", fields=NULL) {
+                             germline_db, j_call="J_CALL", junction="JUNCTION",
+                             fields=NULL) {
     # Visibility hack
     . <- NULL
     
@@ -314,7 +318,7 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
                     nrow()
                 df[["UNIQUE_CDR3S"]] <- data %>%
                     dplyr::filter(.data$V_CALL_GENOTYPED == polymorphism)  %>%
-                    dplyr::distinct(translateDNA(.data$JUNCTION, trim=TRUE)) %>% 
+                    dplyr::distinct(translateDNA(.data[[junction]], trim=TRUE)) %>% 
                     nrow()
             } else {
                 df[["UNIQUE_JS"]]  <- NA
