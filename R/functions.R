@@ -2073,7 +2073,7 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #' A \code{data.frame}, subsampled from \code{data}.
 #' @seealso \link{selectNovel}
 #' @examples
-#' subsampleDb(SampleDb)
+#' # subsampleDb(SampleDb)
 subsampleDb <- function(data, gene="V_CALL", mode=c("gene", "allele", "family"), 
                         min_n=1, max_n=NULL,
                         group=NULL) {
