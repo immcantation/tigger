@@ -16,7 +16,6 @@ test_that("Test findNovelAlleles",{
     novel_df_airr <- findNovelAlleles(airr_db, germline_ighv,
                                       v_call="v_call", j_call="j_call",
                                       sequence_alignment = "sequence_alignment",
-                                      germline_alignment = "germline_alignment",
                                       junction="junction",
                                       junction_length = "junction_length")
     expect_equivalent(novel_df, novel_df_airr)
