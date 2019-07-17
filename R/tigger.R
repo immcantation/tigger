@@ -86,6 +86,6 @@
 #' @importFrom  shazam      calcObservedMutations
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
 #'                          confint lm
-#' @importFrom  stringi     stri_length
+#' @importFrom  stringi     stri_length stri_detect_fixed
 #' @importFrom  tidyr       gather spread unnest
 NULL

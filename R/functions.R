@@ -543,10 +543,13 @@ findNovelAlleles <- function(data, germline_db,
     # The number of records in the sequence dataset matching 
     # each exact NOVEL_IMGT sequence
     getDbMatch <- function(novel_imgt) {
+        novel_imgt <- substr(novel_imgt,  min(pos_range), max(pos_range))
+        novel_imgt <- gsub("[-\\.]","",novel_imgt)
+        data_seq <- substr(data[[seq]],  min(pos_range), max(pos_range))
+        data_seq <- gsub("[-\\.]","",data_seq)
         sapply(novel_imgt, function(n) {
-            n <- substr(n, min(pos_range), max(pos_range))
-            sum(grepl(gsub("[-\\.]","",n),
-                      gsub("[-\\.]","",data[[seq]])))
+            # sum(grepl(n, data_seq))
+            sum(stri_detect_fixed(data_seq,n))
         })
     }
     
