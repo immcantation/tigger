@@ -10,7 +10,11 @@ New features:
 + Updated IGHV germline gene segment alleles in `GermlineIGHV` and moved
   old annotations to `SampleGermlineIGHV`.
 + Upgraded to dplyr >= 0.8.1
-  
++ Added the option to specify with arguments the names of the columns that
+  contain V call (v_call), J call (j_call), sequence alignment (seq),
+  junction (junction) and junction length (junction_length) in all functions
+  that use this information.
+
 Version 0.3.1 October 19, 2018
 -------------------------------------------------------------------------------
 
