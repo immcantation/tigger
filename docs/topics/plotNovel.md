@@ -11,7 +11,9 @@ visualize the results for alleles that did
 Usage
 --------------------
 ```
-plotNovel(data, novel_row, v_call = "V_CALL", ncol = 1)
+plotNovel(data, novel_row, v_call = "V_CALL", j_call = "J_CALL",
+seq = "SEQUENCE_IMGT", junction = "JUNCTION",
+junction_length = "JUNCTION_LENGTH", ncol = 1)
 ```
 
 Arguments
@@ -29,6 +31,24 @@ polymorphism-containing germline allele
 v_call
 :   name of the column in `data` with V allele
 calls. Default is "V_CALL".
+
+j_call
+:   name of the column in `data` with J allele calls. 
+Default is J_CALL.
+
+seq
+:   name of the column in `data` with the 
+aligned, IMGT-numbered, V(D)J nucleotide sequence.
+Default is SEQUENCE_IMGT.
+
+junction
+:   Junction region nucleotide sequence, which includes
+the CDR3 and the two flanking conserved codons. Default
+is JUNCTION.
+
+junction_length
+:   Number of junction nucleotides in the junction sequence.
+Default is JUNCTION_LENGTH.
 
 ncol
 :   number of columns to use when laying out the plots

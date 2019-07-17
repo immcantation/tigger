@@ -11,7 +11,7 @@ Usage
 --------------------
 ```
 generateEvidence(data, novel, genotype, genotype_db, germline_db,
-fields = NULL)
+j_call = "J_CALL", junction = "JUNCTION", fields = NULL)
 ```
 
 Arguments
@@ -36,6 +36,15 @@ Returned by [genotypeFasta](genotypeFasta.md).
 germline_db
 :   the original uncorrected germline database used to by
 [findNovelAlleles](findNovelAlleles.md) to identify novel alleles.
+
+j_call
+:   name of the column in `data` with J allele calls. 
+Default is J_CALL.
+
+junction
+:   Junction region nucleotide sequence, which includes
+the CDR3 and the two flanking conserved codons. Default
+is JUNCTION
 
 fields
 :   character vector of column names used to split the data to 
@@ -108,14 +117,16 @@ Examples
 
 ```R
 # Generate input data
-novel <- findNovelAlleles(SampleDb, GermlineIGHV)
-genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, germline_db=GermlineIGHV,
+novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
+genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, 
+germline_db=SampleGermlineIGHV,
 novel=novel)
-genotype_db <- genotypeFasta(genotype, GermlineIGHV, novel)
+genotype_db <- genotypeFasta(genotype, SampleGermlineIGHV, novel)
 data_db <- reassignAlleles(SampleDb, genotype_db)
 
 # Assemble evidence table
-evidence <- generateEvidence(data_db, novel, genotype, genotype_db, GermlineIGHV)
+evidence <- generateEvidence(data_db, novel, genotype, 
+genotype_db, SampleGermlineIGHV)
 ```
 
 

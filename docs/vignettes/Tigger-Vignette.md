@@ -289,6 +289,36 @@ data.frame(Ambiguous=c(mean(grepl(",", sample_db$V_CALL)),
 ## NotInGenotype  0.057 0.000
 ```
 
+## Evidence 
+
+`generateEvidence` uses the final corrected calls, the novel alleles and genotype 
+information, the final genotype sequences and the starting reference germlines
+to build a table of evidence metrics supporting the final novel V allele detection.
+
+
+```r
+evidence <- generateEvidence(sample_db, novel, geno, genotype_db, GermlineIGHV,
+  j_call = "J_CALL", junction = "JUNCTION", fields = NULL)
+
+evidence %>%
+  select(GENE, ALLELE, POLYMORPHISM_CALL, SEQUENCES, UNMUTATED_FREQUENCY)
+```
+
+```
+## Source: local data frame [1 x 5]
+## Groups: <by row>
+## 
+## # A tibble: 1 x 5
+##   GENE    ALLELE   POLYMORPHISM_CALL SEQUENCES UNMUTATED_FREQUENCY
+##   <chr>   <chr>    <chr>                 <int>               <dbl>
+## 1 IGHV1-8 02_G234T IGHV1-8*02_G234T        864               0.428
+```
+
+In this example, 864 sequences were unambiguously assigned
+to allele IGHV1-8*02_G234T, 
+42.82%
+of them unmutated.
+
 ## References
 
 1. [Alamyar *et al.* (2010)](http://www.imgt.org/IMGTindex/IMGTHighV-QUEST.html)

@@ -1,11 +1,10 @@
-**GermlineIGHV** - *Human IGHV germlines*
+**SampleGermlineIGHV** - *Example Human IGHV germlines*
 
 Description
 --------------------
 
-A `character` vector of all human IGHV germline gene segment alleles
-in IMGT/GENE-DB (2019-06-01, 372 alleles). 
-See IMGT data updates: http://www.imgt.org/IMGTgenedbdoc/dataupdates.html.
+A `character` vector of all 344 human IGHV germline gene segment alleles
+in IMGT/GENE-DB release 201408-4.
 
 
 

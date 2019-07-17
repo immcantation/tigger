@@ -12,9 +12,11 @@ Usage
 --------------------
 ```
 findNovelAlleles(data, germline_db, v_call = "V_CALL",
-germline_min = 200, min_seqs = 50, auto_mutrange = TRUE,
-mut_range = 1:10, pos_range = 1:312, y_intercept = 0.125,
-alpha = 0.05, j_max = 0.15, min_frac = 0.75, nproc = 1)
+j_call = "J_CALL", seq = "SEQUENCE_IMGT", junction = "JUNCTION",
+junction_length = "JUNCTION_LENGTH", germline_min = 200,
+min_seqs = 50, auto_mutrange = TRUE, mut_range = 1:10,
+pos_range = 1:312, y_intercept = 0.125, alpha = 0.05,
+j_max = 0.15, min_frac = 0.75, nproc = 1)
 ```
 
 Arguments
@@ -30,6 +32,24 @@ matching the V calls in `data`.
 v_call
 :   name of the column in `data` with V allele calls. 
 Default is V_CALL.
+
+j_call
+:   name of the column in `data` with J allele calls. 
+Default is J_CALL.
+
+seq
+:   name of the column in `data` with the 
+aligned, IMGT-numbered, V(D)J nucleotide sequence.
+Default is SEQUENCE_IMGT.
+
+junction
+:   Junction region nucleotide sequence, which includes
+the CDR3 and the two flanking conserved codons. Default
+is JUNCTION.
+
+junction_length
+:   Number of junction nucleotides in the junction sequence.
+Default is JUNCTION_LENGTH.
 
 germline_min
 :   the minimum number of sequences that must have a
@@ -115,7 +135,7 @@ in the input data that were initially considered for the analysis.
 +  `GERMLINE_CALL_FREQ`: The fraction of sequences with the `GERMLINE_CALL` 
 in the input data initially considered for the analysis.              
 +  `GERMLINE_IMGT`: Germline sequence for `GERMLINE_CALL`.
-+  `GERMLINE_IMGT_COUNT`:  The number of times the `GERMLINE_IMGT` 
++  `GERMLINE_IMGT_COUNT`: The number of times the `GERMLINE_IMGT` 
 sequence is found in the input data.
 +  `MUT_MIN`: Minimum mutation considered by the algorithm.
 +  `MUT_MAX`: Maximum mutation considered by the algorithm.
@@ -181,7 +201,38 @@ Examples
 
 ```R
 # Find novel alleles and return relevant data
-novel <- findNovelAlleles(SampleDb, GermlineIGHV)
+novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
+selectNovel(novel)
+
+```
+
+
+```
+  GERMLINE_CALL                NOTE POLYMORPHISM_CALL NT_SUBSTITUTIONS
+1    IGHV1-8*02 Novel allele found!  IGHV1-8*02_G234T           234G>T
+                                                                                                                                                                                                                                                                                                                        NOVEL_IMGT
+1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATTACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
+  NOVEL_IMGT_COUNT NOVEL_IMGT_UNIQUE_J NOVEL_IMGT_UNIQUE_CDR3 PERFECT_MATCH_COUNT
+1              657                   6                    626                 661
+  PERFECT_MATCH_FREQ GERMLINE_CALL_COUNT GERMLINE_CALL_FREQ MUT_MIN MUT_MAX MUT_PASS_COUNT
+1          0.7295806                 906              0.052       1      10            760
+                                                                                                                                                                                                                                                                                                                     GERMLINE_IMGT
+1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATGACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
+  GERMLINE_IMGT_COUNT POS_MIN POS_MAX Y_INTERCEPT Y_INTERCEPT_PASS SNP_PASS UNMUTATED_COUNT
+1                   0       1     312       0.125                1      754             661
+  UNMUTATED_FREQ UNMUTATED_SNP_J_GENE_LENGTH_COUNT SNP_MIN_SEQS_J_MAX_PASS ALPHA MIN_SEQS
+1      0.7295806                                83                       1  0.05       50
+  J_MAX MIN_FRAC
+1  0.15     0.75
+
+```
+
+
+```R
+# Note: In this example, with SampleGermlineIGHV,
+# which contains reference germlines retrieved on August 2018,
+# TIgGER finds the allele IGHV1-8*02_G234T. This allele
+# was added to IMGT as IGHV1-8*03 on March 28, 2018.
 ```
 
 
@@ -189,6 +240,7 @@ novel <- findNovelAlleles(SampleDb, GermlineIGHV)
 See also
 -------------------
 
+[selectNovel](selectNovel.md) to filter the results to show only novel alleles.
 [plotNovel](plotNovel.md) to visualize the data supporting any
 novel alleles hypothesized to be present in the data and
 [inferGenotype](inferGenotype.md) to determine if the novel alleles are frequent

@@ -12,8 +12,8 @@ Usage
 --------------------
 ```
 reassignAlleles(data, genotype_db, v_call = "V_CALL",
-method = "hamming", path = NA, keep_gene = c("gene", "family",
-"repertoire"))
+seq = "SEQUENCE_IMGT", method = "hamming", path = NA,
+keep_gene = c("gene", "family", "repertoire"))
 ```
 
 Arguments
@@ -32,6 +32,11 @@ and personalized to the subject
 v_call
 :   name of the column in `data` with V allele
 calls. Default is `"V_CALL"`.
+
+seq
+:   name of the column in `data` with the 
+aligned, IMGT-numbered, V(D)J nucleotide sequence.
+Default is SEQUENCE_IMGT
 
 method
 :   the method to be used when realigning sequences to
@@ -75,7 +80,7 @@ Examples
 
 ```R
 # Extract the database sequences that correspond to the genotype
-genotype_db <- genotypeFasta(SampleGenotype, GermlineIGHV, novel=SampleNovel)
+genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNovel)
 
 # Use the personlized genotype to determine corrected allele assignments
 output_db <- reassignAlleles(SampleDb, genotype_db)

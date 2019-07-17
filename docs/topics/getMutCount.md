@@ -46,19 +46,19 @@ Examples
 
 ```R
 # Insert a mutation into a germline sequence
-s2 <- s3 <- GermlineIGHV[1]
+s2 <- s3 <- SampleGermlineIGHV[1]
 stringi::stri_sub(s2, 103, 103) <- "G"
 stringi::stri_sub(s3, 107, 107) <- "C"
 
-sample_seqs <- c(GermlineIGHV[2], s2, s3)
+sample_seqs <- c(SampleGermlineIGHV[2], s2, s3)
 
 # Pretend that one sample sequence has received an ambiguous allele call
-sample_alleles <- c(paste(names(GermlineIGHV[1:2]), collapse=","),
-names(GermlineIGHV[2]),
-names(GermlineIGHV[1]))
+sample_alleles <- c(paste(names(SampleGermlineIGHV[1:2]), collapse=","),
+names(SampleGermlineIGHV[2]),
+names(SampleGermlineIGHV[1]))
 
 # Compare each sequence to its assigned germline(s) to determine the distance
-getMutCount(sample_seqs, sample_alleles, GermlineIGHV)
+getMutCount(sample_seqs, sample_alleles, SampleGermlineIGHV)
 ```
 
 

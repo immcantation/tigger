@@ -1,4 +1,4 @@
-**SampleDb** - *Example human immune repertoire data*
+**airrDb** - *Example human immune repertoire data*
 
 Description
 --------------------
@@ -15,11 +15,11 @@ Format
 A `data.frame` where rows correspond to unique V(D)J sequences and
 columns include:
 
-+  `"SEQUENCE_IMGT"`: IMGT-gapped V(D)J nucleotide sequence.
-+  `"V_CALL"`: IMGT/HighV-QUEST V segment allele calls.
-+  `"D_CALL"`: IMGT/HighV-QUEST D segment allele calls.
-+  `"J_CALL"`: IMGT/HighV-QUEST J segment allele calls.
-+  `"JUNCTION_LENGTH"`: Junction region length.
++  `"sequence_alignment"`: IMGT-gapped V(D)J nucleotide sequence.
++  `"v_call"`: IMGT/HighV-QUEST V segment allele calls.
++  `"d_call"`: IMGT/HighV-QUEST D segment allele calls.
++  `"j_call"`: IMGT/HighV-QUEST J segment allele calls.
++  `"junction_length"`: Junction region length.
 
 
 References
@@ -37,7 +37,7 @@ segment alleles. PNAS. 112(8):E862-70.
 See also
 -------------------
 
-See [airrDb](airrDb.md) for an AIRR formatted version of `SampleDb`.
+See [SampleDb](SampleDb.md) for Change-O formatted version of `airrDb`.
 
 
 

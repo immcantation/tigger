@@ -17,8 +17,8 @@ Usage
 --------------------
 ```
 inferGenotypeBayesian(data, germline_db = NA, novel = NA,
-v_call = "V_CALL", find_unmutated = TRUE, priors = c(0.6, 0.4, 0.4,
-0.35, 0.25, 0.25, 0.25, 0.25, 0.25))
+v_call = "V_CALL", seq = "SEQUENCE_IMGT", find_unmutated = TRUE,
+priors = c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25))
 ```
 
 Arguments
@@ -28,7 +28,7 @@ data
 :   a `data.frame` containing V allele
 calls from a single subject. If `find_unmutated` 
 is `TRUE`, then the sample IMGT-gapped V(D)J sequence 
-should be provided in a column `"SEQUENCE_IMGT"`
+should be provided in column `sequence_alignment`
 
 germline_db
 :   named vector of sequences containing the
@@ -44,6 +44,11 @@ germline sequences that will be utilized if
 v_call
 :   column in `data` with V allele calls.
 Default is `"V_CALL"`.
+
+seq
+:   name of the column in `data` with the 
+aligned, IMGT-numbered, V(D)J nucleotide sequence.
+Default is SEQUENCE_IMGT.
 
 find_unmutated
 :   if `TRUE`, use `germline_db` to
@@ -127,32 +132,32 @@ Examples
 
 ```R
 # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-inferGenotypeBayesian(SampleDb, germline_db=GermlineIGHV, novel=SampleNovel, 
+inferGenotypeBayesian(SampleDb, germline_db=SampleGermlineIGHV, novel=SampleNovel, 
 find_unmutated=TRUE)
 ```
 
 
 ```
-        GENE     ALLELES         COUNTS TOTAL NOTE                KH
-1    IGHV1-2       02,04        664,302   966                  -1000
-2    IGHV1-3          01            226   226       4.20089197988625
-3    IGHV1-8 01,02_G234T        467,370   837                  -1000
-4   IGHV1-18          01           1005  1005      -3.76643736033536
-5   IGHV1-24          01            105   105       4.75335701924247
-6   IGHV1-46          01            624   624      0.457455409315221
-7   IGHV1-58       01,02          23,18    41      -20.3932114156223
-8   IGHV1-69 01,04,06,02 515,469,280,15  1279                  -1000
-9 IGHV1-69-2          01             31    31       4.16107190423977
-                 KD                KT                KQ           K_DIFF
-1 -7.92846809405969 -139.556367176944 -313.583949130729 131.627899082884
-2 -45.2911957825576 -84.2865868763307 -128.991761853586 49.4920877624439
-3 -1.04759115960507 -102.524664723923 -247.193958844361 101.477073564318
-4  -223.85293382607             -1000             -1000 220.086496465735
-5 -18.2407545518045 -36.3580822723628 -57.1281856909991 22.9941115710469
-6 -136.193264784335 -243.861955237939             -1000  136.65072019365
-7  3.60009261357983 -1.38512929425796 -8.47869574581951  4.9852219078378
-8 -277.291087469703  3.55051520054669 -143.380669247128 146.931184447674
-9 -2.62766579768837 -7.97659112471034 -14.1087168959268 6.78873770192814
+        GENE     ALLELES         COUNTS TOTAL NOTE                KH                KD
+1    IGHV1-2       02,04        664,302   966                  -1000 -7.92846809405969
+2    IGHV1-3          01            226   226       4.20089197988625 -45.2911957825576
+3    IGHV1-8 01,02_G234T        467,370   837                  -1000 -1.04759115960507
+4   IGHV1-18          01           1005  1005      -3.76643736033536  -223.85293382607
+5   IGHV1-24          01            105   105       4.75335701924247 -18.2407545518045
+6   IGHV1-46          01            624   624      0.457455409315221 -136.193264784335
+7   IGHV1-58       01,02          23,18    41      -20.3932114156223  3.60009261357983
+8   IGHV1-69 01,04,06,02 515,469,280,15  1279                  -1000 -277.291087469703
+9 IGHV1-69-2          01             31    31       4.16107190423977 -2.62766579768837
+                 KT                KQ           K_DIFF
+1 -139.556367176944 -313.583949130729 131.627899082884
+2 -84.2865868763307 -128.991761853586 49.4920877624439
+3 -102.524664723923 -247.193958844361 101.477073564318
+4             -1000             -1000 220.086496465735
+5 -36.3580822723628 -57.1281856909991 22.9941115710469
+6 -243.861955237939             -1000  136.65072019365
+7 -1.38512929425796 -8.47869574581951  4.9852219078378
+8  3.55051520054669 -143.380669247128 146.931184447674
+9 -7.97659112471034 -14.1087168959268 6.78873770192814
 
 ```
 

@@ -16,8 +16,8 @@ Usage
 --------------------
 ```
 inferGenotype(data, germline_db = NA, novel = NA, v_call = "V_CALL",
-fraction_to_explain = 0.875, gene_cutoff = 1e-04,
-find_unmutated = TRUE)
+seq = "SEQUENCE_IMGT", fraction_to_explain = 0.875,
+gene_cutoff = 1e-04, find_unmutated = TRUE)
 ```
 
 Arguments
@@ -45,8 +45,12 @@ Details.
 
 v_call
 :   column in `data` with V allele calls.
-Default is `"V_CALL"`.                            
-be provided in a column `"SEQUENCE_IMGT"`
+Default is `"V_CALL"`.
+
+seq
+:   name of the column in `data` with the 
+aligned, IMGT-numbered, V(D)J nucleotide sequence.
+Default is SEQUENCE_IMGT.
 
 fraction_to_explain
 :   the portion of each gene that must be
@@ -112,7 +116,7 @@ Examples
 
 ```R
 # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-inferGenotype(SampleDb, germline_db=GermlineIGHV, novel=SampleNovel,
+inferGenotype(SampleDb, germline_db=SampleGermlineIGHV, novel=SampleNovel,
 find_unmutated=TRUE)
 ```
 
