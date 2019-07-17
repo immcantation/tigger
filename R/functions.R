@@ -543,10 +543,10 @@ findNovelAlleles <- function(data, germline_db,
     # The number of records in the sequence dataset matching 
     # each exact NOVEL_IMGT sequence
     getDbMatch <- function(novel_imgt) {
-        novel_imgt <- substr(novel_imgt,  min(pos_range), max(pos_range))
-        novel_imgt <- gsub("[-\\.]","",novel_imgt)
-        data_seq <- substr(data[[seq]],  min(pos_range), max(pos_range))
-        data_seq <- gsub("[-\\.]","",data_seq)
+        novel_imgt <- stri_sub(novel_imgt,  min(pos_range), max(pos_range))
+        novel_imgt <- stri_replace_all_regex(novel_imgt, "[-\\.]","")
+        data_seq <- stri_sub(data[[seq]],  min(pos_range), max(pos_range))
+        data_seq <- stri_replace_all_regex(data_seq,"[-\\.]","")
         sapply(novel_imgt, function(n) {
             # sum(grepl(n, data_seq))
             sum(stri_detect_fixed(data_seq,n))
@@ -556,10 +556,12 @@ findNovelAlleles <- function(data, germline_db,
     # The number of distinct J in the sequence dataset associated 
     # with the exact NOVEL_IMGT sequence
     getNumJ <- function(novel_imgt) {
+        novel_imgt <- stri_sub(novel_imgt,  min(pos_range), max(pos_range))
+        novel_imgt <- stri_replace_all_regex(novel_imgt, "[-\\.]","")
+        data_seq <- stri_sub(data[[seq]],  min(pos_range), max(pos_range))
+        data_seq <- stri_replace_all_regex(data_seq,"[-\\.]","")      
         sapply(novel_imgt, function(n) {
-            n <- substr(n, min(pos_range), max(pos_range))
-            imgt_idx <- grepl(gsub("[-\\.]","",n),
-                              gsub("[-\\.]","",data[[seq]]))
+            imgt_idx <- stri_detect_fixed(data_seq,n)
             length(unique(getGene(data[[j_call]][imgt_idx])))
         })
     }
@@ -568,12 +570,14 @@ findNovelAlleles <- function(data, germline_db,
     # The number of distinct CDR3 in the sequence dataset associated 
     # with the exact NOVEL_IMGT sequence
     getNumCDR3 <- function(novel_imgt) {
+        novel_imgt <- stri_sub(novel_imgt,  min(pos_range), max(pos_range))
+        novel_imgt <- stri_replace_all_regex(novel_imgt, "[-\\.]","")
+        data_seq <- stri_sub(data[[seq]],  min(pos_range), max(pos_range))
+        data_seq <- stri_replace_all_regex(data_seq,"[-\\.]","")            
         sapply(novel_imgt, function(n) {
-            n <- substr(n, min(pos_range), max(pos_range))
-            imgt_idx <- grepl(gsub("[-\\.]","",n),
-                              gsub("[-\\.]","",data[[seq]]))
+            imgt_idx <- stri_detect_fixed(data_seq,n)
             seq <- data[[junction]][imgt_idx]
-            seq <- substr(seq, 4, stringi::stri_length(seq) - 3)
+            seq <- stri_sub(seq, 4, stringi::stri_length(seq) - 3)
             length(unique(seq))
         })
     }
@@ -590,9 +594,7 @@ findNovelAlleles <- function(data, germline_db,
     }
     out_df$GERMLINE_IMGT_COUNT <- getDbMatch(out_df$GERMLINE_IMGT)
     out_df$UNMUTATED_FREQ <- out_df$UNMUTATED_COUNT/out_df$GERMLINE_CALL_COUNT
-    rm(data)
-    gc()
-    
+
     return(out_df)
 }
 
@@ -1859,8 +1861,11 @@ cleanSeqs <- function(seqs) {
     #     gsub(".", "-", . , fixed = TRUE) %>%
     #     gsub("[^ACGT-]", "N", .) %>%
     #     return
-
-    return (gsub("[^ACGT\\.\\-]", "N", toupper(seqs)))
+    clean_seqs <- stri_replace_all_regex(stri_trans_toupper(seqs), "[^ACGT\\.\\-]", "N")
+    if (!is.null(names(seqs))) {
+        names(clean_seqs) <- names(seqs)
+    }
+    clean_seqs
 }
 
 
