@@ -15,21 +15,21 @@ test_that("Test findNovelAlleles",{
         
     novel_df_airr <- findNovelAlleles(airr_db, germline_ighv,
                                       v_call="v_call", j_call="j_call",
-                                      sequence_alignment = "sequence_alignment",
+                                      seq = "sequence_alignment",
                                       junction="junction",
                                       junction_length = "junction_length")
     expect_equivalent(novel_df, novel_df_airr)
     
     geno <- inferGenotype(sample_db,
                           v_call="V_CALL",
-                          sequence_alignment = "SEQUENCE_IMGT",
+                          seq = "SEQUENCE_IMGT",
                           germline_db = germline_ighv, 
                           novel = novel_df,
                           find_unmutated = TRUE)
     
     geno_airr <- inferGenotype(airr_db,
                           v_call="v_call",
-                          sequence_alignment = "sequence_alignment",
+                          seq = "sequence_alignment",
                           germline_db = germline_ighv, 
                           novel = novel_df_airr,
                           find_unmutated = TRUE)
@@ -39,12 +39,12 @@ test_that("Test findNovelAlleles",{
                                       germline_db = germline_ighv,
                                       novel = novel_df,
                                       v_call="V_CALL", 
-                                      sequence_alignment="SEQUENCE_IMGT")
+                                      seq="SEQUENCE_IMGT")
     geno_bay_airr <- inferGenotypeBayesian(airr_db,
                                       germline_db = germline_ighv,
                                       novel = novel_df_airr,
                                       v_call="v_call", 
-                                      sequence_alignment="sequence_alignment")
+                                      seq="sequence_alignment")
     expect_equivalent(geno_bay, geno_bay_airr)
     
 })

@@ -23,7 +23,7 @@
 #'                          Default is V_CALL.    
 #' @param    j_call         name of the column in \code{data} with J allele calls. 
 #'                          Default is J_CALL. 
-#' @param    sequence_alignment  name of the column in \code{data} with the 
+#' @param    seq  name of the column in \code{data} with the 
 #'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                          Default is SEQUENCE_IMGT.
 #' @param    junction       Junction region nucleotide sequence, which includes
@@ -158,7 +158,7 @@
 findNovelAlleles <- function(data, germline_db,
                              v_call="V_CALL",
                              j_call="J_CALL",
-                             sequence_alignment="SEQUENCE_IMGT",
+                             seq="SEQUENCE_IMGT",
                              junction="JUNCTION",
                              junction_length="JUNCTION_LENGTH",
                              germline_min=200,
@@ -175,7 +175,7 @@ findNovelAlleles <- function(data, germline_db,
     
     # Keep only the db columns needed
     data <- data %>% 
-        dplyr::select(!!!rlang::syms(c(sequence_alignment,
+        dplyr::select(!!!rlang::syms(c(seq,
                                        v_call,
                                        j_call,
                                        junction_length,
@@ -183,7 +183,7 @@ findNovelAlleles <- function(data, germline_db,
     gc()
     
     # Keep only the columns we need and clean up the sequences
-    missing <- c(sequence_alignment, v_call, j_call, junction_length) %>%
+    missing <- c(seq, v_call, j_call, junction_length) %>%
         setdiff(colnames(data))
     if (length(missing) != 0) {
         stop("Could not find required columns in the input data:\n  ",
@@ -196,7 +196,7 @@ findNovelAlleles <- function(data, germline_db,
     }
     germlines <- cleanSeqs(germline_db)
     names(germlines) <- getAllele(names(germlines), first=FALSE, strip_d=FALSE)
-    data[[sequence_alignment]] <- cleanSeqs(data[[sequence_alignment]])
+    data[[seq]] <- cleanSeqs(data[[seq]])
     
     
     # Find which rows' calls contain which germline alleles
@@ -232,7 +232,7 @@ findNovelAlleles <- function(data, germline_db,
                                               "germlines",
                                               "v_call","j_call",
                                               "junction", "junction_length",
-                                              "sequence_alignment",
+                                              "seq",
                                               "data",
                                               "min_seqs",
                                               "auto_mutrange",
@@ -268,7 +268,7 @@ findNovelAlleles <- function(data, germline_db,
                                     gene_min=0, seq_min=min_seqs,
                                     seq_p_of_max=1/8, full_return=TRUE,
                                     v_call=v_call,
-                                    sequence_alignment=sequence_alignment)
+                                    seq=seq)
         
         # Determine the mutation range(s) to scan
         mut_mins <- min(mut_range)
@@ -335,7 +335,7 @@ findNovelAlleles <- function(data, germline_db,
             # Add a mutation count column and filter out sequences not in our range
             db_subset_mm <- mutationRangeSubset(db_subset, germline,
                                                mut_min:mut_max, pos_range,
-                                               sequence_alignment=sequence_alignment)
+                                               seq=seq)
             df_run$MUT_PASS_COUNT[1] <- nrow(db_subset_mm)
             
             if(nrow(db_subset_mm) < min_seqs){
@@ -350,7 +350,7 @@ findNovelAlleles <- function(data, germline_db,
             # Duplicate each sequence for all the positions to be analyzed
             # and find which positions are mutated
             pos_db <- positionMutations(db_subset_mm, germline, pos_range,
-                                        sequence_alignment=sequence_alignment)
+                                        seq=seq)
             
             # Find positional mut freq vs seq mut count
             pos_muts <- pos_db %>%
@@ -390,7 +390,7 @@ findNovelAlleles <- function(data, germline_db,
             # the germline at all those positions or any combo that is too rare
             db_y_subset_mm <- db_subset_mm %>%
                 dplyr::group_by(1:n()) %>%
-                dplyr::mutate(SNP_STRING = superSubstring(!! rlang::sym(sequence_alignment),
+                dplyr::mutate(SNP_STRING = superSubstring(!! rlang::sym(seq),
                                                             pass_y$POSITION)) %>%
                 dplyr::filter(!!rlang::sym("SNP_STRING") != gl_substring) %>%
                 dplyr::group_by(!!rlang::sym("SNP_STRING")) %>%
@@ -413,7 +413,7 @@ findNovelAlleles <- function(data, germline_db,
             
             # Get mutation count at all positions that are not potential SNPs
             pads <- paste(rep("-", min(pos_range)-1), collapse="")
-            db_y_subset_mm$MUT_COUNT_MINUS_SUBSTRING <- db_y_subset_mm[[sequence_alignment]] %>%
+            db_y_subset_mm$MUT_COUNT_MINUS_SUBSTRING <- db_y_subset_mm[[seq]] %>%
                 substring(min(pos_range), max(pos_range)) %>%
                 paste(pads, ., sep="") %>% 
                 getMutatedPositions(gl_minus_substring) %>%
@@ -546,7 +546,7 @@ findNovelAlleles <- function(data, germline_db,
         sapply(novel_imgt, function(n) {
             n <- substr(n, min(pos_range), max(pos_range))
             sum(grepl(gsub("[-\\.]","",n),
-                      gsub("[-\\.]","",data[[sequence_alignment]])))
+                      gsub("[-\\.]","",data[[seq]])))
         })
     }
     
@@ -556,7 +556,7 @@ findNovelAlleles <- function(data, germline_db,
         sapply(novel_imgt, function(n) {
             n <- substr(n, min(pos_range), max(pos_range))
             imgt_idx <- grepl(gsub("[-\\.]","",n),
-                              gsub("[-\\.]","",data[[sequence_alignment]]))
+                              gsub("[-\\.]","",data[[seq]]))
             length(unique(getGene(data[[j_call]][imgt_idx])))
         })
     }
@@ -568,7 +568,7 @@ findNovelAlleles <- function(data, germline_db,
         sapply(novel_imgt, function(n) {
             n <- substr(n, min(pos_range), max(pos_range))
             imgt_idx <- grepl(gsub("[-\\.]","",n),
-                              gsub("[-\\.]","",data[[sequence_alignment]]))
+                              gsub("[-\\.]","",data[[seq]]))
             seq <- data[[junction]][imgt_idx]
             seq <- substr(seq, 4, stringi::stri_length(seq) - 3)
             length(unique(seq))
@@ -661,7 +661,7 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #'                          calls. Default is "V_CALL".
 #' @param    j_call         name of the column in \code{data} with J allele calls. 
 #'                          Default is J_CALL. 
-#' @param    sequence_alignment  name of the column in \code{data} with the 
+#' @param    seq            name of the column in \code{data} with the 
 #'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                          Default is SEQUENCE_IMGT.
 #' @param    junction       Junction region nucleotide sequence, which includes
@@ -678,7 +678,7 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' 
 #' @export
 plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
-                      sequence_alignment="SEQUENCE_IMGT",
+                      seq="SEQUENCE_IMGT",
                       junction="JUNCTION", junction_length="JUNCTION_LENGTH",
                       ncol=1) {
     . = NULL
@@ -700,22 +700,22 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
     }
     
     germline <- cleanSeqs(germline)
-    data[[sequence_alignment]] <- cleanSeqs(data[[sequence_alignment]])
+    data[[seq]] <- cleanSeqs(data[[seq]])
     
     # Extract sequences assigned to the germline, determine which
     # have an appropriate range of mutations, and find the mutation
     # frequency of each position
     db_subset <- data %>%
-        select(!!!rlang::syms(c(sequence_alignment, v_call, j_call, junction_length))) %>%
+        select(!!!rlang::syms(c(seq, v_call, j_call, junction_length))) %>%
         filter(grepl(names(germline),  .data[[v_call]], fixed=TRUE))
     pos_db <- db_subset %>%  
-        mutationRangeSubset(germline, mut_range, pos_range, sequence_alignment=sequence_alignment)
+        mutationRangeSubset(germline, mut_range, pos_range, seq=seq)
     if (nrow(pos_db) == 0) {
         warning(paste0("Insufficient sequences (",nrow(pos_db),") in desired mutational range."))
         return (invisible(NULL))
     }
     pos_db <- pos_db %>%
-        positionMutations(germline, pos_range,sequence_alignment=sequence_alignment)
+        positionMutations(germline, pos_range,seq=seq)
     pos_muts <- pos_db %>%
         group_by(!!rlang::sym("POSITION")) %>%
         mutate(PASS = mean(!!rlang::sym("OBSERVED")) >= min_frac) %>%
@@ -746,7 +746,7 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
         mutate(Polymorphic = ifelse(!!rlang::sym("POSITION") %in% pass_y, "True", "False"))
     
     pads <- paste(rep("-", min(pos_range)-1), collapse="")
-    db_subset$MUT_COUNT_NOVEL <- db_subset[[sequence_alignment]] %>%
+    db_subset$MUT_COUNT_NOVEL <- db_subset[[seq]] %>%
         substring(min(pos_range), max(pos_range)) %>%
         paste(pads, ., sep="") %>%
         getMutatedPositions(novel_imgt) %>%
@@ -882,7 +882,7 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
 #'                                Details.
 #' @param    v_call               column in \code{data} with V allele calls.
 #'                                Default is \code{"V_CALL"}.                            
-#' @param    sequence_alignment   name of the column in \code{data} with the 
+#' @param    seq                  name of the column in \code{data} with the 
 #'                                aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                                Default is SEQUENCE_IMGT.
 #' @param    fraction_to_explain  the portion of each gene that must be
@@ -928,7 +928,7 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
 #' 
 #' @export
 inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="V_CALL", 
-                          sequence_alignment="SEQUENCE_IMGT",
+                          seq="SEQUENCE_IMGT",
                           fraction_to_explain=0.875, gene_cutoff=1e-4, 
                           find_unmutated=TRUE) {
     
@@ -957,7 +957,7 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="V_CALL",
         }
         # Find unmutated sequences
         allele_calls <- findUnmutatedCalls(allele_calls,
-                                          as.character(data[[sequence_alignment]]),
+                                          as.character(data[[seq]]),
                                           germline_db)
         if(length(allele_calls) == 0){
             stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
@@ -1197,9 +1197,9 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #'                         and personalized to the subject
 #' @param    v_call        name of the column in \code{data} with V allele
 #'                         calls. Default is \code{"V_CALL"}.    
-#' @param    sequence_alignment  name of the column in \code{data} with the 
-#'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                          Default is SEQUENCE_IMGT                                      
+#' @param    seq           name of the column in \code{data} with the 
+#'                         aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#'                         Default is SEQUENCE_IMGT                                      
 #' @param    method        the method to be used when realigning sequences to
 #'                         the genotype_db sequences. Currently, only \code{"hammming"}
 #'                         (for Hamming distance) is implemented.
@@ -1225,14 +1225,14 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' 
 #' @export
 reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
-                            sequence_alignment="SEQUENCE_IMGT",
+                            seq="SEQUENCE_IMGT",
                             method="hamming", path=NA,
                             keep_gene=c("gene", "family", "repertoire")){
     # Check arguments    
     keep_gene <- match.arg(keep_gene)
     
     # Extract data subset and prepare output vector
-    v_sequences = as.character(data[[sequence_alignment]])
+    v_sequences = as.character(data[[seq]])
     v_calls = getAllele(data[[v_call]], first=FALSE, strip_d=FALSE)
     v_call_genotyped = rep("", length(v_calls))
     
@@ -1539,11 +1539,11 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'                       \link{findNovelAlleles} for a list of required
 #'                       columns.
 #' @param  germline_db   A named list of IMGT-gapped germline sequences.
-#' @param    v_call         name of the column in \code{data} with V allele calls. 
-#'                          Default is V_CALL.    
-#' @param    sequence_alignment  name of the column in \code{data} with the 
-#'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                          Default is SEQUENCE_IMG
+#' @param  v_call        name of the column in \code{data} with V allele calls. 
+#'                       Default is V_CALL.    
+#' @param  seq           name of the column in \code{data} with the 
+#'                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#'                       Default is SEQUENCE_IMG
 #' @param  gene_min      The portion of all unique sequences a gene must
 #'                       constitute to avoid exclusion.
 #' @param  seq_min       The number of copies of the V that must be present for
@@ -1565,7 +1565,7 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #' @export
 getPopularMutationCount <- function(data, germline_db, 
                                     v_call="V_CALL",
-                                    sequence_alignment="SEQUENCE_IMGT",
+                                    seq="SEQUENCE_IMGT",
                                     gene_min = 1e-03,
                                     seq_min = 50, seq_p_of_max = 1/8,
                                     full_return = FALSE){
@@ -1574,7 +1574,7 @@ getPopularMutationCount <- function(data, germline_db,
         group_by(!!rlang::sym("V_GENE")) %>%
         mutate(V_GENE_N = n()) %>%
         group_by(1:n()) %>%
-        mutate(V_SEQUENCE_IMGT = substring(!!rlang::sym(sequence_alignment), 1, 312)) %>%
+        mutate(V_SEQUENCE_IMGT = substring(!!rlang::sym(seq), 1, 312)) %>%
         # Count occurence of each unique IMGT-gapped V sequence
         group_by(!!!rlang::syms(c("V_GENE", "V_SEQUENCE_IMGT"))) %>%
         mutate(V_SEQUENCE_IMGT_N = n()) %>%
@@ -1876,14 +1876,14 @@ cleanSeqs <- function(seqs) {
 #                       compared
 # @param  pos_range     the range of positions within the sequence for which
 #                       the rows should be duplicated and checked for mutation
-# @param    sequence_alignment  name of the column in \code{data} with the 
-#                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#                          Default is SEQUENCE_IMGT. 
+# @param  seq           name of the column in \code{data} with the 
+#                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#                       Default is SEQUENCE_IMGT. 
 # @return  A data frame with rows duplicated for all the positions to be
 # analyzed and a column indicating whether the position is mutated in
 # comparison to the germline
 #
-positionMutations <- function(data, germline, pos_range, sequence_alignment="SEQUENCE_IMGT"){
+positionMutations <- function(data, germline, pos_range, seq="SEQUENCE_IMGT"){
     . = NULL
     pos_db = pos_range %>%
         length() %>%
@@ -1895,7 +1895,7 @@ positionMutations <- function(data, germline, pos_range, sequence_alignment="SEQ
     pos_db$POSITION = c(sapply(pos_range, rep, nrow(data)))
     # Find which positions are mutated
     pos_db <- pos_db %>%
-        mutate(NT = substring(!!rlang::sym(sequence_alignment),
+        mutate(NT = substring(!!rlang::sym(seq),
                               !!rlang::sym("POSITION"),
                               !!rlang::sym("POSITION"))) %>%
         mutate(GERM_NT = substring(germline, !!rlang::sym("POSITION"), !!rlang::sym("POSITION"))) %>%
@@ -1925,18 +1925,18 @@ positionMutations <- function(data, germline, pos_range, sequence_alignment="SEQ
 #                       be analyzed for mutations
 # @param  pos_range     the range of mutation counts that sequences can have
 #                       and still be included
-# @param    sequence_alignment  name of the column in \code{data} with the 
-#                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#                          Default is SEQUENCE_IMGT.
+# @param  seq           name of the column in \code{data} with the 
+#                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#                       Default is SEQUENCE_IMGT.
 # @return
 # A data.frame containing only the subset carrying the desired levels
 # of mutation
 #
 mutationRangeSubset <- function(data, germline, mut_range, pos_range, 
-                                sequence_alignment="SEQUENCE_IMGT"){
+                                seq="SEQUENCE_IMGT"){
     . = NULL
     pads = paste(rep("-", min(pos_range)-1), collapse="")
-    data$MUT_COUNT = data[[sequence_alignment]] %>%
+    data$MUT_COUNT = data[[seq]] %>%
         substring(min(pos_range), max(pos_range)) %>%
         paste(pads, ., sep="") %>%
         getMutatedPositions(germline) %>%

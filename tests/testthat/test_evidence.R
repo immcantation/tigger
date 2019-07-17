@@ -25,7 +25,7 @@ test_that("generateEvidence", {
     novel_df <- findNovelAlleles(sample_db, germline_ighv)
     geno <- inferGenotype(sample_db,
                           v_call="V_CALL",
-                          sequence_alignment = "SEQUENCE_IMGT",
+                          seq = "SEQUENCE_IMGT",
                           germline_db = germline_ighv, 
                           novel = novel_df,
                           find_unmutated = TRUE)

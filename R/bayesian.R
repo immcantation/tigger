@@ -25,9 +25,9 @@
 #'                           should be provided in column \code{sequence_alignment}
 #' @param    v_call          column in \code{data} with V allele calls.
 #'                           Default is \code{"V_CALL"}.            
-#' @param    sequence_alignment   name of the column in \code{data} with the 
-#'                                aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                                Default is SEQUENCE_IMGT.                                          
+#' @param    seq             name of the column in \code{data} with the 
+#'                           aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#'                           Default is SEQUENCE_IMGT.                                          
 #' @param    find_unmutated  if \code{TRUE}, use \code{germline_db} to
 #'                           find which samples are unmutated. Not needed
 #'                           if \code{allele_calls} only represent
@@ -95,7 +95,7 @@
 #' 
 #' @export
 inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA, 
-                                  v_call="V_CALL", sequence_alignment="SEQUENCE_IMGT",
+                                  v_call="V_CALL", seq="SEQUENCE_IMGT",
                                   find_unmutated=TRUE,
                                   priors=c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)){
     # Visibility hack
@@ -126,7 +126,7 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         }
         # Find unmutated sequences
         allele_calls <- findUnmutatedCalls(allele_calls,
-                                          as.character(data[[sequence_alignment]]),
+                                          as.character(data[[seq]]),
                                           germline_db)
         if(length(allele_calls) == 0){
             stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
