@@ -26,12 +26,6 @@
 #' @param    sequence_alignment  name of the column in \code{data} with the 
 #'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                          Default is SEQUENCE_IMGT.
-#' @param    germline_alignment  name of the column in \code{data} with the 
-#'                          assembled, aligned, full-length inferred germline 
-#'                          sequence spanning the same region as the 
-#'                          \code{sequence_alignment} field, and including the 
-#'                          same set of corrections and spacers (if any). Default
-#'                          is GERMLINE_IMGT.
 #' @param    junction       Junction region nucleotide sequence, which includes
 #'                          the CDR3 and the two flanking conserved codons. Default
 #'                          is JUNCTION.
@@ -96,8 +90,8 @@
 #'         in the input data that were initially considered for the analysis.
 #'   \item \code{GERMLINE_CALL_FREQ}: The fraction of sequences with the \code{GERMLINE_CALL} 
 #'         in the input data initially considered for the analysis.              
-#'   \item \code{germline_alignment}: Germline sequence for \code{GERMLINE_CALL}.
-#'   \item \code{germline_alignment_COUNT}: The number of times the \code{germline_alignment} 
+#'   \item \code{GERMLINE_IMGT}: Germline sequence for \code{GERMLINE_CALL}.
+#'   \item \code{GERMLINE_IMGT_COUNT}: The number of times the \code{GERMLINE_IMGT} 
 #'         sequence is found in the input data.
 #'   \item \code{MUT_MIN}: Minimum mutation considered by the algorithm.
 #'   \item \code{MUT_MAX}: Maximum mutation considered by the algorithm.
@@ -110,7 +104,7 @@
 #'   \item \code{SNP_PASS}: Number of sequences that pass the \code{Y_INTERCEPT} threshold and are
 #'         within the desired nucleotide range (\code{min_seqs}).
 #'   \item \code{UNMUTATED_COUNT}: Number of unmutated sequences.
-#'   \item \code{UNMUTATED_FREQ}: Number of unmutated sequences over \code{germline_alignment_COUNT}.
+#'   \item \code{UNMUTATED_FREQ}: Number of unmutated sequences over \code{GERMLINE_IMGT_COUNT}.
 #'   \item \code{UNMUTATED_SNP_J_GENE_LENGTH_COUNT}: Number of distinct combinations
 #'         of SNP, J gene, and junction length.     
 #'   \item \code{SNP_MIN_SEQS_J_MAX_PASS}: Number of SNPs that pass both the \code{min_seqs} 
@@ -165,7 +159,6 @@ findNovelAlleles <- function(data, germline_db,
                              v_call="V_CALL",
                              j_call="J_CALL",
                              sequence_alignment="SEQUENCE_IMGT",
-                             germline_alignment="GERMLINE_IMGT",
                              junction="JUNCTION",
                              junction_length="JUNCTION_LENGTH",
                              germline_min=200,
@@ -596,12 +589,6 @@ findNovelAlleles <- function(data, germline_db,
     out_df$UNMUTATED_FREQ <- out_df$UNMUTATED_COUNT/out_df$GERMLINE_CALL_COUNT
     rm(data)
     gc()
-    
-    if (germline_alignment != "GERMLINE_IMGT") {
-        colnames(out_df) <- gsub("^GERMLINE_IMGT(.*)", 
-                                 paste0(germline_alignment,"\\1"),
-                                 colnames(out_df))        
-    }
     
     return(out_df)
 }

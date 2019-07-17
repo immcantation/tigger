@@ -250,6 +250,25 @@ data.frame(Ambiguous=c(mean(grepl(",", sample_db$V_CALL)),
     t() %>% round(3)
 ```
 
+## Evidence 
+
+`generateEvidence` uses the final corrected calls, the novel alleles and genotype 
+information, the final genotype sequences and the starting reference germlines
+to build a table of evidence metrics supporting the final novel V allele detection.
+
+```{r, eval=TRUE, warning=FALSE}
+evidence <- generateEvidence(sample_db, novel, geno, genotype_db, GermlineIGHV,
+  j_call = "J_CALL", junction = "JUNCTION", fields = NULL)
+
+evidence %>%
+  select(GENE, ALLELE, POLYMORPHISM_CALL, SEQUENCES, UNMUTATED_FREQUENCY)
+```
+
+In this example, `r evidence[["SEQUENCE"]]` sequences were unambiguously assigned
+to allele `r evidence[["POLYMORPHISM_CALL"]]`, 
+`r round(100*evidence[["UNMUTATED_FREQUENCY"]],2)`%
+of them unmutated.
+
 ## References
 
 1. [Alamyar *et al.* (2010)](http://www.imgt.org/IMGTindex/IMGTHighV-QUEST.html)
