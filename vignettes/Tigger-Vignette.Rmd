@@ -264,7 +264,7 @@ evidence %>%
   select(GENE, ALLELE, POLYMORPHISM_CALL, SEQUENCES, UNMUTATED_FREQUENCY)
 ```
 
-In this example, `r evidence[["SEQUENCE"]]` sequences were unambiguously assigned
+In this example, `r evidence[["SEQUENCES"]]` sequences were unambiguously assigned
 to allele `r evidence[["POLYMORPHISM_CALL"]]`, 
 `r round(100*evidence[["UNMUTATED_FREQUENCY"]],2)`%
 of them unmutated.
