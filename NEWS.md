@@ -4,6 +4,7 @@ Version 0.3.2 July 18, 2019
 Bug fixes:
 
 + Fixed bug in `sortAlleles` that was not sorting correctly TR gene names
++ Fixed bug in `positionMutations` that was counting `.` as mutated position
 
 New features:
 
