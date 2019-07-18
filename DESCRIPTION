@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
-Version: 0.3.1.999
-Date: 2019-07-17
+Version: 0.3.2
+Date: 2019-07-18
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Susanna", "Marquez", role=c("aut"), 
@@ -32,7 +32,7 @@ Depends:
     R (>= 3.2.5),
     ggplot2 (>= 2.0.0)
 Imports:
-    alakazam (>= 0.2.11.999),
+    alakazam (>= 0.3.0),
     dplyr (>= 0.8.1),
     doParallel,
     foreach,
