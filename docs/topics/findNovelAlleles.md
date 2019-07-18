@@ -208,28 +208,20 @@ selectNovel(novel)
 
 
 ```
-  GERMLINE_CALL                NOTE POLYMORPHISM_CALL
-1    IGHV1-8*02 Novel allele found!  IGHV1-8*02_G234T
-  NT_SUBSTITUTIONS
-1           234G>T
+  GERMLINE_CALL                NOTE POLYMORPHISM_CALL NT_SUBSTITUTIONS
+1    IGHV1-8*02 Novel allele found!  IGHV1-8*02_G234T           234G>T
                                                                                                                                                                                                                                                                                                                         NOVEL_IMGT
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATTACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  NOVEL_IMGT_COUNT NOVEL_IMGT_UNIQUE_J NOVEL_IMGT_UNIQUE_CDR3
-1              657                   6                    626
-  PERFECT_MATCH_COUNT PERFECT_MATCH_FREQ GERMLINE_CALL_COUNT
-1                 661          0.7295806                 906
+  NOVEL_IMGT_COUNT NOVEL_IMGT_UNIQUE_J NOVEL_IMGT_UNIQUE_CDR3 PERFECT_MATCH_COUNT PERFECT_MATCH_FREQ GERMLINE_CALL_COUNT
+1              657                   6                    626                 661          0.7295806                 906
   GERMLINE_CALL_FREQ MUT_MIN MUT_MAX MUT_PASS_COUNT
 1              0.052       1      10            760
                                                                                                                                                                                                                                                                                                                      GERMLINE_IMGT
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATGACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  GERMLINE_IMGT_COUNT POS_MIN POS_MAX Y_INTERCEPT
-1                   0       1     312       0.125
-  Y_INTERCEPT_PASS SNP_PASS UNMUTATED_COUNT UNMUTATED_FREQ
-1                1      754             661      0.7295806
-  UNMUTATED_SNP_J_GENE_LENGTH_COUNT SNP_MIN_SEQS_J_MAX_PASS
-1                                83                       1
-  ALPHA MIN_SEQS J_MAX MIN_FRAC
-1  0.05       50  0.15     0.75
+  GERMLINE_IMGT_COUNT POS_MIN POS_MAX Y_INTERCEPT Y_INTERCEPT_PASS SNP_PASS UNMUTATED_COUNT UNMUTATED_FREQ
+1                   0       1     312       0.125                1      754             661      0.7295806
+  UNMUTATED_SNP_J_GENE_LENGTH_COUNT SNP_MIN_SEQS_J_MAX_PASS ALPHA MIN_SEQS J_MAX MIN_FRAC
+1                                83                       1  0.05       50  0.15     0.75
 
 ```
 

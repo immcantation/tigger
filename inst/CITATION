@@ -6,7 +6,7 @@ bibentry(bibtype = "Article",
                     person("Gur", "Yaari"),
                     person("Mohamed", "Uduman"),
                     person("Steven H.", "Kleinstein",
-                           "steven.kleinstein@yale.edu")),
+                           email="steven.kleinstein@yale.edu")),
          
          year = 2015,
          journal = "Proceedings of the National Academy of Sciency of the United
