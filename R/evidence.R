@@ -55,7 +55,7 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' @param germline_db   the original uncorrected germline database used to by
 #'                      \link{findNovelAlleles} to identify novel alleles.
 #' @param j_call        name of the column in \code{data} with J allele calls. 
-#'                      Default is J_CALL.
+#'                      Default is \code{j_call}.
 #' @param junction      Junction region nucleotide sequence, which includes
 #'                      the CDR3 and the two flanking conserved codons. Default
 #'                      is JUNCTION
@@ -124,12 +124,12 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' @examples
 #' \donttest{
 #' # Generate input data
-#' novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
+#' novel <- findNovelAlleles(airrDb, SampleGermlineIGHV)
 #' genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, 
 #'                           germline_db=SampleGermlineIGHV,
 #'                           novel=novel)
 #' genotype_db <- genotypeFasta(genotype, SampleGermlineIGHV, novel)
-#' data_db <- reassignAlleles(SampleDb, genotype_db)
+#' data_db <- reassignAlleles(airrDb, genotype_db)
 #' 
 #' # Assemble evidence table
 #' evidence <- generateEvidence(data_db, novel, genotype, 
@@ -138,7 +138,7 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' 
 #' @export
 generateEvidence <- function(data, novel, genotype, genotype_db, 
-                             germline_db, j_call="J_CALL", junction="JUNCTION",
+                             germline_db, j_call="j_call", junction="junction",
                              fields=NULL) {
     # Visibility hack
     . <- NULL

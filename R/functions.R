@@ -16,21 +16,21 @@
 #' against by ensuring that sequences perfectly matching the potential novel
 #' allele utilize a wide range of combinations of J gene and junction length.
 #' 
-#' @param    data           a \code{data.frame} in Change-O format. See details.
+#' @param    data           a \code{data.frame} in AIRR or Change-O format. See details.
 #' @param    germline_db    a vector of named nucleotide germline sequences
 #'                          matching the V calls in \code{data}.
 #' @param    v_call         name of the column in \code{data} with V allele calls. 
-#'                          Default is V_CALL.    
+#'                          Default is \cdde{v_call}.    
 #' @param    j_call         name of the column in \code{data} with J allele calls. 
-#'                          Default is J_CALL. 
+#'                          Default is \code{j_call}. 
 #' @param    seq  name of the column in \code{data} with the 
 #'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                          Default is SEQUENCE_IMGT.
+#'                          Default is \code{sequence_alignment}.
 #' @param    junction       Junction region nucleotide sequence, which includes
 #'                          the CDR3 and the two flanking conserved codons. Default
-#'                          is JUNCTION.
+#'                          is \code{junction}.
 #' @param    junction_length Number of junction nucleotides in the junction sequence.
-#'                          Default is JUNCTION_LENGTH.                        
+#'                          Default is \code{junction_length}.                        
 #' @param    germline_min   the minimum number of sequences that must have a
 #'                          particular germline allele call for the allele to
 #'                          be analyzed
@@ -140,13 +140,13 @@
 #' @seealso \link{selectNovel} to filter the results to show only novel alleles.
 #' \link{plotNovel} to visualize the data supporting any
 #' novel alleles hypothesized to be present in the data and
-#' \link{inferGenotype} to determine if the novel alleles are frequent
+#' \link{inferGenotype} and \link{inferGenotypeBayesian} to determine if the novel alleles are frequent
 #' enought to be included in the subject's genotype.
 #' 
 #' @examples
 #' \donttest{
 #' # Find novel alleles and return relevant data
-#' novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
+#' novel <- findNovelAlleles(airrDb, SampleGermlineIGHV)
 #' selectNovel(novel)
 #' # Note: In this example, with SampleGermlineIGHV,
 #' # which contains reference germlines retrieved on August 2018,
@@ -156,11 +156,11 @@
 #' 
 #' @export
 findNovelAlleles <- function(data, germline_db,
-                             v_call="V_CALL",
-                             j_call="J_CALL",
-                             seq="SEQUENCE_IMGT",
-                             junction="JUNCTION",
-                             junction_length="JUNCTION_LENGTH",
+                             v_call="v_call",
+                             j_call="j_call",
+                             seq="sequence_alignment",
+                             junction="junction",
+                             junction_length="junction_length",
                              germline_min=200,
                              min_seqs=50,
                              auto_mutrange=TRUE,
@@ -657,23 +657,23 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' the combinations of J gene and junction length among sequences which perfectly 
 #' match the proposed germline allele.
 #' 
-#' @param    data           a \code{data.frame} in Change-O format. See
+#' @param    data           a \code{data.frame} in AIRR or Change-O format. See
 #'                          \link{findNovelAlleles} for details.
 #' @param    novel_row      a single row from a data frame as output by
 #'                          \link{findNovelAlleles} that contains a
 #'                          polymorphism-containing germline allele
 #' @param    v_call         name of the column in \code{data} with V allele
-#'                          calls. Default is "V_CALL".
+#'                          calls. Default is \code{v_call}..
 #' @param    j_call         name of the column in \code{data} with J allele calls. 
-#'                          Default is J_CALL. 
+#'                          Default is \code{j_call}. 
 #' @param    seq            name of the column in \code{data} with the 
 #'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                          Default is SEQUENCE_IMGT.
+#'                          Default is \code{sequence_alignment}.
 #' @param    junction       Junction region nucleotide sequence, which includes
 #'                          the CDR3 and the two flanking conserved codons. Default
-#'                          is JUNCTION.
+#'                          is \code{junction}.
 #' @param    junction_length Number of junction nucleotides in the junction sequence.
-#'                          Default is JUNCTION_LENGTH.                        
+#'                          Default is \code{junction_length}.                        
 #' @param    ncol           number of columns to use when laying out the plots  
 #' 
 #' @examples
@@ -682,9 +682,9 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' plotNovel(SampleDb, novel[1, ])
 #' 
 #' @export
-plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
-                      seq="SEQUENCE_IMGT",
-                      junction="JUNCTION", junction_length="JUNCTION_LENGTH",
+plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
+                      seq="sequence_alignment",
+                      junction="junction", junction_length="junction_length",
                       ncol=1) {
     . = NULL
     
@@ -881,10 +881,10 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
 #'                                \code{find_unmutated} is \code{TRUE}. See
 #'                                Details.
 #' @param    v_call               column in \code{data} with V allele calls.
-#'                                Default is \code{"V_CALL"}.                            
+#'                                Default is \code{"v_call"}.                            
 #' @param    seq                  name of the column in \code{data} with the 
 #'                                aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                                Default is SEQUENCE_IMGT.
+#'                                Default is \code{sequence_alignment}.
 #' @param    fraction_to_explain  the portion of each gene that must be
 #'                                explained by the alleles that will be included
 #'                                in the genotype.
@@ -923,12 +923,12 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
 #' 
 #' @examples
 #' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-#' inferGenotype(SampleDb, germline_db=SampleGermlineIGHV, novel=SampleNovel,
+#' inferGenotype(airrDb, germline_db=SampleGermlineIGHV, novel=SampleNovel,
 #'               find_unmutated=TRUE)
 #' 
 #' @export
-inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="V_CALL", 
-                          seq="SEQUENCE_IMGT",
+inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call", 
+                          seq="sequence_alignment",
                           fraction_to_explain=0.875, gene_cutoff=1e-4, 
                           find_unmutated=TRUE) {
     
@@ -1191,12 +1191,12 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' 
 #' @param    data          a \code{data.frame} containing V allele calls from a
 #'                         single subject and the sample IMGT-gapped V(D)J sequences under
-#'                         \code{"SEQUENCE_IMGT"}.
+#'                         \code{seq}.
 #' @param    genotype_db   a vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #'                         and personalized to the subject
 #' @param    v_call        name of the column in \code{data} with V allele
-#'                         calls. Default is \code{"V_CALL"}.    
+#'                         calls. Default is \code{v_call}.    
 #' @param    seq           name of the column in \code{data} with the 
 #'                         aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                         Default is SEQUENCE_IMGT                                      
@@ -1224,8 +1224,8 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' output_db <- reassignAlleles(SampleDb, genotype_db)
 #' 
 #' @export
-reassignAlleles <- function(data, genotype_db, v_call="V_CALL",
-                            seq="SEQUENCE_IMGT",
+reassignAlleles <- function(data, genotype_db, v_call="v_call",
+                            seq="sequence_alignment",
                             method="hamming", path=NA,
                             keep_gene=c("gene", "family", "repertoire")){
     # Check arguments    
@@ -1540,10 +1540,10 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'                       columns.
 #' @param  germline_db   A named list of IMGT-gapped germline sequences.
 #' @param  v_call        name of the column in \code{data} with V allele calls. 
-#'                       Default is V_CALL.    
+#'                       Default is \code{v_call}.    
 #' @param  seq           name of the column in \code{data} with the 
 #'                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                       Default is SEQUENCE_IMG
+#'                       Default is \code{sequence_alignment}.
 #' @param  gene_min      The portion of all unique sequences a gene must
 #'                       constitute to avoid exclusion.
 #' @param  seq_min       The number of copies of the V that must be present for
@@ -1560,12 +1560,12 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'          of a set of sequences are mutated.
 #' 
 #' @examples
-#' getPopularMutationCount(SampleDb, SampleGermlineIGHV)
+#' getPopularMutationCount(airrDb, SampleGermlineIGHV)
 #' 
 #' @export
 getPopularMutationCount <- function(data, germline_db, 
-                                    v_call="V_CALL",
-                                    seq="SEQUENCE_IMGT",
+                                    v_call="v_call",
+                                    seq="sequence_alignment",
                                     gene_min = 1e-03,
                                     seq_min = 50, seq_p_of_max = 1/8,
                                     full_return = FALSE){
@@ -1929,13 +1929,13 @@ positionMutations <- function(data, germline, pos_range, seq="SEQUENCE_IMGT"){
 #                       and still be included
 # @param  seq           name of the column in \code{data} with the 
 #                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#                       Default is SEQUENCE_IMGT.
+#                       Default is \code{sequence_alignment}.
 # @return
 # A data.frame containing only the subset carrying the desired levels
 # of mutation
 #
 mutationRangeSubset <- function(data, germline, mut_range, pos_range, 
-                                seq="SEQUENCE_IMGT"){
+                                seq="sequence_alignment"){
     . = NULL
     pads = paste(rep("-", min(pos_range)-1), collapse="")
     data$MUT_COUNT = data[[seq]] %>%
@@ -2053,7 +2053,8 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #' subsampled \code{data} will contain unique rows.
 #' 
 #' @param   data   a \code{data.frame} in Change-O format.
-#' @param   gene   name of the column in \code{data} with allele calls
+#' @param   gene   name of the column in \code{data} with allele calls. Default
+#'                 is \code{v_call}.
 #' @param   mode   one of c("gene", "family", "allele") defining the degree of
 #'                 specificity regarding allele calls when subsetting sequences.
 #'                 Determines how \code{data} will be split into subsets from 
@@ -2075,8 +2076,8 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #' A \code{data.frame}, subsampled from \code{data}.
 #' @seealso \link{selectNovel}
 #' @examples
-#' # subsampleDb(SampleDb)
-subsampleDb <- function(data, gene="V_CALL", mode=c("gene", "allele", "family"), 
+#' # subsampleDb(airrDb)
+subsampleDb <- function(data, gene="v_call", mode=c("gene", "allele", "family"), 
                         min_n=1, max_n=NULL,
                         group=NULL) {
     

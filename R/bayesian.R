@@ -24,10 +24,10 @@
 #'                           is \code{TRUE}, then the sample IMGT-gapped V(D)J sequence 
 #'                           should be provided in column \code{sequence_alignment}
 #' @param    v_call          column in \code{data} with V allele calls.
-#'                           Default is \code{"V_CALL"}.            
+#'                           Default is \code{"v_call"}.            
 #' @param    seq             name of the column in \code{data} with the 
 #'                           aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                           Default is SEQUENCE_IMGT.                                          
+#'                           Default is \code{"sequence_alignment"}.                                          
 #' @param    find_unmutated  if \code{TRUE}, use \code{germline_db} to
 #'                           find which samples are unmutated. Not needed
 #'                           if \code{allele_calls} only represent
@@ -95,7 +95,7 @@
 #' 
 #' @export
 inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA, 
-                                  v_call="V_CALL", seq="SEQUENCE_IMGT",
+                                  v_call="v_call", seq="sequence_alignment",
                                   find_unmutated=TRUE,
                                   priors=c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)){
     # Visibility hack

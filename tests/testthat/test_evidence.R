@@ -22,7 +22,13 @@ test_that("Helper functions", {
 test_that("generateEvidence", {
     skip_on_cran()
     # Find novel alleles and return relevant data
-    novel_df <- findNovelAlleles(sample_db, germline_ighv)
+    novel_df <- findNovelAlleles(sample_db, 
+                                 v_call="V_CALL",
+                                 j_call="J_CALL",
+                                 seq="SEQUENCE_IMGT",
+                                 junction="JUNCTION",
+                                 junction_length="JUNCTION_LENGTH",
+                                 germline_ighv)
     geno <- inferGenotype(sample_db,
                           v_call="V_CALL",
                           seq = "SEQUENCE_IMGT",
@@ -32,7 +38,10 @@ test_that("generateEvidence", {
     # Save the genotype sequences to a vector
     genotype_db <- genotypeFasta(geno, germline_db=germline_ighv, novel=novel_df)
     # Visualize the genotype and sequence counts
-    sample_db <- reassignAlleles(sample_db, genotype_db=genotype_db)
+    sample_db <- reassignAlleles(sample_db,
+                                 v_call="V_CALL", 
+                                 seq="SEQUENCE_IMGT",
+                                 genotype_db=genotype_db)
     # ev <- generateEvidence(geno, 
     #                  novel_df, 
     #                  c(germline_ighv[!names(germline_ighv) %in% names(genotype_seqs)], 
@@ -43,7 +52,8 @@ test_that("generateEvidence", {
                            novel=novel_df, 
                            genotype=geno,
                            genotype_db=genotype_db,
-                           germline_db=germline_ighv)
+                           germline_db=germline_ighv,
+                           j_call="J_CALL", junction="JUNCTION")
 
     # Iterative, with 1 iteration, should match
     # novel_df_i <- itigger(sample_db, germline_ighv, max.iter = 1)

@@ -10,7 +10,13 @@ load(germline_ighv)
 context("Core functions")
 
 test_that("Test findNovelAlleles",{ 
-    novel_df <- findNovelAlleles(sample_db, germline_ighv)
+    expect_error(novel_df <- findNovelAlleles(sample_db, germline_ighv))
+    novel_df <- findNovelAlleles(sample_db, germline_ighv,
+                            v_call="V_CALL", j_call="J_CALL",
+                            seq="SEQUENCE_IMGT",
+                            junction = "JUNCTION",
+                            junction_length = "JUNCTION_LENGTH")
+    
     expect_equal(selectNovel(novel_df)$POLYMORPHISM_CALL, "IGHV1-8*02_G234T")
         
     novel_df_airr <- findNovelAlleles(airr_db, germline_ighv,
@@ -72,8 +78,8 @@ test_that("Test sortAlleles",{
 test_that("subsampleDb",{ 
     
     db <- data.frame(
-        "V_CALL"=c("IGHV1-2*01","IGHV1-2*02","IGHV1-2*01,IGHV1-2*02","IGHV1-2*03"),
-        "SAMPLE"=c("S1","S1","S2","S3")
+        "v_call"=c("IGHV1-2*01","IGHV1-2*02","IGHV1-2*01,IGHV1-2*02","IGHV1-2*03"),
+        "sample"=c("S1","S1","S2","S3")
     )
     
     set.seed(5)
@@ -85,7 +91,7 @@ test_that("subsampleDb",{
     
     set.seed(5)
     expect_equivalent(db[c(1,2,3,4),], 
-                 subsampleDb(db, min_n = 1, max_n=1, mode="allele", group = "SAMPLE"))
+                 subsampleDb(db, min_n = 1, max_n=1, mode="allele", group = "sample"))
     
     set.seed(5)
     expect_equivalent(db[1,], 
@@ -93,7 +99,7 @@ test_that("subsampleDb",{
     
     set.seed(5)
     expect_equivalent(db[c(1,3,4),], 
-                 subsampleDb(db, min_n = 1, max_n=1, mode="family", group="SAMPLE"))    
+                 subsampleDb(db, min_n = 1, max_n=1, mode="family", group="sample"))    
     
     set.seed(5)
     expect_equivalent(db[c(1, 3),], subsampleDb(db, min_n = 1, max_n=2))
