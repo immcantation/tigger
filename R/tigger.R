@@ -82,7 +82,7 @@
 #' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
 #' @importFrom  parallel    clusterEvalQ clusterExport makeCluster stopCluster
-#' @importFrom  rlang       .data :=
+#' @importFrom  rlang       .data := sym syms
 #' @importFrom  shazam      calcObservedMutations
 #' @importFrom  stats       na.omit setNames ecdf sd cor cov median mad
 #'                          confint lm

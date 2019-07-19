@@ -774,12 +774,10 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
     # MAKE THE FIRST PLOT
     if (!is.na(novel_imgt)) {
         POLYCOLORS <- setNames(DNA_COLORS[c(4,3)], c("False", "True"))
-        p1 <- ggplot(pos_muts, aes(factor(!!rlang::sym("MUT_COUNT")),
-                                   !!rlang::sym("POS_MUT_RATE"), 
-                                   group=!!rlang::sym("POSITION"),
-                                   color=!!rlang::sym("Polymorphic"))) +
-            geom_line(data=pos_muts %>% filter(!!rlang::sym("Polymorphic") == "False"),size = 0.75) +
-            geom_line(data=pos_muts %>% filter(!!rlang::sym("Polymorphic") == "True"),size = 0.75) +
+        p1 <- ggplot(pos_muts, aes_string(x="MUT_COUNT", y="POS_MUT_RATE", 
+                                          group="POSITION", color="Polymorphic")) +
+            geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "False"), size=0.75) +
+            geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "True"), size=0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values = POLYCOLORS) +
             ylim(0,1) +
@@ -791,19 +789,17 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
             guides(color = guide_legend(ncol = 2, reverse = TRUE))
     } else{
         POLYCOLORS = setNames(DNA_COLORS[c(4,2)], c("False", "True"))
-        p1 <- ggplot(pos_muts, aes(factor(!!rlang::sym("MUT_COUNT")),
-                                   !!rlang::sym("POS_MUT_RATE"), 
-                                   group=!!rlang::sym("POSITION"),
-                                   color=!!rlang::sym("Polymorphic"))) +
-            geom_line(size = 0.75) +
+        p1 <- ggplot(pos_muts, aes_string(x="MUT_COUNT", y="POS_MUT_RATE", 
+                                          group="POSITION", color="Polymorphic")) +
+            geom_line(size=0.75) +
             facet_grid(GERMLINE ~ .) +
-            scale_color_manual(values = POLYCOLORS) +
-            ylim(0,1) +
+            scale_color_manual(values=POLYCOLORS) +
+            ylim(0, 1) +
             xlab("Mutation Count (Sequence)") +
             ylab("Mutation Frequency (Position)") +
             theme_bw() +
-            theme(legend.position=c(0.5,0.9), legend.justification=c(0.5,1),
-                  legend.background=element_rect(fill = "transparent")) +
+            theme(legend.position=c(0.5, 0.9), legend.justification=c(0.5, 1),
+                  legend.background=element_rect(fill="transparent")) +
             guides(color = guide_legend("Passed y-intercept test",
                                         ncol = 2, reverse = TRUE))
     }
@@ -811,23 +807,22 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
     p2_data <- mutate(filter(pos_db, !!rlang::sym("POSITION") %in% pass_y),
                       POSITION = to_from[as.character(!!rlang::sym("POSITION"))])
     if (nrow(p2_data)) {
-        p2 <- ggplot(p2_data,
-                    aes(factor(!!rlang::sym("MUT_COUNT")), 
-                        fill=!!rlang::sym("NT"))) +
+        p2 <- ggplot(p2_data, aes_string(x="MUT_COUNT", fill="NT")) +
             geom_bar(width=0.9) +
-            guides(fill = guide_legend("Nucleotide", ncol = 4)) +
+            guides(fill = guide_legend("Nucleotide", ncol=4)) +
             facet_grid(POSITION ~ .) +
-            xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
-            scale_fill_manual(values = DNA_COLORS, breaks=names(DNA_COLORS),
+            xlab("Mutation Count (Sequence)") + 
+            ylab("Sequence Count") +
+            scale_fill_manual(values=DNA_COLORS, breaks=names(DNA_COLORS),
                               drop=FALSE) +
             theme_bw() +
             theme(legend.position=c(1,1), legend.justification=c(1,1),
-                  legend.background=element_rect(fill = "transparent"))
+                  legend.background=element_rect(fill="transparent"))
     } else {
         p2_data <- mutate(filter(pos_db,
                                   !!rlang::sym("POSITION") %in% names(which.max(table(pos_db$POSITION)))),
                           POSITION = "No positions pass y-intercept test.")
-        p2 <- ggplot(p2_data, aes(factor(!!rlang::sym("MUT_COUNT")))) +
+        p2 <- ggplot(p2_data, aes_string(x="MUT_COUNT")) +
             geom_bar(width=0.9) +
             facet_grid(POSITION ~ .) +
             xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
@@ -836,14 +831,14 @@ plotNovel <- function(data, novel_row, v_call="V_CALL", j_call="J_CALL",
                   legend.background=element_rect(fill = "transparent"))
     }
     # MAKE THE THIRD PLOT
-    p3 <- ggplot(db_subset, aes(!!rlang::sym(junction_length),
-                                fill=factor(!!rlang::sym("J_GENE")))) +
+    p3 <- ggplot(db_subset, aes_string(x=junction_length, fill="J_GENE")) +
         geom_bar(width=0.9) +
-        guides(fill = guide_legend("J Gene", ncol = 2)) +
-        xlab("Junction Length") + ylab("Unmutated Sequence Count") +
+        guides(fill=guide_legend("J Gene", ncol=2)) +
+        xlab("Junction Length") + 
+        ylab("Unmutated Sequence Count") +
         theme_bw() +
-        theme(legend.position=c(1,1), legend.justification=c(1,1),
-              legend.background=element_rect(fill = "transparent"))
+        theme(legend.position=c(1, 1), legend.justification=c(1, 1),
+              legend.background=element_rect(fill="transparent"))
     
     p2_height <- length(unique(p2_data$POSITION))
     if (p2_height>1) { p2_height = 0.5 * p2_height}
@@ -1108,7 +1103,7 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
                         levels=rev(sortAlleles(unique(geno2$GENE), method=gene_sort)))
     
     # Create the base plot
-    p = ggplot(geno2, aes(x=!!rlang::sym("GENE"), fill=!!rlang::sym("ALLELES"))) +
+    p = ggplot(geno2, aes_string(x="GENE", fill="ALLELES")) +
         theme_bw() +
         theme(axis.ticks=element_blank(),
               axis.text.x=element_blank(),
@@ -1818,19 +1813,18 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
         mutate(GENE2 = gsub("[^-]+[-S][^-]+-?","",!! rlang::sym("GENE"))) %>%
         mutate(GENE2 = as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("GENE2")))) %>%
         mutate(ALLELE = getAllele(!!rlang::sym("SUBMITTED_CALLS"))) %>%      
-        mutate(ALLELE = sub("[^\\*]+\\*|[^\\*]+$","",
-                               !! rlang::sym("ALLELE"))) %>%
-        mutate(ALLELE = as.numeric(sub("_.+$","",
-                                         !! rlang::sym("ALLELE"))))
+        mutate(ALLELE = sub("[^\\*]+\\*|[^\\*]+$","", !!rlang::sym("ALLELE"))) %>%
+        mutate(ALLELE = as.numeric(sub("_.+$", "", !!rlang::sym("ALLELE"))))
+    
     # Convert missing values to 0, sort data frame
     allele_df[is.na(allele_df)] <- 0
     if (method == "name") {  
-        sorted_df <- arrange(allele_df, !!! rlang::syms(c("FAMILY", "GENE1", "GENE2", "ALLELE")))
+        sorted_df <- arrange(allele_df, !!!rlang::syms(c("FAMILY", "GENE1", "GENE2", "ALLELE")))
     } else if (method == "position") {
-        sorted_df <- arrange(allele_df, desc(!! rlang::sym("GENE1")),
-                             desc(!! rlang::sym("GENE2")), 
-                             desc(!! rlang::sym("FAMILY")),
-                             desc(!! rlang::sym("ALLELE")))
+        sorted_df <- arrange(allele_df, desc(!!rlang::sym("GENE1")),
+                             desc(!!rlang::sym("GENE2")), 
+                             desc(!!rlang::sym("FAMILY")),
+                             desc(!!rlang::sym("ALLELE")))
     }
     
     return(sorted_df$SUBMITTED_NAMES)
