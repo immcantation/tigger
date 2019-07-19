@@ -3,7 +3,7 @@ Version 0.4.0 July 18, 2019
 
 Dependencies:
 
-+ Upgraded to alakazam >= 0.3.0, shazam >= 0.2.0, and dplyr >= 0.8.1.
++ Upgraded to alakazam >= 0.3.0, shazam >= 0.2.0, dplyr >= 0.8.1 and ggplot2 >= 3.1.1
 
 Bug Fixes:
 
