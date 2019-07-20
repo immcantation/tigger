@@ -43,7 +43,7 @@ Imports:
     lazyeval,
     parallel,
     rlang,
-    shazam (>= 0.2.0),
+    shazam (>= 0.2.1),
     stats,
     stringi,
     tidyr
