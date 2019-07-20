@@ -44,8 +44,9 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
     cran_versions <- cran_versions[[dep_pack_name]]$version
     
     this_pack_devel <- length(grep("\\.999$", this_pack_v)) > 0
+    in_cran <- numeric_version(required_version) %in% cran_versions
     
-    if (!this_pack_devel & !devel & (numeric_version(required_version) %in% cran_versions)) {
+    if (!this_pack_devel & !devel & in_cran) {
         tryCatch({ devtools::install_version(dep_pack_name, required_version, repos="https://cran.cnr.berkeley.edu") },
                  error=function(e) { 
                      cat(e, "\n")
@@ -53,9 +54,10 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
                      install_bitbucket(paste0("kleinstein/", dep_pack_name, "@default"))
                  })
     } else {
-        if (!devel) { 
-            warning(paste0(required_version," not found in CRAN. Install most recent version from Bitbucket instead.")) 
+        if (!in_cran & !devel) { 
+            warning(paste0(required_version," not found in CRAN.")) 
         }
+        message(paste0(dep_pack_name, " ", required_version,": installing most recent version from Bitbucket instead.")) 
         install_bitbucket(paste0("kleinstein/", dep_pack_name, "@default"))
     }
 }
