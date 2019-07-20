@@ -11,12 +11,41 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
     required_version <- gsub(".*\\([^0-9.]*(.*)\\)$", "\\1", dep_pack_v)
     devel <- length(grep("\\.999$", required_version)) > 0
     
-    cran_versions <- available.versions(dep_pack_name)
+    get_cran_versions <- function (pkg) {
+        
+        current_url <- sprintf("%s/src/contrib",versions:::latest.MRAN())
+        lines <- versions:::url.lines(current_url)
+        lines <- lines[grep("^<a href=\"*", lines)]
+        tarballs <- gsub(".*href=\"([^\"]+)\".*", "\\1", lines)
+        dates <- gsub(".*  ([0-9]+-[a-zA-Z]+-[0-9]+) .*", "\\1", lines)
+        dates <- as.Date(dates, format = "%d-%b-%Y")
+        idx <- grep(sprintf("^%s_.*.tar.gz$", pkgs), tarballs)
+        # Keep all versions
+        if (length(idx) < 1) {
+            warning(sprintf("The current version and publication date of %s could not\n                     be detected", 
+                            pkg))
+            versions <- dates <- NA
+        } else if (length(idx) > 1) {
+            versions <- tarballs[idx]
+            versions <- gsub(sprintf("^%s_", pkg), "", versions)
+            versions <- numeric_version(gsub(".tar.gz$", "", versions))
+            dates <- dates[idx]
+        } 
+        
+        ret <- list()
+        ret[[pkgs]] <- data.frame(
+                version = versions, 
+                date = as.character(dates), 
+                stringsAsFactors = FALSE)
+        ret
+    }
+    
+    cran_versions <- get_cran_versions(dep_pack_name)
     cran_versions <- cran_versions[[dep_pack_name]]$version
     
     this_pack_devel <- length(grep("\\.999$", this_pack_v)) > 0
     
-    if (!this_pack_devel & !devel & (required_version %in% cran_versions)) {
+    if (!this_pack_devel & !devel & (numeric_version(required_version) %in% cran_versions)) {
         tryCatch({ devtools::install_version(dep_pack_name, required_version, repos="https://cran.cnr.berkeley.edu") },
                  error=function(e) { 
                      cat(e, "\n")
