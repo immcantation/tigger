@@ -19,7 +19,7 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
         tarballs <- gsub(".*href=\"([^\"]+)\".*", "\\1", lines)
         dates <- gsub(".*  ([0-9]+-[a-zA-Z]+-[0-9]+) .*", "\\1", lines)
         dates <- as.Date(dates, format = "%d-%b-%Y")
-        idx <- grep(sprintf("^%s_.*.tar.gz$", pkgs), tarballs)
+        idx <- grep(sprintf("^%s_.*.tar.gz$", pkg), tarballs)
         # Keep all versions
         if (length(idx) < 1) {
             warning(sprintf("The current version and publication date of %s could not\n                     be detected", 
@@ -33,7 +33,7 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
         } 
         
         ret <- list()
-        ret[[pkgs]] <- data.frame(
+        ret[[pkg]] <- data.frame(
                 version = versions, 
                 date = as.character(dates), 
                 stringsAsFactors = FALSE)
