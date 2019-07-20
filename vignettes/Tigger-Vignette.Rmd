@@ -143,7 +143,7 @@ made by `findNovelAlleles` using the function `plotNovel`.
 
 ```{r, eval=TRUE, warning=FALSE, fig.width=6, fig.height=8}
 # Plot evidence of the first (and only) novel allele from the example data
-plotNovel(SampleDb, novel[1, ])
+plotNovel(airrDb, novel[1, ])
 ```
 
 ## Inferring genotypes
