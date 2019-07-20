@@ -215,14 +215,8 @@ findNovelAlleles <- function(data, germline_db,
     allele_groups <- allele_groups[sortAlleles(names(allele_groups))]
     
     # Prepare for parallel processing
-    nproc <- ifelse(Sys.info()['sysname'] == "Windows",
-                   Sys.getenv('NUMBER_OF_PROCESSORS'),
-                   ifelse(Sys.info()['sysname'] == "Darwin",  
-                          system("sysctl -n hw.ncpu", intern=TRUE),
-                          system("nproc", intern=TRUE))) %>%
-        as.numeric() %>% 
-        min(nproc, . - 1) %>%
-        max(1, .)
+    nproc <- max(1,min(nproc, alakazam::cpuCount()-1))
+    
     if(nproc == 1) {
         foreach::registerDoSEQ()
     } else {
