@@ -673,7 +673,10 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' @examples
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel <- selectNovel(SampleNovel)
-#' plotNovel(SampleDb, novel[1, ])
+#' plotNovel(SampleDb, novel[1, ], 
+#'    v_call="V_CALL", j_call="J_CALL", 
+#'    seq="SEQUENCE_IMGT", 
+#'    junction="JUNCTION", junction_length="JUNCTION_LENGTH")
 #' 
 #' @export
 plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
@@ -1215,7 +1218,8 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNovel)
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
-#' output_db <- reassignAlleles(SampleDb, genotype_db)
+#' output_db <- reassignAlleles(SampleDb, genotype_db,
+#'     v_call="V_CALL",  seq = "SEQUENCE_IMGT")
 #' 
 #' @export
 reassignAlleles <- function(data, genotype_db, v_call="v_call",
@@ -1874,12 +1878,12 @@ cleanSeqs <- function(seqs) {
 #                       the rows should be duplicated and checked for mutation
 # @param  seq           name of the column in \code{data} with the 
 #                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#                       Default is SEQUENCE_IMGT. 
+#                       Default is \code{sequence_alignment} 
 # @return  A data frame with rows duplicated for all the positions to be
 # analyzed and a column indicating whether the position is mutated in
 # comparison to the germline
 #
-positionMutations <- function(data, germline, pos_range, seq="SEQUENCE_IMGT"){
+positionMutations <- function(data, germline, pos_range, seq="sequence_alignment"){
     . = NULL
     pos_db = pos_range %>%
         length() %>%

@@ -124,16 +124,22 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' @examples
 #' \donttest{
 #' # Generate input data
-#' novel <- findNovelAlleles(airrDb, SampleGermlineIGHV)
+#' novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV,
+#'     v_call="V_CALL", j_call="J_CALL", junction="JUNCTION", 
+#'     junction_length="JUNCTION_LENGTH", seq="SEQUENCE_IMGT")
 #' genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, 
 #'                           germline_db=SampleGermlineIGHV,
-#'                           novel=novel)
+#'                           novel=novel,
+#'                           v_call="V_CALL", seq="SEQUENCE_IMGT")
 #' genotype_db <- genotypeFasta(genotype, SampleGermlineIGHV, novel)
-#' data_db <- reassignAlleles(airrDb, genotype_db)
+#' data_db <- reassignAlleles(SampleDb, genotype_db, 
+#' v_call="V_CALL", seq="SEQUENCE_IMGT")
 #' 
 #' # Assemble evidence table
 #' evidence <- generateEvidence(data_db, novel, genotype, 
-#'                              genotype_db, SampleGermlineIGHV)
+#'                              genotype_db, SampleGermlineIGHV,
+#'                              j_call = "J_CALL", 
+#'                              junction = "JUNCTION")
 #' }
 #' 
 #' @export

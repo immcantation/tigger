@@ -25,7 +25,7 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
             warning(sprintf("The current version and publication date of %s could not\n                     be detected", 
                             pkg))
             versions <- dates <- NA
-        } else if (length(idx) > 1) {
+        } else if (length(idx) > 0) {
             versions <- tarballs[idx]
             versions <- gsub(sprintf("^%s_", pkg), "", versions)
             versions <- numeric_version(gsub(".tar.gz$", "", versions))
@@ -34,9 +34,9 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
         
         ret <- list()
         ret[[pkg]] <- data.frame(
-                version = versions, 
-                date = as.character(dates), 
-                stringsAsFactors = FALSE)
+            version = versions, 
+            date = as.character(dates), 
+            stringsAsFactors = FALSE)
         ret
     }
     
@@ -57,8 +57,8 @@ installDep <- function(this_pack_v, dep_pack_name, dep_pack_v) {
         if (!in_cran & !devel) { 
             warning(paste0(required_version," not found in CRAN.")) 
         }
-        message(paste0(dep_pack_name, " ", required_version,": installing most recent version from Bitbucket instead.")) 
-        install_bitbucket(paste0("kleinstein/", dep_pack_name, "@default"))
+        message(paste0(dep_pack_name, " ", required_version,": installing most recent version from Bitbucket.")) 
+        install_bitbucket(paste0("kleinstein/", dep_pack_name, "@default"), upgrade = "never")
     }
 }
 
