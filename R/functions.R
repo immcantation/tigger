@@ -18,7 +18,8 @@
 #' 
 #' @param    data           a \code{data.frame} in AIRR or Change-O format. See details.
 #' @param    germline_db    a vector of named nucleotide germline sequences
-#'                          matching the V calls in \code{data}.
+#'                          matching the V calls in \code{data}. These should be 
+#'                          the reference germlines used to make the V calls.
 #' @param    v_call         name of the column in \code{data} with V allele calls. 
 #'                          Default is \cdde{v_call}.    
 #' @param    j_call         name of the column in \code{data} with J allele calls. 
