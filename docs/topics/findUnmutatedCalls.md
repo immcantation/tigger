@@ -45,9 +45,13 @@ Examples
 
 ```R
 # Find which of the sample alleles are unmutated
-calls <- findUnmutatedCalls(SampleDb$V_CALL, SampleDb$SEQUENCE_IMGT, 
+calls <- findUnmutatedCalls(airrDb$v_call, airrDb$sequence_alignment, 
 germline_db=SampleGermlineIGHV)
 ```
+
+
+
+
 
 
 

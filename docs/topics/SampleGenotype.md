@@ -12,6 +12,8 @@ IMGT/HighV-QUEST to IGHV1 family alleles.
 
 
 
+
+
 Format
 -------------------
 A `data.frame` where rows correspond to genes carried by an
@@ -33,6 +35,9 @@ See also
 -------------------
 
 See [inferGenotype](inferGenotype.md) for detailed column descriptions.
+
+
+
 
 
 

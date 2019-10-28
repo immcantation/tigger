@@ -124,22 +124,22 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
 #' @examples
 #' \donttest{
 #' # Generate input data
-#' novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV,
-#'     v_call="V_CALL", j_call="J_CALL", junction="JUNCTION", 
-#'     junction_length="JUNCTION_LENGTH", seq="SEQUENCE_IMGT")
-#' genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, 
+#' novel <- findNovelAlleles(airrDb, SampleGermlineIGHV,
+#'     v_call="v_call", j_call="j_call", junction="junction", 
+#'     junction_length="junction_length", seq="sequence_alignment")
+#' genotype <- inferGenotype(airrDb, find_unmutated=TRUE, 
 #'                           germline_db=SampleGermlineIGHV,
 #'                           novel=novel,
-#'                           v_call="V_CALL", seq="SEQUENCE_IMGT")
+#'                           v_call="v_call", seq="sequence_alignment")
 #' genotype_db <- genotypeFasta(genotype, SampleGermlineIGHV, novel)
-#' data_db <- reassignAlleles(SampleDb, genotype_db, 
-#' v_call="V_CALL", seq="SEQUENCE_IMGT")
+#' data_db <- reassignAlleles(airrDb, genotype_db, 
+#' v_call="v_call", seq="sequence_alignment")
 #' 
 #' # Assemble evidence table
 #' evidence <- generateEvidence(data_db, novel, genotype, 
 #'                              genotype_db, SampleGermlineIGHV,
-#'                              j_call = "J_CALL", 
-#'                              junction = "JUNCTION")
+#'                              j_call = "j_call", 
+#'                              junction = "junction")
 #' }
 #' 
 #' @export
@@ -220,7 +220,7 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
         dplyr::ungroup() %>%
         dplyr::mutate(ALLELES=strsplit(as.character(.data$ALLELES), ","),
                       COUNTS=strsplit(as.character(.data$COUNTS), ",")) %>%
-        tidyr::unnest(.data$ALLELES, .data$COUNTS) %>%
+        tidyr::unnest(cols=c(ALLELES, COUNTS)) %>%
         dplyr::mutate(POLYMORPHISM_CALL=paste0(.data$GENE, "*" , .data$ALLELES)) %>%
         dplyr::filter(.data$POLYMORPHISM_CALL %in% novel$POLYMORPHISM_CALL)  %>%
         dplyr::rename(ALLELE="ALLELES")

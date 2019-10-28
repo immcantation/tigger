@@ -10,8 +10,8 @@ for each V gene and returns the mutation count of those sequences.
 Usage
 --------------------
 ```
-getPopularMutationCount(data, germline_db, v_call = "V_CALL",
-seq = "SEQUENCE_IMGT", gene_min = 0.001, seq_min = 50,
+getPopularMutationCount(data, germline_db, v_call = "v_call",
+seq = "sequence_alignment", gene_min = 0.001, seq_min = 50,
 seq_p_of_max = 1/8, full_return = FALSE)
 ```
 
@@ -28,12 +28,12 @@ germline_db
 
 v_call
 :   name of the column in `data` with V allele calls. 
-Default is V_CALL.
+Default is `v_call`.
 
 seq
 :   name of the column in `data` with the 
 aligned, IMGT-numbered, V(D)J nucleotide sequence.
-Default is SEQUENCE_IMG
+Default is `sequence_alignment`.
 
 gene_min
 :   The portion of all unique sequences a gene must
@@ -66,7 +66,7 @@ Examples
 -------------------
 
 ```R
-getPopularMutationCount(SampleDb, SampleGermlineIGHV)
+getPopularMutationCount(airrDb, SampleGermlineIGHV)
 ```
 
 
@@ -85,6 +85,9 @@ See also
 
 [getMutatedPositions](getMutatedPositions.md) can be used to find which positions
 of a set of sequences are mutated.
+
+
+
 
 
 

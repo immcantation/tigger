@@ -11,16 +11,16 @@ visualize the results for alleles that did
 Usage
 --------------------
 ```
-plotNovel(data, novel_row, v_call = "V_CALL", j_call = "J_CALL",
-seq = "SEQUENCE_IMGT", junction = "JUNCTION",
-junction_length = "JUNCTION_LENGTH", ncol = 1)
+plotNovel(data, novel_row, v_call = "v_call", j_call = "j_call",
+seq = "sequence_alignment", junction = "junction",
+junction_length = "junction_length", ncol = 1)
 ```
 
 Arguments
 -------------------
 
 data
-:   a `data.frame` in Change-O format. See
+:   a `data.frame` in AIRR or Change-O format. See
 [findNovelAlleles](findNovelAlleles.md) for details.
 
 novel_row
@@ -30,25 +30,25 @@ polymorphism-containing germline allele
 
 v_call
 :   name of the column in `data` with V allele
-calls. Default is "V_CALL".
+calls. Default is `v_call`..
 
 j_call
 :   name of the column in `data` with J allele calls. 
-Default is J_CALL.
+Default is `j_call`.
 
 seq
 :   name of the column in `data` with the 
 aligned, IMGT-numbered, V(D)J nucleotide sequence.
-Default is SEQUENCE_IMGT.
+Default is `sequence_alignment`.
 
 junction
 :   Junction region nucleotide sequence, which includes
 the CDR3 and the two flanking conserved codons. Default
-is JUNCTION.
+is `junction`.
 
 junction_length
 :   Number of junction nucleotides in the junction sequence.
-Default is JUNCTION_LENGTH.
+Default is `junction_length`.
 
 ncol
 :   number of columns to use when laying out the plots
@@ -78,10 +78,17 @@ Examples
 ```R
 # Plot the evidence for the first (and only) novel allele in the example data
 novel <- selectNovel(SampleNovel)
-plotNovel(SampleDb, novel[1, ])
+plotNovel(airrDb, novel[1, ], 
+v_call="v_call", j_call="j_call", 
+seq="sequence_alignment", 
+junction="junction", junction_length="junction_length")
 ```
 
 ![2](plotNovel-2.png)
+
+
+
+
 
 
 

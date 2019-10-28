@@ -11,45 +11,46 @@ might be polymorphic.
 Usage
 --------------------
 ```
-findNovelAlleles(data, germline_db, v_call = "V_CALL",
-j_call = "J_CALL", seq = "SEQUENCE_IMGT", junction = "JUNCTION",
-junction_length = "JUNCTION_LENGTH", germline_min = 200,
-min_seqs = 50, auto_mutrange = TRUE, mut_range = 1:10,
-pos_range = 1:312, y_intercept = 0.125, alpha = 0.05,
-j_max = 0.15, min_frac = 0.75, nproc = 1)
+findNovelAlleles(data, germline_db, v_call = "v_call",
+j_call = "j_call", seq = "sequence_alignment",
+junction = "junction", junction_length = "junction_length",
+germline_min = 200, min_seqs = 50, auto_mutrange = TRUE,
+mut_range = 1:10, pos_range = 1:312, y_intercept = 0.125,
+alpha = 0.05, j_max = 0.15, min_frac = 0.75, nproc = 1)
 ```
 
 Arguments
 -------------------
 
 data
-:   a `data.frame` in Change-O format. See details.
+:   a `data.frame` in AIRR or Change-O format. See details.
 
 germline_db
 :   a vector of named nucleotide germline sequences
-matching the V calls in `data`.
+matching the V calls in `data`. These should be 
+the reference germlines used to make the V calls.
 
 v_call
 :   name of the column in `data` with V allele calls. 
-Default is V_CALL.
+Default is \cddev_call.
 
 j_call
 :   name of the column in `data` with J allele calls. 
-Default is J_CALL.
+Default is `j_call`.
 
 seq
 :   name of the column in `data` with the 
 aligned, IMGT-numbered, V(D)J nucleotide sequence.
-Default is SEQUENCE_IMGT.
+Default is `sequence_alignment`.
 
 junction
 :   Junction region nucleotide sequence, which includes
 the CDR3 and the two flanking conserved codons. Default
-is JUNCTION.
+is `junction`.
 
 junction_length
 :   Number of junction nucleotides in the junction sequence.
-Default is JUNCTION_LENGTH.
+Default is `junction_length`.
 
 germline_min
 :   the minimum number of sequences that must have a
@@ -201,7 +202,7 @@ Examples
 
 ```R
 # Find novel alleles and return relevant data
-novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
+novel <- findNovelAlleles(airrDb, SampleGermlineIGHV)
 selectNovel(novel)
 
 ```
@@ -212,16 +213,20 @@ selectNovel(novel)
 1    IGHV1-8*02 Novel allele found!  IGHV1-8*02_G234T           234G>T
                                                                                                                                                                                                                                                                                                                         NOVEL_IMGT
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATTACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  NOVEL_IMGT_COUNT NOVEL_IMGT_UNIQUE_J NOVEL_IMGT_UNIQUE_CDR3 PERFECT_MATCH_COUNT PERFECT_MATCH_FREQ GERMLINE_CALL_COUNT
-1              657                   6                    626                 661          0.7295806                 906
-  GERMLINE_CALL_FREQ MUT_MIN MUT_MAX MUT_PASS_COUNT
-1              0.052       1      10            760
+  NOVEL_IMGT_COUNT NOVEL_IMGT_UNIQUE_J NOVEL_IMGT_UNIQUE_CDR3
+1              657                   6                    626
+  PERFECT_MATCH_COUNT PERFECT_MATCH_FREQ GERMLINE_CALL_COUNT GERMLINE_CALL_FREQ
+1                 661          0.7295806                 906              0.052
+  MUT_MIN MUT_MAX MUT_PASS_COUNT
+1       1      10            760
                                                                                                                                                                                                                                                                                                                      GERMLINE_IMGT
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATGACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  GERMLINE_IMGT_COUNT POS_MIN POS_MAX Y_INTERCEPT Y_INTERCEPT_PASS SNP_PASS UNMUTATED_COUNT UNMUTATED_FREQ
-1                   0       1     312       0.125                1      754             661      0.7295806
-  UNMUTATED_SNP_J_GENE_LENGTH_COUNT SNP_MIN_SEQS_J_MAX_PASS ALPHA MIN_SEQS J_MAX MIN_FRAC
-1                                83                       1  0.05       50  0.15     0.75
+  GERMLINE_IMGT_COUNT POS_MIN POS_MAX Y_INTERCEPT Y_INTERCEPT_PASS SNP_PASS
+1                   0       1     312       0.125                1      754
+  UNMUTATED_COUNT UNMUTATED_FREQ UNMUTATED_SNP_J_GENE_LENGTH_COUNT
+1             661      0.7295806                                83
+  SNP_MIN_SEQS_J_MAX_PASS ALPHA MIN_SEQS J_MAX MIN_FRAC
+1                       1  0.05       50  0.15     0.75
 
 ```
 
@@ -241,8 +246,11 @@ See also
 [selectNovel](selectNovel.md) to filter the results to show only novel alleles.
 [plotNovel](plotNovel.md) to visualize the data supporting any
 novel alleles hypothesized to be present in the data and
-[inferGenotype](inferGenotype.md) to determine if the novel alleles are frequent
+[inferGenotype](inferGenotype.md) and [inferGenotypeBayesian](inferGenotypeBayesian.md) to determine if the novel alleles are frequent
 enought to be included in the subject's genotype.
+
+
+
 
 
 

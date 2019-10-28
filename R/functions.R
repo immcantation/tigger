@@ -674,10 +674,10 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' @examples
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel <- selectNovel(SampleNovel)
-#' plotNovel(SampleDb, novel[1, ], 
-#'    v_call="V_CALL", j_call="J_CALL", 
-#'    seq="SEQUENCE_IMGT", 
-#'    junction="JUNCTION", junction_length="JUNCTION_LENGTH")
+#' plotNovel(airrDb, novel[1, ], 
+#'    v_call="v_call", j_call="j_call", 
+#'    seq="sequence_alignment", 
+#'    junction="junction", junction_length="junction_length")
 #' 
 #' @export
 plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
@@ -1219,8 +1219,8 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNovel)
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
-#' output_db <- reassignAlleles(SampleDb, genotype_db,
-#'     v_call="V_CALL",  seq = "SEQUENCE_IMGT")
+#' output_db <- reassignAlleles(airrDb, genotype_db,
+#'     v_call="v_call",  seq = "sequence_alignment")
 #' 
 #' @export
 reassignAlleles <- function(data, genotype_db, v_call="v_call",
@@ -1474,7 +1474,7 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' 
 #' @examples
 #' # Find which of the sample alleles are unmutated
-#' calls <- findUnmutatedCalls(SampleDb$V_CALL, SampleDb$SEQUENCE_IMGT, 
+#' calls <- findUnmutatedCalls(airrDb$v_call, airrDb$sequence_alignment, 
 #'          germline_db=SampleGermlineIGHV)
 #' 
 #' @export

@@ -11,8 +11,8 @@ from a single subject.
 Usage
 --------------------
 ```
-reassignAlleles(data, genotype_db, v_call = "V_CALL",
-seq = "SEQUENCE_IMGT", method = "hamming", path = NA,
+reassignAlleles(data, genotype_db, v_call = "v_call",
+seq = "sequence_alignment", method = "hamming", path = NA,
 keep_gene = c("gene", "family", "repertoire"))
 ```
 
@@ -22,7 +22,7 @@ Arguments
 data
 :   a `data.frame` containing V allele calls from a
 single subject and the sample IMGT-gapped V(D)J sequences under
-`"SEQUENCE_IMGT"`.
+`seq`.
 
 genotype_db
 :   a vector of named nucleotide germline sequences
@@ -31,7 +31,7 @@ and personalized to the subject
 
 v_call
 :   name of the column in `data` with V allele
-calls. Default is `"V_CALL"`.
+calls. Default is `v_call`.
 
 seq
 :   name of the column in `data` with the 
@@ -83,8 +83,13 @@ Examples
 genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNovel)
 
 # Use the personlized genotype to determine corrected allele assignments
-output_db <- reassignAlleles(SampleDb, genotype_db)
+output_db <- reassignAlleles(airrDb, genotype_db,
+v_call="v_call",  seq = "sequence_alignment")
 ```
+
+
+
+
 
 
 

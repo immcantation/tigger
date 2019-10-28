@@ -11,6 +11,8 @@ IMGT/HighV-QUEST to IGHV1 family alleles.
 
 
 
+
+
 Format
 -------------------
 A `data.frame` where rows correspond to alleles checked for
@@ -33,6 +35,9 @@ See also
 -------------------
 
 See [findNovelAlleles](findNovelAlleles.md) for detailed column descriptions.
+
+
+
 
 
 

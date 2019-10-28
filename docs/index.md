@@ -32,7 +32,7 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 
 **Depends:** ggplot2  
 **Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, shazam, stats, stringi, tidyr  
-**Suggests:** knitr, testthat
+**Suggests:** knitr, rmarkdown, testthat
 
 
 # Authors
@@ -48,9 +48,11 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 # Citing
 
 
-Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated analysis of high-throughput B cell
-sequencing data reveals a high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of
-the National Academy of Sciency of the United States of America_, E862-70.
+Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated
+analysis of high-throughput B cell sequencing data reveals a high
+frequency of novel immunoglobulin V gene segment alleles.” _Proceedings
+of the National Academy of Sciency of the United States of America_,
+E862-70.
 
 A BibTeX entry for LaTeX users is
 

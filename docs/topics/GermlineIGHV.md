@@ -10,6 +10,8 @@ See IMGT data updates: http://www.imgt.org/IMGTgenedbdoc/dataupdates.html.
 
 
 
+
+
 Format
 -------------------
 Values correspond to IMGT-gaped nuceltoide sequences (with
@@ -23,6 +25,10 @@ References
 1.  Xochelli, et al. (2014) Immunoglobulin heavy variable (IGHV) genes and 
 alleles: new entities, new names and implications for research and 
 prognostication in chronic lymphocytic leukaemia. Immunogenetics. 67(1):61-6.
+
+
+
+
 
 
 

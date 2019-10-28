@@ -11,7 +11,7 @@ be subsampled indepently by setting `group`.
 Usage
 --------------------
 ```
-subsampleDb(data, gene = "V_CALL", mode = c("gene", "allele",
+subsampleDb(data, gene = "v_call", mode = c("gene", "allele",
 "family"), min_n = 1, max_n = NULL, group = NULL)
 ```
 
@@ -22,7 +22,8 @@ data
 :   a `data.frame` in Change-O format.
 
 gene
-:   name of the column in `data` with allele calls
+:   name of the column in `data` with allele calls. Default
+is `v_call`.
 
 mode
 :   one of c("gene", "family", "allele") defining the degree of
@@ -75,7 +76,7 @@ Examples
 -------------------
 
 ```R
-# subsampleDb(SampleDb)
+# subsampleDb(airrDb)
 ```
 
 
@@ -84,6 +85,9 @@ See also
 -------------------
 
 [selectNovel](selectNovel.md)
+
+
+
 
 
 

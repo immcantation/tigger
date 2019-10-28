@@ -11,7 +11,7 @@ Usage
 --------------------
 ```
 generateEvidence(data, novel, genotype, genotype_db, germline_db,
-j_call = "J_CALL", junction = "JUNCTION", fields = NULL)
+j_call = "j_call", junction = "junction", fields = NULL)
 ```
 
 Arguments
@@ -39,7 +39,7 @@ germline_db
 
 j_call
 :   name of the column in `data` with J allele calls. 
-Default is J_CALL.
+Default is `j_call`.
 
 junction
 :   Junction region nucleotide sequence, which includes
@@ -117,16 +117,22 @@ Examples
 
 ```R
 # Generate input data
-novel <- findNovelAlleles(SampleDb, SampleGermlineIGHV)
-genotype <- inferGenotype(SampleDb, find_unmutated=TRUE, 
+novel <- findNovelAlleles(airrDb, SampleGermlineIGHV,
+v_call="v_call", j_call="j_call", junction="junction", 
+junction_length="junction_length", seq="sequence_alignment")
+genotype <- inferGenotype(airrDb, find_unmutated=TRUE, 
 germline_db=SampleGermlineIGHV,
-novel=novel)
+novel=novel,
+v_call="v_call", seq="sequence_alignment")
 genotype_db <- genotypeFasta(genotype, SampleGermlineIGHV, novel)
-data_db <- reassignAlleles(SampleDb, genotype_db)
+data_db <- reassignAlleles(airrDb, genotype_db, 
+v_call="v_call", seq="sequence_alignment")
 
 # Assemble evidence table
 evidence <- generateEvidence(data_db, novel, genotype, 
-genotype_db, SampleGermlineIGHV)
+genotype_db, SampleGermlineIGHV,
+j_call = "j_call", 
+junction = "junction")
 ```
 
 
@@ -136,6 +142,9 @@ See also
 
 See [findNovelAlleles](findNovelAlleles.md), [inferGenotype](inferGenotype.md) and [genotypeFasta](genotypeFasta.md) 
 for generating the required input.
+
+
+
 
 
 
