@@ -46,7 +46,7 @@ Imports:
     shazam (>= 0.2.1),
     stats,
     stringi,
-    tidyr (>=0.1.0)
+    tidyr (>= 0.1.0)
 Suggests:
     knitr,
     rmarkdown,
