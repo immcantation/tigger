@@ -1,3 +1,15 @@
+Version 0.4.0.999 2019-09-27
+-------------------------------------------------------------------------------
+
+Backwards Incompatible Changes:
+
++ Changed default expected data format from Change-O to AIRR. Example: where
+  functions expected the column name 'V_CALL', they now require 'v_call'.
+
+Dependencies:
+
++ Upgraded to shazam >= 0.2.1, tidyr (>=0.1.0) 
+
 Version 0.4.0 July 18, 2019
 -------------------------------------------------------------------------------
 
