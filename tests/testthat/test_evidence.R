@@ -6,6 +6,15 @@ load(germline_ighv)
 
 context("Evidence")
 
+#ensure older version of sample() used
+R_v <- paste(version$major, version$minor,sep=".")
+w <- getOption("warn")
+options(warn = -1)
+if ( numeric_version(R_v) >= numeric_version("3.6.0") ) {
+    RNGkind(sample.kind="Round")   
+}
+options(warn = w)
+
 test_that("Helper functions", {
     expect_true(hasNonImgtGaps("AT.ATT"))
     expect_null(getMutatedAA("...", "..."))

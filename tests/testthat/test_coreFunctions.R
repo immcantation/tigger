@@ -9,6 +9,15 @@ load(germline_ighv)
 
 context("Core functions")
 
+#ensure older version of sample() used
+R_v <- paste(version$major, version$minor,sep=".")
+w <- getOption("warn")
+options(warn = -1)
+if ( numeric_version(R_v) >= numeric_version("3.6.0") ) {
+    RNGkind(sample.kind="Round")   
+}
+options(warn = w)
+
 test_that("Test findNovelAlleles",{ 
     expect_error(novel_df <- findNovelAlleles(sample_db, germline_ighv))
     novel_df <- findNovelAlleles(sample_db, germline_ighv,
