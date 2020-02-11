@@ -51,7 +51,8 @@
 #' @param    j_max          the maximum fraction of sequences perfectly aligning
 #'                          to a potential novel allele that are allowed to
 #'                          utilize to a particular combination of junction
-#'                          length and J gene
+#'                          length and J gene. The closer to 1, the less strict 
+#'                          the filter for J gene diversity will be.
 #' @param    min_seqs       the minimum number of total sequences (within the
 #'                          desired mutational range and nucleotide range)
 #'                          required for the samples to be considered
