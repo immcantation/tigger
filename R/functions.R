@@ -858,7 +858,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
         theme(legend.position=c(1, 1), legend.justification=c(1, 1),
               legend.background=element_rect(fill="transparent"))
     
-    p2_height <- 0.6*nrows 
+    p2_height <- max(1,0.6*nrows )
 
     heights <- c(1, p2_height, 1)
     if (multiplot) {
