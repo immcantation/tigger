@@ -1910,7 +1910,7 @@ positionMutations <- function(data, germline, pos_range, seq="sequence_alignment
                            !!rlang::sym("NT") != "." & 
                            !!rlang::sym("NT") != ""))
     if (any(pos_db$GERM_NT == "")) { 
-        stop("Empty ('') GERMN_NT positions found. Check you are using gapped reference germlines.")
+        stop("Empty ('') GERM_NT positions found. Check you are using gapped reference germlines.")
         }
     return(pos_db)
 }
