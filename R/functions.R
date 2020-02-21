@@ -671,20 +671,21 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' @param    junction_length Number of junction nucleotides in the junction sequence.
 #'                          Default is \code{junction_length}.                        
 #' @param    ncol           number of columns to use when laying out the plots  
-#' 
+#' @param    multiplot      Whether to return one single plot (\code{TRUE}) or a list 
+#'                          with the three individual plots (\code{FALSE}).
 #' @examples
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel <- selectNovel(SampleNovel)
 #' plotNovel(airrDb, novel[1, ], 
 #'    v_call="v_call", j_call="j_call", 
 #'    seq="sequence_alignment", 
-#'    junction="junction", junction_length="junction_length")
+#'    junction="junction", junction_length="junction_length", multiplot=TRUE)
 #' 
 #' @export
 plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
                       seq="sequence_alignment",
                       junction="junction", junction_length="junction_length",
-                      ncol=1) {
+                      ncol=1, multiplot=TRUE) {
     . = NULL
     
     # Use the data frame
@@ -860,7 +861,11 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
     p2_height <- 0.6*nrows 
 
     heights <- c(1, p2_height, 1)
-    multiplot(p1, p2, p3, cols = ncol, heights=heights)      
+    if (multiplot) {
+        multiplot(p1, p2, p3, cols = ncol, heights=heights)         
+    } else {
+        list(p1, p2, p3)
+    }
 }
 
 #' Infer a subject-specific genotype using a frequency method
