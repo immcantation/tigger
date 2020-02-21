@@ -19,7 +19,7 @@
 #' @param    data           a \code{data.frame} in AIRR or Change-O format. See details.
 #' @param    germline_db    a vector of named nucleotide germline sequences
 #'                          matching the V calls in \code{data}. These should be 
-#'                          the reference germlines used to make the V calls.
+#'                          the gapped reference germlines used to make the V calls.
 #' @param    v_call         name of the column in \code{data} with V allele calls. 
 #'                          Default is \cdde{v_call}.    
 #' @param    j_call         name of the column in \code{data} with J allele calls. 
@@ -787,7 +787,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
                   legend.background=element_rect(fill = "transparent")) +
             guides(color = guide_legend(ncol = 2, reverse = TRUE))
     } else{
-        POLYCOLORS = setNames(DNA_COLORS[c(4,2)], c("False", "True"))
+        POLYCOLORS <- setNames(DNA_COLORS[c(4,2)], c("False", "True"))
         p1 <- ggplot(pos_muts, aes_string(x="MUT_COUNT", y="POS_MUT_RATE", 
                                           group="POSITION", color="Polymorphic")) +
             geom_line(size=0.75) +
@@ -805,11 +805,17 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
     # MAKE THE SECOND PLOT
     p2_data <- mutate(filter(pos_db, !!rlang::sym("POSITION") %in% pass_y),
                       POSITION = to_from[as.character(!!rlang::sym("POSITION"))])
+    positions <- unique(p2_data$POSITION)
+    numeric_positions <- as.numeric(sub("Position ([0-9]+) .+","\\1",positions))
+    
+    p2_data$POSITION <- factor(p2_data$POSITION,
+                               levels=positions[order(numeric_positions)],
+                               ordered = TRUE)
+    
     if (nrow(p2_data)) {
         p2 <- ggplot(p2_data, aes_string(x="MUT_COUNT", fill="NT")) +
             geom_bar(width=0.9) +
             guides(fill = guide_legend("Nucleotide", ncol=4)) +
-            facet_grid(POSITION ~ .) +
             xlab("Mutation Count (Sequence)") + 
             ylab("Sequence Count") +
             scale_fill_manual(values=DNA_COLORS, breaks=names(DNA_COLORS),
@@ -823,12 +829,24 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
                           POSITION = "No positions pass y-intercept test.")
         p2 <- ggplot(p2_data, aes_string(x="MUT_COUNT")) +
             geom_bar(width=0.9) +
-            facet_grid(POSITION ~ .) +
             xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
             theme_bw() +
             theme(legend.position=c(1,1), legend.justification=c(1,1),
                   legend.background=element_rect(fill = "transparent"))
     }
+    
+    if (length(positions) < 5) {
+        p2 <- p2 +
+            facet_grid(POSITION ~ .) 
+        ncols <- 1
+        nrows <- length(positions)
+    } else {
+        ncols <- min(length(positions),6)
+        nrows <- ceiling(length(positions)/ncols)
+        p2 <- p2 +
+            facet_wrap(POSITION ~ ., ncol=ncols)
+    }
+        
     # MAKE THE THIRD PLOT
     p3 <- ggplot(db_subset, aes_string(x=junction_length, fill="J_GENE")) +
         geom_bar(width=0.9) +
@@ -839,8 +857,8 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
         theme(legend.position=c(1, 1), legend.justification=c(1, 1),
               legend.background=element_rect(fill="transparent"))
     
-    p2_height <- length(unique(p2_data$POSITION))
-    if (p2_height>1) { p2_height = 0.5 * p2_height}
+    p2_height <- 0.6*nrows 
+
     heights <- c(1, p2_height, 1)
     multiplot(p1, p2, p3, cols = ncol, heights=heights)      
 }
