@@ -242,9 +242,9 @@ not_in_genotype <- sample_db$v_call %>%
 # and the fraction that contained original calls to non-genotype alleles. Note
 # that by design, only genotype alleles are allowed in "after" calls.
 data.frame(Ambiguous=c(mean(grepl(",", sample_db$v_call)),
-                       mean(grepl(",", sample_db$V_CALL_GENOTYPED))),
+                       mean(grepl(",", sample_db$v_call_genotyped))),
            NotInGenotype=c(mean(sample_db$v_call %in% not_in_genotype),
-                           mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
+                           mean(sample_db$v_call_genotyped %in% not_in_genotype)),
            row.names=c("Before", "After")) %>% 
     t() %>% round(3)
 ```
@@ -259,12 +259,12 @@ to build a table of evidence metrics supporting the final novel V allele detecti
 evidence <- generateEvidence(sample_db, novel, geno, genotype_db, SampleGermlineIGHV, fields = NULL)
 
 evidence %>%
-  select(GENE, ALLELE, POLYMORPHISM_CALL, SEQUENCES, UNMUTATED_FREQUENCY)
+  select(gene, allele, polymorphism_call, sequences, unmutated_frequency)
 ```
 
-In this example, `r evidence[["SEQUENCES"]]` sequences were unambiguously assigned
-to allele `r evidence[["POLYMORPHISM_CALL"]]`, 
-`r round(100*evidence[["UNMUTATED_FREQUENCY"]],2)`%
+In this example, `r evidence[["sequences"]]` sequences were unambiguously assigned
+to allele `r evidence[["polymorphism_call"]]`, 
+`r round(100*evidence[["unmutated_frequency"]],2)`%
 of them unmutated.
 
 ## References

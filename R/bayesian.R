@@ -59,17 +59,17 @@
 #' contains the following columns:
 #' 
 #' \itemize{
-#'   \item \code{GENE}: The gene name without allele.
-#'   \item \code{ALLELES}: Comma separated list of alleles for the given \code{GENE}.
-#'   \item \code{COUNTS}: Comma separated list of observed sequences for each 
-#'         corresponding allele in the \code{ALLELES} list.
-#'   \item \code{TOTAL}: The total count of observed sequences for the given \code{GENE}.
-#'   \item \code{NOTE}: Any comments on the inferrence.
-#'   \item \code{KH}: log10 likelihood that the \code{GENE} is homozygous.
-#'   \item \code{KD}: log10 likelihood that the \code{GENE} is heterozygous.
-#'   \item \code{KT}: log10 likelihood that the \code{GENE} is trizygous
-#'   \item \code{KQ}: log10 likelihood that the \code{GENE} is quadrozygous.
-#'   \item \code{K_DIFF}: log10 ratio of the highest to second-highest zygosity likelihoods.
+#'   \item \code{gene}: The gene name without allele.
+#'   \item \code{alleles}: Comma separated list of alleles for the given \code{gene}.
+#'   \item \code{counts}: Comma separated list of observed sequences for each 
+#'         corresponding allele in the \code{alleles} list.
+#'   \item \code{total}: The total count of observed sequences for the given \code{gene}.
+#'   \item \code{note}: Any comments on the inferrence.
+#'   \item \code{kh}: log10 likelihood that the \code{gene} is homozygous.
+#'   \item \code{kd}: log10 likelihood that the \code{gene} is heterozygous.
+#'   \item \code{kt}: log10 likelihood that the \code{gene} is trizygous
+#'   \item \code{kq}: log10 likelihood that the \code{gene} is quadrozygous.
+#'   \item \code{k_diff}: log10 ratio of the highest to second-highest zygosity likelihoods.
 #' }     
 #' 
 #' @note
@@ -109,18 +109,18 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         }
         if (!is.null(nrow(novel))) {
             novel <- novel %>%
-                filter(!is.na(!!rlang::sym("POLYMORPHISM_CALL"))) %>%
-                select(!!!rlang::syms(c("GERMLINE_CALL", "POLYMORPHISM_CALL", "NOVEL_IMGT")))
+                filter(!is.na(!!rlang::sym("polymorphism_call"))) %>%
+                select(!!!rlang::syms(c("germline_call", "polymorphism_call", "novel_imgt")))
             if(nrow(novel) > 0){
                 # Extract novel alleles if any and add them to germline_db
-                novel_gl <- novel$NOVEL_IMGT
-                names(novel_gl) <- novel$POLYMORPHISM_CALL
+                novel_gl <- novel$novel_imgt
+                names(novel_gl) <- novel$polymorphism_call
                 germline_db <- c(germline_db, novel_gl)
                 # Add the novel allele calls to allele calls of the same starting allele
                 for(r in 1:nrow(novel)){
-                    ind <- grep(novel$GERMLINE_CALL[r], allele_calls, fixed=TRUE)
+                    ind <- grep(novel$germline_call[r], allele_calls, fixed=TRUE)
                     allele_calls[ind] <- allele_calls[ind] %>%
-                        sapply(paste, novel$POLYMORPHISM_CALL[r], sep=",")
+                        sapply(paste, novel$polymorphism_call[r], sep=",")
                 }
             }
         }
@@ -141,16 +141,16 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
     gene_groups <- gene_groups[sortAlleles(names(gene_groups))]
     
     # Make a table to store the resulting genotype
-    GENE <- names(gene_groups)
-    #   ALLELES = COUNTS = NOTE = rep("", length(GENE))
-    #   TOTAL = sapply(gene_groups, length)
-    #   genotype = cbind(GENE, ALLELES, COUNTS, TOTAL, NOTE)
-    ALLELES <- COUNTS <- KH <- KD <- KT <- KQ <- K_DIFF <- NOTE <- rep("", length(GENE))
-    TOTAL <- sapply(gene_groups, length)
-    genotype <- cbind(GENE, ALLELES, COUNTS, TOTAL, NOTE, KH, KD, KT, KQ, K_DIFF)
+    gene <- names(gene_groups)
+    #   alleles = counts = note = rep("", length(gene))
+    #   total = sapply(gene_groups, length)
+    #   genotype = cbind(gene, alleles, counts, total, note)
+    alleles <- counts <- kh <- kd <- kt <- kq <- k_diff <- note <- rep("", length(gene))
+    total <- sapply(gene_groups, length)
+    genotype <- cbind(gene, alleles, counts, total, note, kh, kd, kt, kq, k_diff)
     
     # For each gene, find which alleles to include
-    for (g in GENE){
+    for (g in gene){
         # Keep only the part of the allele calls that uses the gene being analyzed
         ac <- allele_calls[gene_groups[[g]]] %>%
             strsplit(",") %>%
@@ -231,17 +231,17 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         k <- sort(as.numeric(probs),decreasing = T);
         
         probs<-c(probs,k[1]-k[2])
-        names(probs)[5] <- "K_DIFF"
+        names(probs)[5] <- "k_diff"
         
-        genotype[genotype[, "GENE"] == g, "ALLELES"] <- paste(gsub("[^d\\*]*[d\\*]", 
+        genotype[genotype[, "gene"] == g, "alleles"] <- paste(gsub("[^d\\*]*[d\\*]", 
                                                                   "", names(allele_tot)[1:len]), collapse = ",")
-        genotype[genotype[, "GENE"] == g, "COUNTS"] <- paste(as.numeric(allele_tot)[1:len], 
+        genotype[genotype[, "gene"] == g, "counts"] <- paste(as.numeric(allele_tot)[1:len], 
                                                             collapse = ",")
-        genotype[genotype[, "GENE"] == g, "KH"] <- probs[1];
-        genotype[genotype[, "GENE"] == g, "KD"] <- probs[2];
-        genotype[genotype[, "GENE"] == g, "KT"] <- probs[3];
-        genotype[genotype[, "GENE"] == g, "KQ"] <- probs[4];
-        genotype[genotype[, "GENE"] == g, "K_DIFF"] <- probs[5];
+        genotype[genotype[, "gene"] == g, "kh"] <- probs[1];
+        genotype[genotype[, "gene"] == g, "kd"] <- probs[2];
+        genotype[genotype[, "gene"] == g, "kt"] <- probs[3];
+        genotype[genotype[, "gene"] == g, "kq"] <- probs[4];
+        genotype[genotype[, "gene"] == g, "k_diff"] <- probs[5];
         #     }
         
     }
@@ -260,7 +260,7 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         if (nrow(same) > 0 ) {
             for (r in 1:nrow(same)) {
                 inds <- as.vector(same[r,])
-                geno[getGene(rownames(dist_mat)[inds][1]),]$NOTE <-
+                geno[getGene(rownames(dist_mat)[inds][1]),]$note <-
                     paste(rownames(dist_mat)[inds], collapse=" and ") %>%
                     paste("Cannot distinguish", .)
             }

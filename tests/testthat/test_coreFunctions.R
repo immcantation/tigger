@@ -26,7 +26,7 @@ test_that("Test findNovelAlleles",{
                             junction = "JUNCTION",
                             junction_length = "JUNCTION_LENGTH")
     
-    expect_equal(selectNovel(novel_df)$POLYMORPHISM_CALL, "IGHV1-8*02_G234T")
+    expect_equal(selectNovel(novel_df)$polymorphism_call, "IGHV1-8*02_G234T")
         
     novel_df_airr <- findNovelAlleles(airr_db, germline_ighv,
                                       v_call="v_call", j_call="j_call",

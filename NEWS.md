@@ -1,10 +1,16 @@
-Version 0.4.0.999 2019-09-27
+Version 0.4.0.999 2020-03-26
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
 
 + Changed default expected data format from Change-O to AIRR. Example: where
   functions expected the column name 'V_CALL', they now require 'v_call'.
++ Added AIRR formatted example data `airrDb`
++ For consistency with the style of the new data format default, field names in
+  all other data structures have been updated to use the same font case style. 
+  e.g, the column names of the results of `findNovelAlleles` are now using lower case
+  (`germline_call`, not `GERMLINE_cALL`)
+
 
 Dependencies:
 
