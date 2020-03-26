@@ -151,7 +151,7 @@
 #' novel <- findNovelAlleles(airrDb, SampleGermlineIGHV)
 #' selectNovel(novel)
 #' # Note: In this example, with SampleGermlineIGHV,
-#' # which contains reference germlines retrieved on August 2018,
+#' # which contains reference germlines retrieved on August 2014,
 #' # TIgGER finds the allele IGHV1-8*02_G234T. This allele
 #' # was added to IMGT as IGHV1-8*03 on March 28, 2018.
 #' }
