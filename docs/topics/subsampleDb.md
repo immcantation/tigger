@@ -11,8 +11,14 @@ be subsampled indepently by setting `group`.
 Usage
 --------------------
 ```
-subsampleDb(data, gene = "v_call", mode = c("gene", "allele",
-"family"), min_n = 1, max_n = NULL, group = NULL)
+subsampleDb(
+data,
+gene = "v_call",
+mode = c("gene", "allele", "family"),
+min_n = 1,
+max_n = NULL,
+group = NULL
+)
 ```
 
 Arguments

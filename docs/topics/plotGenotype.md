@@ -9,8 +9,14 @@ Description
 Usage
 --------------------
 ```
-plotGenotype(genotype, facet_by = NULL, gene_sort = c("name",
-"position"), text_size = 12, silent = FALSE, ...)
+plotGenotype(
+genotype,
+facet_by = NULL,
+gene_sort = c("name", "position"),
+text_size = 12,
+silent = FALSE,
+...
+)
 ```
 
 Arguments

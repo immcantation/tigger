@@ -15,9 +15,16 @@ by chance have been mutated to look like another allele) can be removed.
 Usage
 --------------------
 ```
-inferGenotype(data, germline_db = NA, novel = NA, v_call = "v_call",
-seq = "sequence_alignment", fraction_to_explain = 0.875,
-gene_cutoff = 1e-04, find_unmutated = TRUE)
+inferGenotype(
+data,
+germline_db = NA,
+novel = NA,
+v_call = "v_call",
+seq = "sequence_alignment",
+fraction_to_explain = 0.875,
+gene_cutoff = 1e-04,
+find_unmutated = TRUE
+)
 ```
 
 Arguments
@@ -80,12 +87,12 @@ A `data.frame` of alleles denoting the genotype of the subject containing
 the following columns:
 
 
-+  `GENE`: The gene name without allele.
-+  `ALLELES`: Comma separated list of alleles for the given `GENE`.
-+  `COUNTS`: Comma separated list of observed sequences for each 
-corresponding allele in the `ALLELES` list.
-+  `TOTAL`: The total count of observed sequences for the given `GENE`.
-+  `NOTE`: Any comments on the inferrence.
++  `gene`: The gene name without allele.
++  `alleles`: Comma separated list of alleles for the given `gene`.
++  `counts`: Comma separated list of observed sequences for each 
+corresponding allele in the `alleles` list.
++  `total`: The total count of observed sequences for the given `gene`.
++  `note`: Any comments on the inferrence.
 
 
 
@@ -122,7 +129,7 @@ find_unmutated=TRUE)
 
 
 ```
-        GENE     ALLELES      COUNTS TOTAL NOTE
+        gene     alleles      counts total note
 1    IGHV1-2       02,04     664,302   966     
 2    IGHV1-3          01         226   226     
 3    IGHV1-8 01,02_G234T     467,370   837     

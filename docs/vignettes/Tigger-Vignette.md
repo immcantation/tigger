@@ -162,7 +162,7 @@ print(geno)
 ```
 
 ```
-##         GENE     ALLELES      COUNTS TOTAL NOTE
+##         gene     alleles      counts total note
 ## 1    IGHV1-2       02,04     664,302   966     
 ## 2    IGHV1-3          01         226   226     
 ## 3    IGHV1-8 01,02_G234T     467,370   837     
@@ -205,7 +205,7 @@ print(geno_bayesian)
 ```
 
 ```
-##         GENE     ALLELES         COUNTS TOTAL NOTE                KH
+##         gene     alleles         counts total note                kh
 ## 1    IGHV1-2       02,04        664,302   966                  -1000
 ## 2    IGHV1-3          01            226   226       4.20089197988625
 ## 3    IGHV1-8 01,02_G234T        467,370   837                  -1000
@@ -215,7 +215,7 @@ print(geno_bayesian)
 ## 7   IGHV1-58       01,02          23,18    41      -20.3932114156223
 ## 8   IGHV1-69 01,04,06,02 515,469,280,15  1279                  -1000
 ## 9 IGHV1-69-2          01             31    31       4.16107190423977
-##                  KD                KT                KQ           K_DIFF
+##                  kd                kt                kq           k_diff
 ## 1 -7.92846809405969 -139.556367176944 -313.583949130729 131.627899082884
 ## 2 -45.2911957825576 -84.2865868763307 -128.991761853586 49.4920877624439
 ## 3 -1.04759115960507 -102.524664723923 -247.193958844361 101.477073564318
@@ -270,9 +270,9 @@ not_in_genotype <- sample_db$v_call %>%
 # and the fraction that contained original calls to non-genotype alleles. Note
 # that by design, only genotype alleles are allowed in "after" calls.
 data.frame(Ambiguous=c(mean(grepl(",", sample_db$v_call)),
-                       mean(grepl(",", sample_db$V_CALL_GENOTYPED))),
+                       mean(grepl(",", sample_db$v_call_genotyped))),
            NotInGenotype=c(mean(sample_db$v_call %in% not_in_genotype),
-                           mean(sample_db$V_CALL_GENOTYPED %in% not_in_genotype)),
+                           mean(sample_db$v_call_genotyped %in% not_in_genotype)),
            row.names=c("Before", "After")) %>% 
     t() %>% round(3)
 ```
@@ -294,7 +294,7 @@ to build a table of evidence metrics supporting the final novel V allele detecti
 evidence <- generateEvidence(sample_db, novel, geno, genotype_db, SampleGermlineIGHV, fields = NULL)
 
 evidence %>%
-  select(GENE, ALLELE, POLYMORPHISM_CALL, SEQUENCES, UNMUTATED_FREQUENCY)
+  select(gene, allele, polymorphism_call, sequences, unmutated_frequency)
 ```
 
 ```
@@ -302,7 +302,7 @@ evidence %>%
 ## Groups: <by row>
 ## 
 ## # A tibble: 1 x 5
-##   GENE    ALLELE   POLYMORPHISM_CALL SEQUENCES UNMUTATED_FREQUENCY
+##   gene    allele   polymorphism_call sequences unmutated_frequency
 ##   <chr>   <chr>    <chr>                 <int>               <dbl>
 ## 1 IGHV1-8 02_G234T IGHV1-8*02_G234T        864               0.428
 ```

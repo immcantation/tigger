@@ -14,6 +14,7 @@ IMGT/HighV-QUEST to IGHV1 family alleles.
 
 Format
 -------------------
+
 A `data.frame` where rows correspond to unique V(D)J sequences and
 columns include:
 
@@ -22,6 +23,7 @@ columns include:
 +  `"D_CALL"`: IMGT/HighV-QUEST D segment allele calls.
 +  `"J_CALL"`: IMGT/HighV-QUEST J segment allele calls.
 +  `"JUNCTION_LENGTH"`: Junction region length.
+
 
 
 References

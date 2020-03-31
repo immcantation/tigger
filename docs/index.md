@@ -32,7 +32,8 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 
 **Depends:** ggplot2  
 **Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, shazam, stats, stringi, tidyr  
-**Suggests:** knitr, rmarkdown, testthat
+**Suggests:** knitr, rmarkdown, testthat  
+**Extends:** FALSE
 
 
 # Authors

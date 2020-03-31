@@ -15,9 +15,11 @@ IMGT/HighV-QUEST to IGHV1 family alleles.
 
 Format
 -------------------
+
 A `data.frame` where rows correspond to alleles checked for
 polymorphisms and columns give results as well as paramaters used to run
 the test.
+
 
 References
 -------------------

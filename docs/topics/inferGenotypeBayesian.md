@@ -16,10 +16,15 @@ The larger the Bayes factor (K), the greater the certainty in the model.
 Usage
 --------------------
 ```
-inferGenotypeBayesian(data, germline_db = NA, novel = NA,
-v_call = "v_call", seq = "sequence_alignment",
-find_unmutated = TRUE, priors = c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25,
-0.25, 0.25, 0.25))
+inferGenotypeBayesian(
+data,
+germline_db = NA,
+novel = NA,
+v_call = "v_call",
+seq = "sequence_alignment",
+find_unmutated = TRUE,
+priors = c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)
+)
 ```
 
 Arguments
@@ -83,17 +88,17 @@ of the likelihood of each model and the log10 of the Bayes factor. The output
 contains the following columns:
 
 
-+  `GENE`: The gene name without allele.
-+  `ALLELES`: Comma separated list of alleles for the given `GENE`.
-+  `COUNTS`: Comma separated list of observed sequences for each 
-corresponding allele in the `ALLELES` list.
-+  `TOTAL`: The total count of observed sequences for the given `GENE`.
-+  `NOTE`: Any comments on the inferrence.
-+  `KH`: log10 likelihood that the `GENE` is homozygous.
-+  `KD`: log10 likelihood that the `GENE` is heterozygous.
-+  `KT`: log10 likelihood that the `GENE` is trizygous
-+  `KQ`: log10 likelihood that the `GENE` is quadrozygous.
-+  `K_DIFF`: log10 ratio of the highest to second-highest zygosity likelihoods.
++  `gene`: The gene name without allele.
++  `alleles`: Comma separated list of alleles for the given `gene`.
++  `counts`: Comma separated list of observed sequences for each 
+corresponding allele in the `alleles` list.
++  `total`: The total count of observed sequences for the given `gene`.
++  `note`: Any comments on the inferrence.
++  `kh`: log10 likelihood that the `gene` is homozygous.
++  `kd`: log10 likelihood that the `gene` is heterozygous.
++  `kt`: log10 likelihood that the `gene` is trizygous
++  `kq`: log10 likelihood that the `gene` is quadrozygous.
++  `k_diff`: log10 ratio of the highest to second-highest zygosity likelihoods.
 
 
 
@@ -139,7 +144,7 @@ find_unmutated=TRUE, v_call="v_call", seq="sequence_alignment")
 
 
 ```
-        GENE     ALLELES         COUNTS TOTAL NOTE                KH
+        gene     alleles         counts total note                kh
 1    IGHV1-2       02,04        664,302   966                  -1000
 2    IGHV1-3          01            226   226       4.20089197988625
 3    IGHV1-8 01,02_G234T        467,370   837                  -1000
@@ -149,7 +154,7 @@ find_unmutated=TRUE, v_call="v_call", seq="sequence_alignment")
 7   IGHV1-58       01,02          23,18    41      -20.3932114156223
 8   IGHV1-69 01,04,06,02 515,469,280,15  1279                  -1000
 9 IGHV1-69-2          01             31    31       4.16107190423977
-                 KD                KT                KQ           K_DIFF
+                 kd                kt                kq           k_diff
 1 -7.92846809405969 -139.556367176944 -313.583949130729 131.627899082884
 2 -45.2911957825576 -84.2865868763307 -128.991761853586 49.4920877624439
 3 -1.04759115960507 -102.524664723923 -247.193958844361 101.477073564318

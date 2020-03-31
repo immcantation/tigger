@@ -7,9 +7,9 @@ Backwards Incompatible Changes:
   functions expected the column name 'V_CALL', they now require 'v_call'.
 + Added AIRR formatted example data `airrDb`
 + For consistency with the style of the new data format default, field names in
-  all other data structures have been updated to use the same font case style. 
-  e.g, the column names of the results of `findNovelAlleles` are now using lower case
-  (`germline_call`, not `GERMLINE_cALL`)
+  all other user exposed data structures have been updated to use the same font 
+  case style. e.g, the column names of the results of `findNovelAlleles` are now 
+  using lower case (`germline_call`, not `GERMLINE_cALL`)
 
 
 Dependencies:

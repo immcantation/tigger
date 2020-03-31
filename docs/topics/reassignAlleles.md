@@ -11,9 +11,15 @@ from a single subject.
 Usage
 --------------------
 ```
-reassignAlleles(data, genotype_db, v_call = "v_call",
-seq = "sequence_alignment", method = "hamming", path = NA,
-keep_gene = c("gene", "family", "repertoire"))
+reassignAlleles(
+data,
+genotype_db,
+v_call = "v_call",
+seq = "sequence_alignment",
+method = "hamming",
+path = NA,
+keep_gene = c("gene", "family", "repertoire")
+)
 ```
 
 Arguments
@@ -63,7 +69,7 @@ Value
 
 A modifed input `data.frame` containing the best allele call from 
 among the sequences listed in `genotype_db` in the 
-`V_CALL_GENOTYPED` column.
+`v_call_genotyped` column.
 
 
 Details

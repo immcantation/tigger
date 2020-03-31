@@ -11,12 +11,25 @@ might be polymorphic.
 Usage
 --------------------
 ```
-findNovelAlleles(data, germline_db, v_call = "v_call",
-j_call = "j_call", seq = "sequence_alignment",
-junction = "junction", junction_length = "junction_length",
-germline_min = 200, min_seqs = 50, auto_mutrange = TRUE,
-mut_range = 1:10, pos_range = 1:312, y_intercept = 0.125,
-alpha = 0.05, j_max = 0.15, min_frac = 0.75, nproc = 1)
+findNovelAlleles(
+data,
+germline_db,
+v_call = "v_call",
+j_call = "j_call",
+seq = "sequence_alignment",
+junction = "junction",
+junction_length = "junction_length",
+germline_min = 200,
+min_seqs = 50,
+auto_mutrange = TRUE,
+mut_range = 1:10,
+pos_range = 1:312,
+y_intercept = 0.125,
+alpha = 0.05,
+j_max = 0.15,
+min_frac = 0.75,
+nproc = 1
+)
 ```
 
 Arguments
@@ -28,11 +41,11 @@ data
 germline_db
 :   a vector of named nucleotide germline sequences
 matching the V calls in `data`. These should be 
-the reference germlines used to make the V calls.
+the gapped reference germlines used to make the V calls.
 
 v_call
 :   name of the column in `data` with V allele calls. 
-Default is \cddev_call.
+Default is `v_call`.
 
 j_call
 :   name of the column in `data` with J allele calls. 
@@ -89,7 +102,8 @@ j_max
 :   the maximum fraction of sequences perfectly aligning
 to a potential novel allele that are allowed to
 utilize to a particular combination of junction
-length and J gene
+length and J gene. The closer to 1, the less strict 
+the filter for J gene diversity will be.
 
 min_frac
 :   the minimum fraction of sequences that must have
@@ -113,60 +127,60 @@ additional evidence.
 
 The output contains the following columns:
 
-+  `GERMLINE_CALL`: The input (uncorrected) V call.
-+  `NOTE`: Comments regarding the inferrence.
-+  `POLYMORPHISM_CALL`: The novel allele call.
-+  `NT_SUBSTITUTIONS`: Mutations identified in the novel allele, relative
-to the reference germline (`GERMLINE_CALL`)
-+  `NOVEL_IMGT`: The novel allele sequence.
-+  `NOVEL_IMGT_COUNT`:  The number of times the sequence `NOVEL_IMGT` 
-is found in the input data. Considers the subsequence of `NOVEL_IMGT` 
++  `germline_call`: The input (uncorrected) V call.
++  `note`: Comments regarding the inferrence.
++  `polymorphism_call`: The novel allele call.
++  `nt_substitutions`: Mutations identified in the novel allele, relative
+to the reference germline (`germline_call`)
++  `novel_imgt`: The novel allele sequence.
++  `novel_imgt_count`:  The number of times the sequence `novel_imgt` 
+is found in the input data. Considers the subsequence of `novel_imgt` 
 in the `pos_range`.
-+  `NOVEL_IMGT_UNIQUE_J`: Number of distinct J calls associated to `NOVEL_IMGT` 
-in the input data. Considers the subsequence of `NOVEL_IMGT` in the `pos_range`.       
-+  `NOVEL_IMGT_UNIQUE_CDR3`: Number of distinct CDR3 sequences associated
-with `NOVEL_IMGT` in the input data. Considers the subsequence of `NOVEL_IMGT` 
++  `novel_imgt_unique_j`: Number of distinct J calls associated to `novel_imgt` 
+in the input data. Considers the subsequence of `novel_imgt` in the `pos_range`.       
++  `novel_imgt_unique_cdr3`: Number of distinct CDR3 sequences associated
+with `novel_imgt` in the input data. Considers the subsequence of `novel_imgt` 
 in the `pos_range`.                                              
-+  `PERFECT_MATCH_COUNT`: Final number of sequences retained to call the new 
++  `perfect_match_count`: Final number of sequences retained to call the new 
 allele. These are unique sequences that have V segments that perfectly match 
 the predicted germline in the `pos_range`.
-+  `PERFECT_MATCH_FREQ`: `PERFECT_MATCH_COUNT / GERMLINE_CALL_COUNT`
-+  `GERMLINE_CALL_COUNT`: The number of sequences with the `GERMLINE_CALL` 
++  `perfect_match_freq`: `perfect_match_count / germline_call_count`
++  `germline_call_count`: The number of sequences with the `germline_call` 
 in the input data that were initially considered for the analysis.
-+  `GERMLINE_CALL_FREQ`: The fraction of sequences with the `GERMLINE_CALL` 
++  `germline_call_freq`: The fraction of sequences with the `germline_call` 
 in the input data initially considered for the analysis.              
-+  `GERMLINE_IMGT`: Germline sequence for `GERMLINE_CALL`.
-+  `GERMLINE_IMGT_COUNT`: The number of times the `GERMLINE_IMGT` 
++  `germline_imgt`: Germline sequence for `germline_call`.
++  `germline_imgt_count`: The number of times the `germline_imgt` 
 sequence is found in the input data.
-+  `MUT_MIN`: Minimum mutation considered by the algorithm.
-+  `MUT_MAX`: Maximum mutation considered by the algorithm.
-+  `MUT_PASS_COUNT`: Number of sequences in the mutation range.
-+  `POS_MIN`: First position of the sequence considered by the algorithm (IMGT numbering).
-+  `POS_MAX`: Last position of the sequence considered by the algorithm (IMGT numbering).
-+  `Y_INTERCEPT`: The y-intercept above which positions were considered 
++  `mut_min`: Minimum mutation considered by the algorithm.
++  `mut_max`: Maximum mutation considered by the algorithm.
++  `mut_pass_count`: Number of sequences in the mutation range.
++  `pos_min`: First position of the sequence considered by the algorithm (IMGT numbering).
++  `pos_max`: Last position of the sequence considered by the algorithm (IMGT numbering).
++  `y_intercept`: The y-intercept above which positions were considered 
 potentially polymorphic.
-+  `Y_INTERCEPT_PASS`: Number of positions that pass the `Y_INTERCEPT` threshold.
-+  `SNP_PASS`: Number of sequences that pass the `Y_INTERCEPT` threshold and are
++  `y_intercept_pass`: Number of positions that pass the `y_intercept` threshold.
++  `snp_pass`: Number of sequences that pass the `y_intercept` threshold and are
 within the desired nucleotide range (`min_seqs`).
-+  `UNMUTATED_COUNT`: Number of unmutated sequences.
-+  `UNMUTATED_FREQ`: Number of unmutated sequences over `GERMLINE_IMGT_COUNT`.
-+  `UNMUTATED_SNP_J_GENE_LENGTH_COUNT`: Number of distinct combinations
++  `unmutated_count`: Number of unmutated sequences.
++  `unmutated_freq`: Number of unmutated sequences over `germline_imgt_count`.
++  `unmutated_snp_j_gene_length_count`: Number of distinct combinations
 of SNP, J gene, and junction length.     
-+  `SNP_MIN_SEQS_J_MAX_PASS`: Number of SNPs that pass both the `min_seqs` 
++  `snp_min_seqs_j_max_pass`: Number of SNPs that pass both the `min_seqs` 
 and `j_max` thresholds.
-+  `ALPHA`: Significance threshold to be used when constructing the 
++  `alpha`: Significance threshold to be used when constructing the 
 confidence interval for the y-intercept.
-+  `MIN_SEQS`: Input `min_seqs`. The minimum number of total sequences 
++  `min_seqs`: Input `min_seqs`. The minimum number of total sequences 
 (within the desired mutational range and nucleotide range) required 
 for the samples to be considered.
-+  `J_MAX`: Input `j_max`. The maximum fraction of sequences perfectly 
++  `j_max`: Input `j_max`. The maximum fraction of sequences perfectly 
 aligning to a potential novel allele that are allowed to utilize to a particular 
 combination of junction length and J gene.
-+  `MIN_FRAC`: Input `min_frac`. The minimum fraction of sequences that must
++  `min_frac`: Input `min_frac`. The minimum fraction of sequences that must
 have usable nucleotides in a given position for that position to be considered.
 
 
-The following comments can appear in the `NOTE` column:
+The following comments can appear in the `note` column:
 
 
 +  *Novel allele found*: A novel allele was detected.
@@ -209,23 +223,23 @@ selectNovel(novel)
 
 
 ```
-  GERMLINE_CALL                NOTE POLYMORPHISM_CALL NT_SUBSTITUTIONS
+  germline_call                note polymorphism_call nt_substitutions
 1    IGHV1-8*02 Novel allele found!  IGHV1-8*02_G234T           234G>T
-                                                                                                                                                                                                                                                                                                                        NOVEL_IMGT
+                                                                                                                                                                                                                                                                                                                        novel_imgt
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATTACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  NOVEL_IMGT_COUNT NOVEL_IMGT_UNIQUE_J NOVEL_IMGT_UNIQUE_CDR3
+  novel_imgt_count novel_imgt_unique_j novel_imgt_unique_cdr3
 1              657                   6                    626
-  PERFECT_MATCH_COUNT PERFECT_MATCH_FREQ GERMLINE_CALL_COUNT GERMLINE_CALL_FREQ
+  perfect_match_count perfect_match_freq germline_call_count germline_call_freq
 1                 661          0.7295806                 906              0.052
-  MUT_MIN MUT_MAX MUT_PASS_COUNT
+  mut_min mut_max mut_pass_count
 1       1      10            760
-                                                                                                                                                                                                                                                                                                                     GERMLINE_IMGT
+                                                                                                                                                                                                                                                                                                                     germline_imgt
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATGACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  GERMLINE_IMGT_COUNT POS_MIN POS_MAX Y_INTERCEPT Y_INTERCEPT_PASS SNP_PASS
+  germline_imgt_count pos_min pos_max y_intercept y_intercept_pass snp_pass
 1                   0       1     312       0.125                1      754
-  UNMUTATED_COUNT UNMUTATED_FREQ UNMUTATED_SNP_J_GENE_LENGTH_COUNT
+  unmutated_count unmutated_freq unmutated_snp_j_gene_length_count
 1             661      0.7295806                                83
-  SNP_MIN_SEQS_J_MAX_PASS ALPHA MIN_SEQS J_MAX MIN_FRAC
+  snp_min_seqs_j_max_pass alpha min_seqs j_max min_frac
 1                       1  0.05       50  0.15     0.75
 
 ```
@@ -233,7 +247,7 @@ selectNovel(novel)
 
 ```R
 # Note: In this example, with SampleGermlineIGHV,
-# which contains reference germlines retrieved on August 2018,
+# which contains reference germlines retrieved on August 2014,
 # TIgGER finds the allele IGHV1-8*02_G234T. This allele
 # was added to IMGT as IGHV1-8*03 on March 28, 2018.
 ```

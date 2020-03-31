@@ -10,9 +10,16 @@ for each V gene and returns the mutation count of those sequences.
 Usage
 --------------------
 ```
-getPopularMutationCount(data, germline_db, v_call = "v_call",
-seq = "sequence_alignment", gene_min = 0.001, seq_min = 50,
-seq_p_of_max = 1/8, full_return = FALSE)
+getPopularMutationCount(
+data,
+germline_db,
+v_call = "v_call",
+seq = "sequence_alignment",
+gene_min = 0.001,
+seq_min = 50,
+seq_p_of_max = 1/8,
+full_return = FALSE
+)
 ```
 
 Arguments
@@ -72,7 +79,7 @@ getPopularMutationCount(airrDb, SampleGermlineIGHV)
 
 ```
 # A tibble: 1 x 2
-  V_GENE  MUTATION_COUNT
+  v_gene  mutation_count
   <chr>            <int>
 1 IGHV1-8              1
 

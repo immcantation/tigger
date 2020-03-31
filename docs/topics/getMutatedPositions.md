@@ -11,8 +11,12 @@ any differences.
 Usage
 --------------------
 ```
-getMutatedPositions(samples, germlines, ignored_regex = "[\\.N-]",
-match_instead = FALSE)
+getMutatedPositions(
+samples,
+germlines,
+ignored_regex = "[\\.N-]",
+match_instead = FALSE
+)
 ```
 
 Arguments

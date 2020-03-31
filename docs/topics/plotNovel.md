@@ -11,9 +11,17 @@ visualize the results for alleles that did
 Usage
 --------------------
 ```
-plotNovel(data, novel_row, v_call = "v_call", j_call = "j_call",
-seq = "sequence_alignment", junction = "junction",
-junction_length = "junction_length", ncol = 1)
+plotNovel(
+data,
+novel_row,
+v_call = "v_call",
+j_call = "j_call",
+seq = "sequence_alignment",
+junction = "junction",
+junction_length = "junction_length",
+ncol = 1,
+multiplot = TRUE
+)
 ```
 
 Arguments
@@ -53,6 +61,10 @@ Default is `junction_length`.
 ncol
 :   number of columns to use when laying out the plots
 
+multiplot
+:   Whether to return one single plot (`TRUE`) or a list 
+with the three individual plots (`FALSE`).
+
 
 
 
@@ -81,7 +93,7 @@ novel <- selectNovel(SampleNovel)
 plotNovel(airrDb, novel[1, ], 
 v_call="v_call", j_call="j_call", 
 seq="sequence_alignment", 
-junction="junction", junction_length="junction_length")
+junction="junction", junction_length="junction_length", multiplot=TRUE)
 ```
 
 ![2](plotNovel-2.png)
