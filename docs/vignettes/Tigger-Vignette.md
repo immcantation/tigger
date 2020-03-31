@@ -247,7 +247,7 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 
 ```r
 # Use the personlized genotype to determine corrected allele assignments
-# Updated genotype will be placed in the V_CALL_GENOTYPED column
+# Updated genotype will be placed in the v_call_genotyped column
 sample_db <- reassignAlleles(airrDb, genotype_db)
 ```
 
