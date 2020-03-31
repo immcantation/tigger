@@ -2,7 +2,9 @@ Package: tigger
 Type: Package
 Version: 0.4.0.999
 Date: 2020-03-31
-Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
+Authors@R: c(person("Immcantation", "", role=c("cre"), 
+                    email="jason.vanderheiden@yale.edu"),
+            person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Susanna", "Marquez", role=c("aut"), 
                     email="susanna.marquez@yale.edu"),                    
@@ -10,7 +12,7 @@ Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"),
                     email="moriah.cohen@biu.ac.il"),   
              person("Gur", "Yaari", role=c("aut"), 
                     email="gur.yaari@biu.ac.il"),
-             person("Jason", "Vander Heiden", role=c("ctb", "cre"), 
+             person("Jason", "Vander Heiden", role=c("ctb"), 
                     email="jason.vanderheiden@yale.edu"),
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))

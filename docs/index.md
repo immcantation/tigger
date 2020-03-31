@@ -38,11 +38,12 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 
 # Authors
 
+[Immcantation](mailto:jason.vanderheiden@yale.edu) (cre)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
 [Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)  
 [Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)  
-[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (ctb, cre)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (ctb)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
