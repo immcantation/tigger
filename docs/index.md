@@ -38,7 +38,7 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 
 # Authors
 
-[Immcantation](mailto:jason.vanderheiden@yale.edu) (cre)  
+[Immcantation](mailto:immcantation@gmail.com) (cre)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
 [Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)  
