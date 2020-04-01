@@ -214,13 +214,14 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
     }
     
     # Subset to novel alleles
+    unnest_cols <- c("alleles", "counts")
     final_gt <- genotype %>%
         dplyr::group_by(.data$gene) %>%
         dplyr::filter(!duplicated(.data$alleles)) %>%
         dplyr::ungroup() %>%
         dplyr::mutate(alleles=strsplit(as.character(.data$alleles), ","),
                       counts=strsplit(as.character(.data$counts), ",")) %>%
-        tidyr::unnest(cols=c(alleles, counts)) %>%
+        tidyr::unnest(cols=unnest_cols) %>%
         dplyr::mutate(polymorphism_call=paste0(.data$gene, "*" , .data$alleles)) %>%
         dplyr::filter(.data$polymorphism_call %in% novel$polymorphism_call)  %>%
         dplyr::rename(allele="alleles")
