@@ -41,6 +41,7 @@ pages:
       - topics/sortAlleles.md
       - topics/updateAlleleNames.md
     - 'Data':
+      - topics/airrDb.md
       - topics/GermlineIGHV.md
       - topics/SampleDb.md
       - topics/SampleGenotype.md
