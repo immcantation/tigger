@@ -119,10 +119,12 @@ made by `findNovelAlleles` using the function `plotNovel`.
 
 ```r
 # Plot evidence of the first (and only) novel allele from the example data
-plotNovel(airrDb, novel[1, ])
+novel_row <- which(!is.na(novel$polymorphism_call))[1]
+plotNovel(airrDb, novel[novel_row, ])
 ```
 
 ![plot of chunk Tigger-Vignette-4](figure/Tigger-Vignette-4-1.png)
+
 
 ## Inferring genotypes
 

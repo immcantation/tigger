@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
 Version: 0.4.0.999
-Date: 2020-04-01
+Date: 2020-04-13
 Authors@R: c(person("Immcantation", "", role=c("cre"), 
                     email="immcantation@gmail.com"),
             person("Daniel", "Gadala-Maria", role=c("aut"), 
