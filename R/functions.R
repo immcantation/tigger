@@ -644,11 +644,18 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' @details
 #' The first panel in the plot shows, for all sequences which align to a particular 
 #' germline allele, the mutation frequency at each postion along the aligned 
-#' sequece as a function of the sequence-wide mutation. Each line is a position.
+#' sequence as a function of the sequence-wide mutation count. Each line is a position.
 #' Positions that contain polymorphisms (rather than somatic hypermutations) 
 #' will exhibit a high apparent mutation frequency for a range of 
-#' sequence-wide mutation counts. This positions that pass the novel allele 
-#' test are colored red, while sequences that don't pass the test are colored yellow. 
+#' sequence-wide mutation counts. The positions are color coded as follows:
+#' 
+#' \itemize{
+#'   \item  \link{red}:    the position(s) pass(ess) the novel allele test 
+#'   \item  \link{yellow}: the position(s) pass(ess) the y-intercept test but not
+#'                         other tests
+#'   \item  \link{blue}:   the position(s) didn't pass the y-intercept test and 
+#'                         was(were) not further considered
+#' }
 #'  
 #' The second panel shows the nucleotide usage at each of the polymorphic positions
 #' as a function of sequence-wide mutation count. If no polymorphisms were identified,
@@ -658,7 +665,7 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' the combinations of J gene and junction length among sequences which perfectly 
 #' match the proposed germline allele. Clonally related sequences usually share 
 #' the same V gene, J gene and junction length. Requiring the novel allele
-#' to be found in different combinations of V gene, J gene and junction lengths
+#' to be found in different combinations of J gene and junction lengths
 #' is a proxy for requiring it to be found in different clonal lineages.
 #' 
 #' @param    data           a \code{data.frame} in AIRR or Change-O format. See
@@ -781,7 +788,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
     
     # MAKE THE FIRST PLOT
     if (!is.na(novel_imgt)) {
-        POLYCOLORS <- setNames(DNA_COLORS[c(4,3)], c("False", "True"))
+        POLYCOLORS <- setNames(DNA_COLORS[c(4,3)], c("False", "True")) # blue #3C88EE, red #EB413C
         p1 <- ggplot(pos_muts, aes_string(x="MUT_COUNT", y="POS_MUT_RATE", 
                                           group="POSITION", color="Polymorphic")) +
             geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "False"), size=0.75) +
@@ -796,7 +803,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
                   legend.background=element_rect(fill = "transparent")) +
             guides(color = guide_legend(ncol = 2, reverse = TRUE))
     } else{
-        POLYCOLORS <- setNames(DNA_COLORS[c(4,2)], c("False", "True"))
+        POLYCOLORS <- setNames(DNA_COLORS[c(4,2)], c("False", "True")) # blue #3C88EE, yellow #FFB340
         p1 <- ggplot(pos_muts, aes_string(x="MUT_COUNT", y="POS_MUT_RATE", 
                                           group="POSITION", color="Polymorphic")) +
             geom_line(size=0.75) +
