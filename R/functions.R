@@ -650,10 +650,10 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' sequence-wide mutation counts. The positions are color coded as follows:
 #' 
 #' \itemize{
-#'   \item  \link{red}:    the position(s) pass(ess) the novel allele test 
-#'   \item  \link{yellow}: the position(s) pass(ess) the y-intercept test but not
+#'   \item  red:    the position(s) pass(ess) the novel allele test 
+#'   \item  yellow: the position(s) pass(ess) the y-intercept test but not
 #'                         other tests
-#'   \item  \link{blue}:   the position(s) didn't pass the y-intercept test and 
+#'   \item  blue:   the position(s) didn't pass the y-intercept test and 
 #'                         was(were) not further considered
 #' }
 #'  
