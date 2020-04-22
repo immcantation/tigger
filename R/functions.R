@@ -644,14 +644,22 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' @details
 #' The first panel in the plot shows, for all sequences which align to a particular 
 #' germline allele, the mutation frequency at each postion along the aligned 
-#' sequece as a function of the sequence-wide mutation. Sequences that pass 
-#' the novel allele test are colored red, while sequences that don't pass
-#' the test are colored yellow. The second panel shows the nucleotide usage at the 
-#' positions as a function of sequence-wide mutation count.
+#' sequece as a function of the sequence-wide mutation. Each line is a position.
+#' Positions that contain polymorphisms (rather than somatic hypermutations) 
+#' will exhibit a high apparent mutation frequency for a range of 
+#' sequence-wide mutation counts. This positions that pass the novel allele 
+#' test are colored red, while sequences that don't pass the test are colored yellow. 
+#'  
+#' The second panel shows the nucleotide usage at each of the polymorphic positions
+#' as a function of sequence-wide mutation count. If no polymorphisms were identified,
+#' the panel will show the mutation count.
 #' 
-#' To avoid cases where a clonal expansion might lead to a false positive, tigger examines
+#' To avoid cases where a clonal expansion might lead to a false positive, TIgGER examines
 #' the combinations of J gene and junction length among sequences which perfectly 
-#' match the proposed germline allele.
+#' match the proposed germline allele. Clonally related sequences usually share 
+#' the same V gene, J gene and junction length. Requiring the novel allele
+#' to be found in different combinations of V gene, J gene and junction lengths
+#' is a proxy for requiring it to be found in different clonal lineages.
 #' 
 #' @param    data           a \code{data.frame} in AIRR or Change-O format. See
 #'                          \link{findNovelAlleles} for details.
