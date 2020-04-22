@@ -79,10 +79,10 @@ will exhibit a high apparent mutation frequency for a range of
 sequence-wide mutation counts. The positions are color coded as follows:
 
 
-+ [red](http://www.rdocumentation.org/packages/crayon/topics/crayon):    the position(s) pass(ess) the novel allele test 
-+ [yellow](http://www.rdocumentation.org/packages/crayon/topics/crayon): the position(s) pass(ess) the y-intercept test but not
++ red:    the position(s) pass(ess) the novel allele test 
++ yellow: the position(s) pass(ess) the y-intercept test but not
 other tests
-+ [blue](http://www.rdocumentation.org/packages/crayon/topics/crayon):   the position(s) didn't pass the y-intercept test and 
++ blue:   the position(s) didn't pass the y-intercept test and 
 was(were) not further considered
 
  
