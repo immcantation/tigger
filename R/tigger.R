@@ -1,9 +1,4 @@
 # Project documentation for tigger
-# 
-# @author     Daniel Gadala-Maria
-# @copyright  Copyright 2016 Kleinstein Lab, Yale University. All rights reserved
-# @license    Creative Commons Attribution-NonCommercial-ShareAlike 4.0 Unported
-
 
 #' tigger
 #' 
@@ -90,3 +85,13 @@
 #'                          stri_sub stri_sub<- stri_trans_toupper
 #' @importFrom  tidyr       gather spread unnest
 NULL
+
+# Package loading actions
+.onAttach <- function(libname, pkgname) {
+    msg <- paste("As of v1.0.0 the AIRR Rearrangement schema is now the default file format.",
+                 "A description of the standard is available at https://docs.airr-community.org.",
+                 "The legacy Change-O format is supported through arguments to each function",
+                 "that allow the input column names to be explicitly defined.",
+                 sep="\n")
+    packageStartupMessage(msg)
+}
