@@ -45,11 +45,11 @@ Examples
 
 ```R
 # Find which of the sample alleles are unmutated
-calls <- findUnmutatedCalls(airrDb$v_call, airrDb$sequence_alignment, 
+calls <- findUnmutatedCalls(AIRRDb$v_call, AIRRDb$sequence_alignment, 
 germline_db=SampleGermlineIGHV)
 ```
 
-
+**Error in gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), **: object 'AIRRDb' not found
 
 
 

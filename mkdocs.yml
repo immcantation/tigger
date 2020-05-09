@@ -39,10 +39,12 @@ pages:
       - topics/writeFasta.md
       - topics/cleanSeqs.md
       - topics/sortAlleles.md
+      - topics/subsampleDb.md
       - topics/updateAlleleNames.md
     - 'Data':
-      - topics/airrDb.md
+      - topics/AIRRDb.md
       - topics/GermlineIGHV.md
+      - topics/SampleGermlineIGHV.md
       - topics/SampleDb.md
       - topics/SampleGenotype.md
       - topics/SampleNovel.md

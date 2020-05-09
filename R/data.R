@@ -58,7 +58,7 @@ NULL
 #'   \item \code{"J_CALL"}: IMGT/HighV-QUEST J segment allele calls.
 #'   \item \code{"JUNCTION_LENGTH"}: Junction region length.
 #' }
-#' @seealso See \link{airrDb} for an AIRR formatted version of \code{SampleDb}.
+#' @seealso See \link{AIRRDb} for an AIRR formatted version of \code{SampleDb}.
 #' @references
 #' \enumerate{
 #'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
@@ -75,7 +75,7 @@ NULL
 #' single individual (PGP1), sequenced on the Roche 454 platform, and assigned by
 #' IMGT/HighV-QUEST to IGHV1 family alleles.
 #'
-#' @name airrDb
+#' @name AIRRDb
 #' @docType data
 #' @format A \code{data.frame} where rows correspond to unique V(D)J sequences and
 #' columns include:
@@ -86,7 +86,7 @@ NULL
 #'   \item \code{"j_call"}: IMGT/HighV-QUEST J segment allele calls.
 #'   \item \code{"junction_length"}: Junction region length.
 #' }
-#' @seealso See \link{SampleDb} for Change-O formatted version of \code{airrDb}.
+#' @seealso See \link{SampleDb} for Change-O formatted version of \code{AIRRDb}.
 #' @references
 #' \enumerate{
 #'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 

@@ -105,14 +105,12 @@ Examples
 ```R
 # Plot the evidence for the first (and only) novel allele in the example data
 novel <- selectNovel(SampleNovel)
-plotNovel(airrDb, novel[1, ], 
-v_call="v_call", j_call="j_call", 
-seq="sequence_alignment", 
-junction="junction", junction_length="junction_length", multiplot=TRUE)
+plotNovel(AIRRDb, novel[1, ], v_call="v_call", j_call="j_call", 
+seq="sequence_alignment", junction="junction", junction_length="junction_length", 
+multiplot=TRUE)
 ```
 
-![2](plotNovel-2.png)
-
+**Error in stri_trans_toupper(seqs)**: object 'AIRRDb' not found
 
 
 

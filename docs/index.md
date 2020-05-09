@@ -31,30 +31,26 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 # Dependencies
 
 **Depends:** ggplot2  
-**Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, shazam, stats, stringi, tidyr  
-**Suggests:** knitr, rmarkdown, testthat  
-**Extends:** FALSE
+**Imports:** alakazam, shazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, stats, stringi, tidyr  
+**Suggests:** knitr, rmarkdown, testthat
 
 
 # Authors
 
-[Immcantation](mailto:immcantation@gmail.com) (cre)  
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
 [Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)  
+[Jason Vander Heiden](mailto:vanderheiden.jason@gene.com) (aut, cre)  
 [Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)  
-[Jason Vander Heiden](mailto:jason.vanderheiden@yale.edu) (ctb)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
 # Citing
 
 
-Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated
-analysis of high-throughput B cell sequencing data reveals a high
-frequency of novel immunoglobulin V gene segment alleles.” _Proceedings
-of the National Academy of Sciency of the United States of America_,
-E862-70.
+Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated analysis of high-throughput B cell sequencing data reveals a high
+frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the National Academy of Sciency of the United States of
+America_, E862-70.
 
 A BibTeX entry for LaTeX users is
 
@@ -70,3 +66,8 @@ A BibTeX entry for LaTeX users is
     pages = {E862-70},
   }
 
+
+
+# License
+
+AGPL-3

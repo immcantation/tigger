@@ -89,11 +89,11 @@ Examples
 genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNovel)
 
 # Use the personlized genotype to determine corrected allele assignments
-output_db <- reassignAlleles(airrDb, genotype_db,
-v_call="v_call",  seq = "sequence_alignment")
+output_db <- reassignAlleles(AIRRDb, genotype_db, v_call="v_call",
+seq="sequence_alignment")
 ```
 
-
+**Error in reassignAlleles(AIRRDb, genotype_db, v_call = "v_call", seq = "sequence_alignment")**: object 'AIRRDb' not found
 
 
 

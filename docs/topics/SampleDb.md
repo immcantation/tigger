@@ -41,7 +41,7 @@ segment alleles. PNAS. 112(8):E862-70.
 See also
 -------------------
 
-See [airrDb](airrDb.md) for an AIRR formatted version of `SampleDb`.
+See [AIRRDb](AIRRDb.md) for an AIRR formatted version of `SampleDb`.
 
 
 

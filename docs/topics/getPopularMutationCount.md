@@ -73,19 +73,10 @@ Examples
 -------------------
 
 ```R
-getPopularMutationCount(airrDb, SampleGermlineIGHV)
+getPopularMutationCount(AIRRDb, SampleGermlineIGHV)
 ```
 
-
-```
-# A tibble: 1 x 2
-  v_gene  mutation_count
-  <chr>            <int>
-1 IGHV1-8              1
-
-```
-
-
+**Error in eval(lhs, parent, parent)**: object 'AIRRDb' not found
 
 See also
 -------------------

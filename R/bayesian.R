@@ -90,7 +90,7 @@
 #' 
 #' @examples
 #' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-#' inferGenotypeBayesian(airrDb, germline_db=SampleGermlineIGHV, novel=SampleNovel, 
+#' inferGenotypeBayesian(AIRRDb, germline_db=SampleGermlineIGHV, novel=SampleNovel, 
 #'                       find_unmutated=TRUE, v_call="v_call", seq="sequence_alignment")
 #' 
 #' @export

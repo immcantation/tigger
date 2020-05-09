@@ -1,4 +1,4 @@
-**airrDb** - *Example human immune repertoire data*
+**AIRRDb** - *Example human immune repertoire data*
 
 Description
 --------------------
@@ -41,7 +41,7 @@ segment alleles. PNAS. 112(8):E862-70.
 See also
 -------------------
 
-See [SampleDb](SampleDb.md) for Change-O formatted version of `airrDb`.
+See [SampleDb](SampleDb.md) for Change-O formatted version of `AIRRDb`.
 
 
 

@@ -147,13 +147,14 @@
 #' 
 #' @examples
 #' \donttest{
-#' # Find novel alleles and return relevant data
-#' novel <- findNovelAlleles(airrDb, SampleGermlineIGHV)
-#' selectNovel(novel)
 #' # Note: In this example, with SampleGermlineIGHV,
 #' # which contains reference germlines retrieved on August 2014,
 #' # TIgGER finds the allele IGHV1-8*02_G234T. This allele
 #' # was added to IMGT as IGHV1-8*03 on March 28, 2018.
+#' 
+#' # Find novel alleles and return relevant data
+#' novel <- findNovelAlleles(AIRRDb, SampleGermlineIGHV)
+#' selectNovel(novel)
 #' }
 #' 
 #' @export
@@ -691,10 +692,9 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' @examples
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel <- selectNovel(SampleNovel)
-#' plotNovel(airrDb, novel[1, ], 
-#'    v_call="v_call", j_call="j_call", 
-#'    seq="sequence_alignment", 
-#'    junction="junction", junction_length="junction_length", multiplot=TRUE)
+#' plotNovel(AIRRDb, novel[1, ], v_call="v_call", j_call="j_call", 
+#'           seq="sequence_alignment", junction="junction", junction_length="junction_length", 
+#'           multiplot=TRUE)
 #' 
 #' @export
 plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
@@ -960,7 +960,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
 #' 
 #' @examples
 #' # Infer IGHV genotype, using only unmutated sequences, including novel alleles
-#' inferGenotype(airrDb, germline_db=SampleGermlineIGHV, novel=SampleNovel,
+#' inferGenotype(AIRRDb, germline_db=SampleGermlineIGHV, novel=SampleNovel,
 #'               find_unmutated=TRUE)
 #' 
 #' @export
@@ -1258,8 +1258,8 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNovel)
 #' 
 #' # Use the personlized genotype to determine corrected allele assignments
-#' output_db <- reassignAlleles(airrDb, genotype_db,
-#'     v_call="v_call",  seq = "sequence_alignment")
+#' output_db <- reassignAlleles(AIRRDb, genotype_db, v_call="v_call",
+#'                              seq="sequence_alignment")
 #' 
 #' @export
 reassignAlleles <- function(data, genotype_db, v_call="v_call",
@@ -1513,8 +1513,8 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' 
 #' @examples
 #' # Find which of the sample alleles are unmutated
-#' calls <- findUnmutatedCalls(airrDb$v_call, airrDb$sequence_alignment, 
-#'          germline_db=SampleGermlineIGHV)
+#' calls <- findUnmutatedCalls(AIRRDb$v_call, AIRRDb$sequence_alignment, 
+#'                             germline_db=SampleGermlineIGHV)
 #' 
 #' @export
 findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
@@ -1598,7 +1598,7 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #'          of a set of sequences are mutated.
 #' 
 #' @examples
-#' getPopularMutationCount(airrDb, SampleGermlineIGHV)
+#' getPopularMutationCount(AIRRDb, SampleGermlineIGHV)
 #' 
 #' @export
 getPopularMutationCount <- function(data, germline_db, 
@@ -2113,14 +2113,17 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #'                 These groups will be subsampled independently. If
 #'                 \code{max_n} is \code{NULL}, a \code{max_n} will be 
 #'                 automatically set for each \code{group}.
-#' @return
-#' A \code{data.frame}, subsampled from \code{data}.
+#' 
+#' @return  A \code{data.frame}, subsampled from \code{data}.
+#' 
 #' @seealso \link{selectNovel}
+#' 
 #' @examples
-#' # subsampleDb(airrDb)
+#' subsampleDb(AIRRDb)
+#' 
+#' @export
 subsampleDb <- function(data, gene="v_call", mode=c("gene", "allele", "family"), 
-                        min_n=1, max_n=NULL,
-                        group=NULL) {
+                        min_n=1, max_n=NULL, group=NULL) {
     
     mode <- match.arg(mode)
     
@@ -2135,9 +2138,8 @@ subsampleDb <- function(data, gene="v_call", mode=c("gene", "allele", "family"),
         group_id <- data %>%
             group_by(!!rlang::sym(group)) %>%
             group_indices()
-        ss_data <- bind_rows(
-            lapply(split(data, group_id), subsampleDb,
-               gene=gene, mode=mode, min_n=min_n, max_n=max_n, group=NULL)
+        ss_data <- bind_rows(lapply(split(data, group_id), subsampleDb,
+                             gene=gene, mode=mode, min_n=min_n, max_n=max_n, group=NULL)
         ) 
         return(ss_data)
     }

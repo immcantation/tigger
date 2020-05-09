@@ -5,11 +5,11 @@ library(profvis)
 
 #### Load example data ####
 
-data("airrDb")
+data("AIRRDb")
 data("GermlineIGHV")
 
 #### Find novel alleles ####
 
 profvis({
-    nv <- findNovelAlleles(airrDb, GermlineIGHV,nproc=6)
+    nv <- findNovelAlleles(AIRRDb, GermlineIGHV,nproc=6)
 })

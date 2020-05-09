@@ -82,10 +82,10 @@ Examples
 -------------------
 
 ```R
-# subsampleDb(airrDb)
+subsampleDb(AIRRDb)
 ```
 
-
+**Error in checkColumns(data, c(gene, group))**: object 'AIRRDb' not found
 
 See also
 -------------------

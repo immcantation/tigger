@@ -215,10 +215,19 @@ Examples
 -------------------
 
 ```R
-# Find novel alleles and return relevant data
-novel <- findNovelAlleles(airrDb, SampleGermlineIGHV)
-selectNovel(novel)
+# Note: In this example, with SampleGermlineIGHV,
+# which contains reference germlines retrieved on August 2014,
+# TIgGER finds the allele IGHV1-8*02_G234T. This allele
+# was added to IMGT as IGHV1-8*03 on March 28, 2018.
 
+# Find novel alleles and return relevant data
+novel <- findNovelAlleles(AIRRDb, SampleGermlineIGHV)
+
+```
+
+**Error in eval(lhs, parent, parent)**: object 'AIRRDb' not found
+```R
+selectNovel(novel)
 ```
 
 
@@ -227,29 +236,17 @@ selectNovel(novel)
 1    IGHV1-8*02 Novel allele found!  IGHV1-8*02_G234T           234G>T
                                                                                                                                                                                                                                                                                                                         novel_imgt
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATTACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  novel_imgt_count novel_imgt_unique_j novel_imgt_unique_cdr3
-1              657                   6                    626
-  perfect_match_count perfect_match_freq germline_call_count germline_call_freq
-1                 661          0.7295806                 906              0.052
-  mut_min mut_max mut_pass_count
-1       1      10            760
+  novel_imgt_count novel_imgt_unique_j novel_imgt_unique_cdr3 perfect_match_count perfect_match_freq germline_call_count germline_call_freq mut_min
+1              657                   6                    626                 661          0.7295806                 906              0.052       1
+  mut_max mut_pass_count
+1      10            760
                                                                                                                                                                                                                                                                                                                      germline_imgt
 1 CAGGTGCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGGCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGATACACCTTC............ACCAGCTATGATATCAACTGGGTGCGACAGGCCACTGGACAAGGGCTTGAGTGGATGGGATGGATGAACCCTAAC......AGTGGTAACACAGGCTATGCACAGAAGTTCCAG...GGCAGAGTCACCATGACCAGGAACACCTCCATAAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGG
-  germline_imgt_count pos_min pos_max y_intercept y_intercept_pass snp_pass
-1                   0       1     312       0.125                1      754
-  unmutated_count unmutated_freq unmutated_snp_j_gene_length_count
-1             661      0.7295806                                83
+  germline_imgt_count pos_min pos_max y_intercept y_intercept_pass snp_pass unmutated_count unmutated_freq unmutated_snp_j_gene_length_count
+1                   0       1     312       0.125                1      754             661      0.7295806                                83
   snp_min_seqs_j_max_pass alpha min_seqs j_max min_frac
 1                       1  0.05       50  0.15     0.75
 
-```
-
-
-```R
-# Note: In this example, with SampleGermlineIGHV,
-# which contains reference germlines retrieved on August 2014,
-# TIgGER finds the allele IGHV1-8*02_G234T. This allele
-# was added to IMGT as IGHV1-8*03 on March 28, 2018.
 ```
 
 

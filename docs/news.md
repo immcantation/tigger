@@ -1,4 +1,4 @@
-Version 0.4.0.999 2020-03-31
+Version 1.0.0:  May 12, 2020
 -------------------------------------------------------------------------------
 
 Backwards Incompatible Changes:
@@ -13,16 +13,17 @@ Backwards Incompatible Changes:
   `v_call="v_call"` will fail to identify the column with the V gene calls
   as the column `v_call` doesn't exist. In this case, `v_call="V_CALL"` needs 
   to be specified in the function call.
-+ Added AIRR formatted example data `airrDb`
++ Added AIRR formatted example data `airrDb`.
 + For consistency with the style of the new data format default, field names in
   all other user exposed data structures have been updated to use the same font 
   case style. e.g, the column names of the results of `findNovelAlleles` are now 
   using lower case (`germline_call`, not `GERMLINE_cALL`)
 
+General:
 
-Dependencies:
++ License changed to AGPL-3.
++ Upgraded tidyr dependency to >=0.1.0.
 
-+ Upgraded to shazam >= 0.2.1, tidyr (>=0.1.0) 
 
 Version 0.4.0 July 18, 2019
 -------------------------------------------------------------------------------
