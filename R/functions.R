@@ -1691,6 +1691,11 @@ insertPolymorphisms <- function(sequence, positions, nucleotides) {
 #' 
 #' @seealso  \link{writeFasta} to do the inverse.
 #' 
+#' @examples 
+#' \dontrun{
+#'     germlines <- readIgFasta("ighv.fasta")
+#' }
+#' 
 #' @export
 readIgFasta <- function(fasta_file, strip_down_name=TRUE, force_caps=TRUE) {
     all_char = readChar(fasta_file, file.info(fasta_file)$size)
@@ -1723,6 +1728,11 @@ readIgFasta <- function(fasta_file, strip_down_name=TRUE, force_caps=TRUE) {
 #' @return   A named vector of strings respresenting Ig alleles.
 #' 
 #' @seealso  \link{readIgFasta} to do the inverse.
+#' 
+#' @examples
+#' \dontrun{
+#'     writeFasta(germlines, "ighv.fasta")
+#' }
 #' 
 #' @export
 writeFasta <- function(named_sequences, file, width=60, append=FALSE){

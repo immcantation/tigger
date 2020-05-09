@@ -40,6 +40,15 @@ A named vector of strings respresenting Ig alleles.
 
 
 
+Examples
+-------------------
+
+```R
+### Not run:
+writeFasta(germlines, "ighv.fasta")
+```
+
+**Error in eval(lhs, parent, parent)**: object 'germlines' not found
 
 See also
 -------------------

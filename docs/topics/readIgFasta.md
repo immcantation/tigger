@@ -37,6 +37,15 @@ Named vector of strings respresenting Ig alleles.
 
 
 
+Examples
+-------------------
+
+```R
+### Not run:
+germlines <- readIgFasta("ighv.fasta")
+```
+
+*Warning*:cannot open file 'ighv.fasta': No such file or directory**Error in file(con, "rb")**: cannot open the connection
 
 See also
 -------------------
