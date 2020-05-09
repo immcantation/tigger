@@ -82,6 +82,10 @@ changed in `findNovelAlleles`).
 novel <- findNovelAlleles(airrDb, SampleGermlineIGHV, nproc=1)
 ```
 
+```
+## Error in eval(lhs, parent, parent): object 'airrDb' not found
+```
+
 
 ```r
 # Extract and view the rows that contain successful novel allele calls
@@ -123,7 +127,9 @@ novel_row <- which(!is.na(novel$polymorphism_call))[1]
 plotNovel(airrDb, novel[novel_row, ])
 ```
 
-![plot of chunk Tigger-Vignette-4](figure/Tigger-Vignette-4-1.png)
+```
+## Error in stri_trans_toupper(seqs): object 'airrDb' not found
+```
 
 
 ## Inferring genotypes
@@ -157,6 +163,13 @@ this vector to a fasta file, `writeFasta` may be used.
 # for the use of the novel alleles inferred in the earlier step.
 geno <- inferGenotype(airrDb, germline_db=SampleGermlineIGHV, novel=novel,
                       find_unmutated=TRUE)
+```
+
+```
+## Error in gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), : object 'airrDb' not found
+```
+
+```r
 # Save the genotype sequences to a vector
 genotype_db <- genotypeFasta(geno, SampleGermlineIGHV, novel)
 # Visualize the genotype and sequence counts
@@ -202,6 +215,13 @@ method doesn't use the strict cutoff criterion `fraction_to_explain` that
 # Infer the individual's genotype, using the bayesian method
 geno_bayesian <- inferGenotypeBayesian(airrDb, germline_db=SampleGermlineIGHV, 
                                        novel=novel, find_unmutated=TRUE)
+```
+
+```
+## Error in gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), : object 'airrDb' not found
+```
+
+```r
 # Visualize the genotype and sequence counts
 print(geno_bayesian)
 ```
@@ -241,6 +261,10 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 # Use the personlized genotype to determine corrected allele assignments
 # Updated genotype will be placed in the v_call_genotyped column
 sample_db <- reassignAlleles(airrDb, genotype_db)
+```
+
+```
+## Error in reassignAlleles(airrDb, genotype_db): object 'airrDb' not found
 ```
 
 From here, one may proceed with further downstream analyses, but with the

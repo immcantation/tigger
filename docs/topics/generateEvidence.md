@@ -128,33 +128,13 @@ Examples
 novel <- findNovelAlleles(AIRRDb, SampleGermlineIGHV,
 v_call="v_call", j_call="j_call", junction="junction", 
 junction_length="junction_length", seq="sequence_alignment")
-
-```
-
-**Error in eval(lhs, parent, parent)**: object 'AIRRDb' not found
-```R
 genotype <- inferGenotype(AIRRDb, find_unmutated=TRUE, 
 germline_db=SampleGermlineIGHV,
 novel=novel,
 v_call="v_call", seq="sequence_alignment")
-
-```
-
-**Error in gsub(paste0(edge_regex, "(", segment_regex, ")", edge_regex), **: object 'AIRRDb' not found
-```R
 genotype_db <- genotypeFasta(genotype, SampleGermlineIGHV, novel)
-
-```
-
-**Error in gsub("[Dd]\\*", "*", genotype$gene)**: object 'genotype' not found
-```R
 data_db <- reassignAlleles(AIRRDb, genotype_db, 
 v_call="v_call", seq="sequence_alignment")
-
-```
-
-**Error in reassignAlleles(AIRRDb, genotype_db, v_call = "v_call", seq = "sequence_alignment")**: object 'AIRRDb' not found
-```R
 
 # Assemble evidence table
 evidence <- generateEvidence(data_db, novel, genotype, 
@@ -163,7 +143,7 @@ j_call = "j_call",
 junction = "junction")
 ```
 
-**Error in eval(lhs, parent, parent)**: object 'genotype' not found
+
 
 See also
 -------------------

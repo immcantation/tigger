@@ -85,7 +85,27 @@ Examples
 subsampleDb(AIRRDb)
 ```
 
-**Error in checkColumns(data, c(gene, group))**: object 'AIRRDb' not found
+
+```
+# A tibble: 140 x 26
+   sequence_id sequence rev_comp productive v_call d_call j_call sequence_alignm… germline_alignm… junction junction_aa v_cigar d_cigar j_cigar
+   <chr>       <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr>  <chr>            <lgl>            <chr>    <lgl>       <lgl>   <lgl>   <lgl>  
+ 1 177861_136… NNNNNNN… NA       TRUE       IGHV1… IGHD1… IGHJ4… CAGGTCCAGCTGGTA… NA               TGTGCAA… NA          NA      NA      NA     
+ 2 192163_359… NNNNNNN… NA       TRUE       IGHV1… IGHD1… IGHJ4… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 3 214977_370… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ3… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 4 135525_309… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ4… AGGTGCGAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 5 045652_051… NNNNNNN… NA       TRUE       IGHV1… IGHD6… IGHJ4… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 6 009276_223… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ2… CAGGTCCAGCTGGTA… NA               TGTGCAA… NA          NA      NA      NA     
+ 7 154020_110… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ3… CAGGTCCAGCTGGTA… NA               TGTGCAA… NA          NA      NA      NA     
+ 8 076683_277… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 9 032791_235… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ5… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+10 106046_061… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ5… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+# … with 130 more rows, and 12 more variables: vj_in_frame <lgl>, stop_codon <lgl>, v_germline_end <lgl>, np1_length <dbl>, np2_length <dbl>,
+#   j_germline_end <lgl>, junction_length <dbl>, mutated_invariant <lgl>, indels <lgl>, d_5_trim <dbl>, d_3_trim <dbl>, j_5_trim <dbl>
+
+```
+
+
 
 See also
 -------------------

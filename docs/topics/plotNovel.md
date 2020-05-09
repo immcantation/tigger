@@ -110,7 +110,8 @@ seq="sequence_alignment", junction="junction", junction_length="junction_length"
 multiplot=TRUE)
 ```
 
-**Error in stri_trans_toupper(seqs)**: object 'AIRRDb' not found
+![2](plotNovel-2.png)
+
 
 
 

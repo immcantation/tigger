@@ -222,11 +222,6 @@ Examples
 
 # Find novel alleles and return relevant data
 novel <- findNovelAlleles(AIRRDb, SampleGermlineIGHV)
-
-```
-
-**Error in eval(lhs, parent, parent)**: object 'AIRRDb' not found
-```R
 selectNovel(novel)
 ```
 
