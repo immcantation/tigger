@@ -90,16 +90,16 @@ subsampleDb(AIRRDb)
 # A tibble: 140 x 26
    sequence_id sequence rev_comp productive v_call d_call j_call sequence_alignm… germline_alignm… junction junction_aa v_cigar d_cigar j_cigar
    <chr>       <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr>  <chr>            <lgl>            <chr>    <lgl>       <lgl>   <lgl>   <lgl>  
- 1 093821_073… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ5… CAGGTGCAATTGGTG… NA               TGTGCTA… NA          NA      NA      NA     
- 2 097523_094… NNNNNNN… NA       TRUE       IGHV1… IGHD1… IGHJ4… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
- 3 200630_143… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ6… CAGGTCCAGCTGGTA… NA               TGTGCAA… NA          NA      NA      NA     
- 4 230565_172… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ5… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
- 5 068808_034… NNNNNNN… NA       TRUE       IGHV1… IGHD4… IGHJ3… CAGGTCCAGCTGGTA… NA               TGTGCAA… NA          NA      NA      NA     
- 6 195249_153… NNNNNNN… NA       TRUE       IGHV1… IGHD1… IGHJ3… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
- 7 013865_228… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
- 8 036486_240… NNNNNNN… NA       TRUE       IGHV1… IGHD6… IGHJ5… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
- 9 120066_101… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
-10 081526_067… NNNNNNN… NA       TRUE       IGHV1… IGHD5… IGHJ4… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 1 165681_307… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ5… CAGGTCCAGCTGGTA… NA               TGTGCAA… NA          NA      NA      NA     
+ 2 158272_125… NNNNNNN… NA       TRUE       IGHV1… IGHD4… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 3 116896_095… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 4 033754_026… NNNNNNN… NA       TRUE       IGHV1… IGHD1… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 5 186479_140… NNNNNNN… NA       TRUE       IGHV1… IGHD4… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 6 249918_394… NNNNNNN… NA       TRUE       IGHV1… IGHD4… IGHJ5… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 7 265432_193… NNNNNNN… NA       TRUE       IGHV1… IGHD4… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 8 149727_107… NNNNNNN… NA       TRUE       IGHV1… IGHD4… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
+ 9 210027_372… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ4… CAGGTCCAGCTGGTA… NA               TGTGCAA… NA          NA      NA      NA     
+10 184035_119… NNNNNNN… NA       TRUE       IGHV1… IGHD6… IGHJ6… CAGGTGCAGCTGGTG… NA               TGTGCGA… NA          NA      NA      NA     
 # … with 130 more rows, and 12 more variables: vj_in_frame <lgl>, stop_codon <lgl>, v_germline_end <lgl>, np1_length <dbl>, np2_length <dbl>,
 #   j_germline_end <lgl>, junction_length <dbl>, mutated_invariant <lgl>, indels <lgl>, d_5_trim <dbl>, d_3_trim <dbl>, j_5_trim <dbl>
 
