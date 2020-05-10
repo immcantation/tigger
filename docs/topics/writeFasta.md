@@ -45,10 +45,10 @@ Examples
 
 ```R
 ### Not run:
-writeFasta(germlines, "ighv.fasta")
+# writeFasta(germlines, "ighv.fasta")
 ```
 
-**Error in eval(lhs, parent, parent)**: object 'germlines' not found
+
 
 See also
 -------------------

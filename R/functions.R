@@ -1693,7 +1693,7 @@ insertPolymorphisms <- function(sequence, positions, nucleotides) {
 #' 
 #' @examples 
 #' \dontrun{
-#'     germlines <- readIgFasta("ighv.fasta")
+#' # germlines <- readIgFasta("ighv.fasta")
 #' }
 #' 
 #' @export
@@ -1731,7 +1731,7 @@ readIgFasta <- function(fasta_file, strip_down_name=TRUE, force_caps=TRUE) {
 #' 
 #' @examples
 #' \dontrun{
-#'     writeFasta(germlines, "ighv.fasta")
+#' # writeFasta(germlines, "ighv.fasta")
 #' }
 #' 
 #' @export
