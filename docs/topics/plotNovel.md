@@ -28,17 +28,17 @@ Arguments
 -------------------
 
 data
-:   a `data.frame` in AIRR or Change-O format. See
+:   `data.frame` containing repertoire data. See
 [findNovelAlleles](findNovelAlleles.md) for details.
 
 novel_row
-:   a single row from a data frame as output by
+:   single row from a data frame as output by
 [findNovelAlleles](findNovelAlleles.md) that contains a
-polymorphism-containing germline allele
+polymorphism-containing germline allele.
 
 v_call
 :   name of the column in `data` with V allele
-calls. Default is `v_call`..
+calls. Default is `v_call`.
 
 j_call
 :   name of the column in `data` with J allele calls. 
@@ -55,14 +55,14 @@ the CDR3 and the two flanking conserved codons. Default
 is `junction`.
 
 junction_length
-:   Number of junction nucleotides in the junction sequence.
+:   number of junction nucleotides in the junction sequence.
 Default is `junction_length`.
 
 ncol
-:   number of columns to use when laying out the plots
+:   number of columns to use when laying out the plots.
 
 multiplot
-:   Whether to return one single plot (`TRUE`) or a list 
+:   whether to return one single plot (`TRUE`) or a list 
 with the three individual plots (`FALSE`).
 
 

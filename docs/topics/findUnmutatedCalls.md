@@ -19,7 +19,7 @@ Arguments
 -------------------
 
 allele_calls
-:   a vector of strings respresenting Ig allele calls,
+:   vector of strings respresenting Ig allele calls,
 where multiple calls are separated by a comma.
 
 sample_seqs
@@ -27,7 +27,7 @@ sample_seqs
 of the given `allele_calls`.
 
 germline_db
-:   a vector of named nucleotide germline sequences
+:   vector of named nucleotide germline sequences
 
 
 

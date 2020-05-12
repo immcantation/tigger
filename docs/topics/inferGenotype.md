@@ -31,10 +31,8 @@ Arguments
 -------------------
 
 data
-:   a `data.frame` containing V allele
-calls from a single subject. If
-`find_unmutated` is `TRUE`, then
-the sample IMGT-gapped V(D)J sequence should
+:   `data.frame` containing V allele
+calls from a single subject.
 
 germline_db
 :   named vector of sequences containing the
@@ -43,7 +41,7 @@ germline sequences named in
 `find_unmutated` is `TRUE`.
 
 novel
-:   an optional `data.frame` of the type
+:   optional `data.frame` of the type
 novel returned by
 [findNovelAlleles](findNovelAlleles.md) containing
 germline sequences that will be utilized if

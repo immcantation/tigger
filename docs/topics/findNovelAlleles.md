@@ -36,10 +36,10 @@ Arguments
 -------------------
 
 data
-:   a `data.frame` in AIRR or Change-O format. See details.
+:   `data.frame` containing repertoire data. See details.
 
 germline_db
-:   a vector of named nucleotide germline sequences
+:   vector of named nucleotide germline sequences
 matching the V calls in `data`. These should be 
 the gapped reference germlines used to make the V calls.
 
@@ -68,50 +68,50 @@ Default is `junction_length`.
 germline_min
 :   the minimum number of sequences that must have a
 particular germline allele call for the allele to
-be analyzed
+be analyzed.
 
 min_seqs
-:   the minimum number of total sequences (within the
+:   minimum number of total sequences (within the
 desired mutational range and nucleotide range)
-required for the samples to be considered
+required for the samples to be considered.
 
 auto_mutrange
 :   if `TRUE`, the algorithm will attempt to
 determine the appropriate mutation range
 automatically using the mutation count of the most
-common sequence assigned to each allele analyzed
+common sequence assigned to each allele analyzed.
 
 mut_range
-:   the range of mutations that samples may carry and
-be considered by the algorithm
+:   range of mutations that samples may carry and
+be considered by the algorithm.
 
 pos_range
-:   the range of IMGT-numbered positions that should be
-considered by the algorithm
+:   range of IMGT-numbered positions that should be
+considered by the algorithm.
 
 y_intercept
-:   the y-intercept threshold above which positions should be
-considered potentially polymorphic
+:   y-intercept threshold above which positions should be
+considered potentially polymorphic.
 
 alpha
-:   the alpha value used for determining whether the 
+:   alpha value used for determining whether the 
 fit y-intercept is greater than the `y_intercept`
-threshold
+threshold.
 
 j_max
-:   the maximum fraction of sequences perfectly aligning
+:   maximum fraction of sequences perfectly aligning
 to a potential novel allele that are allowed to
 utilize to a particular combination of junction
 length and J gene. The closer to 1, the less strict 
 the filter for J gene diversity will be.
 
 min_frac
-:   the minimum fraction of sequences that must have
+:   minimum fraction of sequences that must have
 usable nucleotides in a given position for that
-position to considered
+position to considered.
 
 nproc
-:   the number of processors to use
+:   number of processors to use.
 
 
 

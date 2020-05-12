@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 seqs
-:   a vector of nucleotide sequences.
+:   vector of nucleotide sequences.
 
 
 

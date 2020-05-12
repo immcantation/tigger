@@ -21,10 +21,10 @@ Arguments
 -------------------
 
 allele_calls
-:   a vector of strings respresenting Ig allele names.
+:   vector of strings respresenting Ig allele names.
 
 method
-:   a string defining the method to use when sorting alleles.
+:   string defining the method to use when sorting alleles.
 If `"name"` then sort in lexicographic order. If
 `"position"` then sort by position in the locus, as
 determined by the final two numbers in the gene name.

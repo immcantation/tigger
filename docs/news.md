@@ -4,25 +4,26 @@ Version 1.0.0:  May 12, 2020
 Backwards Incompatible Changes:
 
 + Changed default expected data format from the Change-O data format to the
-  AIRR Rearrangement standard. For example: where functions used the column 
+  AIRR Rearrangement standard. For example, where functions used the column 
   name `V_CALL` (Change-O) as the default to identify the field that stored 
-  the V gene calls, they now use `v_call` (AIRR). That means, scripts that 
-  relied on default values (previously, `v_call="V_CALL"`), will now fail if 
-  calls to the functions are not updated to reflect the correct value for the 
-  data. If data are in the Change-O format, the current default value 
-  `v_call="v_call"` will fail to identify the column with the V gene calls
-  as the column `v_call` doesn't exist. In this case, `v_call="V_CALL"` needs 
-  to be specified in the function call.
-+ Added AIRR formatted example data `airrDb`.
+  the V gene calls, they now use `v_call` (AIRR). Scripts that relied on 
+  default values (previously, `v_call="V_CALL"`), will now fail if calls to the 
+  functions are not updated to reflect the correct value for the data. If data 
+  are in the Change-O format, the current default value `v_call="v_call"` will 
+  fail to identify the column with the V gene calls as the column `v_call` 
+  doesn't exist. In this case, `v_call="V_CALL"` needs to be specified in 
+  the function call.
 + For consistency with the style of the new data format default, field names in
   all other user exposed data structures have been updated to use the same font 
   case style. e.g, the column names of the results of `findNovelAlleles` are now 
-  using lower case (`germline_call`, not `GERMLINE_cALL`)
+  using lower case (`germline_call`, not `GERMLINE_CALL`)
 
 General:
 
 + License changed to AGPL-3.
-+ Upgraded tidyr dependency to >=0.1.0.
++ Added AIRR formatted example data `airrDb`.
++ Updated dependencies to R >= 3.5.0, ggplot2 >= 3.2.0, alakazam >= 1.0.0,
+  shazam >= 1.0.0, and tidyr >=0.1.0.
 
 
 Version 0.4.0 July 18, 2019

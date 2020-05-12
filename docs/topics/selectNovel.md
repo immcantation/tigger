@@ -17,11 +17,11 @@ Arguments
 -------------------
 
 novel
-:   a `data.frame` of the type returned by
+:   `data.frame` of the type returned by
 [findNovelAlleles](findNovelAlleles.md).
 
 keep_alleles
-:   a `logical` indicating if different alleles
+:   `logical` indicating if different alleles
 leading to the same novel sequence should be kept.
 See Details.
 

@@ -23,16 +23,16 @@ Arguments
 -------------------
 
 samples
-:   a vector of strings respresenting aligned sequences
+:   vector of strings respresenting aligned sequences
 
 germlines
-:   a vector of strings respresenting aligned sequences
+:   vector of strings respresenting aligned sequences
 to which `samples` will be compared. If only
 one string is submitted, it will be used for all
 `samples`.
 
 ignored_regex
-:   a regular expression indicating what characters
+:   regular expression indicating what characters
 should be ignored (such as gaps and N nucleotides).
 
 match_instead

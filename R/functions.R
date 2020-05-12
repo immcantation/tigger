@@ -16,50 +16,50 @@
 #' against by ensuring that sequences perfectly matching the potential novel
 #' allele utilize a wide range of combinations of J gene and junction length.
 #' 
-#' @param    data           a \code{data.frame} in AIRR or Change-O format. See details.
-#' @param    germline_db    a vector of named nucleotide germline sequences
-#'                          matching the V calls in \code{data}. These should be 
-#'                          the gapped reference germlines used to make the V calls.
-#' @param    v_call         name of the column in \code{data} with V allele calls. 
-#'                          Default is \code{v_call}.    
-#' @param    j_call         name of the column in \code{data} with J allele calls. 
-#'                          Default is \code{j_call}. 
-#' @param    seq  name of the column in \code{data} with the 
-#'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                          Default is \code{sequence_alignment}.
-#' @param    junction       Junction region nucleotide sequence, which includes
-#'                          the CDR3 and the two flanking conserved codons. Default
-#'                          is \code{junction}.
-#' @param    junction_length Number of junction nucleotides in the junction sequence.
-#'                          Default is \code{junction_length}.                        
-#' @param    germline_min   the minimum number of sequences that must have a
-#'                          particular germline allele call for the allele to
-#'                          be analyzed
-#' @param    auto_mutrange  if \code{TRUE}, the algorithm will attempt to
-#'                          determine the appropriate mutation range
-#'                          automatically using the mutation count of the most
-#'                          common sequence assigned to each allele analyzed
-#' @param    mut_range      the range of mutations that samples may carry and
-#'                          be considered by the algorithm
-#' @param    pos_range      the range of IMGT-numbered positions that should be
-#'                          considered by the algorithm
-#' @param    alpha          the alpha value used for determining whether the 
-#'                          fit y-intercept is greater than the \code{y_intercept}
-#'                          threshold
-#' @param    y_intercept    the y-intercept threshold above which positions should be
-#'                          considered potentially polymorphic
-#' @param    j_max          the maximum fraction of sequences perfectly aligning
-#'                          to a potential novel allele that are allowed to
-#'                          utilize to a particular combination of junction
-#'                          length and J gene. The closer to 1, the less strict 
-#'                          the filter for J gene diversity will be.
-#' @param    min_seqs       the minimum number of total sequences (within the
-#'                          desired mutational range and nucleotide range)
-#'                          required for the samples to be considered
-#' @param    min_frac       the minimum fraction of sequences that must have
-#'                          usable nucleotides in a given position for that
-#'                          position to considered
-#' @param    nproc          the number of processors to use
+#' @param    data             \code{data.frame} containing repertoire data. See details.
+#' @param    germline_db      vector of named nucleotide germline sequences
+#'                            matching the V calls in \code{data}. These should be 
+#'                            the gapped reference germlines used to make the V calls.
+#' @param    v_call           name of the column in \code{data} with V allele calls. 
+#'                            Default is \code{v_call}.    
+#' @param    j_call           name of the column in \code{data} with J allele calls. 
+#'                            Default is \code{j_call}. 
+#' @param    seq              name of the column in \code{data} with the 
+#'                            aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#'                            Default is \code{sequence_alignment}.
+#' @param    junction         Junction region nucleotide sequence, which includes
+#'                            the CDR3 and the two flanking conserved codons. Default
+#'                            is \code{junction}.
+#' @param    junction_length  Number of junction nucleotides in the junction sequence.
+#'                            Default is \code{junction_length}.                        
+#' @param    germline_min     the minimum number of sequences that must have a
+#'                            particular germline allele call for the allele to
+#'                            be analyzed.
+#' @param    auto_mutrange    if \code{TRUE}, the algorithm will attempt to
+#'                            determine the appropriate mutation range
+#'                            automatically using the mutation count of the most
+#'                            common sequence assigned to each allele analyzed.
+#' @param    mut_range        range of mutations that samples may carry and
+#'                            be considered by the algorithm.
+#' @param    pos_range        range of IMGT-numbered positions that should be
+#'                            considered by the algorithm.
+#' @param    alpha            alpha value used for determining whether the 
+#'                            fit y-intercept is greater than the \code{y_intercept}
+#'                            threshold.
+#' @param    y_intercept      y-intercept threshold above which positions should be
+#'                            considered potentially polymorphic.
+#' @param    j_max            maximum fraction of sequences perfectly aligning
+#'                            to a potential novel allele that are allowed to
+#'                            utilize to a particular combination of junction
+#'                            length and J gene. The closer to 1, the less strict 
+#'                            the filter for J gene diversity will be.
+#' @param    min_seqs         minimum number of total sequences (within the
+#'                            desired mutational range and nucleotide range)
+#'                            required for the samples to be considered.
+#' @param    min_frac         minimum fraction of sequences that must have
+#'                            usable nucleotides in a given position for that
+#'                            position to considered.
+#' @param    nproc            number of processors to use.
 #'
 #' @return
 #' A \code{data.frame} with a row for each known allele analyzed.
@@ -608,9 +608,9 @@ findNovelAlleles <- function(data, germline_db,
 #' be retained. In the case that multiple mutation ranges are checked for the
 #' same allele, only one mutation range will be kept in the output.
 #' 
-#' @param   novel           a \code{data.frame} of the type returned by
+#' @param   novel           \code{data.frame} of the type returned by
 #'                          \link{findNovelAlleles}.
-#' @param   keep_alleles    a \code{logical} indicating if different alleles
+#' @param   keep_alleles    \code{logical} indicating if different alleles
 #'                          leading to the same novel sequence should be kept.
 #'                          See Details.
 #'                        
@@ -669,26 +669,26 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' to be found in different combinations of J gene and junction lengths
 #' is a proxy for requiring it to be found in different clonal lineages.
 #' 
-#' @param    data           a \code{data.frame} in AIRR or Change-O format. See
-#'                          \link{findNovelAlleles} for details.
-#' @param    novel_row      a single row from a data frame as output by
-#'                          \link{findNovelAlleles} that contains a
-#'                          polymorphism-containing germline allele
-#' @param    v_call         name of the column in \code{data} with V allele
-#'                          calls. Default is \code{v_call}..
-#' @param    j_call         name of the column in \code{data} with J allele calls. 
-#'                          Default is \code{j_call}. 
-#' @param    seq            name of the column in \code{data} with the 
-#'                          aligned, IMGT-numbered, V(D)J nucleotide sequence.
-#'                          Default is \code{sequence_alignment}.
-#' @param    junction       Junction region nucleotide sequence, which includes
-#'                          the CDR3 and the two flanking conserved codons. Default
-#'                          is \code{junction}.
-#' @param    junction_length Number of junction nucleotides in the junction sequence.
-#'                          Default is \code{junction_length}.                        
-#' @param    ncol           number of columns to use when laying out the plots  
-#' @param    multiplot      Whether to return one single plot (\code{TRUE}) or a list 
-#'                          with the three individual plots (\code{FALSE}).
+#' @param    data             \code{data.frame} containing repertoire data. See
+#'                            \link{findNovelAlleles} for details.
+#' @param    novel_row        single row from a data frame as output by
+#'                            \link{findNovelAlleles} that contains a
+#'                            polymorphism-containing germline allele.
+#' @param    v_call           name of the column in \code{data} with V allele
+#'                            calls. Default is \code{v_call}.
+#' @param    j_call           name of the column in \code{data} with J allele calls. 
+#'                            Default is \code{j_call}. 
+#' @param    seq              name of the column in \code{data} with the 
+#'                            aligned, IMGT-numbered, V(D)J nucleotide sequence.
+#'                            Default is \code{sequence_alignment}.
+#' @param    junction         Junction region nucleotide sequence, which includes
+#'                            the CDR3 and the two flanking conserved codons. Default
+#'                            is \code{junction}.
+#' @param    junction_length  number of junction nucleotides in the junction sequence.
+#'                            Default is \code{junction_length}.                        
+#' @param    ncol             number of columns to use when laying out the plots.
+#' @param    multiplot        whether to return one single plot (\code{TRUE}) or a list 
+#'                            with the three individual plots (\code{FALSE}).
 #' @examples
 #' # Plot the evidence for the first (and only) novel allele in the example data
 #' novel <- selectNovel(SampleNovel)
@@ -903,15 +903,13 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
 #' novel germline allele will have the novel germline allele appended
 #' to their assignent prior to searching for unmutated sequences.
 #'           
-#' @param    data                 a \code{data.frame} containing V allele
-#'                                calls from a single subject. If
-#'                                \code{find_unmutated} is \code{TRUE}, then
-#'                                the sample IMGT-gapped V(D)J sequence should 
+#' @param    data                 \code{data.frame} containing V allele
+#'                                calls from a single subject.
 #' @param    germline_db          named vector of sequences containing the
 #'                                germline sequences named in
 #'                                \code{allele_calls}. Only required if
 #'                                \code{find_unmutated} is \code{TRUE}.
-#' @param    novel             an optional \code{data.frame} of the type
+#' @param    novel                optional \code{data.frame} of the type
 #'                                novel returned by
 #'                                \link{findNovelAlleles} containing
 #'                                germline sequences that will be utilized if
@@ -1089,15 +1087,15 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
 #'
 #' \code{plotGenotype} plots a genotype table.
 #' 
-#' @param    genotype     a \code{data.frame} of alleles denoting a genotype, 
+#' @param    genotype     \code{data.frame} of alleles denoting a genotype, 
 #'                        as returned by \link{inferGenotype}.
-#' @param    facet_by     a column name in \code{genotype} to facet the plot by. 
-#'                        If \code{NULL}, then do not facet the plot. 
-#' @param    gene_sort    a string defining the method to use when sorting alleles.
-#'                        If \code{"name"} then sort in lexicographic order. If
+#' @param    facet_by     column name in \code{genotype} to facet the plot by. 
+#'                        if \code{NULL}, then do not facet the plot. 
+#' @param    gene_sort    string defining the method to use when sorting alleles.
+#'                        if \code{"name"} then sort in lexicographic order. If
 #'                        \code{"position"} then sort by position in the locus, as
 #'                        determined by the final two numbers in the gene name.
-#' @param    text_size    the point size of the plotted text.
+#' @param    text_size    point size of the plotted text.
 #' @param    silent       if \code{TRUE} do not draw the plot and just return the ggplot
 #'                        object; if \code{FALSE} draw the plot.
 #' @param    ...          additional arguments to pass to ggplot2::theme.
@@ -1172,9 +1170,9 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
 #' \code{genotypeFasta} converts a genotype table into a vector of nucleotide
 #' sequences.
 #' 
-#' @param    genotype     a \code{data.frame} of alleles denoting a genotype, 
+#' @param    genotype     \code{data.frame} of alleles denoting a genotype, 
 #'                        as returned by \link{inferGenotype}.
-#' @param    germline_db  a vector of named nucleotide germline sequences
+#' @param    germline_db  vector of named nucleotide germline sequences
 #'                        matching the alleles detailed in \code{genotype}.
 #' @param    novel        an optional \code{data.frame} containing putative
 #'                        novel alleeles of the type returned by
@@ -1226,10 +1224,10 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' the allele calls are chosen from among those provided in \code{genotype_db},
 #' based on a simple alignment to the sample sequence.
 #' 
-#' @param    data          a \code{data.frame} containing V allele calls from a
+#' @param    data          \code{data.frame} containing V allele calls from a
 #'                         single subject and the sample IMGT-gapped V(D)J sequences under
 #'                         \code{seq}.
-#' @param    genotype_db   a vector of named nucleotide germline sequences
+#' @param    genotype_db   vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #'                         and personalized to the subject
 #' @param    v_call        name of the column in \code{data} with V allele
@@ -1237,13 +1235,13 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #' @param    seq           name of the column in \code{data} with the 
 #'                         aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                         Default is SEQUENCE_IMGT                                      
-#' @param    method        the method to be used when realigning sequences to
+#' @param    method        method to use when realigning sequences to
 #'                         the genotype_db sequences. Currently, only \code{"hammming"}
 #'                         (for Hamming distance) is implemented.
 #' @param    path          directory containing the tool used in the
 #'                         realignment method, if needed. Hamming distance does
 #'                         not require a path to a tool.
-#' @param    keep_gene     a string indicating if the gene (\code{"gene"}), 
+#' @param    keep_gene     string indicating if the gene (\code{"gene"}), 
 #'                         family (\code{"family"}) or complete repertoire
 #'                         (\code{"repertoire"}) assignments should be performed. 
 #'                         Use of \code{"gene"} increases speed by minimizing required number of 
@@ -1377,12 +1375,12 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
 #' compares pairs of sequences. It returns a list of the nucleotide positions of
 #' any differences.
 #' 
-#' @param    samples        a vector of strings respresenting aligned sequences
-#' @param    germlines      a vector of strings respresenting aligned sequences
+#' @param    samples        vector of strings respresenting aligned sequences
+#' @param    germlines      vector of strings respresenting aligned sequences
 #'                          to which \code{samples} will be compared. If only
 #'                          one string is submitted, it will be used for all
 #'                          \code{samples}.
-#' @param    ignored_regex  a regular expression indicating what characters
+#' @param    ignored_regex  regular expression indicating what characters
 #'                          should be ignored (such as gaps and N nucleotides).
 #' @param    match_instead  if \code{TRUE}, the function returns the positions
 #'                          that are the same instead of those that are
@@ -1438,11 +1436,11 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
 #' and determines the distance between that seqeunce and any germline alleles
 #' contained within the call
 #' 
-#' @param    samples       a vector of IMGT-gapped sample V sequences
-#' @param    allele_calls  a vector of strings respresenting Ig allele calls for
+#' @param    samples       vector of IMGT-gapped sample V sequences
+#' @param    allele_calls  vector of strings respresenting Ig allele calls for
 #'                         the sequences in \code{samples}, where multiple
 #'                         calls are separated by a comma
-#' @param    germline_db   a vector of named nucleotide germline sequences
+#' @param    germline_db   vector of named nucleotide germline sequences
 #'                         matching the calls detailed in \code{allele_calls}
 #' 
 #' @return   A list equal in length to \code{samples}, containing the Hamming
@@ -1502,9 +1500,9 @@ getMutCount <- function(samples, allele_calls, germline_db){
 #' mutation counts. In the case of multiple alleles being assigned to a
 #' sequence, only the subset that would represent a perfect match is returned.
 #' 
-#' @param    allele_calls   a vector of strings respresenting Ig allele calls,
+#' @param    allele_calls   vector of strings respresenting Ig allele calls,
 #'                          where multiple calls are separated by a comma.
-#' @param    germline_db    a vector of named nucleotide germline sequences
+#' @param    germline_db    vector of named nucleotide germline sequences
 #' @param    sample_seqs    V(D)J-rearranged sample sequences matching the order
 #'                          of the given \code{allele_calls}.
 #' 
@@ -1573,22 +1571,22 @@ findUnmutatedCalls <- function(allele_calls, sample_seqs, germline_db){
 #' \code{getPopularMutationCount} determines which sequences occur frequently
 #' for each V gene and returns the mutation count of those sequences.
 #' 
-#' @param  data          a \code{data.frame} in the Change-O format. See
+#' @param  data          \code{data.frame} in the Change-O format. See
 #'                       \link{findNovelAlleles} for a list of required
 #'                       columns.
-#' @param  germline_db   A named list of IMGT-gapped germline sequences.
+#' @param  germline_db   named list of IMGT-gapped germline sequences.
 #' @param  v_call        name of the column in \code{data} with V allele calls. 
 #'                       Default is \code{v_call}.    
 #' @param  seq           name of the column in \code{data} with the 
 #'                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                       Default is \code{sequence_alignment}.
-#' @param  gene_min      The portion of all unique sequences a gene must
+#' @param  gene_min      portion of all unique sequences a gene must
 #'                       constitute to avoid exclusion.
-#' @param  seq_min       The number of copies of the V that must be present for
+#' @param  seq_min       number of copies of the V that must be present for
 #'                       to avoid exclusion.
-#' @param  seq_p_of_max  For each gene, fraction of the most common V sequence's
+#' @param  seq_p_of_max  ror each gene, the fraction of the most common V sequence
 #'                       count that a sequence must meet to avoid exclusion.
-#' @param  full_return   If \code{TRUE}, will return all \code{data} columns and
+#' @param  full_return   if \code{TRUE}, will return all \code{data} columns and
 #'                       will include sequences with mutation count < 1.
 #' 
 #' @return  A data frame of genes that have a frequent sequence mutation count
@@ -1718,7 +1716,7 @@ readIgFasta <- function(fasta_file, strip_down_name=TRUE, force_caps=TRUE) {
 #' \code{writeFasta} writes a named vector of sequences to a file in fasta
 #' format.
 #' 
-#' @param    named_sequences  a vector of named string representing sequences
+#' @param    named_sequences  vector of named string representing sequences
 #' @param    file             the name of the output file.
 #' @param    width            the number of characters to be printed per line.
 #'                            if not between 1 and 255, width with be infinite.
@@ -1756,14 +1754,14 @@ writeFasta <- function(named_sequences, file, width=60, append=FALSE){
 #' \code{updateAlleleNames} takes a set of IGHV allele calls and replaces any
 #' outdated names (e.g. IGHV1-f) with the new IMGT names.
 #' 
-#' @param    allele_calls  a vector of strings respresenting IGHV allele names.
+#' @param    allele_calls  vector of strings respresenting IGHV allele names.
 #' 
 #' @return   Vector of strings respresenting updated IGHV allele names.
 #' 
 #' @note
 #' IGMT has removed \code{IGHV2-5*10} and \code{IGHV2-5*07} as it has determined they
 #' are actually alleles \code{02} and \code{04}, respectively. The updated allele 
-#' names are based on IMGT release 201408-4.
+#' names are based on IMGT release 2014-08-4.
 #' 
 #' @references
 #' \enumerate{
@@ -1817,8 +1815,8 @@ updateAlleleNames <- function(allele_calls) {
 #' but before \code{IGHV1-69*02}), and non-localized genes (e.g. \code{IGHV1-NL1*01}) 
 #' come last within their gene family.
 #' 
-#' @param    allele_calls  a vector of strings respresenting Ig allele names.
-#' @param    method        a string defining the method to use when sorting alleles.
+#' @param    allele_calls  vector of strings respresenting Ig allele names.
+#' @param    method        string defining the method to use when sorting alleles.
 #'                         If \code{"name"} then sort in lexicographic order. If
 #'                         \code{"position"} then sort by position in the locus, as
 #'                         determined by the final two numbers in the gene name.
@@ -1883,7 +1881,7 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
 #' \code{cleanSeqs} capitalizes nucleotides and replaces all characters 
 #' besides \code{c("A", "C", "G", "T", "-", ".")} with \code{"N"}. 
 #' 
-#' @param    seqs  a vector of nucleotide sequences.
+#' @param    seqs  vector of nucleotide sequences.
 #' 
 #' @return   A modified vector of nucleotide sequences.
 #' 
@@ -1919,7 +1917,7 @@ cleanSeqs <- function(seqs) {
 # position to be analyzed and determines if each sample is mutated at that
 # position
 # 
-# @param  data          a Change-O db data.frame. See
+# @param  data          \code{data.frame} containing repertoire data. See
 #                       \link{findNovelAlleles} for a list of required
 #                       columns.
 # @param  germline      the germline to which all the sequences should be
@@ -1969,15 +1967,15 @@ positionMutations <- function(data, germline, pos_range, seq="sequence_alignment
 # sequences and returns the subset of sequences that meet the given mutation
 # count limits
 # 
-# @param  data          a Change-O db data frame. See
+# @param  data          \code{data.frame} containing repertoire data. See
 #                       \link{findNovelAlleles} for a list of required
 #                       columns.
-# @param  germline      the germline to which all the sequences should be
-#                       compared
-# @param  pos_range     the range of positions within the sequences that should
+# @param  germline      germline to which all the sequences should be
+#                       compared.
+# @param  pos_range     range of positions within the sequences that should
 #                       be analyzed for mutations
-# @param  pos_range     the range of mutation counts that sequences can have
-#                       and still be included
+# @param  pos_range     range of mutation counts that sequences can have
+#                       and still be included.
 # @param  seq           name of the column in \code{data} with the 
 #                       aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #                       Default is \code{sequence_alignment}.
@@ -2006,11 +2004,11 @@ mutationRangeSubset <- function(data, germline, mut_range, pos_range,
 # @details  If mut_min is 1, a y-intercept will be searched for at 0. If
 # mut_min is above 1, then the "y-intercept" will be found at x = mut_min - 1.
 #
-# @param    x         A vector of x values
-# @param    y         A vector of y values
-# @param    mut_min   The value where the the lowest mutation count should be
+# @param    x         vector of x values.
+# @param    y         vector of y values.
+# @param    mut_min   value where the the lowest mutation count should be
 #                     found. See details.
-# @param    alpha     The alpha cutoff the be used in constructing the
+# @param    alpha     alpha cutoff the be used in constructing the
 #                     confidence interval
 #
 # @return  A data frame containing only the subset carrying the desired levels
@@ -2027,11 +2025,10 @@ findLowerY = function(x, y, mut_min, alpha){
 # \code{superSubstring} is an enahnced version of \code{substring} in that
 # it can find disjoint positions in one call.
 #
-# @param    string      a single string
-# @param    positions   the positions to be extracted
+# @param    string      single string.
+# @param    positions   the positions to be extracted.
 #
-# @return  a substring
-# 
+# @return   Substring.
 superSubstring = function(string, positions){
     if(length(string) != 1){ stop("Please submit only one string.") }
     chars = sapply(positions, function(x) substring(string, x, x))
@@ -2044,13 +2041,13 @@ superSubstring = function(string, positions){
 # \code{multiplot} is a function provided by http://www.cookbook-r.com/ which
 # allows for plotting multiple ggplot objects in one panel.
 # 
-# @param    ...       ggplot2 object(s)
-# @param    plotlist  a list alternative to ...
-# @param    file      an unused parameter, but present in the provided function
-# @param    cols      Number of columns in layout
-# @param    layout    A matrix specifying the layout. If present, 'cols' is
+# @param    ...       ggplot2 object(s).
+# @param    plotlist  a list alternative to (...).
+# @param    file      an unused parameter, but present in the provided function.
+# @param    cols      Number of columns in layout.
+# @param    layout    matrix specifying the layout. If present, \code{cols} is
 #                     ignored.
-# @param    heights   A numeric vector A numeric vector or unit object 
+# @param    heights   numeric vector A numeric vector or unit object 
 #                     describing the heights of the rows in the layout. Will
 #                     be passed to grid.layout. Default is all plots have 
 #                     the same height.
@@ -2103,10 +2100,10 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #' but these duplicated samplings will be removed, and the final 
 #' subsampled \code{data} will contain unique rows.
 #' 
-#' @param   data   a \code{data.frame} in Change-O format.
+#' @param   data   \code{data.frame} containing repertoire data.
 #' @param   gene   name of the column in \code{data} with allele calls. Default
 #'                 is \code{v_call}.
-#' @param   mode   one of c("gene", "family", "allele") defining the degree of
+#' @param   mode   one of \code{c("gene", "family", "allele")} defining the degree of
 #'                 specificity regarding allele calls when subsetting sequences.
 #'                 Determines how \code{data} will be split into subsets from 
 #'                 which the same number of sequences will be subsampled. See 
@@ -2124,7 +2121,7 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #'                 \code{max_n} is \code{NULL}, a \code{max_n} will be 
 #'                 automatically set for each \code{group}.
 #' 
-#' @return  A \code{data.frame}, subsampled from \code{data}.
+#' @return  Subsampled version of the input \code{data}.
 #' 
 #' @seealso \link{selectNovel}
 #' 

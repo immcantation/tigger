@@ -17,11 +17,11 @@ Arguments
 -------------------
 
 genotype
-:   a `data.frame` of alleles denoting a genotype, 
+:   `data.frame` of alleles denoting a genotype, 
 as returned by [inferGenotype](inferGenotype.md).
 
 germline_db
-:   a vector of named nucleotide germline sequences
+:   vector of named nucleotide germline sequences
 matching the alleles detailed in `genotype`.
 
 novel

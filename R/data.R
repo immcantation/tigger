@@ -23,7 +23,7 @@ NULL
 #' Example Human IGHV germlines
 #'
 #' A \code{character} vector of all 344 human IGHV germline gene segment alleles
-#' in IMGT/GENE-DB release 201408-4.
+#' in IMGT/GENE-DB release 2014-08-4.
 #'
 #' @name SampleGermlineIGHV
 #' @docType data

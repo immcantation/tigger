@@ -26,12 +26,12 @@ Arguments
 -------------------
 
 data
-:   a `data.frame` in the Change-O format. See
+:   `data.frame` in the Change-O format. See
 [findNovelAlleles](findNovelAlleles.md) for a list of required
 columns.
 
 germline_db
-:   A named list of IMGT-gapped germline sequences.
+:   named list of IMGT-gapped germline sequences.
 
 v_call
 :   name of the column in `data` with V allele calls. 
@@ -43,19 +43,19 @@ aligned, IMGT-numbered, V(D)J nucleotide sequence.
 Default is `sequence_alignment`.
 
 gene_min
-:   The portion of all unique sequences a gene must
+:   portion of all unique sequences a gene must
 constitute to avoid exclusion.
 
 seq_min
-:   The number of copies of the V that must be present for
+:   number of copies of the V that must be present for
 to avoid exclusion.
 
 seq_p_of_max
-:   For each gene, fraction of the most common V sequence's
+:   ror each gene, the fraction of the most common V sequence
 count that a sequence must meet to avoid exclusion.
 
 full_return
-:   If `TRUE`, will return all `data` columns and
+:   if `TRUE`, will return all `data` columns and
 will include sequences with mutation count < 1.
 
 

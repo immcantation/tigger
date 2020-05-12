@@ -26,12 +26,12 @@ Arguments
 -------------------
 
 data
-:   a `data.frame` containing V allele calls from a
+:   `data.frame` containing V allele calls from a
 single subject and the sample IMGT-gapped V(D)J sequences under
 `seq`.
 
 genotype_db
-:   a vector of named nucleotide germline sequences
+:   vector of named nucleotide germline sequences
 matching the calls detailed in `allele_calls`
 and personalized to the subject
 
@@ -45,7 +45,7 @@ aligned, IMGT-numbered, V(D)J nucleotide sequence.
 Default is SEQUENCE_IMGT
 
 method
-:   the method to be used when realigning sequences to
+:   method to use when realigning sequences to
 the genotype_db sequences. Currently, only `"hammming"`
 (for Hamming distance) is implemented.
 
@@ -55,7 +55,7 @@ realignment method, if needed. Hamming distance does
 not require a path to a tool.
 
 keep_gene
-:   a string indicating if the gene (`"gene"`), 
+:   string indicating if the gene (`"gene"`), 
 family (`"family"`) or complete repertoire
 (`"repertoire"`) assignments should be performed. 
 Use of `"gene"` increases speed by minimizing required number of 

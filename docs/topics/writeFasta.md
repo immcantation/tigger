@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 named_sequences
-:   a vector of named string representing sequences
+:   vector of named string representing sequences
 
 file
 :   the name of the output file.

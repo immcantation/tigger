@@ -18,15 +18,15 @@ Arguments
 -------------------
 
 samples
-:   a vector of IMGT-gapped sample V sequences
+:   vector of IMGT-gapped sample V sequences
 
 allele_calls
-:   a vector of strings respresenting Ig allele calls for
+:   vector of strings respresenting Ig allele calls for
 the sequences in `samples`, where multiple
 calls are separated by a comma
 
 germline_db
-:   a vector of named nucleotide germline sequences
+:   vector of named nucleotide germline sequences
 matching the calls detailed in `allele_calls`
 
 

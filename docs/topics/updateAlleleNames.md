@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 allele_calls
-:   a vector of strings respresenting IGHV allele names.
+:   vector of strings respresenting IGHV allele names.
 
 
 
@@ -33,7 +33,7 @@ Note
 
 IGMT has removed `IGHV2-5*10` and `IGHV2-5*07` as it has determined they
 are actually alleles `02` and `04`, respectively. The updated allele 
-names are based on IMGT release 201408-4.
+names are based on IMGT release 2014-08-4.
 
 
 References
