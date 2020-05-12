@@ -21,7 +21,7 @@ Backwards Incompatible Changes:
 General:
 
 + License changed to AGPL-3.
-+ Added AIRR formatted example data `airrDb`.
++ Added AIRR formatted example data `AIRRDb`.
 + Updated dependencies to R >= 3.5.0, ggplot2 >= 3.2.0, alakazam >= 1.0.0,
   shazam >= 1.0.0, and tidyr >=0.1.0.
 
