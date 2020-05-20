@@ -156,6 +156,14 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
     # Find closest reference
     .findClosestReference <- function(seq, allele_calls, ref_germ, 
                                       exclude_self=F, multiple=F) {
+        
+        # filter `ref_germ`, use only same gene segment as `seq`
+        diff_calls <- sub("[0-9]+$","",getFamily(names(ref_germ))) != sub("[0-9]+$","",getFamily(names(seq)))
+        if (sum(diff_calls) > 0) {
+            allele_calls <- allele_calls[allele_calls %in% names(ref_germ[diff_calls]) == FALSE]
+            ref_germ <- ref_germ[!diff_calls]   
+        } 
+        
         closest <- getMutCount(seq,
                                paste(allele_calls, collapse=","),
                                ref_germ)

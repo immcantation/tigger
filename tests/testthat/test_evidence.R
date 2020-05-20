@@ -121,6 +121,26 @@ test_that("generateEvidence", {
     
     # expect_equivalent(data.frame(ev_i[,colnames(expected_ev)], stringsAsFactors = F),
                       # expected_ev, tolerance=0.001)    
+    
+    # Test that generateEvidence uses the right reference gene 
+    # segnemnts (i.e. V), even if user provided others (i.e. VDJ)
+    # with `germline_db`
 
+    # Create mock germline_db
+    # Add IGHV1-8*02 as IGHD1-8*02
+    # generateEvidence should not consider it
+    # When it does, this error happens:
+    #     1: Error in .findClosestReference(novel_imgt, names(germline_db), germline_db,  :
+    #       More than one closest reference found for IGHV1-8*02_G234T: IGHV1-8*02,IGHD1-8*02
+    germline_ighv[['IGHD1-8*02']] <- germline_ighv[selectNovel(novel_df)$germline_call]
+    ev_D <- generateEvidence(data=sample_db, 
+                           novel=selectNovel(novel_df), 
+                           genotype=geno,
+                           genotype_db=genotype_db,
+                           germline_db=germline_ighv,
+                           j_call="J_CALL", junction="JUNCTION")
+    expect_equivalent(data.frame(ev_D[,colnames(expected_ev)], stringsAsFactors = F),
+                      expected_ev) 
+    
 })
 
