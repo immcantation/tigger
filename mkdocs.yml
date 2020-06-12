@@ -1,5 +1,7 @@
 site_name: tigger
 site_favicon: img/favicon.ico
+repo_url: https://bitbucket.org/kleinstein/tigger
+edit_uri: src/master/docs/
 theme: readthedocs
 markdown_extensions:
   - def_list
