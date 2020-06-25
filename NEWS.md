@@ -1,3 +1,14 @@
+Version 1.0.0.999:  June 25, 2020
+-------------------------------------------------------------------------------
+
+Bug Fixes:
+
++ Updated the error check in positionMutations to check for both empty GERM_NT 
+  positions and absence of IMGT gaps in the germline. Before, gapped germlines 
+  of less than 312 positions ( IGHV4-31*09, 311 positions) would have empty 
+  GERM_NT positions, and the function would stop with an error message
+  'Check you are using gapped reference germlines'.
+
 Version 1.0.0:  May 12, 2020
 -------------------------------------------------------------------------------
 
