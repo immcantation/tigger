@@ -18,7 +18,7 @@ options(warn = w)
 test_that("Helper functions", {
     expect_true(hasNonImgtGaps("AT.ATT"))
     expect_null(getMutatedAA("...", "..."))
-    expect_error(getMutatedAA("...", "NNN"), regexp = "Unexpected N in novel_imgt")
+    expect_warning(getMutatedAA("...", "NNN"), regexp = "Ns found in novel_imgt")
     expect_warning(expect_null(getMutatedAA("...", ".A.")), 
                    regexp="Non IMGT gaps found in novel_imgt")
     expect_equal(getMutatedAA("ATCAAATTC", "CGCAAAGTC"),

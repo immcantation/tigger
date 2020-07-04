@@ -12,12 +12,16 @@ hasNonImgtGaps <- function (seq) {
 
 # Compare two IMGT gapped sequences and find AA mutations
 getMutatedAA <- function(ref_imgt, novel_imgt) {
-    if (grepl("N", ref_imgt)) {
-        stop("Unexpected N in ref_imgt")
+    
+    n_ref <- grepl("N", ref_imgt)
+    if (any(n_ref)) {
+        warning(sum(n_ref)," Ns found in ref_imgt")
     }     
-    if (grepl("N", novel_imgt)) {
-        stop("Unexpected N in novel_imgt")
-    }          
+    
+    n_novel <- grepl("N", novel_imgt)
+    if (any(n_novel)) {
+        warning(sum(n_novel)," Ns found in novel_imgt")
+    }         
     
     if (hasNonImgtGaps(ref_imgt)) {
         warning("Non IMGT gaps found in ref_imgt")
@@ -26,7 +30,7 @@ getMutatedAA <- function(ref_imgt, novel_imgt) {
     if (hasNonImgtGaps(novel_imgt)) {
         warning("Non IMGT gaps found in novel_imgt")
     }
-    
+
     ref_imgt <- strsplit(alakazam::translateDNA(ref_imgt),"")[[1]]
     novel_imgt <- strsplit(alakazam::translateDNA(novel_imgt),"")[[1]]
     mutations <- c()

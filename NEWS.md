@@ -1,4 +1,4 @@
-Version 1.0.0.999:  June 25, 2020
+Version 1.0.0.999:  July 4, 2020
 -------------------------------------------------------------------------------
 
 Bug Fixes:
@@ -8,6 +8,11 @@ Bug Fixes:
   of less than 312 positions ( IGHV4-31*09, 311 positions) would have empty 
   GERM_NT positions, and the function would stop with an error message
   'Check you are using gapped reference germlines'.
+  
+General:
+
++ Replaced error message with warning in function getMutatedAA, to allow for
+  germlines with N (e.g. IGHV1-45*01)
 
 Version 1.0.0:  May 12, 2020
 -------------------------------------------------------------------------------
