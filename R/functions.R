@@ -969,6 +969,11 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
                           find_unmutated=TRUE) {
     
     . = NULL
+    
+    # Check columns exist(can be NULL)
+    check <- checkColumns(data, c(v_call, seq))
+    if (check != TRUE) { stop(check) }
+    
     allele_calls = getAllele(data[[v_call]], first=FALSE, strip_d=FALSE)
     # Find the unmutated subset, if requested
     if (find_unmutated) {
