@@ -592,6 +592,22 @@ findNovelAlleles <- function(data, germline_db,
     }
     out_df$germline_imgt_count <- getDbMatch(out_df$germline_imgt)
     out_df$unmutated_freq <- out_df$unmutated_count/out_df$germline_call_count
+    
+    dup_novel_imgt <- which(duplicated(out_df[['novel_imgt']]) & !is.na(out_df[['polymorphism_call']]))
+    dup_novel <- which(out_df[['novel_imgt']] %in% out_df[['novel_imgt']][dup_novel_imgt])
+    
+    if (length(dup_novel) > 0 ) {
+        message("Duplicated polymorphism(s) found!. See the field 'note' in your results for more details.")
+        for (i in dup_novel) {
+            this_polymorphism <- out_df[['polymorphism_call']][i]
+            this_novel_imgt <- out_df[['novel_imgt']][i]
+            other <- which(out_df[['novel_imgt']] == this_novel_imgt)
+            other_polymorphism_call <- setdiff(out_df[['polymorphism_call']][other],
+                                               this_polymorphism)
+            new_note <- paste0(other_polymorphism_call, collapse=", ")
+            out_df[['note']][i] <- paste0(out_df[['note']][i],". Same as: ", new_note)
+        }
+    }
 
     return(out_df)
 }
