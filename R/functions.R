@@ -128,6 +128,9 @@
 #' 
 #' \itemize{
 #'   \item \emph{Novel allele found}: A novel allele was detected.
+#'   \item \emph{Same as:}: The same novel allele sequence
+#'               has been identified multiple times. If this happens, the function
+#'               will also throw the message 'Duplicated polymorphism(s) found'.
 #'   \item \emph{Plurality sequence too rare}: No sequence is frequent enough to pass 
 #'         the J test (\code{j_max}).
 #'   \item \emph{A J-junction combination is too prevalent}: Not enough J diversity (\code{j_max}).
