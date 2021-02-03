@@ -643,12 +643,15 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
     novel <- filter(novel, !is.na(!!rlang::sym("novel_imgt")))
     
     if (keep_alleles) {
-        novel < novel %>% 
-            group_by(!!rlang::sym("germline_call"))
+        novel_set <- novel %>% 
+            group_by(!!rlang::sym("germline_call")) %>%
+            distinct(!!rlang::sym("novel_imgt"), .keep_all=TRUE) %>%
+            ungroup()
+    } else {
+        novel_set <- novel %>% 
+            distinct(!!rlang::sym("novel_imgt"), .keep_all=TRUE) %>%
+            ungroup()
     }
-    novel_set <- novel %>%
-        distinct(!!rlang::sym("novel_imgt"), .keep_all=TRUE) %>%
-        ungroup()
     
     return(novel_set)
 }

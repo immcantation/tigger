@@ -114,3 +114,22 @@ test_that("subsampleDb",{
     expect_equivalent(db[c(1, 3),], subsampleDb(db, min_n = 1, max_n=2))
 
 })
+
+
+test_that("selectNovel keep_alleles keeps or removes alleles leading to the same novel sequence",{ 
+    
+    nv <- data.frame(
+        list(
+            "germline_call"=c("IGHV1-69*13", "IGHV1-69*14"),
+            "polymorphism_call"=c("IGHV1-69*13_G244A","IGHV1-69*14_G54A"),
+            "note"=c("Novel allele found!. Same as: IGHV1-69*14_G54A",
+                     "Novel allele found!. Same as: IGHV1-69*13_G244A"),
+            "novel_imgt"=c("CAGGTCCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGTCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGAGGCACCTTC............AGCAGCTATGCTATCAGCTGGGTGCGACAGGCCCCTGGACAAGGGCTTGAGTGGATGGGAGGGATCATCCCTATC......TTTGGTACAGCAAACTACGCACAGAAGTTCCAG...GGCAGAGTCACGATTACCGCGGACAAATCCACGAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGA",
+                           "CAGGTCCAGCTGGTGCAGTCTGGGGCT...GAGGTGAAGAAGCCTGGGTCCTCAGTGAAGGTCTCCTGCAAGGCTTCTGGAGGCACCTTC............AGCAGCTATGCTATCAGCTGGGTGCGACAGGCCCCTGGACAAGGGCTTGAGTGGATGGGAGGGATCATCCCTATC......TTTGGTACAGCAAACTACGCACAGAAGTTCCAG...GGCAGAGTCACGATTACCGCGGACAAATCCACGAGCACAGCCTACATGGAGCTGAGCAGCCTGAGATCTGAGGACACGGCCGTGTATTACTGTGCGAGAGA")
+        ),
+        stringsAsFactors = F
+    )
+    
+    expect_equal(nrow(selectNovel(nv, keep_alleles = F)),1)
+    expect_equal(nrow(selectNovel(nv, keep_alleles = T)),2)
+})
