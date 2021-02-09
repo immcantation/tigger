@@ -1,3 +1,22 @@
+Version 1.0.0.999:  February 3, 2021
+-------------------------------------------------------------------------------
+
+Bug Fixes:
+
++ Updated the error check in positionMutations to check for both empty GERM_NT 
+  positions and absence of IMGT gaps in the germline. Before, gapped germlines 
+  of less than 312 positions ( IGHV4-31*09, 311 positions) would have empty 
+  GERM_NT positions, and the function would stop with an error message
+  'Check you are using gapped reference germlines'.
+  
++ Fixed bug in selectNovel where keep_alleles=T would not keep different alleles 
+  leading to the same novel sequence.
+  
+General:
+
++ Replaced error message with warning in function getMutatedAA, to allow for
+  germlines with N (e.g. IGHV1-45*01)
+
 Version 1.0.0:  May 12, 2020
 -------------------------------------------------------------------------------
 
