@@ -133,3 +133,29 @@ test_that("selectNovel keep_alleles keeps or removes alleles leading to the same
     expect_equal(nrow(selectNovel(nv, keep_alleles = F)),1)
     expect_equal(nrow(selectNovel(nv, keep_alleles = T)),2)
 })
+
+test_that("Test genotypeFasta",{ 
+    gt <- data.frame(
+        "gene"=c("IGHV1-2", "IGHV3-23", "IGHV3-23D", "IGHV3-64D"),
+        "alleles"=c("04,05","01","01","09"),
+        "counts"=c("7,4","11","11","1"),
+        "total"=c(11,11,11,1),
+        "note"=c("","","",""),
+        stringsAsFactors = F
+    )
+    # Dummy data. Sequence is not needed.
+    germline_db <- c(
+        "IGHV1-2*04"="A",
+        "IGHV1-2*05"="A",
+        "IGHV3-23*01"="C",
+        "IGHV3-23D*01"="T",
+        "IGHV3-64D*09"="G",
+        "IGHV7-81*01"="T"
+    )
+    gtfa <- genotypeFasta(gt, germline_db)
+    expect_equal(gtfa, germline_db[1:5])
+    
+    expect_error(genotypeFasta(gt, germline_db[-1]),
+                 regexp="IGHV1-2\\*04")
+    
+})

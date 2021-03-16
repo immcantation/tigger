@@ -1228,16 +1228,22 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
         }
     }
 
-    genotype$gene <- gsub("[Dd]\\*","*",genotype$gene)
+    genotype$gene <- getGene(genotype$gene, first = T, strip_d = T)
     g_names <- names(germline_db)
-    names(g_names) <- gsub("[Dd]\\*", "*", names(germline_db))
+    names(g_names) <- getAllele(names(germline_db), first = T, strip_d = T)
+
     table_calls <- mapply(paste, genotype$gene, strsplit(genotype$alleles, ","),
                          sep="*")
-    seqs <- germline_db[as.vector(g_names[unlist(table_calls)])]
-    if(sum(is.na(seqs)) > 0){
+    table_calls_names <- unlist(table_calls)
+    seq_names <- g_names[names(g_names) %in% table_calls_names]
+    seqs <- germline_db[seq_names]
+    not_found <- !table_calls_names %in% names(g_names)
+    
+    if ( any(not_found) ) {
         stop("The following genotype alleles were not found in germline_db: ",
-             paste(unlist(table_calls)[which(is.na(seqs))], collapse = ", "))
+             paste(table_calls_names[not_found], collapse = ", "))
     }
+    
     return(seqs)
 }
 
