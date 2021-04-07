@@ -255,9 +255,6 @@ findNovelAlleles <- function(data, germline_db,
     }
     
     out_list <- foreach(idx=iterators::icount(length(allele_groups))) %dopar% {
-        library(dplyr)
-        library(alakazam)
-        library(tigger)
         # out_list <- lapply(1:length(allele_groups), function(idx) {  
         gc() 
         #message(paste0("idx=",idx))
@@ -270,7 +267,7 @@ findNovelAlleles <- function(data, germline_db,
         # If mutrange is auto, find most popular mutation count and start from there
         gpm <- db_subset %>%
             dplyr::mutate(!!v_call := allele_name ) %>%
-            tigger::getPopularMutationCount(germline,
+            getPopularMutationCount(germline,
                                     gene_min=0, seq_min=min_seqs,
                                     seq_p_of_max=1/8, full_return=TRUE,
                                     v_call=v_call,
@@ -402,7 +399,7 @@ findNovelAlleles <- function(data, germline_db,
                                                             pass_y$POSITION), 
                               POSITION = ifelse(is.null(pos_range_max),
                                                 TRUE,
-                                                !any(eval(pos_range_max)<pass_y$POSITION))) %>%
+                                                !any(pos_range_max<pass_y$POSITION))) %>%
                 dplyr::filter(!!rlang::sym("SNP_STRING") != gl_substring, !!rlang::sym("POSITION")) %>%
                 dplyr::group_by(!!rlang::sym("SNP_STRING")) %>%
                 dplyr::mutate(STRING_COUNT = n()) %>%
@@ -1001,6 +998,12 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
                           find_unmutated=TRUE) {
     
     . = NULL
+    
+    
+    # Check columns exist(can be NULL)
+    check <- checkColumns(data, c(v_call, seq))
+    if (check != TRUE) { stop(check) }
+    
     allele_calls = getAllele(data[[v_call]], first=FALSE, strip_d=FALSE)
     # Find the unmutated subset, if requested
     if (find_unmutated) {
