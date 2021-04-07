@@ -87,25 +87,25 @@ subsampleDb(AIRRDb)
 
 
 ```
-# A tibble: 140 x 26
+[90m# A tibble: 140 x 26[39m
    sequence_id sequence rev_comp productive v_call d_call j_call
-   <chr>       <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr> 
- 1 071139_066… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6…
- 2 195794_389… NNNNNNN… NA       TRUE       IGHV1… IGHD6… IGHJ4…
- 3 017758_214… NNNNNNN… NA       TRUE       IGHV1… IGHD6… IGHJ3…
- 4 108060_082… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6…
- 5 098846_086… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ4…
- 6 253564_153… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ4…
- 7 247887_157… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6…
- 8 118163_299… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ3…
- 9 100713_070… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ4…
-10 083759_072… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ3…
-# … with 130 more rows, and 19 more variables: sequence_alignment <chr>,
-#   germline_alignment <lgl>, junction <chr>, junction_aa <lgl>, v_cigar <lgl>,
-#   d_cigar <lgl>, j_cigar <lgl>, vj_in_frame <lgl>, stop_codon <lgl>,
-#   v_germline_end <lgl>, np1_length <dbl>, np2_length <dbl>,
-#   j_germline_end <lgl>, junction_length <dbl>, mutated_invariant <lgl>,
-#   indels <lgl>, d_5_trim <dbl>, d_3_trim <dbl>, j_5_trim <dbl>
+   [3m[90m<chr>[39m[23m       [3m[90m<chr>[39m[23m    [3m[90m<lgl>[39m[23m    [3m[90m<lgl>[39m[23m      [3m[90m<chr>[39m[23m  [3m[90m<chr>[39m[23m  [3m[90m<chr>[39m[23m 
+[90m 1[39m 251112_188… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ4…
+[90m 2[39m 062828_048… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD1… IGHJ3…
+[90m 3[39m 133739_332… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ6…
+[90m 4[39m 066458_268… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD2… IGHJ6…
+[90m 5[39m 129724_305… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ6…
+[90m 6[39m 199692_345… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ3…
+[90m 7[39m 182790_352… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ5…
+[90m 8[39m 204947_141… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD2… IGHJ4…
+[90m 9[39m 019164_015… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ4…
+[90m10[39m 256485_170… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD2… IGHJ1…
+[90m# … with 130 more rows, and 19 more variables: sequence_alignment [3m[90m<chr>[90m[23m,[39m
+[90m#   germline_alignment [3m[90m<lgl>[90m[23m, junction [3m[90m<chr>[90m[23m, junction_aa [3m[90m<lgl>[90m[23m, v_cigar [3m[90m<lgl>[90m[23m,[39m
+[90m#   d_cigar [3m[90m<lgl>[90m[23m, j_cigar [3m[90m<lgl>[90m[23m, vj_in_frame [3m[90m<lgl>[90m[23m, stop_codon [3m[90m<lgl>[90m[23m,[39m
+[90m#   v_germline_end [3m[90m<lgl>[90m[23m, np1_length [3m[90m<dbl>[90m[23m, np2_length [3m[90m<dbl>[90m[23m,[39m
+[90m#   j_germline_end [3m[90m<lgl>[90m[23m, junction_length [3m[90m<dbl>[90m[23m, mutated_invariant [3m[90m<lgl>[90m[23m,[39m
+[90m#   indels [3m[90m<lgl>[90m[23m, d_5_trim [3m[90m<dbl>[90m[23m, d_3_trim [3m[90m<dbl>[90m[23m, j_5_trim [3m[90m<dbl>[90m[23m[39m
 
 ```
 

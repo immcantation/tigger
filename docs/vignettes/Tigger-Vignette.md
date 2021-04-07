@@ -301,10 +301,8 @@ evidence %>%
 ```
 
 ```
-## Source: local data frame [1 x 5]
-## Groups: <by row>
-## 
 ## # A tibble: 1 x 5
+## # Rowwise: 
 ##   gene    allele   polymorphism_call sequences unmutated_frequency
 ##   <chr>   <chr>    <chr>                 <int>               <dbl>
 ## 1 IGHV1-8 02_G234T IGHV1-8*02_G234T        864               0.428

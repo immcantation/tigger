@@ -1,4 +1,4 @@
-Version 1.0.0.999:  July 4, 2020
+Version 1.0.0.999:  February 3, 2021
 -------------------------------------------------------------------------------
 
 Bug Fixes:
@@ -8,6 +8,9 @@ Bug Fixes:
   of less than 312 positions ( IGHV4-31*09, 311 positions) would have empty 
   GERM_NT positions, and the function would stop with an error message
   'Check you are using gapped reference germlines'.
+  
++ Fixed bug in selectNovel where keep_alleles=T would not keep different alleles 
+  leading to the same novel sequence.
   
 General:
 

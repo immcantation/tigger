@@ -128,6 +128,9 @@
 #' 
 #' \itemize{
 #'   \item \emph{Novel allele found}: A novel allele was detected.
+#'   \item \emph{Same as:}: The same novel allele sequence
+#'               has been identified multiple times. If this happens, the function
+#'               will also throw the message 'Duplicated polymorphism(s) found'.
 #'   \item \emph{Plurality sequence too rare}: No sequence is frequent enough to pass 
 #'         the J test (\code{j_max}).
 #'   \item \emph{A J-junction combination is too prevalent}: Not enough J diversity (\code{j_max}).
@@ -602,6 +605,22 @@ findNovelAlleles <- function(data, germline_db,
     }
     out_df$germline_imgt_count <- getDbMatch(out_df$germline_imgt)
     out_df$unmutated_freq <- out_df$unmutated_count/out_df$germline_call_count
+    
+    dup_novel_imgt <- which(duplicated(out_df[['novel_imgt']]) & !is.na(out_df[['polymorphism_call']]))
+    dup_novel <- which(out_df[['novel_imgt']] %in% out_df[['novel_imgt']][dup_novel_imgt])
+    
+    if (length(dup_novel) > 0 ) {
+        message("Duplicated polymorphism(s) found!. See the field 'note' in your results for more details.")
+        for (i in dup_novel) {
+            this_polymorphism <- out_df[['polymorphism_call']][i]
+            this_novel_imgt <- out_df[['novel_imgt']][i]
+            other <- which(out_df[['novel_imgt']] == this_novel_imgt)
+            other_polymorphism_call <- setdiff(out_df[['polymorphism_call']][other],
+                                               this_polymorphism)
+            new_note <- paste0(other_polymorphism_call, collapse=", ")
+            out_df[['note']][i] <- paste0(out_df[['note']][i],". Same as: ", new_note)
+        }
+    }
 
     return(out_df)
 }
@@ -637,12 +656,15 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
     novel <- filter(novel, !is.na(!!rlang::sym("novel_imgt")))
     
     if (keep_alleles) {
-        novel < novel %>% 
-            group_by(!!rlang::sym("germline_call"))
+        novel_set <- novel %>% 
+            group_by(!!rlang::sym("germline_call")) %>%
+            distinct(!!rlang::sym("novel_imgt"), .keep_all=TRUE) %>%
+            ungroup()
+    } else {
+        novel_set <- novel %>% 
+            distinct(!!rlang::sym("novel_imgt"), .keep_all=TRUE) %>%
+            ungroup()
     }
-    novel_set <- novel %>%
-        distinct(!!rlang::sym("novel_imgt"), .keep_all=TRUE) %>%
-        ungroup()
     
     return(novel_set)
 }
@@ -1211,16 +1233,22 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
         }
     }
 
-    genotype$gene <- gsub("[Dd]\\*","*",genotype$gene)
+    genotype$gene <- getGene(genotype$gene, first = T, strip_d = T)
     g_names <- names(germline_db)
-    names(g_names) <- gsub("[Dd]\\*", "*", names(germline_db))
+    names(g_names) <- getAllele(names(germline_db), first = T, strip_d = T)
+
     table_calls <- mapply(paste, genotype$gene, strsplit(genotype$alleles, ","),
                          sep="*")
-    seqs <- germline_db[as.vector(g_names[unlist(table_calls)])]
-    if(sum(is.na(seqs)) > 0){
+    table_calls_names <- unlist(table_calls)
+    seq_names <- g_names[names(g_names) %in% table_calls_names]
+    seqs <- germline_db[seq_names]
+    not_found <- !table_calls_names %in% names(g_names)
+    
+    if ( any(not_found) ) {
         stop("The following genotype alleles were not found in germline_db: ",
-             paste(unlist(table_calls)[which(is.na(seqs))], collapse = ", "))
+             paste(table_calls_names[not_found], collapse = ", "))
     }
+    
     return(seqs)
 }
 
