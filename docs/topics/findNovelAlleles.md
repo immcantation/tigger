@@ -185,6 +185,9 @@ The following comments can appear in the `note` column:
 
 
 +  *Novel allele found*: A novel allele was detected.
++  *Same as:*: The same novel allele sequence
+has been identified multiple times. If this happens, the function
+will also throw the message 'Duplicated polymorphism(s) found'.
 +  *Plurality sequence too rare*: No sequence is frequent enough to pass 
 the J test (`j_max`).
 +  *A J-junction combination is too prevalent*: Not enough J diversity (`j_max`).

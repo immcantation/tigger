@@ -78,10 +78,10 @@ getPopularMutationCount(AIRRDb, SampleGermlineIGHV)
 
 
 ```
-[90m# A tibble: 1 x 2[39m
+[38;5;246m# A tibble: 1 x 2[39m
   v_gene  mutation_count
-  [3m[90m<chr>[39m[23m            [3m[90m<int>[39m[23m
-[90m1[39m IGHV1-8              1
+  [3m[38;5;246m<chr>[39m[23m            [3m[38;5;246m<int>[39m[23m
+[38;5;250m1[39m IGHV1-8              1
 
 ```
 

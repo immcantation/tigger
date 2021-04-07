@@ -127,16 +127,26 @@ find_unmutated=TRUE)
 
 
 ```
-        gene     alleles      counts total note
-1    IGHV1-2       02,04     664,302   966     
-2    IGHV1-3          01         226   226     
-3    IGHV1-8 01,02_G234T     467,370   837     
-4   IGHV1-18          01        1005  1005     
-5   IGHV1-24          01         105   105     
-6   IGHV1-46          01         624   624     
-7   IGHV1-58       01,02       23,18    41     
-8   IGHV1-69    01,04,06 515,469,280  1279     
-9 IGHV1-69-2          01          31    31     
+        gene     alleles      counts total
+1    IGHV1-2       02,04     664,302   966
+2    IGHV1-3          01         226   226
+3    IGHV1-8 01,02_G234T     467,370   837
+4   IGHV1-18          01        1005  1005
+5   IGHV1-24          01         105   105
+6   IGHV1-46          01         624   624
+7   IGHV1-58       01,02       23,18    41
+8   IGHV1-69    01,04,06 515,469,280  1279
+9 IGHV1-69-2          01          31    31
+                                             note
+1                                                
+2                                                
+3                                                
+4                                                
+5                                                
+6                                                
+7                                                
+8 Cannot distinguish IGHV1-69*01 and IGHV1-69D*01
+9                                                
 
 ```
 

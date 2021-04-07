@@ -87,25 +87,26 @@ subsampleDb(AIRRDb)
 
 
 ```
-[90m# A tibble: 140 x 26[39m
-   sequence_id sequence rev_comp productive v_call d_call j_call
-   [3m[90m<chr>[39m[23m       [3m[90m<chr>[39m[23m    [3m[90m<lgl>[39m[23m    [3m[90m<lgl>[39m[23m      [3m[90m<chr>[39m[23m  [3m[90m<chr>[39m[23m  [3m[90m<chr>[39m[23m 
-[90m 1[39m 251112_188… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ4…
-[90m 2[39m 062828_048… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD1… IGHJ3…
-[90m 3[39m 133739_332… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ6…
-[90m 4[39m 066458_268… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD2… IGHJ6…
-[90m 5[39m 129724_305… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ6…
-[90m 6[39m 199692_345… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ3…
-[90m 7[39m 182790_352… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ5…
-[90m 8[39m 204947_141… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD2… IGHJ4…
-[90m 9[39m 019164_015… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ4…
-[90m10[39m 256485_170… NNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD2… IGHJ1…
-[90m# … with 130 more rows, and 19 more variables: sequence_alignment [3m[90m<chr>[90m[23m,[39m
-[90m#   germline_alignment [3m[90m<lgl>[90m[23m, junction [3m[90m<chr>[90m[23m, junction_aa [3m[90m<lgl>[90m[23m, v_cigar [3m[90m<lgl>[90m[23m,[39m
-[90m#   d_cigar [3m[90m<lgl>[90m[23m, j_cigar [3m[90m<lgl>[90m[23m, vj_in_frame [3m[90m<lgl>[90m[23m, stop_codon [3m[90m<lgl>[90m[23m,[39m
-[90m#   v_germline_end [3m[90m<lgl>[90m[23m, np1_length [3m[90m<dbl>[90m[23m, np2_length [3m[90m<dbl>[90m[23m,[39m
-[90m#   j_germline_end [3m[90m<lgl>[90m[23m, junction_length [3m[90m<dbl>[90m[23m, mutated_invariant [3m[90m<lgl>[90m[23m,[39m
-[90m#   indels [3m[90m<lgl>[90m[23m, d_5_trim [3m[90m<dbl>[90m[23m, d_3_trim [3m[90m<dbl>[90m[23m, j_5_trim [3m[90m<dbl>[90m[23m[39m
+[38;5;246m# A tibble: 140 x 26[39m
+   sequence_id       sequence           rev_comp productive v_call d_call j_call
+   [3m[38;5;246m<chr>[39m[23m             [3m[38;5;246m<chr>[39m[23m              [3m[38;5;246m<lgl>[39m[23m    [3m[38;5;246m<lgl>[39m[23m      [3m[38;5;246m<chr>[39m[23m  [3m[38;5;246m<chr>[39m[23m  [3m[38;5;246m<chr>[39m[23m 
+[38;5;250m 1[39m 088849_0682_2530… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ4…
+[38;5;250m 2[39m 101756_3039_2086… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD6… IGHJ6…
+[38;5;250m 3[39m 020245_2263_3065… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ4…
+[38;5;250m 4[39m 063394_2816_2054… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ5…
+[38;5;250m 5[39m 110553_0911_1215… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD2… IGHJ4…
+[38;5;250m 6[39m 213015_1355_0914… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ5…
+[38;5;250m 7[39m 164458_1266_2351… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD5… IGHJ4…
+[38;5;250m 8[39m 044962_0498_3654… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD3… IGHJ1…
+[38;5;250m 9[39m 072351_0586_3203… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD1… IGHJ6…
+[38;5;250m10[39m 211468_3820_3687… NNNNNNNNNNNNNNNNN… [31mNA[39m       TRUE       IGHV1… IGHD1… IGHJ5…
+[38;5;246m# … with 130 more rows, and 19 more variables: sequence_alignment <chr>,[39m
+[38;5;246m#   germline_alignment <lgl>, junction <chr>, junction_aa <lgl>,[39m
+[38;5;246m#   v_cigar <lgl>, d_cigar <lgl>, j_cigar <lgl>, vj_in_frame <lgl>,[39m
+[38;5;246m#   stop_codon <lgl>, v_germline_end <lgl>, np1_length <dbl>,[39m
+[38;5;246m#   np2_length <dbl>, j_germline_end <lgl>, junction_length <dbl>,[39m
+[38;5;246m#   mutated_invariant <lgl>, indels <lgl>, d_5_trim <dbl>,[39m
+[38;5;246m#   d_3_trim <dbl>, j_5_trim <dbl>[39m
 
 ```
 
