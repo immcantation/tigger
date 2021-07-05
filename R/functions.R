@@ -1895,7 +1895,8 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
         mutate(FAMILY = getFamily(!! rlang::sym("SUBMITTED_CALLS"))) %>%
         # Determine the gene (exclude family); convert letters to numbers for sort
         mutate(GENE = getGene(!! rlang::sym("SUBMITTED_CALLS"))) %>%
-        mutate(GENE1 = gsub("[^-]+[-S]([^-\\*D]+).*","\\1",!! rlang::sym("SUBMITTED_CALLS"))) %>%
+        mutate(GENE1 = gsub("[^-]+([-S][^-\\*D]+).*","\\1",!! rlang::sym("SUBMITTED_CALLS"))) %>%
+        mutate(GENE1 = sub("^-","",GENE1)) %>%
         mutate(GENE1 = as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("GENE1")))) %>%
         # If there is a second gene number, determine that, too
         mutate(GENE2 = gsub("[^-]+[-S][^-]+-?","",!! rlang::sym("GENE"))) %>%
