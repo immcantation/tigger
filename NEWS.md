@@ -3,7 +3,14 @@ Version 1.0.0.999:  July 25, 2022
 
 New Features:
 
-+ Added the `pos_range_max` argument to `findNovelAlleles` and `plotNovel`.
++ Added the `pos_range_max` argument to `findNovelAlleles` and `plotNovel`. With
+  `pos_range_max`, TIgGER takes into account the position in which the V sequence
+   alignment ends based on the aligner (usually `pos_range_max="v_germline_end"`). 
+   With `pos_range_max=NULL`, mutation count uses all nucleotides in the IMGT V 
+   region. This means that when the V is trimmed on the 3', TIgGER includes in 
+   the mutation count nucleotides from the CDR3.
+
+We added the flag to take the column of "v_germline_end" and limit the mutation count up to the end position of the V sequence.
 
 Bug Fixes:
 

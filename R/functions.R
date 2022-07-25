@@ -32,7 +32,15 @@
 #'                            is \code{junction}.
 #' @param    junction_length  Number of junction nucleotides in the junction sequence.
 #'                            Default is \code{junction_length}.
-#' @param    pos_range_max    #TODO                                                
+#' @param    pos_range_max    Name of the column in \code{data} with the ending
+#'                            positions of the V alignment in the germline 
+#'                            (usually \code{v_germline_end}). The end of the alignment will
+#'                            be used to limit the range of positions to be 
+#'                            considered to count mutations. With \code{NULL} all 
+#'                            positions in the IMGT V region will be considered. In
+#'                            this case, in sequences where the V was trimmed 
+#'                            on the 3', mutated nucleotides could include nucleotides
+#'                            from the CDR3.
 #' @param    germline_min     the minimum number of sequences that must have a
 #'                            particular germline allele call for the allele to
 #'                            be analyzed.
