@@ -1,21 +1,31 @@
-Version 1.0.0.999:  February 3, 2021
+Version 1.0.0.999:  July 25, 2022
 -------------------------------------------------------------------------------
+
+New Features:
+
++ Added the `pos_range_max` argument to `findNovelAlleles` and `plotNovel`.
 
 Bug Fixes:
 
-+ Updated the error check in positionMutations to check for both empty GERM_NT 
++ Updated the error check in `positionMutations` to check for both empty GERM_NT 
   positions and absence of IMGT gaps in the germline. Before, gapped germlines 
   of less than 312 positions ( IGHV4-31*09, 311 positions) would have empty 
   GERM_NT positions, and the function would stop with an error message
   'Check you are using gapped reference germlines'.
   
-+ Fixed bug in selectNovel where keep_alleles=T would not keep different alleles 
++ Fixed bug in `selectNovel` where keep_alleles=T would not keep different alleles 
   leading to the same novel sequence.
+ 
++ Fixed bug `genotypeFasta` where it wouldn't find duplicate genes.
   
 General:
 
 + Replaced error message with warning in function getMutatedAA, to allow for
   germlines with N (e.g. IGHV1-45*01)
+  
++ To identify the closest reference, the `generateEvidence` function will only
+  consider reference germlines belongin to the same gene segment. This is to
+  avoid an error when the user provides VDJ references, not just V.
 
 Version 1.0.0:  May 12, 2020
 -------------------------------------------------------------------------------

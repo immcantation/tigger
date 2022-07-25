@@ -31,7 +31,8 @@
 #'                            the CDR3 and the two flanking conserved codons. Default
 #'                            is \code{junction}.
 #' @param    junction_length  Number of junction nucleotides in the junction sequence.
-#'                            Default is \code{junction_length}.                        
+#'                            Default is \code{junction_length}.
+#' @param    pos_range_max    #TODO                                                
 #' @param    germline_min     the minimum number of sequences that must have a
 #'                            particular germline allele call for the allele to
 #'                            be analyzed.
