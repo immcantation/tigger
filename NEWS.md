@@ -10,8 +10,6 @@ New Features:
    region. This means that when the V is trimmed on the 3', TIgGER includes in 
    the mutation count nucleotides from the CDR3.
 
-We added the flag to take the column of "v_germline_end" and limit the mutation count up to the end position of the V sequence.
-
 Bug Fixes:
 
 + Updated the error check in `positionMutations` to check for both empty GERM_NT 
