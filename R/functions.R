@@ -32,15 +32,6 @@
 #'                            is \code{junction}.
 #' @param    junction_length  Number of junction nucleotides in the junction sequence.
 #'                            Default is \code{junction_length}.
-#' @param    pos_range_max    Name of the column in \code{data} with the ending
-#'                            positions of the V alignment in the germline 
-#'                            (usually \code{v_germline_end}). The end of the alignment will
-#'                            be used to limit the range of positions to be 
-#'                            considered to count mutations. With \code{NULL} all 
-#'                            positions in the IMGT V region will be considered. In
-#'                            this case, in sequences where the V was trimmed 
-#'                            on the 3', mutated nucleotides could include nucleotides
-#'                            from the CDR3.
 #' @param    germline_min     the minimum number of sequences that must have a
 #'                            particular germline allele call for the allele to
 #'                            be analyzed.
@@ -52,6 +43,15 @@
 #'                            be considered by the algorithm.
 #' @param    pos_range        range of IMGT-numbered positions that should be
 #'                            considered by the algorithm.
+#' @param    pos_range_max    Name of the column in \code{data} with the ending
+#'                            positions of the V alignment in the germline 
+#'                            (usually \code{v_germline_end}). The end of the alignment will
+#'                            be used to limit the range of positions to be 
+#'                            considered to count mutations. With \code{NULL} all 
+#'                            positions in the IMGT V region will be considered. In
+#'                            this case, in sequences where the V was trimmed 
+#'                            on the 3', mutated nucleotides could include nucleotides
+#'                            from the CDR3.                            
 #' @param    alpha            alpha value used for determining whether the 
 #'                            fit y-intercept is greater than the \code{y_intercept}
 #'                            threshold.
@@ -177,12 +177,12 @@ findNovelAlleles <- function(data, germline_db,
                              seq="sequence_alignment",
                              junction="junction",
                              junction_length="junction_length",
-                             pos_range_max = NULL,
                              germline_min=200,
                              min_seqs=50,
                              auto_mutrange=TRUE,
                              mut_range=1:10,
                              pos_range=1:312,
+                             pos_range_max = NULL,
                              y_intercept=0.125,
                              alpha=0.05,
                              j_max=0.15,
@@ -1905,7 +1905,7 @@ sortAlleles <- function(allele_calls, method=c("name", "position")) {
         # Determine the gene (exclude family); convert letters to numbers for sort
         mutate(GENE = getGene(!! rlang::sym("SUBMITTED_CALLS"))) %>%
         mutate(GENE1 = gsub("[^-]+([-S][^-\\*D]+).*","\\1",!! rlang::sym("SUBMITTED_CALLS"))) %>%
-        mutate(GENE1 = sub("^-","",GENE1)) %>%
+        mutate(GENE1 = sub("^-","",!!rlang::sym("GENE1"))) %>%
         mutate(GENE1 = as.numeric(gsub("[^0-9]+", "99", !!rlang::sym("GENE1")))) %>%
         # If there is a second gene number, determine that, too
         mutate(GENE2 = gsub("[^-]+[-S][^-]+-?","",!! rlang::sym("GENE"))) %>%
@@ -2049,7 +2049,7 @@ mutationRangeSubset <- function(data, germline, mut_range, pos_range,
     }else{
         data$MUT_COUNT =  data %>%
             mutate(subseq = substring(!!rlang::sym(seq), min(pos_range), min(max(pos_range), !!rlang::sym(pos_range_max)))) %>%
-            pull(subseq) %>% 
+            pull(!!rlang::sym("subseq")) %>% 
             paste(pads, ., sep="") %>%
             getMutatedPositions(germline) %>%
             sapply(length)

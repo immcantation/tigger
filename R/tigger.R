@@ -67,9 +67,8 @@
 #'                          bind_cols bind_rows combine inner_join
 #'                          filter select arrange
 #'                          group_by ungroup
-#'                          mutate transmute
-#'                          rename summarise
-#'                          slice
+#'                          mutate pull rename slice
+#'                          summarise transmute
 #' @importFrom  foreach     foreach %dopar% registerDoSEQ
 #' @importFrom  graphics    plot
 #' @importFrom  gridExtra   arrangeGrob

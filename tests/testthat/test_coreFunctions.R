@@ -4,6 +4,10 @@ load(sample_db)
 airr_db <- file.path("..", "tests-data", "airr_db.rda")
 load(airr_db)
 
+SampleDbPosRangeMax <- file.path("..", "tests-data", "SampleDbPosRangeMax.rda")
+load(SampleDbPosRangeMax)
+
+
 germline_ighv <- file.path("..", "tests-data", "germline_ighv.rda")
 load(germline_ighv)
 
@@ -62,6 +66,20 @@ test_that("Test findNovelAlleles",{
                                       seq="sequence_alignment")
     expect_equivalent(geno_bay, geno_bay_airr)
     
+})
+
+
+test_that("Test findNovelAlleles - pos_range_max",{ 
+    nv_pos_range_318 <- findNovelAlleles(SampleDbPosRangeMax, 
+                                         germline_db = SampleGermlineIGHV,
+                                         pos_range=315:318)
+    nv_pos_range_318_vend <- findNovelAlleles(SampleDbPosRangeMax, 
+                                              germline_db = SampleGermlineIGHV,
+                                              pos_range=315:318,
+                                              pos_range_max="v_germline_end")   
+    # Finds false positive, position 318.Not found when using pos_range_max="v_germline_end"
+    expect_equal(selectNovel(nv_pos_range_318)[['pos_max']],318)
+    expect_equal(nrow(selectNovel(nv_pos_range_318_vend)),0)
 })
 
 test_that("Test sortAlleles",{ 
