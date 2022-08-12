@@ -1,21 +1,36 @@
-Version 1.0.0.999:  February 3, 2021
+Version 1.0.0.999:  July 25, 2022
 -------------------------------------------------------------------------------
+
+New Features:
+
++ Added the `pos_range_max` argument to `findNovelAlleles` and `plotNovel`. With
+  `pos_range_max`, TIgGER takes into account the position in which the V sequence
+   alignment ends based on the aligner (usually `pos_range_max="v_germline_end"`). 
+   With `pos_range_max=NULL`, mutation count uses all nucleotides in the IMGT V 
+   region. This means that when the V is trimmed on the 3', TIgGER includes in 
+   the mutation count nucleotides from the CDR3.
 
 Bug Fixes:
 
-+ Updated the error check in positionMutations to check for both empty GERM_NT 
++ Updated the error check in `positionMutations` to check for both empty GERM_NT 
   positions and absence of IMGT gaps in the germline. Before, gapped germlines 
   of less than 312 positions ( IGHV4-31*09, 311 positions) would have empty 
   GERM_NT positions, and the function would stop with an error message
   'Check you are using gapped reference germlines'.
   
-+ Fixed bug in selectNovel where keep_alleles=T would not keep different alleles 
++ Fixed bug in `selectNovel` where keep_alleles=T would not keep different alleles 
   leading to the same novel sequence.
+ 
++ Fixed bug `genotypeFasta` where it wouldn't find duplicate genes.
   
 General:
 
 + Replaced error message with warning in function getMutatedAA, to allow for
   germlines with N (e.g. IGHV1-45*01)
+  
++ To identify the closest reference, the `generateEvidence` function will only
+  consider reference germlines belongin to the same gene segment. This is to
+  avoid an error when the user provides VDJ references, not just V.
 
 Version 1.0.0:  May 12, 2020
 -------------------------------------------------------------------------------
