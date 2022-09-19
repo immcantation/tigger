@@ -724,7 +724,10 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #'                            the CDR3 and the two flanking conserved codons. Default
 #'                            is \code{junction}.
 #' @param    junction_length  number of junction nucleotides in the junction sequence.
-#'                            Default is \code{junction_length}.                        
+#'                            Default is \code{junction_length}.    
+#' @param    pos_range_max    Name of the column in \code{data} with the ending
+#'                            positions of the V alignment in the germline 
+#'                            (usually \code{v_germline_end}).                                               
 #' @param    ncol             number of columns to use when laying out the plots.
 #' @param    multiplot        whether to return one single plot (\code{TRUE}) or a list 
 #'                            with the three individual plots (\code{FALSE}).
@@ -738,7 +741,8 @@ selectNovel <- function(novel, keep_alleles=FALSE) {
 #' @export
 plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
                       seq="sequence_alignment",
-                      junction="junction", junction_length="junction_length",pos_range_max=NULL,
+                      junction="junction", junction_length="junction_length",
+                      pos_range_max=NULL,
                       ncol=1, multiplot=TRUE) {
     . = NULL
     

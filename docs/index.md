@@ -44,7 +44,7 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 # Authors
 
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
-[Susanna Marqfiruez](mailto:susanna.marquez@yale.edu) (aut)  
+[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut)  
 [Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)  
 [Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut, cre)  
 [Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)  

@@ -59,6 +59,11 @@ junction_length
 :   number of junction nucleotides in the junction sequence.
 Default is `junction_length`.
 
+pos_range_max
+:   Name of the column in `data` with the ending
+positions of the V alignment in the germline 
+(usually `v_germline_end`).
+
 ncol
 :   number of columns to use when laying out the plots.
 
