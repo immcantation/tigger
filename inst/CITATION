@@ -9,7 +9,28 @@ bibentry(bibtype = "Article",
                            email="steven.kleinstein@yale.edu")),
          
          year = 2015,
+         DOI = "10.1073/pnas.1417683112",
          journal = "Proceedings of the National Academy of Sciency of the United
          States of America",
          number = 122,
          pages = "E862-70")
+         
+bibentry(bibtype = "Article",
+         title = " Identification of Subject-Specific Immunoglobulin Alleles From Expressed Repertoire Sequencing Data.",
+         author = c(person("Daniel", "Gadala-Maria"),
+                    person("Moriah", "Gidoni"),
+                    person("Susanna", "Marquez"),
+                    person("Jason A", "Vander Heiden"),
+                    person("Justin T", "Kos"),
+                    person("Corey T", "Watson"),
+                    person("Kevin C", "O'connor"),
+                    person("Gur", "Yaari",
+                            email="Gur Yaari, gur.yaari@biu.ac.il"),
+                    person("Steven H.", "Kleinstein",
+                           email="steven.kleinstein@yale.edu")),
+         
+         year = 2019,
+         DOI = "10.3389/fimmu.2019.00129",
+         journal = "Frontiers in Immunology",
+         number = 10,
+         pages = 129)

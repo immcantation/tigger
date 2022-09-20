@@ -25,7 +25,7 @@ The application of TIgGER continues to identify a surprisingly high frequency of
     * Preliminary V allele calls
     * Preliminary J allele calls
     * Length of the junction region
-* Germline Ig sequences in IMGT-gapped fasta format (e.g., as those downloaded from [IMGT/GENE-DB](https://www.imgt.org/genedb)
+* Germline Ig sequences in IMGT-gapped fasta format (e.g., as those downloaded from [IMGT/GENE-DB](https://www.imgt.org/genedb/)
 
 The former can be created through the use of [IMGT/HighV-QUEST](https://www.imgt.org) and [Change-O](http://changeo.readthedocs.io).
 
@@ -58,21 +58,16 @@ Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated
 analysis of high-throughput B cell sequencing data reveals a high
 frequency of novel immunoglobulin V gene segment alleles.” _Proceedings
 of the National Academy of Sciency of the United States of America_,
-E862-70.
+E862-70. doi: 10.1073/pnas.1417683112 (URL:
+https://doi.org/10.1073/pnas.1417683112).
 
-A BibTeX entry for LaTeX users is
+Gadala-Maria D, Gidoni M, Marquez S, Vander Heiden J, Kos J, Watson C,
+O'connor K, Yaari G, Kleinstein S (2019). “ Identification of
+Subject-Specific Immunoglobulin Alleles From Expressed Repertoire
+Sequencing Data.” _Frontiers in Immunology_, 129. doi:
+10.3389/fimmu.2019.00129 (URL:
+https://doi.org/10.3389/fimmu.2019.00129).
 
-  @Article{,
-    title = {Automated analysis of high-throughput B cell sequencing data
-         reveals a high frequency of novel immunoglobulin V gene segment
-         alleles.},
-    author = {Daniel Gadala-Maria and Gur Yaari and Mohamed Uduman and Steven H. Kleinstein},
-    year = {2015},
-    journal = {Proceedings of the National Academy of Sciency of the United
-         States of America},
-    number = {122},
-    pages = {E862-70},
-  }
 
 
 
