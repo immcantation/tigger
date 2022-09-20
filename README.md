@@ -25,7 +25,7 @@ The application of TIgGER continues to identify a surprisingly high frequency of
     * Preliminary V allele calls
     * Preliminary J allele calls
     * Length of the junction region
-* Germline Ig sequences in IMGT-gapped fasta format (e.g., as those downloaded from [IMGT/GENE-DB](https://www.imgt.org/genedb)
+* Germline Ig sequences in IMGT-gapped fasta format (e.g., as those downloaded from [IMGT/GENE-DB](https://www.imgt.org/genedb/)
 
 The former can be created through the use of [IMGT/HighV-QUEST](https://www.imgt.org) and [Change-O](http://changeo.readthedocs.io).
 
