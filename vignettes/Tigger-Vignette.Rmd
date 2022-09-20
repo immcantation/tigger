@@ -272,11 +272,11 @@ of them unmutated.
 
 ## References
 
-1. [Alamyar *et al.* (2010)](http://www.imgt.org/IMGTindex/IMGTHighV-QUEST.html)
+1. [Alamyar *et al.* (2010)](https://www.imgt.org/HighV-QUEST/)
 2. [Munshaw and Kepler (2010)](http://www.ncbi.nlm.nih.gov/pubmed/20147303)
 3. [Lefranc *et al.* (2003)](http://www.ncbi.nlm.nih.gov/pubmed/12477501)
 
-[1]: http://www.imgt.org/IMGTindex/IMGTHighV-QUEST.html "Alamyar et al. (2010)" 
+[1]: https://www.imgt.org/HighV-QUEST/ "Alamyar et al. (2010)" 
 [2]: http://www.ncbi.nlm.nih.gov/pubmed/20147303 "Munshaw and Kepler (2010)" 
 [3]: http://www.ncbi.nlm.nih.gov/pubmed/12477501 "Lefranc et al. (2003)"
 
