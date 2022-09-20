@@ -4,11 +4,11 @@ Version: 1.0.1
 Date: 2022-09-19
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
-             person("Susanna", "Marquez", role=c("aut"), 
+             person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),                    
              person("Moriah", "Cohen", role=c("aut"), 
                     email="moriah.cohen@biu.ac.il"),   
-             person("Jason", "Vander Heiden", role=c("aut", "cre"), 
+             person("Jason", "Vander Heiden", role=c("aut"), 
                     email="jason.vanderheiden@gmail.com"),
              person("Gur", "Yaari", role=c("aut"), 
                     email="gur.yaari@biu.ac.il"),
