@@ -1,3 +1,6 @@
+#' @keywords internal
+"_PACKAGE"
+
 # Project documentation for tigger
 
 #' tigger
