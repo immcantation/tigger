@@ -34,7 +34,7 @@ Depends:
     ggplot2 (>= 3.4.0)
 Imports:
     alakazam (>= 1.1.0.999),
-    dplyr (>= 0.8.1),
+    dplyr (>= 1.0.0),
     doParallel,
     foreach,
     graphics,
@@ -46,7 +46,7 @@ Imports:
     rlang,
     stats,
     stringi,
-    tidyr (>= 0.1.0)
+    tidyr (>= 1.1.0)
 Suggests:
     knitr,
     rmarkdown,
