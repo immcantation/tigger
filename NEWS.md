@@ -1,9 +1,10 @@
-Version 1.0.1.999:  February 13, 2023
+Version 1.0.1.999:  September 11, 2023
 -------------------------------------------------------------------------------
 
 General:
 
-+ Updated dependencies to ggplot2 >= 3.4.0
++ Updated dependencies to ggplot2 >= 3.4.0, dplyr >= 1.0.0, and 
+  tidyr >= 1.1.0 due to deprecation warnings.
 
 
 Version 1.0.1:  September 19, 2022
