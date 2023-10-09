@@ -1,4 +1,5 @@
 #' @keywords internal
+#' @aliases tigger-package
 "_PACKAGE"
 
 # Project documentation for tigger
