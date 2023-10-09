@@ -1,10 +1,10 @@
-Version 1.0.1.999:  September 11, 2023
+Version 1.1.0:  October 10, 2023
 -------------------------------------------------------------------------------
 
 General:
 
-+ Updated dependencies to ggplot2 >= 3.4.0, dplyr >= 1.0.0, and 
-  tidyr >= 1.1.0 due to deprecation warnings.
++ Updated dependencies to R >= 4.0, alakazam >= 1.3.0, ggplot2 >= 3.4.0, 
+  dplyr >= 1.0.0, and tidyr >= 1.1.0 and fixed deprecation warnings.  
 
 
 Version 1.0.1:  September 19, 2022
