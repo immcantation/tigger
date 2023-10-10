@@ -20,7 +20,7 @@ Description: Infers the V genotype of an individual from immunoglobulin (Ig)
     any novel alleles. This information is then used to correct existing V 
     allele calls from among the sample sequences.
     Citations:
-    Gadala-Maria, et al (2015) <doi:10.1073/pnas.1417683112>.
+    Gadala-Maria, et al (2015) <doi:10.1073/pnas.1417683112>,
     Gadala-Maria, et al (2019) <doi:10.3389/fimmu.2019.00129>.
 License: AGPL-3
 URL: http://tigger.readthedocs.io
@@ -46,7 +46,8 @@ Imports:
     rlang,
     stats,
     stringi,
-    tidyr (>= 1.1.0)
+    tidyr (>= 1.1.0),
+    utils
 Suggests:
     knitr,
     rmarkdown,
