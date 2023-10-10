@@ -16,7 +16,7 @@ bibentry(bibtype = "Article",
          pages = "E862-70")
          
 bibentry(bibtype = "Article",
-         title = " Identification of Subject-Specific Immunoglobulin Alleles From Expressed Repertoire Sequencing Data.",
+         title = "Identification of Subject-Specific Immunoglobulin Alleles From Expressed Repertoire Sequencing Data.",
          author = c(person("Daniel", "Gadala-Maria"),
                     person("Moriah", "Gidoni"),
                     person("Susanna", "Marquez"),

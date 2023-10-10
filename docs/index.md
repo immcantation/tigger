@@ -62,7 +62,7 @@ E862-70. doi:10.1073/pnas.1417683112
 <https://doi.org/10.1073/pnas.1417683112>.
 
 Gadala-Maria D, Gidoni M, Marquez S, Vander Heiden J, Kos J, Watson C,
-O'connor K, Yaari G, Kleinstein S (2019). “ Identification of
+O'connor K, Yaari G, Kleinstein S (2019). “Identification of
 Subject-Specific Immunoglobulin Alleles From Expressed Repertoire
 Sequencing Data.” _Frontiers in Immunology_, 129.
 doi:10.3389/fimmu.2019.00129
