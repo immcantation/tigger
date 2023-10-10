@@ -233,7 +233,7 @@ generateEvidence <- function(data, novel, genotype, genotype_db,
         dplyr::ungroup() %>%
         dplyr::mutate(alleles=strsplit(as.character(.data$alleles), ","),
                       counts=strsplit(as.character(.data$counts), ",")) %>%
-        tidyr::unnest(all_of(unnest_cols)) %>%
+        tidyr::unnest(dplyr::all_of(unnest_cols)) %>%
         dplyr::mutate(polymorphism_call=paste0(.data$gene, "*" , .data$alleles)) %>%
         dplyr::filter(.data$polymorphism_call %in% novel$polymorphism_call)  %>%
         dplyr::rename(allele="alleles")
