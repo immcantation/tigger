@@ -1,5 +1,12 @@
 # Release Notes
 
+Version 1.1.1: August 14, 2024
+-------------------------------------------------------------------------------
+
+Documentation:
+
++ This is a documentation-only update to address changes in Read the Docs.
+
 Version 1.1.0:  October 10, 2023
 -------------------------------------------------------------------------------
 

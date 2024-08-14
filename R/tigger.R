@@ -54,7 +54,6 @@
 #' }
 #' 
 #' @name        tigger
-#' @docType     package
 #' @references
 #' \enumerate{
 #'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
