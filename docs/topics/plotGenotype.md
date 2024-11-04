@@ -23,11 +23,11 @@ Arguments
 -------------------
 
 genotype
-:   `data.frame` of alleles denoting a genotype, 
+:   `data.frame` of alleles denoting a genotype,
 as returned by [inferGenotype](inferGenotype.md).
 
 facet_by
-:   column name in `genotype` to facet the plot by. 
+:   column name in `genotype` to facet the plot by.
 if `NULL`, then do not facet the plot.
 
 gene_sort

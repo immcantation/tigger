@@ -3,7 +3,7 @@
 Description
 --------------------
 
-`cleanSeqs` capitalizes nucleotides and replaces all characters 
+`cleanSeqs` capitalizes nucleotides and replaces all characters
 besides `c("A", "C", "G", "T", "-", ".")` with `"N"`.
 
 

@@ -23,10 +23,10 @@ Arguments
 -------------------
 
 samples
-:   vector of strings respresenting aligned sequences
+:   vector of strings representing aligned sequences
 
 germlines
-:   vector of strings respresenting aligned sequences
+:   vector of strings representing aligned sequences
 to which `samples` will be compared. If only
 one string is submitted, it will be used for all
 `samples`.

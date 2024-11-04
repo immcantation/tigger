@@ -4,7 +4,7 @@ Description
 --------------------
 
 `getMutCount` takes a set of nucleotide sequences and their allele calls
-and determines the distance between that seqeunce and any germline alleles
+and determines the distance between that sequence and any germline alleles
 contained within the call
 
 
@@ -21,7 +21,7 @@ samples
 :   vector of IMGT-gapped sample V sequences
 
 allele_calls
-:   vector of strings respresenting Ig allele calls for
+:   vector of strings representing Ig allele calls for
 the sequences in `samples`, where multiple
 calls are separated by a comma
 

@@ -4,8 +4,8 @@ Description
 --------------------
 
 Here we provide a **T**ool for **I**mmuno**g**lobulin
-**G**enotype **E**lucidation via **R**ep-Seq (TIgGER). 
-TIgGER inferrs the set of Ig alleles carried by an
+**G**enotype **E**lucidation via **R**ep-Seq (TIgGER).
+TIgGER infers the set of Ig alleles carried by an
 individual (including any novel alleles) and then uses this set of alleles to
 correct the initial assignments given to sample sequences by existing tools.
 
@@ -39,8 +39,8 @@ Allele detection and genotyping
 + [plotGenotype](plotGenotype.md):           A colorful genotype visualization.
 + [genotypeFasta](genotypeFasta.md):          Convert a genotype to sequences.
 + [reassignAlleles](reassignAlleles.md):        Correct allele calls.
-+ [generateEvidence](generateEvidence.md):       Generate evidence for the genotype and 
-allele detection inferrence.
++ [generateEvidence](generateEvidence.md):       Generate evidence for the genotype and
+allele detection inference.
 
 
 
@@ -74,8 +74,8 @@ References
 -------------------
 
 
-1.  Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
-sequencing data reveals a high frequency of novel immunoglobulin V gene 
+1.  Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell
+sequencing data reveals a high frequency of novel immunoglobulin V gene
 segment alleles. PNAS. 112(8):E862-70.
 
 

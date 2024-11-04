@@ -17,13 +17,13 @@ Arguments
 -------------------
 
 sequence
-:   starting nucletide sequence.
+:   starting nucleotide sequence.
 
 positions
 :   numeric vector of positions which to be changed.
 
 nucleotides
-:   character vector of nucletides to which to change the
+:   character vector of nucleotides to which to change the
 positions.
 
 

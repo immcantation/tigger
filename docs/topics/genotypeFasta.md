@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 genotype
-:   `data.frame` of alleles denoting a genotype, 
+:   `data.frame` of alleles denoting a genotype,
 as returned by [inferGenotype](inferGenotype.md).
 
 germline_db
@@ -26,7 +26,7 @@ matching the alleles detailed in `genotype`.
 
 novel
 :   an optional `data.frame` containing putative
-novel alleeles of the type returned by
+novel alleles of the type returned by
 [findNovelAlleles](findNovelAlleles.md).
 
 

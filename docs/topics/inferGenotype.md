@@ -4,10 +4,10 @@ Description
 --------------------
 
 `inferGenotype` infers an subject's genotype using a frequency method.
-The genotype is inferred by finding the minimum number set of alleles that 
-can explain the majority of each gene's calls. The most common allele of 
-each gene is included in the genotype first, and the next most common allele 
-is added until the desired fraction of alleles can be explained. In this 
+The genotype is inferred by finding the minimum number set of alleles that
+can explain the majority of each gene's calls. The most common allele of
+each gene is included in the genotype first, and the next most common allele
+is added until the desired fraction of alleles can be explained. In this
 way, mistaken allele calls (resulting from sequences which
 by chance have been mutated to look like another allele) can be removed.
 
@@ -53,7 +53,7 @@ v_call
 Default is `"v_call"`.
 
 seq
-:   name of the column in `data` with the 
+:   name of the column in `data` with the
 aligned, IMGT-numbered, V(D)J nucleotide sequence.
 Default is `sequence_alignment`.
 
@@ -81,16 +81,16 @@ unmutated samples.
 Value
 -------------------
 
-A `data.frame` of alleles denoting the genotype of the subject containing 
+A `data.frame` of alleles denoting the genotype of the subject containing
 the following columns:
 
 
 +  `gene`: The gene name without allele.
 +  `alleles`: Comma separated list of alleles for the given `gene`.
-+  `counts`: Comma separated list of observed sequences for each 
++  `counts`: Comma separated list of observed sequences for each
 corresponding allele in the `alleles` list.
 +  `total`: The total count of observed sequences for the given `gene`.
-+  `note`: Any comments on the inferrence.
++  `note`: Any comments on the inference.
 
 
 
@@ -104,7 +104,7 @@ not available. Calls containing multiple alleles are treated as
 belonging to all groups. If `novel` is provided, all
 sequences that are assigned to the same starting allele as any
 novel germline allele will have the novel germline allele appended
-to their assignent prior to searching for unmutated sequences.
+to their assignment prior to searching for unmutated sequences.
 
 
 Note
@@ -148,7 +148,7 @@ See also
 
 [plotGenotype](plotGenotype.md) for a colorful visualization and
 [genotypeFasta](genotypeFasta.md) to convert the genotype to nucleotide sequences.
-See [inferGenotypeBayesian](inferGenotypeBayesian.md) to infer a subject-specific genotype 
+See [inferGenotypeBayesian](inferGenotypeBayesian.md) to infer a subject-specific genotype
 using a Bayesian approach.
 
 

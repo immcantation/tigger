@@ -38,7 +38,7 @@ that were in the input.
 Details
 -------------------
 
-If, for instance, subject has in his genome `IGHV1-2*02` and a novel 
+If, for instance, subject has in his genome `IGHV1-2*02` and a novel
 allele equally close to `IGHV1-2*02` and `IGHV1-2*05`, the novel allele may be
 detected by analyzing sequences that best align to either of these alleles.
 If `keep_alleles` is `TRUE`, both polymorphic allele calls will

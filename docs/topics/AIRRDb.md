@@ -3,7 +3,7 @@
 Description
 --------------------
 
-A `data.frame` of example V(D)J immunoglobulin sequences derived from a 
+A `data.frame` of example V(D)J immunoglobulin sequences derived from a
 single individual (PGP1), sequenced on the Roche 454 platform, and assigned by
 IMGT/HighV-QUEST to IGHV1 family alleles.
 
@@ -30,8 +30,8 @@ References
 -------------------
 
 
-1.  Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
-sequencing data reveals a high frequency of novel immunoglobulin V gene 
+1.  Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell
+sequencing data reveals a high frequency of novel immunoglobulin V gene
 segment alleles. PNAS. 112(8):E862-70.
 
 

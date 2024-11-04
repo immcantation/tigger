@@ -3,7 +3,7 @@
 Description
 --------------------
 
-`findUnmutatedCalls` determines which allele calls would represent a 
+`findUnmutatedCalls` determines which allele calls would represent a
 perfect match with the germline sequence, given a vector of allele calls and
 mutation counts. In the case of multiple alleles being assigned to a
 sequence, only the subset that would represent a perfect match is returned.
@@ -19,7 +19,7 @@ Arguments
 -------------------
 
 allele_calls
-:   vector of strings respresenting Ig allele calls,
+:   vector of strings representing Ig allele calls,
 where multiple calls are separated by a comma.
 
 sample_seqs
@@ -45,7 +45,7 @@ Examples
 
 ```R
 # Find which of the sample alleles are unmutated
-calls <- findUnmutatedCalls(AIRRDb$v_call, AIRRDb$sequence_alignment, 
+calls <- findUnmutatedCalls(AIRRDb$v_call, AIRRDb$sequence_alignment,
 germline_db=SampleGermlineIGHV)
 
 ```

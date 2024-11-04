@@ -1,4 +1,4 @@
-**SampleGenotype** - *Example genotype inferrence results*
+**SampleGenotype** - *Example genotype inference results*
 
 Description
 --------------------
@@ -25,8 +25,8 @@ References
 -------------------
 
 
-1.  Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
-sequencing data reveals a high frequency of novel immunoglobulin V gene 
+1.  Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell
+sequencing data reveals a high frequency of novel immunoglobulin V gene
 segment alleles. PNAS. 112(8):E862-70.
 
 

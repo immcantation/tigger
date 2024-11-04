@@ -36,7 +36,7 @@ appended to `file` instead of overwriting it
 Value
 -------------------
 
-A named vector of strings respresenting Ig alleles.
+A named vector of strings representing Ig alleles.
 
 
 

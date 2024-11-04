@@ -5,13 +5,13 @@
 # Project documentation for tigger
 
 #' tigger
-#' 
+#'
 #' Here we provide a \strong{T}ool for \strong{I}mmuno\strong{g}lobulin
-#' \strong{G}enotype \strong{E}lucidation via \strong{R}ep-Seq (TIgGER). 
-#' TIgGER inferrs the set of Ig alleles carried by an
+#' \strong{G}enotype \strong{E}lucidation via \strong{R}ep-Seq (TIgGER).
+#' TIgGER infers the set of Ig alleles carried by an
 #' individual (including any novel alleles) and then uses this set of alleles to
 #' correct the initial assignments given to sample sequences by existing tools.
-#' 
+#'
 #' @details
 #' Immunoglobulin repertoire sequencing (AIRR-Seq, Rep-Seq) data is currently the
 #' subject of much study. A key step in analyzing these data involves assigning
@@ -21,7 +21,7 @@
 #' step will fail. Additionally, this alignment has an associated error rate of
 #' ~5%, notably among sequences carrying a large number of somatic
 #' mutations. The purpose of TIgGER is to address these issues.
-#' 
+#'
 #' @section  Allele detection and genotyping:
 #' \itemize{
 #'   \item  \link{findNovelAlleles}:       Detect novel alleles.
@@ -31,10 +31,10 @@
 #'   \item  \link{plotGenotype}:           A colorful genotype visualization.
 #'   \item  \link{genotypeFasta}:          Convert a genotype to sequences.
 #'   \item  \link{reassignAlleles}:        Correct allele calls.
-#'   \item  \link{generateEvidence}:       Generate evidence for the genotype and 
-#'                                         allele detection inferrence.
+#'   \item  \link{generateEvidence}:       Generate evidence for the genotype and
+#'                                         allele detection inference.
 #' }
-#' 
+#'
 #' @section  Mutation handling:
 #' \itemize{
 #'   \item  \link{getMutatedPositions}:      Find mutation locations.
@@ -44,7 +44,7 @@
 #'                                           mutation count.
 #'   \item  \link{insertPolymorphisms}:      Insert SNPs into a sequence.
 #' }
-#' 
+#'
 #' @section  Input, output and formatting:
 #' \itemize{
 #'   \item  \link{readIgFasta}:        Read a fasta file of Ig sequences.
@@ -52,15 +52,15 @@
 #'   \item  \link{sortAlleles}:        Sort allele names intelligently.
 #'   \item  \link{cleanSeqs}:          Standardize sequence format.
 #' }
-#' 
+#'
 #' @name        tigger
 #' @references
 #' \enumerate{
-#'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell 
-#'         sequencing data reveals a high frequency of novel immunoglobulin V gene 
+#'   \item Gadala-Maria, et al. (2015) Automated analysis of high-throughput B cell
+#'         sequencing data reveals a high frequency of novel immunoglobulin V gene
 #'         segment alleles. PNAS. 112(8):E862-70.
 #' }
-#' 
+#'
 #' @import      ggplot2
 #' @importFrom  alakazam    getAllele getGene getFamily translateDNA DNA_COLORS checkColumns
 #' @importFrom  doParallel  registerDoParallel
@@ -91,6 +91,6 @@ NULL
 # Package loading actions
 .onAttach <- function(libname, pkgname) {
     msg <- citation(pkgname)
-    msg <-paste(c(format(msg,"citation")),collapse="\n\n")
+    msg <- paste(c(format(msg, "citation")), collapse = "\n\n")
     packageStartupMessage(msg)
 }

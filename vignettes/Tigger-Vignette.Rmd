@@ -30,7 +30,7 @@ vignette: >
 
 ## Introduction 
 
-Adapative immune receptor repertoire sequencing (AIRR-Seq, Rep-Seq) data is 
+Adaptive immune receptor repertoire sequencing (AIRR-Seq, Rep-Seq) data is 
 currently the subject of much study. A key step in analyzing these data involves 
 assigning the closest known V(D)J germline alleles to the (often somatically mutated) 
 sample sequences using a tool such as IMGT/HighV-QUEST ([[1]][1]). However, 
@@ -117,7 +117,7 @@ novel_rows <- selectNovel(novel)
 The TIgGER procedure for identifying novel alleles (see citation above) involves
 taking all sequences which align to a particular germline allele and, for each 
 position along the aligned sequences, plotting the mutation frequency at that 
-postion as a function of the sequence-wide mutation count. While mutational 
+position as a function of the sequence-wide mutation count. While mutational 
 hot-spots and cold-spots are both expected to have a *y*-intercept around zero, 
 polymorphic positions will have a *y*-intercept larger than zero. The required 
 minimum *y*-intercept may be specified in `findNovelAlleles` by `y_intercept`, but 
@@ -138,7 +138,7 @@ can be ruled out as not being clonally related. The maximum portion of sequences
 which can consist of a specific combination of J gene and junction length may be
 specified in `findNovelAlleles` by `j_max`.
 
-The three pieces of evidence desribed above can be viewed for any allele call
+The three pieces of evidence described above can be viewed for any allele call
 made by `findNovelAlleles` using the function `plotNovel`.
 
 

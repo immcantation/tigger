@@ -34,11 +34,11 @@ germline_db
 :   named list of IMGT-gapped germline sequences.
 
 v_call
-:   name of the column in `data` with V allele calls. 
+:   name of the column in `data` with V allele calls.
 Default is `v_call`.
 
 seq
-:   name of the column in `data` with the 
+:   name of the column in `data` with the
 aligned, IMGT-numbered, V(D)J nucleotide sequence.
 Default is `sequence_alignment`.
 

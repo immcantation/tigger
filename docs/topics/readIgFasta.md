@@ -17,7 +17,7 @@ Arguments
 -------------------
 
 fasta_file
-:   fasta-formatted file of immunoglobuling sequences.
+:   fasta-formatted file of immunoglobulin sequences.
 
 strip_down_name
 :   if `TRUE`, will extract only the allele name
@@ -33,7 +33,7 @@ uppercase.
 Value
 -------------------
 
-Named vector of strings respresenting Ig alleles.
+Named vector of strings representing Ig alleles.
 
 
 

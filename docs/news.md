@@ -125,7 +125,7 @@ Bug Fixes:
   
 New Features:
 
-+ Added a Bayesian approach to genotype inferrence as the 
++ Added a Bayesian approach to genotype inference as the 
   `inferGenotypeBayesian` function.
 + Added the function `generateEvidence` to build a complete evidence table
   from the results of `findNovelAlleles`, `inferGenotype`, 
@@ -204,7 +204,7 @@ Version 0.2.6:  July 01, 2016
 Version 0.2.5.999:  June 10, 2016
 -------------------------------------------------------------------------------
 
-+ Fixed a bug werein `findNovelAlleles()` was not running in parallel, even 
++ Fixed a bug wherein `findNovelAlleles()` was not running in parallel, even 
   when `nproc` > 1.
 + Changed default to `nproc=1` in `findNovelAlleles()`.
 
