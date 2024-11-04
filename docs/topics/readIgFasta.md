@@ -43,6 +43,7 @@ Examples
 ```R
 ### Not run:
 # germlines <- readIgFasta("ighv.fasta")
+
 ```
 
 

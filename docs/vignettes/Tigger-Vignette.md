@@ -60,7 +60,7 @@ the IMGT database (build 2014-08-4) are provided with this package as `SampleGer
 You may read in your own fasta file using `readIgFasta`.
 
 
-```r
+``` r
 # Load packages required for this example
 library(tigger)
 library(dplyr)
@@ -78,13 +78,13 @@ parameters used when searching for novel alleles (which can be optionally
 changed in `findNovelAlleles`).
 
 
-```r
+``` r
 # Detect novel alleles
 novel <- findNovelAlleles(AIRRDb, SampleGermlineIGHV, nproc=1)
 ```
 
 
-```r
+``` r
 # Extract and view the rows that contain successful novel allele calls
 novel_rows <- selectNovel(novel)
 ```
@@ -118,7 +118,7 @@ made by `findNovelAlleles` using the function `plotNovel`.
 
 
 
-```r
+``` r
 # Plot evidence of the first (and only) novel allele from the example data
 novel_row <- which(!is.na(novel$polymorphism_call))[1]
 plotNovel(AIRRDb, novel[novel_row, ])
@@ -153,7 +153,7 @@ nucleotide sequences, the user may use the function `genotypeFasta`. To save
 this vector to a fasta file, `writeFasta` may be used.
 
 
-```r
+``` r
 # Infer the individual's genotype, using only unmutated sequences and checking
 # for the use of the novel alleles inferred in the earlier step.
 geno <- inferGenotype(AIRRDb, germline_db=SampleGermlineIGHV, novel=novel,
@@ -165,29 +165,19 @@ print(geno)
 ```
 
 ```
-##         gene     alleles      counts total
-## 1    IGHV1-2       02,04     664,302   966
-## 2    IGHV1-3          01         226   226
-## 3    IGHV1-8 01,02_G234T     467,370   837
-## 4   IGHV1-18          01        1005  1005
-## 5   IGHV1-24          01         105   105
-## 6   IGHV1-46          01         624   624
-## 7   IGHV1-58       01,02       23,18    41
-## 8   IGHV1-69    01,04,06 515,469,280  1279
+##         gene     alleles      counts total                                            note
+## 1    IGHV1-2       02,04     664,302   966                                                
+## 2    IGHV1-3          01         226   226                                                
+## 3    IGHV1-8 01,02_G234T     467,370   837                                                
+## 4   IGHV1-18          01        1005  1005                                                
+## 5   IGHV1-24          01         105   105                                                
+## 6   IGHV1-46          01         624   624                                                
+## 7   IGHV1-58       01,02       23,18    41                                                
+## 8   IGHV1-69    01,04,06 515,469,280  1279 Cannot distinguish IGHV1-69*01 and IGHV1-69D*01
 ## 9 IGHV1-69-2          01          31    31
-##                                              note
-## 1                                                
-## 2                                                
-## 3                                                
-## 4                                                
-## 5                                                
-## 6                                                
-## 7                                                
-## 8 Cannot distinguish IGHV1-69*01 and IGHV1-69D*01
-## 9
 ```
 
-```r
+``` r
 # Make a colorful visualization. Bars indicate presence, not proportion.
 plotGenotype(geno, text_size = 10)
 ```
@@ -209,7 +199,7 @@ method doesn't use the strict cutoff criterion `fraction_to_explain` that
 
 
 
-```r
+``` r
 # Infer the individual's genotype, using the bayesian method
 geno_bayesian <- inferGenotypeBayesian(AIRRDb, germline_db=SampleGermlineIGHV, 
                                        novel=novel, find_unmutated=TRUE)
@@ -218,39 +208,29 @@ print(geno_bayesian)
 ```
 
 ```
-##         gene     alleles         counts total
-## 1    IGHV1-2       02,04        664,302   966
-## 2    IGHV1-3          01            226   226
-## 3    IGHV1-8 01,02_G234T        467,370   837
-## 4   IGHV1-18          01           1005  1005
-## 5   IGHV1-24          01            105   105
-## 6   IGHV1-46          01            624   624
-## 7   IGHV1-58       01,02          23,18    41
-## 8   IGHV1-69 01,04,06,02 515,469,280,15  1279
-## 9 IGHV1-69-2          01             31    31
-##                                              note                kh
-## 1                                                             -1000
-## 2                                                  4.20089197988625
-## 3                                                             -1000
-## 4                                                 -3.76643736033536
-## 5                                                  4.75335701924247
-## 6                                                 0.457455409315221
-## 7                                                 -20.3932114156223
-## 8 Cannot distinguish IGHV1-69*01 and IGHV1-69D*01             -1000
-## 9                                                  4.16107190423977
-##                  kd                kt                kq           k_diff
-## 1 -7.92846809405969 -139.556367176944 -313.583949130729 131.627899082884
-## 2 -45.2911957825576 -84.2865868763307 -128.991761853586 49.4920877624439
-## 3 -1.04759115960507 -102.524664723923 -247.193958844361 101.477073564318
-## 4  -223.85293382607             -1000             -1000 220.086496465735
-## 5 -18.2407545518045 -36.3580822723628 -57.1281856909991 22.9941115710469
-## 6 -136.193264784335 -243.861955237939             -1000  136.65072019365
-## 7  3.60009261357983 -1.38512929425796 -8.47869574581951  4.9852219078378
-## 8 -277.291087469703  3.55051520054669 -143.380669247128 146.931184447674
-## 9 -2.62766579768837 -7.97659112471034 -14.1087168959268 6.78873770192814
+##         gene     alleles         counts total                                            note                kh                kd
+## 1    IGHV1-2       02,04        664,302   966                                                             -1000 -7.92846809405969
+## 2    IGHV1-3          01            226   226                                                  4.20089197988625 -45.2911957825576
+## 3    IGHV1-8 01,02_G234T        467,370   837                                                             -1000 -1.04759115960507
+## 4   IGHV1-18          01           1005  1005                                                 -3.76643736033536  -223.85293382607
+## 5   IGHV1-24          01            105   105                                                  4.75335701924247 -18.2407545518045
+## 6   IGHV1-46          01            624   624                                                 0.457455409315221 -136.193264784335
+## 7   IGHV1-58       01,02          23,18    41                                                 -20.3932114156223  3.60009261357983
+## 8   IGHV1-69 01,04,06,02 515,469,280,15  1279 Cannot distinguish IGHV1-69*01 and IGHV1-69D*01             -1000 -277.291087469703
+## 9 IGHV1-69-2          01             31    31                                                  4.16107190423977 -2.62766579768837
+##                  kt                kq           k_diff
+## 1 -139.556367176944 -313.583949130729 131.627899082884
+## 2 -84.2865868763307 -128.991761853586 49.4920877624439
+## 3 -102.524664723923 -247.193958844361 101.477073564318
+## 4             -1000             -1000 220.086496465735
+## 5 -36.3580822723628 -57.1281856909991 22.9941115710469
+## 6 -243.861955237939             -1000  136.65072019365
+## 7 -1.38512929425796 -8.47869574581951  4.9852219078378
+## 8  3.55051520054669 -143.380669247128 146.931184447674
+## 9 -7.97659112471034 -14.1087168959268 6.78873770192814
 ```
 
-```r
+``` r
 # Make a colorful visualization. Bars indicate presence, not proportion.
 plotGenotype(geno_bayesian, text_size=10)
 ```
@@ -268,7 +248,7 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 (expected to be ~5% ([[2]][2]), as mentioned above, are corrected in this manner.
 
 
-```r
+``` r
 # Use the personlized genotype to determine corrected allele assignments
 # Updated genotype will be placed in the v_call_genotyped column
 sample_db <- reassignAlleles(AIRRDb, genotype_db)
@@ -281,7 +261,7 @@ the subject's genotype, greatly reducing the number of problematic calls, as
 can be seen below.
 
 
-```r
+``` r
 # Find the set of alleles in the original calls that were not in the genotype
 not_in_genotype <- sample_db$v_call %>%
     strsplit(",") %>%
@@ -313,7 +293,7 @@ information, the final genotype sequences and the starting reference germlines
 to build a table of evidence metrics supporting the final novel V allele detection.
 
 
-```r
+``` r
 evidence <- generateEvidence(sample_db, novel, geno, genotype_db, SampleGermlineIGHV, fields = NULL)
 
 evidence %>%

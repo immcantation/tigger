@@ -114,6 +114,7 @@ novel <- selectNovel(SampleNovel)
 plotNovel(AIRRDb, novel[1, ], v_call="v_call", j_call="j_call", 
 seq="sequence_alignment", junction="junction", junction_length="junction_length", 
 multiplot=TRUE)
+
 ```
 
 ![2](plotNovel-2.png)

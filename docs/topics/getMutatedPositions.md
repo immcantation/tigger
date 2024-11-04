@@ -61,6 +61,7 @@ ref <- "GATAGATA"
 
 # Find the differences between the two
 getMutatedPositions(seqs, ref)
+
 ```
 
 

@@ -41,6 +41,7 @@ Examples
 
 ```R
 insertPolymorphisms("HUGGED", c(1, 6, 2), c("T", "R", "I"))
+
 ```
 
 

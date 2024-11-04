@@ -47,6 +47,7 @@ Examples
 # Find which of the sample alleles are unmutated
 calls <- findUnmutatedCalls(AIRRDb$v_call, AIRRDb$sequence_alignment, 
 germline_db=SampleGermlineIGHV)
+
 ```
 
 

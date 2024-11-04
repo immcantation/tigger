@@ -83,30 +83,28 @@ Examples
 
 ```R
 subsampleDb(AIRRDb)
+
 ```
 
 
 ```
-# A tibble: 139 × 26
-   sequence_id                 sequence rev_comp productive v_call d_call j_call
-   <chr>                       <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr> 
- 1 077294_2726_1483_length=42… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ5…
- 2 240679_3698_3066_length=42… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ3…
- 3 014026_2186_3677_length=45… NNNNNNN… NA       TRUE       IGHV1… IGHD4… IGHJ6…
- 4 087866_2612_1813_length=47… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6…
- 5 186255_1506_0138_length=45… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ6…
- 6 094811_0577_1785_length=45… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6…
- 7 200273_3493_1744_length=45… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ6…
- 8 008329_2221_1510_length=43… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ6…
- 9 098375_3215_3198_length=43… NNNNNNN… NA       TRUE       IGHV1… IGHD6… IGHJ5…
-10 011171_2123_0412_length=44… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ4…
-# ℹ 129 more rows
-# ℹ 19 more variables: sequence_alignment <chr>, germline_alignment <lgl>,
-#   junction <chr>, junction_aa <lgl>, v_cigar <lgl>, d_cigar <lgl>,
-#   j_cigar <lgl>, vj_in_frame <lgl>, stop_codon <lgl>, v_germline_end <lgl>,
-#   np1_length <dbl>, np2_length <dbl>, j_germline_end <lgl>,
-#   junction_length <dbl>, mutated_invariant <lgl>, indels <lgl>,
-#   d_5_trim <dbl>, d_3_trim <dbl>, j_5_trim <dbl>
+# A tibble: 140 × 26
+   sequence_id       sequence rev_comp productive v_call d_call j_call sequence_alignment germline_alignment junction junction_aa v_cigar d_cigar
+   <chr>             <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr>  <chr>              <lgl>              <chr>    <lgl>       <lgl>   <lgl>  
+ 1 066999_2769_2174… NNNNNNN… NA       TRUE       IGHV1… IGHD1… IGHJ5… CAGGTCCAGCTGGTACA… NA                 TGTGCAA… NA          NA      NA     
+ 2 055632_0321_3690… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6… CAGGTGCAGCTGGTGCA… NA                 TGTGCGA… NA          NA      NA     
+ 3 191711_1296_1920… NNNNNNN… NA       TRUE       IGHV1… IGHD1… IGHJ3… CAGGTCCAGTTGGTACA… NA                 TGTGCAA… NA          NA      NA     
+ 4 116284_2932_2648… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ4… CAGGTGCAGCTGGTGCA… NA                 TGTGCGA… NA          NA      NA     
+ 5 103654_3019_2151… NNNNNNN… NA       TRUE       IGHV1… IGHD2… IGHJ4… CAGGTGCAGCTGGTGCA… NA                 TGTGCGG… NA          NA      NA     
+ 6 033099_2393_0215… NNNNNNN… NA       TRUE       IGHV1… IGHD3… IGHJ6… CAGGTGCAGCTGGTGCA… NA                 TGTGCGA… NA          NA      NA     
+ 7 075741_0518_1178… NNNNNNN… NA       TRUE       IGHV1… IGHD6… IGHJ4… CAGGTGCAGCTGGTGCA… NA                 TGTGCGA… NA          NA      NA     
+ 8 018392_0183_0663… NNNNNNN… NA       TRUE       IGHV1… IGHD5… IGHJ6… CAGGTGCAGCTGGTGCA… NA                 TGTGCGA… NA          NA      NA     
+ 9 116540_0778_0567… NNNNNNN… NA       TRUE       IGHV1… IGHD5… IGHJ4… CAGGTGCAGCTGGTGCA… NA                 TGTGCGA… NA          NA      NA     
+10 152551_3143_1297… NNNNNNN… NA       TRUE       IGHV1… IGHD5… IGHJ3… CAGGTGCAGCTGGTGCA… NA                 TGTGCGA… NA          NA      NA     
+# ℹ 130 more rows
+# ℹ 13 more variables: j_cigar <lgl>, vj_in_frame <lgl>, stop_codon <lgl>, v_germline_end <lgl>, np1_length <dbl>, np2_length <dbl>,
+#   j_germline_end <lgl>, junction_length <dbl>, mutated_invariant <lgl>, indels <lgl>, d_5_trim <dbl>, d_3_trim <dbl>, j_5_trim <dbl>
+# ℹ Use `print(n = ...)` to see more rows
 
 ```
 

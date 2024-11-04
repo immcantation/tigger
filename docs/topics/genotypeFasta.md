@@ -46,6 +46,7 @@ Examples
 ```R
 # Find the sequences that correspond to the genotype
 genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, SampleNovel)
+
 ```
 
 

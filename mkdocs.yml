@@ -1,4 +1,5 @@
 site_name: tigger
+site_url: https://tigger.readthedocs.io
 site_favicon: img/favicon.ico
 repo_url: https://bitbucket.org/kleinstein/tigger
 edit_uri: src/master/docs/
@@ -12,6 +13,7 @@ theme:
   analytics:
     gtag: G-6HX7WPZEVH
 markdown_extensions:
+  - admonition
   - def_list
   - sane_lists
   - smarty

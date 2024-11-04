@@ -46,6 +46,7 @@ Examples
 ```R
 ### Not run:
 # writeFasta(germlines, "ighv.fasta")
+
 ```
 
 

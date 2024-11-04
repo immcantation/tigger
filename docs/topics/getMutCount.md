@@ -59,6 +59,7 @@ names(SampleGermlineIGHV[1]))
 
 # Compare each sequence to its assigned germline(s) to determine the distance
 getMutCount(sample_seqs, sample_alleles, SampleGermlineIGHV)
+
 ```
 
 

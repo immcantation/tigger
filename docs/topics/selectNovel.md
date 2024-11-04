@@ -52,6 +52,7 @@ Examples
 
 ```R
 novel <- selectNovel(SampleNovel)
+
 ```
 
 

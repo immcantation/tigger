@@ -36,6 +36,7 @@ Examples
 # Clean messy nucleotide sequences
 seqs <- c("AGAT.taa-GAG...ATA", "GATACAGTXXZZAGNNPPACA")
 cleanSeqs(seqs)
+
 ```
 
 

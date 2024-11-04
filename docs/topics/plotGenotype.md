@@ -75,6 +75,7 @@ genotype_a$SUBJECT <- "A"
 genotype_b$SUBJECT <- "B"
 geno_sub <- rbind(genotype_a, genotype_b)
 plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
+
 ```
 
 ![4](plotGenotype-4.png)

@@ -74,6 +74,7 @@ Examples
 
 ```R
 getPopularMutationCount(AIRRDb, SampleGermlineIGHV)
+
 ```
 
 

@@ -1,5 +1,14 @@
 # [![](http://cranlogs.r-pkg.org/badges/grand-total/tigger)](https://www.r-pkg.org/pkg/tigger) [![](https://cranlogs.r-pkg.org/badges/tigger)](https://www.r-pkg.org/pkg/tigger) [![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
 
+!!! important "2025 Immcantation Users Group Meeting"
+    *Are you an Immcantation user and/or interested in adaptive immune receptor repertoire analysis?*
+    
+    Register now for the upcoming Immcantation Users Group Meeting!
+    
+    It will be held virtually on **January 30th, 2025**, from 10 to 1:30pm (ET).
+    All talks will be from user-submitted abstracts (due on **November 1st, 2024**).
+
+    Full information here: [https://immcantation.github.io/users-meeting/](https://immcantation.github.io/users-meeting/)
 
 TIgGER
 -------------------------------------------------------------------------------
@@ -54,19 +63,13 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 
 ## Citing
 
-Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated
-analysis of high-throughput B cell sequencing data reveals a high
-frequency of novel immunoglobulin V gene segment alleles.” _Proceedings
-of the National Academy of Sciency of the United States of America_,
-E862-70. doi:10.1073/pnas.1417683112
-<https://doi.org/10.1073/pnas.1417683112>.
+Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated analysis of high-throughput B cell sequencing data reveals a
+high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the National Academy of Sciency of the United
+States of America_, E862-70. doi:10.1073/pnas.1417683112 <https://doi.org/10.1073/pnas.1417683112>.
 
-Gadala-Maria D, Gidoni M, Marquez S, Vander Heiden J, Kos J, Watson C,
-O'connor K, Yaari G, Kleinstein S (2019). “Identification of
-Subject-Specific Immunoglobulin Alleles From Expressed Repertoire
-Sequencing Data.” _Frontiers in Immunology_, 129.
-doi:10.3389/fimmu.2019.00129
-<https://doi.org/10.3389/fimmu.2019.00129>.
+Gadala-Maria D, Gidoni M, Marquez S, Vander Heiden J, Kos J, Watson C, O'connor K, Yaari G, Kleinstein S (2019). “Identification
+of Subject-Specific Immunoglobulin Alleles From Expressed Repertoire Sequencing Data.” _Frontiers in Immunology_, 129.
+doi:10.3389/fimmu.2019.00129 <https://doi.org/10.3389/fimmu.2019.00129>.
 
 
 

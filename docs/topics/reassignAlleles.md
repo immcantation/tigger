@@ -91,6 +91,7 @@ genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, novel=SampleNov
 # Use the personlized genotype to determine corrected allele assignments
 output_db <- reassignAlleles(AIRRDb, genotype_db, v_call="v_call",
 seq="sequence_alignment")
+
 ```
 
 
