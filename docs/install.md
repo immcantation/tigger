@@ -5,7 +5,7 @@ Download
     
 The latest stable release of TIgGER can be downloaded from 
 <a href="http://cran.rstudio.com/web/packages/tigger" target="_blank">CRAN</a> or 
-<a href="https://bitbucket.org/kleinstein/tigger/downloads" target="_blank">Bitbucket</a>.
+<a href="https://github.com/immcantation/tigger/tags" target="_blank">GitHub</a>.
 
 Installing Released Versions
 -------------------------------------------------------------------------------
@@ -16,7 +16,7 @@ The simplest way to install TIgGER is via CRAN:
 install.packages("tigger")
 ```
 
-Downloaded source builds from Bitbucket may be installed in the usual way:
+Downloaded source builds from GitHun may be installed in the usual way:
     
 ```R
 install.packages("tigger_x.y.z.tar.gz", repos=NULL, type="source")
@@ -25,7 +25,7 @@ install.packages("tigger_x.y.z.tar.gz", repos=NULL, type="source")
 Building Development Versions
 -------------------------------------------------------------------------------
     
-To build from the [source code](https://bitbucket.org/kleinstein/tigger),
+To build from the [source code](https://github.com/immcantation/tigger),
 first install the build dependencies:
     
 ```R
@@ -36,10 +36,10 @@ To install the latest development code via devtools:
     
 ```R
 library(devtools)
-install_bitbucket("kleinstein/tigger@master")
+install_github("immcantation/tigger@master")
 ```
 
-Note, using `install_bitbucket` will not build the documentation. To generate the 
+Note, using `install_github` will not build the documentation. To generate the 
 documentation, clone the repository and build as normal using devtools, 
 roxygen and knitr:
     

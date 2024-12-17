@@ -40,7 +40,7 @@ The former can be created through the use of [IMGT/HighV-QUEST](https://www.imgt
 Contact
 -------------------------------------------------------------------------------
 
-For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](https://bitbucket.org/kleinstein/tigger/issues?status=new&status=open).
+For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](https://github.com/immcantation/tigger/issues).
 
 
 ## Dependencies
@@ -62,13 +62,19 @@ For help, questions, or suggestions, please contact the [Immcantation Group](mai
 
 ## Citing
 
-Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated analysis of high-throughput B cell sequencing data reveals a
-high frequency of novel immunoglobulin V gene segment alleles.” _Proceedings of the National Academy of Sciency of the United
-States of America_, E862-70. doi:10.1073/pnas.1417683112 <https://doi.org/10.1073/pnas.1417683112>.
+Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated
+analysis of high-throughput B cell sequencing data reveals a high
+frequency of novel immunoglobulin V gene segment alleles.” _Proceedings
+of the National Academy of Sciency of the United States of America_,
+E862-70. doi:10.1073/pnas.1417683112
+<https://doi.org/10.1073/pnas.1417683112>.
 
-Gadala-Maria D, Gidoni M, Marquez S, Vander Heiden J, Kos J, Watson C, O'connor K, Yaari G, Kleinstein S (2019). “Identification
-of Subject-Specific Immunoglobulin Alleles From Expressed Repertoire Sequencing Data.” _Frontiers in Immunology_, 129.
-doi:10.3389/fimmu.2019.00129 <https://doi.org/10.3389/fimmu.2019.00129>.
+Gadala-Maria D, Gidoni M, Marquez S, Vander Heiden J, Kos J, Watson C,
+O'connor K, Yaari G, Kleinstein S (2019). “Identification of
+Subject-Specific Immunoglobulin Alleles From Expressed Repertoire
+Sequencing Data.” _Frontiers in Immunology_, 129.
+doi:10.3389/fimmu.2019.00129
+<https://doi.org/10.3389/fimmu.2019.00129>.
 
 
 

@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
 Version: 1.1.1.999
-Date: 2024-08-14
+Date: 2024-12-17
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Susanna", "Marquez", role=c("aut", "cre"), 
@@ -24,7 +24,7 @@ Description: Infers the V genotype of an individual from immunoglobulin (Ig)
     Gadala-Maria, et al (2019) <doi:10.3389/fimmu.2019.00129>.
 License: AGPL-3
 URL: http://tigger.readthedocs.io
-BugReports: https://bitbucket.org/kleinstein/tigger/issues
+BugReports: https://github.com/immcantation/tigger/issues
 LazyData: true
 BuildVignettes: true
 VignetteBuilder: knitr

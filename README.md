@@ -11,6 +11,18 @@
 
     Full information here: [https://immcantation.github.io/users-meeting/](https://immcantation.github.io/users-meeting/)
 
+**IMPORTANT!** 
+
+TIgGER has moved to https://github.com/immcantation/tigger
+
+To update Git configuration settings use:
+
+```
+   git config user.email "your-gh-user@email.com"
+   git config user.name "your-gh-user-name"
+   git remote set-url origin git@github.com:immcantation/tigger.git
+```
+
 TIgGER
 -------------------------------------------------------------------------------
 
@@ -42,4 +54,4 @@ The former can be created through the use of [IMGT/HighV-QUEST](https://www.imgt
 Contact
 -------------------------------------------------------------------------------
 
-For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](https://bitbucket.org/kleinstein/tigger/issues?status=new&status=open).
+For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](https://github.com/immcantation/tigger/issues).
