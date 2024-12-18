@@ -16,7 +16,7 @@ The simplest way to install TIgGER is via CRAN:
 install.packages("tigger")
 ```
 
-Downloaded source builds from GitHun may be installed in the usual way:
+Downloaded source builds from GitHub may be installed in the usual way:
     
 ```R
 install.packages("tigger_x.y.z.tar.gz", repos=NULL, type="source")
