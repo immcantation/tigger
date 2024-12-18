@@ -11,18 +11,6 @@
 
     Full information here: [https://immcantation.github.io/users-meeting/](https://immcantation.github.io/users-meeting/)
 
-**IMPORTANT!** 
-
-TIgGER has moved to https://github.com/immcantation/tigger
-
-To update Git configuration settings use:
-
-```
-   git config user.email "your-gh-user@email.com"
-   git config user.name "your-gh-user-name"
-   git remote set-url origin git@github.com:immcantation/tigger.git
-```
-
 TIgGER
 -------------------------------------------------------------------------------
 
