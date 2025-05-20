@@ -29,6 +29,7 @@ nav:
   - 'About':
     - 'Introduction': index.md
     - 'Download & Installation': install.md
+    - 'Contributing': contributing.md
     - 'Package Overview': topics/tigger.md
     - 'Release Notes': news.md
     - 'Related Projects': projects.md
