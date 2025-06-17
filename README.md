@@ -33,4 +33,8 @@ The former can be created through the use of [IMGT/HighV-QUEST](https://www.imgt
 Contact
 -------------------------------------------------------------------------------
 
-For help, questions, or suggestions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com) or use the [issue tracker](https://github.com/immcantation/tigger/issues).
+If you need help or have any questions, please contact the [Immcantation Group](mailto:immcantation@googlegroups.com).
+
+If you have discovered a bug or have a feature request, you can open an issue using the [issue tracker](https://github.com/immcantation/tigger/issues).
+
+To receive alerts about Immcantation releases, news, events, and tutorials, join the [Immcantation News](https://groups.google.com/g/immcantation-news) Google Group. [Membership settings](https://groups.google.com/g/immcantation-news/membership) can be adjusted to change the frequency of email updates.
