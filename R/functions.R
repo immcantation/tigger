@@ -837,8 +837,8 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
                          y=!!rlang::sym("POS_MUT_RATE"),
                          group=!!rlang::sym("POSITION"),
                          color=!!rlang::sym("Polymorphic"))) +
-            geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "False"), size=0.75) +
-            geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "True"), size=0.75) +
+            geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "False"), linewidth=0.75) +
+            geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "True"), linewidth=0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values = POLYCOLORS) +
             ylim(0,1) +
@@ -855,7 +855,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
                          y=!!rlang::sym("POS_MUT_RATE"),
                          group=!!rlang::sym("POSITION"),
                          color=!!rlang::sym("Polymorphic"))) +
-            geom_line(size=0.75) +
+            geom_line(linewidth=0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values=POLYCOLORS) +
             ylim(0, 1) +
