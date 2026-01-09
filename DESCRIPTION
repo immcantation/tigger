@@ -1,7 +1,7 @@
 Package: tigger
 Type: Package
-Version: 1.1.1.999
-Date: 2024-12-17
+Version: 1.1.2
+Date: 2026-01-09
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Susanna", "Marquez", role=c("aut", "cre"), 
@@ -52,4 +52,4 @@ Suggests:
     knitr,
     rmarkdown,
     testthat
-RoxygenNote: 7.3.2
+RoxygenNote: 7.3.3

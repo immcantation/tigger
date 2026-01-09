@@ -1,3 +1,11 @@
+Version 1.1.2: January 9, 2026
+-------------------------------------------------------------------------------
+
+General:
+
++ Development of `tigger` has moved to GitHub: https://github.com/immcantation/tigger.
+
+
 Version 1.1.1: August 14, 2024
 -------------------------------------------------------------------------------
 
