@@ -406,9 +406,12 @@ findNovelAlleles <- function(data, germline_db,
                 dplyr::group_by(1:n()) %>%
                 dplyr::mutate(SNP_STRING = superSubstring(!! rlang::sym(seq),
                                                             pass_y$POSITION),
-                              POSITION = ifelse(is.null(pos_range_max),
-                                                TRUE,
-                                                !any(pos_range_max<pass_y$POSITION))) %>%
+                              POSITION = TRUE)
+            if (!is.null(pos_range_max)) {
+                db_y_subset_mm <- db_y_subset_mm %>%
+                    dplyr::mutate(POSITION = !any(!!rlang::sym(pos_range_max) < pass_y$POSITION))
+            }
+            db_y_subset_mm <- db_y_subset_mm %>%
                 dplyr::filter(!!rlang::sym("SNP_STRING") != gl_substring, !!rlang::sym("POSITION")) %>%
                 dplyr::group_by(!!rlang::sym("SNP_STRING")) %>%
                 dplyr::mutate(STRING_COUNT = n()) %>%
