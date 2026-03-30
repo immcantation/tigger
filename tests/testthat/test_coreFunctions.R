@@ -82,6 +82,34 @@ test_that("Test findNovelAlleles - pos_range_max",{
     expect_equal(nrow(selectNovel(nv_pos_range_318_vend)),0)
 })
 
+test_that("findNovelAlleles pos_range_max column is dereferenced correctly", {
+    # airr_db and germline_ighv are loaded at the top of this file.
+    # pos_range 310:320 overlaps with the v_germ_length boundary (values 310-320),
+    # so the POSITION filter has observable effect: sequences whose v_germ_length
+    # is shorter than a passing position are excluded.
+    nv_null <- findNovelAlleles(airr_db, germline_ighv,
+                                v_call="v_call", j_call="j_call",
+                                seq="sequence_alignment",
+                                junction="junction",
+                                junction_length="junction_length",
+                                pos_range=310:320,
+                                pos_range_max=NULL)
+    nv_with_max <- findNovelAlleles(airr_db, germline_ighv,
+                                    v_call="v_call", j_call="j_call",
+                                    seq="sequence_alignment",
+                                    junction="junction",
+                                    junction_length="junction_length",
+                                    pos_range=310:320,
+                                    pos_range_max="v_germ_length")
+
+    # Both calls must complete without error
+    expect_s3_class(nv_null, "data.frame")
+    expect_s3_class(nv_with_max, "data.frame")
+
+    # Applying pos_range_max must change results, proving the filter is applied
+    expect_false(identical(nrow(nv_null), nrow(nv_with_max)))
+})
+
 test_that("Test sortAlleles",{ 
     alleles = c("IGHV1-69D*01","IGHV1-69*01","IGHV1-2*01","IGHV1-69-2*01",
                 "IGHV2-5*01","IGHV1-NL1*01", "IGHV1-2*01,IGHV1-2*05", 
