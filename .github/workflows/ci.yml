@@ -28,6 +28,10 @@ jobs:
         run: |
             testthat::test_local()
         shell: Rscript {0}
+      - name: Generate documentation
+        run: |
+          devtools::document()
+        shell: Rscript {0}
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_: false
@@ -37,7 +41,6 @@ jobs:
         shell: Rscript {0}
       - name: Check usage
         run: |
-          devtools::document()
           devtools::install()
           pkg_name <- read.dcf("DESCRIPTION")[1, "Package"]
           library(pkg_name, character.only=T)
