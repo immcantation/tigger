@@ -91,16 +91,16 @@ subsampleDb(AIRRDb)
 # A tibble: 140 x 26
    sequence_id                 sequence rev_comp productive v_call d_call j_call
    <chr>                       <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr> 
- 1 158498_1030_0273_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ4~
- 2 107087_0717_2844_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD5~ IGHJ6~
- 3 163780_3206_0908_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD6~ IGHJ5~
- 4 100500_0514_2635_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ6~
- 5 207885_3679_0182_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ2~
- 6 260939_1868_0090_length=42~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ4~
- 7 232481_1618_0319_length=46~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ6~
- 8 145334_3200_3791_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ4~
- 9 088524_0561_0742_length=42~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD1~ IGHJ4~
-10 102063_2942_3470_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ6~
+ 1 130679_0980_0761_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD1~ IGHJ6~
+ 2 138963_3155_2096_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD4~ IGHJ4~
+ 3 232991_1649_3592_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD6~ IGHJ4~
+ 4 037149_0503_1038_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ3~
+ 5 046606_0311_0428_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ4~
+ 6 216998_3721_3981_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ4~
+ 7 063000_2573_3080_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ6~
+ 8 211918_3641_1700_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ4~
+ 9 236910_1609_2498_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ4~
+10 107673_3212_3364_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ6~
 # i 130 more rows
 # i 19 more variables: sequence_alignment <chr>, germline_alignment <lgl>,
 #   junction <chr>, junction_aa <lgl>, v_cigar <lgl>, d_cigar <lgl>,
