@@ -57,17 +57,17 @@ To receive alerts about Immcantation releases, news, events, and tutorials, join
 
 ## Citing
 
-Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). “Automated
+Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). "Automated
 analysis of high-throughput B cell sequencing data reveals a high
-frequency of novel immunoglobulin V gene segment alleles.” _Proceedings
+frequency of novel immunoglobulin V gene segment alleles." _Proceedings
 of the National Academy of Sciency of the United States of America_,
 E862-70. doi:10.1073/pnas.1417683112
 <https://doi.org/10.1073/pnas.1417683112>.
 
 Gadala-Maria D, Gidoni M, Marquez S, Vander Heiden J, Kos J, Watson C,
-O'Connor K, Yaari G, Kleinstein S (2019). “Identification of
+O'Connor K, Yaari G, Kleinstein S (2019). "Identification of
 Subject-Specific Immunoglobulin Alleles From Expressed Repertoire
-Sequencing Data.” _Frontiers in Immunology_, 129.
+Sequencing Data." _Frontiers in Immunology_, 129.
 doi:10.3389/fimmu.2019.00129
 <https://doi.org/10.3389/fimmu.2019.00129>.
 
