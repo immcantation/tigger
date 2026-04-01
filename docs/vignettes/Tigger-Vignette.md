@@ -321,7 +321,7 @@ evidence %>%
 ```
 
 ```
-## # A tibble: 1 × 5
+## # A tibble: 1 x 5
 ## # Rowwise: 
 ##   gene    allele   polymorphism_call sequences unmutated_frequency
 ##   <chr>   <chr>    <chr>                 <int>               <dbl>
