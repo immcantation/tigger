@@ -33,7 +33,7 @@ jobs:
         run: |
             testthat::test_local()
         shell: Rscript {0}
-      - name: Generate documentation
+      - name: Generate .Rd documentation
         run: |
           devtools::document()
         shell: Rscript {0}
@@ -55,12 +55,14 @@ jobs:
             warning("Found issues with code usage.")
           }
         shell: Rscript {0}
-      - name: Render docs
-        # Only render and publish docs on pushes to master, not on PRs or local `act` runs.
-        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
+      - name: Render Readthedocs documentation
         run: |
           rm -rf docs/topics/* docs/vignettes/*
           Rscript docs/build.R
+          # Re-compress png files to a deterministic form to 
+          # avoid commiting .png files that differ only in compression values
+          dnf install -y optipng
+          find docs -name '*.png' -exec optipng -o0 -strip all {} \;
         shell: bash
       - name: Commit rendered docs
         # Only commit rendered docs on pushes to master, not on PRs or local `act` runs.
