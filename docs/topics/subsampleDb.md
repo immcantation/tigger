@@ -82,6 +82,7 @@ Examples
 -------------------
 
 ```R
+set.seed(1)
 subsampleDb(AIRRDb)
 
 ```
@@ -91,16 +92,16 @@ subsampleDb(AIRRDb)
 # A tibble: 140 x 26
    sequence_id                 sequence rev_comp productive v_call d_call j_call
    <chr>                       <chr>    <lgl>    <lgl>      <chr>  <chr>  <chr> 
- 1 166259_3156_0976_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ4~
- 2 035195_0458_3177_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ4~
- 3 148272_3170_2366_length=46~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ5~
- 4 012625_0195_3349_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD1~ IGHJ4~
- 5 035403_2317_2363_length=42~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ5~
- 6 176426_1153_0959_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ6~
- 7 109099_0966_3212_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD1~ IGHJ4~
- 8 181444_1357_3199_length=42~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD6~ IGHJ4~
- 9 214394_3591_2354_length=43~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ4~
-10 125682_0777_0633_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ6~
+ 1 162366_1230_1356_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD5~ IGHJ3~
+ 2 053163_2319_0521_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD1~ IGHJ5~
+ 3 175431_1170_2788_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ3~
+ 4 151778_3269_0501_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD5~ IGHJ6~
+ 5 112230_0840_0227_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ6~
+ 6 176024_3740_2255_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ6~
+ 7 070090_2629_3436_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD6~ IGHJ6~
+ 8 007556_2294_3485_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ4~
+ 9 240300_1635_0534_length=45~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD2~ IGHJ6~
+10 038750_0415_2078_length=44~ NNNNNNN~ NA       TRUE       IGHV1~ IGHD3~ IGHJ4~
 # i 130 more rows
 # i 19 more variables: sequence_alignment <chr>, germline_alignment <lgl>,
 #   junction <chr>, junction_aa <lgl>, v_cigar <lgl>, d_cigar <lgl>,
