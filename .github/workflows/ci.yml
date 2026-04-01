@@ -60,13 +60,14 @@ jobs:
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
         run: |
           rm -rf docs/topics/* docs/vignettes/*
-          Rscript -e "devtools::document()"
           Rscript docs/build.R
         shell: bash
       - name: Commit rendered docs
         # Only commit rendered docs on pushes to master, not on PRs or local `act` runs.
         if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
         run: |
+          # Container jobs mount the workspace as a different owner; mark it safe for git.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           CHANGES=$(git status --porcelain docs/ | wc -l)
