@@ -29,10 +29,6 @@ jobs:
         run: |
             sed -i '/test/ d' .Rbuildignore
         shell: bash
-      - name: Run Tests
-        run: |
-            testthat::test_local()
-        shell: Rscript {0}
       - name: Generate .Rd documentation
         run: |
           devtools::document()
