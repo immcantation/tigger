@@ -7,9 +7,10 @@ on:
     branches:
 jobs:
 
-  # Validation job: runs on every push and PR.
   unittest:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
     container:
@@ -17,6 +18,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Full history needed so the doc-commit push is not rejected
+          # due to a shallow clone being behind the remote.
+          fetch-depth: 0
       - name: Install dependencies
         run: |
           Rscript tests/setup/install_dep.R
@@ -50,37 +55,17 @@ jobs:
             warning("Found issues with code usage.")
           }
         shell: Rscript {0}
-
-  # Publishing job: only runs on pushes to master once validation passes.
-  publish:
-    needs: unittest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    env:
-      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
-    container:
-      image: immcantation/test:devel
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          # Full history needed so the doc-commit push is not rejected
-          # due to a shallow clone being behind the remote.
-          fetch-depth: 0
-      - name: Install dependencies
-        run: |
-          Rscript tests/setup/install_dep.R
       - name: Render docs
+        # Only render and publish docs on pushes to master, not on PRs or local `act` runs.
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
         run: |
           rm -rf docs/topics/* docs/vignettes/*
           Rscript -e "devtools::document()"
           Rscript docs/build.R
         shell: bash
       - name: Commit rendered docs
-        # Only commit docs on real pushes to master, not on local `act` runs.
-        if: ${{ !env.ACT }}
+        # Only commit rendered docs on pushes to master, not on PRs or local `act` runs.
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -92,8 +77,7 @@ jobs:
           fi
         shell: bash
       - name: Update container
-        # Trigger the Docker Hub build after a successful push to master,
-        # but not on local `act` runs.
-        if: ${{ !env.ACT }}
+        # Only trigger the Docker Hub build on pushes to master, not on PRs or local `act` runs.
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
         run: |
           curl -H "Content-Type:application/json" --data '{"docker_tag":"devel"}' -X POST https://hub.docker.com/api/build/v1/source/${{ secrets.DOCKERHUB_REPO }}/trigger/${{ secrets.DOCKERHUB_TRIGGER }}/call/
