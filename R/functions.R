@@ -2205,6 +2205,7 @@ multiplot <- function(..., plotlist=NULL, cols=1, layout=NULL, heights=NULL) {
 #' @seealso \link{selectNovel}
 #'
 #' @examples
+#' set.seed(1)
 #' subsampleDb(AIRRDb)
 #'
 #' @export
