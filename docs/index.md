@@ -50,8 +50,9 @@ To receive alerts about Immcantation releases, news, events, and tutorials, join
 [Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
 [Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut, cre)  
 [Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)  
+[Ayelet Peres](mailto:ayelet.peres@yale.edu) (aut)  
 [Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)  
-[Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)  
+[Gur Yaari](mailto:gur.yaari@yale.edu) (aut)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 

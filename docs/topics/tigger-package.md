@@ -35,8 +35,9 @@ Authors:
 
 +  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu)
 +  Moriah Cohen [moriah.cohen@biu.ac.il](moriah.cohen@biu.ac.il)
++  Ayelet Peres [ayelet.peres@yale.edu](ayelet.peres@yale.edu)
 +  Jason Vander Heiden [jason.vanderheiden@gmail.com](jason.vanderheiden@gmail.com)
-+  Gur Yaari [gur.yaari@biu.ac.il](gur.yaari@biu.ac.il)
++  Gur Yaari [gur.yaari@yale.edu](gur.yaari@yale.edu)
 +  Steven Kleinstein [steven.kleinstein@yale.edu](steven.kleinstein@yale.edu) [copyright holder]
 
 
