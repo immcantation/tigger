@@ -1,3 +1,19 @@
+
+Version 1.1.3: April 13, 2026
+-------------------------------------------------------------------------------
+
+Bug Fixes:
+
++ Updated `plotNovel` to display integer x-axis labels in the mutation count plots.
+
++ Fixed `findNovelAlleles` to correctly dereference the `pos_range_max` column
+  name when filtering SNP positions.
+
+Documentation:
+
++ Updated example for `subsampleDb` to use `set.seed` for reproducibility.
+
+
 Version 1.1.2: January 9, 2026
 -------------------------------------------------------------------------------
 
