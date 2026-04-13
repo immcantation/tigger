@@ -1,17 +1,19 @@
 Package: tigger
 Type: Package
-Version: 1.1.2.999
+Version: 1.1.3
 Date: 2026-04-13
 Authors@R: c(person("Daniel", "Gadala-Maria", role=c("aut"), 
                     email="daniel.gadala-maria@yale.edu"),
              person("Susanna", "Marquez", role=c("aut", "cre"), 
                     email="susanna.marquez@yale.edu"),                    
              person("Moriah", "Cohen", role=c("aut"), 
-                    email="moriah.cohen@biu.ac.il"),   
+                    email="moriah.cohen@biu.ac.il"),
+             person("Ayelet", "Peres", role=c("aut"), 
+                    email="ayelet.peres@yale.edu"),
              person("Jason", "Vander Heiden", role=c("aut"), 
                     email="jason.vanderheiden@gmail.com"),
              person("Gur", "Yaari", role=c("aut"), 
-                    email="gur.yaari@biu.ac.il"),
+                    email="gur.yaari@yale.edu"),
              person("Steven", "Kleinstein", role=c("aut", "cph"), 
                     email="steven.kleinstein@yale.edu"))
 Title: Infers Novel Immunoglobulin Alleles from Sequencing Data
