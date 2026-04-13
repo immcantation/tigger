@@ -832,6 +832,10 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
         factor(levels = names(DNA_COLORS))
     pos_muts$GERMLINE <- names(germline)
 
+    x_range <- range(pos_muts$MUT_COUNT)
+    x_limits <- c(x_range[1] - 0.5, x_range[2] + 0.5)
+    x_breaks <- seq(x_range[1], x_range[2], by = 1)
+
     # MAKE THE FIRST PLOT
     if (!is.na(novel_imgt)) {
         POLYCOLORS <- setNames(DNA_COLORS[c(4,3)], c("False", "True")) # blue #3C88EE, red #EB413C
@@ -844,6 +848,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
             geom_line(data=filter(pos_muts, !!rlang::sym("Polymorphic") == "True"), linewidth=0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values = POLYCOLORS) +
+            scale_x_continuous(limits = x_limits, breaks = x_breaks) +
             ylim(0,1) +
             xlab("Mutation Count (Sequence)") +
             ylab("Mutation Frequency (Position)") +
@@ -861,6 +866,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
             geom_line(linewidth=0.75) +
             facet_grid(GERMLINE ~ .) +
             scale_color_manual(values=POLYCOLORS) +
+            scale_x_continuous(limits = x_limits, breaks = x_breaks) +
             ylim(0, 1) +
             xlab("Mutation Count (Sequence)") +
             ylab("Mutation Frequency (Position)") +
@@ -887,6 +893,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
             guides(fill = guide_legend("Nucleotide", ncol=4)) +
             xlab("Mutation Count (Sequence)") +
             ylab("Sequence Count") +
+            scale_x_continuous(limits = x_limits, breaks = x_breaks) +
             scale_fill_manual(values=DNA_COLORS, breaks=names(DNA_COLORS),
                               drop=FALSE) +
             theme_bw() +
@@ -899,6 +906,7 @@ plotNovel <- function(data, novel_row, v_call="v_call", j_call="j_call",
         p2 <- ggplot(p2_data, aes(x=!!rlang::sym("MUT_COUNT"))) +
             geom_bar(width=0.9) +
             xlab("Mutation Count (Sequence)") + ylab("Sequence Count") +
+            scale_x_continuous(limits = x_limits, breaks = x_breaks) +
             theme_bw() +
             theme(legend.position=c(1,1), legend.justification=c(1,1),
                   legend.background=element_rect(fill = "transparent"))
