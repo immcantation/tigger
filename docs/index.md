@@ -40,18 +40,18 @@ To receive alerts about Immcantation releases, news, events, and tutorials, join
 
 ## Dependencies
 
-**Depends:** ggplot2
-**Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, stats, stringi, tidyr, utils
+**Depends:** ggplot2  
+**Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, stats, stringi, tidyr, utils  
 **Suggests:** knitr, rmarkdown, testthat
 
 
 ## Authors
 
-[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)
-[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut, cre)
-[Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)
-[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)
-[Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)
+[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
+[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut, cre)  
+[Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)  
+[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)  
+[Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)  
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 

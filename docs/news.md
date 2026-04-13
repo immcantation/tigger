@@ -123,7 +123,7 @@ Version 0.3.0 October 3, 2018
 Bug Fixes:
 
 + Fixed a bug in `reassignAlleles` occurring with single match genotypes.
-+ Fixed `selectNovel` improperly removing all identical novel alleles, rather
++ Fixed `selectNovel` improperly removing all identical novel alleles, rather 
   than keeping a single entry.
 + `genotypeFasta` will now retain IMGT-numbering spacers as `.` characters
   instead of converting them to `-` characters.

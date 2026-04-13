@@ -93,3 +93,11 @@ output_db <- reassignAlleles(AIRRDb, genotype_db, v_call="v_call",
 seq="sequence_alignment")
 
 ```
+
+
+
+
+
+
+
+
