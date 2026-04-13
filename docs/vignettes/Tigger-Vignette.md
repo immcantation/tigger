@@ -261,7 +261,7 @@ plotGenotype(geno_bayesian, text_size=10)
 
 Finally, the original V allele calls may be limited to only those within the 
 inferred genotype. This can be done by using the function `reassignAlleles`.
-By correcting the calls in this manner, the user can greatly reduce the numer of
+By correcting the calls in this manner, the user can greatly reduce the number of
 ambiguous allele calls (where a single sample sequences is assigned to multiple
 V alleles, thus preventing the mutations analysis of allele-differentiating
 positions). Additionally, assignments to erroneous not-in-genotype alleles
@@ -269,7 +269,7 @@ positions). Additionally, assignments to erroneous not-in-genotype alleles
 
 
 ``` r
-# Use the personlized genotype to determine corrected allele assignments
+# Use the personalized genotype to determine corrected allele assignments
 # Updated genotype will be placed in the v_call_genotyped column
 sample_db <- reassignAlleles(AIRRDb, genotype_db)
 ```
@@ -289,7 +289,7 @@ not_in_genotype <- sample_db$v_call %>%
     unique() %>%
     setdiff(names(genotype_db))
 
-# Determine the fraction of calls that were ambigious before/after correction
+# Determine the fraction of calls that were ambiguous before/after correction
 # and the fraction that contained original calls to non-genotype alleles. Note
 # that by design, only genotype alleles are allowed in "after" calls.
 data.frame(Ambiguous=c(mean(grepl(",", sample_db$v_call)),
@@ -342,4 +342,3 @@ of them unmutated.
 [1]: https://www.imgt.org/HighV-QUEST/ "Alamyar et al. (2010)" 
 [2]: https://pubmed.ncbi.nlm.nih.gov/20147303/ "Munshaw and Kepler (2010)" 
 [3]: https://pubmed.ncbi.nlm.nih.gov/12477501 "Lefranc et al. (2003)"
-

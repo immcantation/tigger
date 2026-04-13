@@ -224,7 +224,7 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         allele_tot <- sort(apply(seqs_expl, 2, sum),decreasing=TRUE)
         len=min(length(allele_tot),4);
         #print(priors)
-        probs <-get_probabilites_with_priors(sort(c(allele_tot,rep(0,4-len)),decreasing = T)[1:4],priors = priors)
+        probs <-get_probabilities_with_priors(sort(c(allele_tot,rep(0,4-len)),decreasing = T)[1:4],priors = priors)
         probs[probs==-Inf] <- -1000
         names(probs) <- c('H','D','T','Q')
 
@@ -280,7 +280,7 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
 # @param    priors      a vector of priors
 #
 # @return  log10 of the likelihoods
-get_probabilites_with_priors <- function(X, alpha_dirichlet=c(0.5,0.5,0.5,0.5)*2,
+get_probabilities_with_priors <- function(X, alpha_dirichlet=c(0.5,0.5,0.5,0.5)*2,
                                          epsilon=0.01,
                                          priors=c(0.5,0.5,0.33,0.33,0.33,0.25,0.25,0.25,0.25)){
     ## Hypotheses

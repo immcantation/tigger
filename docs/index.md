@@ -40,18 +40,18 @@ To receive alerts about Immcantation releases, news, events, and tutorials, join
 
 ## Dependencies
 
-**Depends:** ggplot2  
-**Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, stats, stringi, tidyr, utils  
+**Depends:** ggplot2
+**Imports:** alakazam, dplyr, doParallel, foreach, graphics, gridExtra, gtools, iterators, lazyeval, parallel, rlang, stats, stringi, tidyr, utils
 **Suggests:** knitr, rmarkdown, testthat
 
 
 ## Authors
 
-[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)  
-[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut, cre)  
-[Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)  
-[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)  
-[Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)  
+[Daniel Gadala-Maria](mailto:daniel.gadala-maria@yale.edu) (aut)
+[Susanna Marquez](mailto:susanna.marquez@yale.edu) (aut, cre)
+[Moriah Cohen](mailto:moriah.cohen@biu.ac.il) (aut)
+[Jason Vander Heiden](mailto:jason.vanderheiden@gmail.com) (aut)
+[Gur Yaari](mailto:gur.yaari@biu.ac.il) (aut)
 [Steven Kleinstein](mailto:steven.kleinstein@yale.edu) (aut, cph)
 
 
@@ -60,7 +60,7 @@ To receive alerts about Immcantation releases, news, events, and tutorials, join
 Gadala-Maria D, Yaari G, Uduman M, Kleinstein S (2015). "Automated
 analysis of high-throughput B cell sequencing data reveals a high
 frequency of novel immunoglobulin V gene segment alleles." _Proceedings
-of the National Academy of Sciency of the United States of America_,
+of the National Academy of Sciences of the United States of America_,
 E862-70. doi:10.1073/pnas.1417683112
 <https://doi.org/10.1073/pnas.1417683112>.
 

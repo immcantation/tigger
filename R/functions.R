@@ -270,8 +270,8 @@ findNovelAlleles <- function(data, germline_db,
         # Subset of data being analyzed
         allele_name <- names(allele_groups)[idx]
         germline <- germlines[allele_name]
-        indicies <- allele_groups[[allele_name]]
-        db_subset <- data[indicies, ]
+        indices <- allele_groups[[allele_name]]
+        db_subset <- data[indices, ]
 
         # If mutrange is auto, find most popular mutation count and start from there
         gpm <- db_subset %>%
@@ -301,8 +301,8 @@ findNovelAlleles <- function(data, germline_db,
                                   novel_imgt_unique_cdr3=NA,
                                   perfect_match_count = NA,
                                   perfect_match_freq = NA,
-                                  germline_call_count = length(indicies),
-                                  germline_call_freq = round(length(indicies)/nrow(data), 3),
+                                  germline_call_count = length(indices),
+                                  germline_call_freq = round(length(indices)/nrow(data), 3),
                                   mut_min = NA,
                                   mut_max = NA,
                                   mut_pass_count=NA,
@@ -439,7 +439,7 @@ findNovelAlleles <- function(data, germline_db,
                 getMutatedPositions(gl_minus_substring) %>%
                 sapply(length)
 
-            # Keep only unmutated seqences and then find the counts of J and
+            # Keep only unmutated sequences and then find the counts of J and
             # junction length for each of the SNP strings, and then check to
             # see which pass the j/junction and count requirements
             db_y_summary0 <- db_y_subset_mm %>%
@@ -1303,7 +1303,7 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #'                         aligned, IMGT-numbered, V(D)J nucleotide sequence.
 #'                         Default is SEQUENCE_IMGT
 #' @param    method        method to use when realigning sequences to
-#'                         the genotype_db sequences. Currently, only \code{"hammming"}
+#'                         the genotype_db sequences. Currently, only \code{"hamming"}
 #'                         (for Hamming distance) is implemented.
 #' @param    path          directory containing the tool used in the
 #'                         realignment method, if needed. Hamming distance does
@@ -1480,7 +1480,7 @@ getMutatedPositions <- function(samples, germlines, ignored_regex="[\\.N-]",
     germ = toupper(mapply(substr, germlines, 1, min_lens, SIMPLIFY=FALSE))
     samp = toupper(mapply(substr, samples, 1, min_lens, SIMPLIFY=FALSE))
 
-    # Calculate poisitions of mutations (or matches), ignoring gaps, Ns, and CDR3
+    # Calculate positions of mutations (or matches), ignoring gaps, Ns, and CDR3
     samp_char = strsplit(samp,"")
     germ_char = strsplit(germ,"")
     if(!match_instead){
@@ -1678,7 +1678,7 @@ getPopularMutationCount <- function(data, germline_db,
         mutate(v_gene_n = n()) %>%
         group_by(1:n()) %>%
         mutate(v_sequence_imgt = substring(!!rlang::sym(seq), 1, 312)) %>%
-        # Count occurence of each unique IMGT-gapped V sequence
+        # Count occurrence of each unique IMGT-gapped V sequence
         group_by(!!!rlang::syms(c("v_gene", "v_sequence_imgt"))) %>%
         mutate(v_sequence_imgt_n = n()) %>%
         # Determine count of most common sequence
@@ -1979,7 +1979,7 @@ cleanSeqs <- function(seqs) {
 
 # Private Functions -------------------------------------------------------
 
-# Find muations-by-position compared to a germline
+# Find mutations-by-position compared to a germline
 #
 # \code{positionMutations} duplicates the rows of a data frame for each
 # position to be analyzed and determines if each sample is mutated at that
@@ -2099,9 +2099,9 @@ findLowerY = function(x, y, mut_min, alpha){
     return(lowerY)
 }
 
-# Enchanced substring extraction
+# enhanced substring extraction
 #
-# \code{superSubstring} is an enahnced version of \code{substring} in that
+# \code{superSubstring} is an enhanced version of \code{substring} in that
 # it can find disjoint positions in one call.
 #
 # @param    string      single string.

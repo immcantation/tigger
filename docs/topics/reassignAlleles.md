@@ -46,7 +46,7 @@ Default is SEQUENCE_IMGT
 
 method
 :   method to use when realigning sequences to
-the genotype_db sequences. Currently, only `"hammming"`
+the genotype_db sequences. Currently, only `"hamming"`
 (for Hamming distance) is implemented.
 
 path
@@ -93,11 +93,3 @@ output_db <- reassignAlleles(AIRRDb, genotype_db, v_call="v_call",
 seq="sequence_alignment")
 
 ```
-
-
-
-
-
-
-
-
