@@ -1067,13 +1067,34 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
         }
     }
 
+    # Determine each call's locus so that fractional cutoffs use the
+    # locus-specific repertoire depth
+    if ("locus" %in% colnames(data) && length(allele_calls) == nrow(data)) {
+        call_loci <- as.character(data$locus)
+    } else {
+        call_loci <- getLocus(allele_calls, first=TRUE, strip_d=FALSE)
+    }
+    call_loci[is.na(call_loci)] <- ""
+    if (length(unique(call_loci[nzchar(call_loci)])) > 1) {
+        warning("Mixed loci detected. Repertoire depth and fractional thresholds are locus specific.")
+    }
+
     # Find which rows' calls contain which genes
-    cutoff <- ifelse(gene_cutoff < 1, length(allele_calls)*gene_cutoff, gene_cutoff)
     gene_regex <- allele_calls %>% strsplit(",") %>% unlist() %>%
         getGene(strip_d=FALSE) %>%  unique() %>% paste("\\*", sep="")
     gene_groups <- sapply(gene_regex, grep, allele_calls, simplify=FALSE)
     names(gene_groups) <- gsub("\\*", "", gene_regex, fixed=TRUE)
-    gene_groups <- gene_groups[sapply(gene_groups, length) >= cutoff]
+    gene_cutoffs <- sapply(names(gene_groups), function(g) {
+        if (gene_cutoff >= 1) {
+            gene_cutoff
+        } else {
+            g_locus <- getLocus(g, first=TRUE, strip_d=FALSE)
+            length(call_loci[call_loci == g_locus]) * gene_cutoff
+        }
+    })
+    gene_groups <- gene_groups[sapply(seq_along(gene_groups), function(i) {
+        length(gene_groups[[i]]) >= gene_cutoffs[[i]]
+    })]
     gene_groups <- gene_groups[sortAlleles(names(gene_groups))]
 
     # Make a table to store the resulting genotype
@@ -1166,11 +1187,23 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
 #' @param    text_size    point size of the plotted text.
 #' @param    silent       if \code{TRUE} do not draw the plot and just return the ggplot
 #'                        object; if \code{FALSE} draw the plot.
+#' @param    confidence_col    name of a column in \code{genotype} holding a per-gene
+#'                        confidence value to display as evidence, e.g. \code{"k_diff"}
+#'                        from \link{inferGenotypeBayesian}. If \code{NULL} (default),
+#'                        no confidence panel is drawn. The value is binned and shown on a
+#'                        blue color scale, with the column name as the legend title.
+#' @param    confidence_breaks    numeric vector of breaks used to bin the confidence
+#'                        value into color groups. The default
+#'                        \code{c(0, 1, 2, 3, 4, 5, 10, 20, 50, Inf)} matches the binning
+#'                        used by RAbHIT for the haplotype lK panel.
 #' @param    ...          additional arguments to pass to ggplot2::theme.
 #'
-#' @return  A ggplot object defining the plot.
+#' @return  A ggplot object defining the plot. If \code{confidence_col} is supplied, a
+#'          \code{gridExtra} grob is returned instead, placing the confidence panel
+#'          next to the genotype. \code{confidence_col} is not combined with
+#'          \code{facet_by}; if both are given, \code{facet_by} is ignored.
 #'
-#' @seealso \link{inferGenotype}
+#' @seealso \link{inferGenotype}, \link{inferGenotypeBayesian}
 #'
 #' @examples
 #' # Plot genotype
@@ -1183,11 +1216,26 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
 #' geno_sub <- rbind(genotype_a, genotype_b)
 #' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #'
+#' # Add a confidence evidence panel from a per-gene confidence column
+#' geno_conf <- SampleGenotype
+#' geno_conf$k_diff <- seq(0, 20, length.out=nrow(geno_conf))
+#' plotGenotype(geno_conf, confidence_col="k_diff")
+#'
 #' @export
 plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"),
-                         text_size=12, silent=FALSE, ...) {
+                         text_size=12, silent=FALSE, confidence_col=NULL,
+                         confidence_breaks=c(0, 1, 2, 3, 4, 5, 10, 20, 50, Inf), ...) {
     # Check arguments
     gene_sort <- match.arg(gene_sort)
+    if (!is.null(confidence_col)) {
+        if (!confidence_col %in% colnames(genotype)) {
+            stop("confidence_col '", confidence_col, "' not found in genotype.")
+        }
+        if (!is.null(facet_by)) {
+            warning("confidence_col is not supported together with facet_by; ignoring facet_by.")
+            facet_by = NULL
+        }
+    }
 
     # Split genes' alleles into their own rows
     alleles = strsplit(genotype$alleles, ",")
@@ -1202,8 +1250,8 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
     }
 
     # Set the gene order
-    geno2$gene = factor(geno2$gene,
-                        levels=rev(sortAlleles(unique(geno2$gene), method=gene_sort)))
+    gene_levels = rev(sortAlleles(unique(geno2$gene), method=gene_sort))
+    geno2$gene = factor(geno2$gene, levels=gene_levels)
 
     # Create the base plot
     p = ggplot(geno2, aes(x=!!rlang::sym("gene"),
@@ -1228,10 +1276,54 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
     # Add additional theme elements
     p = p + do.call(theme, list(...))
 
-    # Plot
-    if (!silent) { plot(p) }
+    # Without a confidence column, return the genotype plot as is
+    if (is.null(confidence_col)) {
+        if (!silent) { plot(p) }
+        return(invisible(p))
+    }
 
-    invisible(p)
+    # Bin the per-gene confidence value and draw it as a blue color panel beside the
+    # genotype. White marks NA/unscored genes; drop=FALSE keeps the full scale.
+    blues = c("#FFFFFF", "#F7FBFF", "#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6",
+              "#4292C6", "#2171B5", "#08519C", "#08306B")
+    bins = cut(suppressWarnings(as.numeric(genotype[[confidence_col]])),
+               confidence_breaks, include.lowest=TRUE, right=FALSE)
+    bin_levels = gsub(",", ", ", levels(bins))
+    conf_levels = c("NA", bin_levels)
+    conf = data.frame(gene=factor(genotype$gene, levels=gene_levels),
+                      confidence=factor(ifelse(is.na(bins), "NA", bin_levels[bins]),
+                                        levels=conf_levels))
+    pc = ggplot(conf, aes(x=!!rlang::sym("gene"),
+                          fill=!!rlang::sym("confidence"))) +
+        theme_bw() +
+        theme(axis.ticks=element_blank(),
+              axis.text=element_blank(),
+              panel.grid.major=element_blank(),
+              panel.grid.minor=element_blank(),
+              text=element_text(size=text_size)) +
+        geom_bar(position="fill") +
+        coord_flip() + xlab("") + ylab("") +
+        scale_fill_manual(name=confidence_col,
+                          values=setNames(blues[seq_along(conf_levels)], conf_levels),
+                          drop=FALSE)
+
+    # Align the gene rows and place the confidence panel beside the genotype, with
+    # both legends moved to the right so the two panels sit next to each other
+    geno_grob = ggplotGrob(p + theme(legend.position="none"))
+    conf_grob = ggplotGrob(pc + theme(legend.position="none"))
+    conf_grob$heights = geno_grob$heights
+    p_legend = ggplotGrob(p)
+    pc_legend = ggplotGrob(pc)
+    leg_allele = p_legend$grobs[[which(p_legend$layout$name %in% c("guide-box", "guide-box-right"))[1]]]
+    leg_conf = pc_legend$grobs[[which(pc_legend$layout$name %in% c("guide-box", "guide-box-right"))[1]]]
+    panels = gridExtra::arrangeGrob(geno_grob, conf_grob, ncol=2, widths=c(0.85, 0.15))
+    legends = gridExtra::arrangeGrob(leg_allele, leg_conf, ncol=1)
+    combined = gridExtra::arrangeGrob(panels, legends, ncol=2, widths=c(0.85, 0.15))
+
+    # Plot
+    if (!silent) { gridExtra::grid.arrange(combined) }
+
+    invisible(combined)
 }
 
 #' Return the nucleotide sequences of a genotype
@@ -1246,6 +1338,10 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
 #' @param    novel        an optional \code{data.frame} containing putative
 #'                        novel alleles of the type returned by
 #'                        \link{findNovelAlleles}.
+#' @param    include_unseen if \code{TRUE}, include germline database alleles for
+#'                        genes that are not present in \code{genotype}. For
+#'                        genes present in \code{genotype}, include only the
+#'                        genotyped alleles.
 #'
 #' @return   A named vector of strings containing the germline nucleotide
 #'           sequences of the alleles in the provided genotype.
@@ -1257,7 +1353,7 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
 #' genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, SampleNovel)
 #'
 #' @export
-genotypeFasta <- function(genotype, germline_db, novel=NA){
+genotypeFasta <- function(genotype, germline_db, novel=NA, include_unseen=FALSE){
     if(!is.null(nrow(novel))){
         # Extract novel alleles if any and add them to germline_db
         novel <- filter(novel, !is.na(!!rlang::sym("polymorphism_call"))) %>%
@@ -1273,7 +1369,13 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
     g_names <- names(germline_db)
     names(g_names) <- getAllele(names(germline_db), first = T, strip_d = T)
 
-    table_calls <- mapply(paste, genotype$gene, strsplit(genotype$alleles, ","),
+    allele_values <- genotype$alleles
+    if ("genotyped_alleles" %in% colnames(genotype)) {
+        use_genotyped <- !is.na(genotype$genotyped_alleles) &
+            nzchar(genotype$genotyped_alleles)
+        allele_values[use_genotyped] <- genotype$genotyped_alleles[use_genotyped]
+    }
+    table_calls <- mapply(paste, genotype$gene, strsplit(allele_values, ","),
                          sep="*")
     table_calls_names <- unlist(table_calls)
     seq_names <- g_names[names(g_names) %in% table_calls_names]
@@ -1283,6 +1385,11 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
     if ( any(not_found) ) {
         stop("The following genotype alleles were not found in germline_db: ",
              paste(table_calls_names[not_found], collapse = ", "))
+    }
+
+    if (include_unseen) {
+        germline_genes <- getGene(names(germline_db), first=TRUE, strip_d=TRUE)
+        seqs <- c(germline_db[!germline_genes %in% genotype$gene], seqs)
     }
 
     return(seqs)
@@ -1321,10 +1428,34 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 #'                         (\code{"repertoire"}) assignments should be performed.
 #'                         Use of \code{"gene"} increases speed by minimizing required number of
 #'                         alignments, as gene level assignments will be maintained when possible.
+#' @param    trim_seq      if \code{TRUE}, trim sample and germline sequences
+#'                         to the segment boundaries before calculating Hamming
+#'                         distance. Boundaries are determined from the segment
+#'                         prefix of \code{v_call}, such as \code{v_*},
+#'                         \code{d_*}, or \code{j_*} columns.
+#' @param    overwrite     if \code{TRUE}, replace \code{v_call} with reassigned
+#'                         calls instead of writing a \code{*_call_genotyped}
+#'                         column.
+#' @param    ignored_regex regular expression indicating characters to ignore
+#'                         when comparing sequences. May also be \code{TRUE} to
+#'                         ignore nothing (every position counts), as used for
+#'                         D and J segments.
+#' @param    treat_multigene_as_uncalled if \code{TRUE}, sequences whose call
+#'                         spans more than one gene are treated as uncalled and
+#'                         realigned against the whole genotype rather than kept
+#'                         at their first gene. Only applies when \code{keep_gene}
+#'                         is \code{"gene"} or \code{"repertoire"}.
+#' @param    top_k         maximum number of equally-best alleles to report per
+#'                         sequence. \code{NULL} (default) keeps all ties.
+#' @param    top_by        how to break ties when more than \code{top_k} alleles
+#'                         are equally close. \code{"alphabetical"} keeps the
+#'                         first \code{top_k} by name; \code{"mutation_count"}
+#'                         keeps all ties.
 #'
 #' @return   A modified input \code{data.frame} containing the best allele call from
 #'           among the sequences listed in \code{genotype_db} in the
-#'           \code{v_call_genotyped} column.
+#'           \code{*_call_genotyped} column, or in \code{v_call} when
+#'           \code{overwrite=TRUE}.
 #'
 #' @examples
 #' # Extract the database sequences that correspond to the genotype
@@ -1338,21 +1469,108 @@ genotypeFasta <- function(genotype, germline_db, novel=NA){
 reassignAlleles <- function(data, genotype_db, v_call="v_call",
                             seq="sequence_alignment",
                             method="hamming", path=NA,
-                            keep_gene=c("gene", "family", "repertoire")){
+                            keep_gene=c("gene", "family", "repertoire"),
+                            trim_seq=FALSE, overwrite=FALSE,
+                            ignored_regex="[\\.N-]",
+                            treat_multigene_as_uncalled=FALSE,
+                            top_k=NULL, top_by=c("alphabetical", "mutation_count")){
     # Check arguments
     keep_gene <- match.arg(keep_gene)
+    top_by <- match.arg(top_by)
+    seg <- tolower(substr(v_call, 1, 1))
+    if (!seg %in% c("v", "d", "j")) {
+        stop("Could not determine segment from call column: ", v_call,
+             ". Expected a column beginning with v, d, or j.")
+    }
+    output_col <- paste0(seg, "_call_genotyped")
 
     # Extract data subset and prepare output vector
-    v_sequences = as.character(data[[seq]])
-    v_calls = getAllele(data[[v_call]], first=FALSE, strip_d=FALSE)
-    v_call_genotyped = rep("", length(v_calls))
+    v_sequences <- as.character(data[[seq]])
+    original_calls <- data[[v_call]]
+    # The call column typically has very few distinct values relative to the
+    # number of rows, so parse allele/gene/family on the unique calls and
+    # expand back via index instead of parsing the full-length vector.
+    uniq_calls <- unique(original_calls)
+    uniq_idx <- match(original_calls, uniq_calls)
+    uniq_alleles <- getAllele(uniq_calls, first=FALSE, strip_d=FALSE)
+    v_calls <- uniq_alleles[uniq_idx]
+    v_call_genotyped <- rep("", length(v_calls))
+    has_call <- !is.na(v_calls) & nzchar(v_calls)
+
+    if (trim_seq) {
+        germline_cols <- c(paste0(seg, "_germline_start"),
+                           paste0(seg, "_germline_end"))
+        if (seq == "sequence_alignment") {
+            seq_cols <- germline_cols
+        } else {
+            seq_cols <- c(paste0(seg, "_sequence_start"),
+                          paste0(seg, "_sequence_end"))
+        }
+        missing <- setdiff(unique(c(seq_cols, germline_cols)), colnames(data))
+        if (length(missing) > 0) {
+            stop("Cannot trim sequences: missing columns ",
+                 paste(missing, collapse=", "))
+        }
+        v_sequences <- substr(v_sequences, data[[seq_cols[1]]],
+                              data[[seq_cols[2]]])
+    }
+
+    mismatch_matrix <- function(samples, germlines, indices) {
+        # Map the ignored_regex to the equivalent alakazam Rcpp ignore-set
+        # (verified to reproduce getMutatedPositions bit-for-bit):
+        #   "[\\.N-]" -> ignore gaps/N (V segments)
+        #   TRUE      -> ignore nothing (D/J, where ignored_regex is a logical
+        #                and gregexpr("TRUE", ...) never matches a DNA sequence)
+        # Anything else falls back to the pure-R path below.
+        rcpp_ignore <- if (identical(ignored_regex, "[\\.N-]")) {
+            c(".", "N", "-")
+        } else if (isTRUE(ignored_regex)) {
+            character(0)
+        } else {
+            NULL
+        }
+        use_rcpp <- !is.null(rcpp_ignore) &&
+            isTRUE(getOption("tigger.use_alakazam_rcpp_mismatch", TRUE)) &&
+            exists("seqMismatchCountRcpp", envir=asNamespace("alakazam"), inherits=FALSE) && # this will be removed once alakazam updates
+            exists("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"), inherits=FALSE) # this will be removed once alakazam updates
+        if (use_rcpp) {
+            ignore <- rcpp_ignore
+            if (!trim_seq) {
+                dist_mat <- get("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"))(
+                    samples, germlines, ignore=ignore)
+            } else {
+                dist_mat <- sapply(germlines, function(x) {
+                    germline_seqs <- substr(rep(x, length(indices)),
+                                            data[[germline_cols[1]]][indices],
+                                            data[[germline_cols[2]]][indices])
+                    get("seqMismatchCountRcpp", envir=asNamespace("alakazam"))(
+                        samples, germline_seqs, ignore=ignore)
+                })
+            }
+            return(matrix(as.integer(dist_mat), nrow=length(samples),
+                          ncol=length(germlines)))
+        }
+
+        dists <- lapply(germlines, function(x) {
+            germline_seqs <- if (trim_seq) {
+                substr(rep(x, length(indices)), data[[germline_cols[1]]][indices],
+                       data[[germline_cols[2]]][indices])
+            } else {
+                x
+            }
+            sapply(getMutatedPositions(samples, germline_seqs,
+                                       ignored_regex=ignored_regex,
+                                       match_instead=FALSE), length)
+        })
+        matrix(unlist(dists), ncol=length(germlines))
+    }
 
     if (keep_gene == "gene") {
-        v = getGene(v_calls, first = TRUE, strip_d=FALSE)
+        v = getGene(uniq_alleles, first = TRUE, strip_d=FALSE)[uniq_idx]
         geno = getGene(names(genotype_db),strip_d=TRUE)
         names(geno) = names(genotype_db)
     } else if (keep_gene == "family") {
-        v <- getFamily(v_calls, first = TRUE, strip_d = FALSE)
+        v <- getFamily(uniq_alleles, first = TRUE, strip_d = FALSE)[uniq_idx]
         geno = getFamily(names(genotype_db),strip_d=TRUE)
         names(geno) = names(genotype_db)
     } else if (keep_gene == "repertoire") {
@@ -1363,26 +1581,45 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
         stop("Unknown keep_gene value: ", keep_gene)
     }
 
+    # Optionally treat multi-gene calls (e.g. "IGHV1-2*02,IGHV3-7*01") as
+    # uncalled so they are realigned against the whole genotype rather than
+    # kept at the first gene. Only meaningful for gene/repertoire grouping.
+    if (keep_gene %in% c("gene", "repertoire") && treat_multigene_as_uncalled) {
+        genes_full = getGene(uniq_alleles, first=FALSE, strip_d=FALSE)[uniq_idx]
+        genes_split = strsplit(genes_full, ",")
+        is_multigene = vapply(genes_split,
+                              function(x) length(unique(trimws(x))) > 1, logical(1))
+    } else {
+        is_multigene = rep(FALSE, length(v_calls))
+    }
+
+    # Optionally cap the number of equally-best alleles reported per sequence.
+    apply_top_k <- function(best_alleles) {
+        if (!is.null(top_k) && !is.na(top_k) && top_by == "alphabetical") {
+            best_alleles <- lapply(best_alleles, function(x) {
+                if (length(x) > top_k) head(sort(x), top_k) else x
+            })
+        }
+        best_alleles
+    }
+
     # keep_gene == FALSE
     # Find which genotype genes/families are homozygous and assign those alleles first
     hetero = unique(geno[which(duplicated(geno))])
     homo = geno[!(geno %in% hetero)]
     homo_alleles = names(homo)
     names(homo_alleles) = homo
-    homo_calls_i = which(v %in% homo)
+    homo_calls_i = which(v %in% homo & !is_multigene & has_call)
     v_call_genotyped[homo_calls_i] = homo_alleles[v[homo_calls_i]]
 
     # Now realign the heterozygote sequences to each allele of that gene
     for (het in hetero){
-        ind = which(v %in% het)
+        ind = which(v %in% het & !is_multigene & has_call)
         if (length(ind) > 0){
             het_alleles = names(geno[which(geno == het)])
             het_seqs = genotype_db[het_alleles]
             if(method == "hamming"){
-                dists = lapply(het_seqs, function(x)
-                    sapply(getMutatedPositions(v_sequences[ind], x, match_instead=FALSE),
-                           length))
-                dist_mat = matrix(unlist(dists), ncol = length(het_seqs))
+                dist_mat <- mismatch_matrix(v_sequences[ind], het_seqs, ind)
             } else {
                 stop("Only Hamming distance is currently supported as a method.")
             }
@@ -1395,20 +1632,17 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
             for (i in 1:nrow(dist_mat)) {
                 best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
             }
-            best_alleles = lapply(best_match, function(x) het_alleles[x])
+            best_alleles = apply_top_k(lapply(best_match, function(x) het_alleles[x]))
             v_call_genotyped[ind] = unlist(lapply(best_alleles, paste, collapse=","))
         }
     }
 
     # Now realign the gene-not-in-genotype calls to every genotype allele
-    hetero_calls_i = which(v %in% hetero)
-    not_called = setdiff(1:length(v), c(homo_calls_i, hetero_calls_i))
-    if(length(not_called)>1){
+    hetero_calls_i = which(v %in% hetero & !is_multigene & has_call)
+    not_called = setdiff(which(has_call), c(homo_calls_i, hetero_calls_i))
+    if(length(not_called)>0){
         if(method ==  "hamming"){
-            dists = lapply(genotype_db, function(x)
-                sapply(getMutatedPositions(v_sequences[not_called], x, match_instead=FALSE),
-                       length))
-            dist_mat = matrix(unlist(dists), ncol = length(genotype_db))
+            dist_mat <- mismatch_matrix(v_sequences[not_called], genotype_db, not_called)
         } else {
             stop("Only Hamming distance is currently supported as a method.")
         }
@@ -1421,11 +1655,11 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
         for (i in 1:nrow(dist_mat)) {
             best_match[[i]] = which(dist_mat[i, ]==min(dist_mat[i, ]))
         }
-        best_alleles = lapply(best_match, function(x) names(genotype_db[x]))
+        best_alleles = apply_top_k(lapply(best_match, function(x) names(genotype_db[x])))
         v_call_genotyped[not_called] = unlist(lapply(best_alleles, paste, collapse=","))
     }
 
-    if (all(v_call_genotyped == data[[v_call]])) {
+    if (all(v_call_genotyped == original_calls, na.rm=TRUE)) {
         msg <- ("No allele assignment corrections made.")
         if (all(v %in% homo) & length(hetero) > 0) {
             keep_opt <- eval(formals(reassignAlleles)$keep_gene)
@@ -1436,7 +1670,11 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
         warning(msg)
     }
 
-    data$v_call_genotyped <- v_call_genotyped
+    if (overwrite) {
+        data[[v_call]] <- v_call_genotyped
+    } else {
+        data[[output_col]] <- v_call_genotyped
+    }
 
     return(data)
 }

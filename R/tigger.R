@@ -62,7 +62,7 @@
 #' }
 #'
 #' @import      ggplot2
-#' @importFrom  alakazam    getAllele getGene getFamily translateDNA DNA_COLORS checkColumns
+#' @importFrom  alakazam    getAllele getGene getFamily getLocus translateDNA DNA_COLORS checkColumns
 #' @importFrom  doParallel  registerDoParallel
 #' @importFrom  dplyr       do n desc %>%
 #'                          glimpse distinct group_indices
@@ -74,7 +74,7 @@
 #'                          summarise transmute
 #' @importFrom  foreach     foreach %dopar% registerDoSEQ
 #' @importFrom  graphics    plot
-#' @importFrom  gridExtra   arrangeGrob
+#' @importFrom  gridExtra   arrangeGrob grid.arrange
 #' @importFrom  gtools      ddirichlet
 #' @importFrom  iterators   icount
 #' @importFrom  lazyeval    interp
@@ -85,7 +85,7 @@
 #' @importFrom  stringi     stri_length stri_detect_fixed stri_replace_all_regex
 #'                          stri_sub stri_sub<- stri_trans_toupper
 #' @importFrom  tidyr       gather spread unnest
-#' @importFrom  utils       citation
+#' @importFrom  utils       citation head
 NULL
 
 # Package loading actions

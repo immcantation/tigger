@@ -52,6 +52,10 @@
 #'                           assigned to \code{0}; e.g., the heterozygous case is
 #'                           \code{c(priors[1], priors[2], 0, 0)}. The prior for the
 #'                           homozygous distribution is fixed at \code{c(1, 0, 0, 0)}.
+#' @param    genotyped_alleles if \code{TRUE}, add a \code{genotyped_alleles}
+#'                           column containing the most likely alleles based on
+#'                           the highest Bayesian zygosity likelihood. Default
+#'                           is \code{FALSE}.
 #'
 #' @return
 #' A \code{data.frame} of alleles denoting the genotype of the subject with the log10
@@ -70,6 +74,8 @@
 #'   \item \code{kt}: log10 likelihood that the \code{gene} is trizygous
 #'   \item \code{kq}: log10 likelihood that the \code{gene} is quadrozygous.
 #'   \item \code{k_diff}: log10 ratio of the highest to second-highest zygosity likelihoods.
+#'   \item \code{genotyped_alleles}: If requested, comma separated list of
+#'         alleles in the most likely genotype for the given \code{gene}.
 #' }
 #'
 #' @note
@@ -97,7 +103,8 @@
 inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
                                   v_call="v_call", seq="sequence_alignment",
                                   find_unmutated=TRUE,
-                                  priors=c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)){
+                                  priors=c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25),
+                                  genotyped_alleles=FALSE){
     # Visibility hack
     . <- NULL
 
@@ -131,6 +138,17 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
         if(length(allele_calls) == 0){
             stop("No unmutated sequences found! Set 'find_unmutated' to 'FALSE'.")
         }
+    }
+
+    # Warn if the calls span more than one locus
+    if ("locus" %in% colnames(data) && length(allele_calls) == nrow(data)) {
+        loci <- as.character(data$locus)
+    } else {
+        loci <- getLocus(allele_calls, first=TRUE, strip_d=FALSE)
+    }
+    loci[is.na(loci)] <- ""
+    if (length(unique(loci[nzchar(loci)])) > 1) {
+        warning("Mixed loci detected. Repertoire depth and fractional thresholds are locus specific.")
     }
 
     # Find which rows' calls contain which genes
@@ -265,6 +283,17 @@ inferGenotypeBayesian <- function(data, germline_db=NA, novel=NA,
                     paste("Cannot distinguish", .)
             }
         }
+    }
+    if (genotyped_alleles) {
+        # For each gene, keep the most likely alleles based on the highest
+        # Bayesian zygosity likelihood (kh, kd, kt, kq)
+        geno$genotyped_alleles <- apply(geno[, c("alleles", "kh", "kd", "kt", "kq")], 1,
+                                        function(row) {
+            m <- which.max(as.numeric(row[2:5]))
+            alleles <- unlist(strsplit(row[1], ","))
+            m <- min(m, length(alleles))
+            paste0(alleles[1:m], collapse=",")
+        })
     }
     rownames(geno) <- NULL
     return(geno)

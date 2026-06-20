@@ -65,6 +65,15 @@ test_that("Test findNovelAlleles",{
                                       v_call="v_call", 
                                       seq="sequence_alignment")
     expect_equivalent(geno_bay, geno_bay_airr)
+    expect_false("genotyped_alleles" %in% colnames(geno_bay_airr))
+
+    geno_bay_gt <- inferGenotypeBayesian(airr_db,
+                                      germline_db = germline_ighv,
+                                      novel = novel_df_airr,
+                                      v_call="v_call",
+                                      seq="sequence_alignment",
+                                      genotyped_alleles=TRUE)
+    expect_true("genotyped_alleles" %in% colnames(geno_bay_gt))
     
 })
 
@@ -200,8 +209,178 @@ test_that("Test genotypeFasta",{
     )
     gtfa <- genotypeFasta(gt, germline_db)
     expect_equal(gtfa, germline_db[1:5])
+
+    gt$genotyped_alleles <- c("04", "01", "01", "09")
+    gtfa_unseen <- genotypeFasta(gt, germline_db, include_unseen=TRUE)
+    expect_equal(gtfa_unseen, germline_db[c(6, 1, 3, 4, 5)])
     
     expect_error(genotypeFasta(gt, germline_db[-1]),
                  regexp="IGHV1-2\\*04")
     
+})
+
+test_that("inferGenotype uses locus-specific fractional gene_cutoff", {
+    db <- data.frame(
+        v_call=c(rep("IGHV1-1*01", 10), rep("IGKV1-1*01", 10)),
+        sequence_alignment=rep("AAAA", 20),
+        locus=c(rep("IGH", 10), rep("IGK", 10)),
+        stringsAsFactors=FALSE
+    )
+
+    expect_warning(
+        geno <- inferGenotype(db, find_unmutated=FALSE, gene_cutoff=0.75),
+        regexp="Mixed loci detected"
+    )
+    expect_equal(sort(geno$gene), c("IGHV1-1", "IGKV1-1"))
+
+    db$locus <- NULL
+    expect_warning(
+        geno_from_call <- inferGenotype(db, find_unmutated=FALSE, gene_cutoff=0.75),
+        regexp="Mixed loci detected"
+    )
+    expect_equal(sort(geno_from_call$gene), c("IGHV1-1", "IGKV1-1"))
+})
+
+test_that("reassignAlleles supports segment output, overwrite, and trimming", {
+    db_v <- data.frame(
+        v_call="IGHV1-1*01",
+        sequence_alignment="AAAT",
+        stringsAsFactors=FALSE
+    )
+    genotype_v <- c("IGHV1-1*01"="AAAA", "IGHV1-1*02"="AAAT")
+    reassigned_v <- reassignAlleles(db_v, genotype_v,
+                                    v_call="v_call",
+                                    seq="sequence_alignment")
+    expect_equal(reassigned_v$v_call_genotyped, "IGHV1-1*02")
+
+    overwritten_v <- reassignAlleles(db_v, genotype_v,
+                                     v_call="v_call",
+                                     seq="sequence_alignment",
+                                     overwrite=TRUE)
+    expect_equal(overwritten_v$v_call, "IGHV1-1*02")
+    expect_false("v_call_genotyped" %in% colnames(overwritten_v))
+
+    db_d <- data.frame(
+        d_call="IGHD1-1*01",
+        sequence_alignment="CCCA",
+        stringsAsFactors=FALSE
+    )
+    genotype_d <- c("IGHD1-1*01"="CCCC", "IGHD1-1*02"="CCCA")
+    reassigned_d <- reassignAlleles(db_d, genotype_d,
+                                    v_call="d_call",
+                                    seq="sequence_alignment")
+    expect_equal(reassigned_d$d_call_genotyped, "IGHD1-1*02")
+
+    db_j <- data.frame(
+        j_call="IGHJ1*01",
+        sequence_alignment="TTTA",
+        stringsAsFactors=FALSE
+    )
+    genotype_j <- c("IGHJ1*01"="TTTT", "IGHJ1*02"="TTTA")
+    reassigned_j <- reassignAlleles(db_j, genotype_j,
+                                    v_call="j_call",
+                                    seq="sequence_alignment")
+    expect_equal(reassigned_j$j_call_genotyped, "IGHJ1*02")
+
+    db_trim <- data.frame(
+        v_call="IGHV1-1*01",
+        sequence_alignment="GGAAAT",
+        v_germline_start=3,
+        v_germline_end=6,
+        stringsAsFactors=FALSE
+    )
+    genotype_trim <- c("IGHV1-1*01"="GGAAAA", "IGHV1-1*02"="CCAAAT")
+    reassigned_trim <- reassignAlleles(db_trim, genotype_trim,
+                                       v_call="v_call",
+                                       seq="sequence_alignment",
+                                       trim_seq=TRUE)
+    expect_equal(reassigned_trim$v_call_genotyped, "IGHV1-1*02")
+
+    expect_error(
+        reassignAlleles(db_v, genotype_v, trim_seq=TRUE),
+        regexp="missing columns"
+    )
+})
+
+test_that("reassignAlleles Rcpp mismatch path matches fallback results", {
+    skip_if_not(
+        exists("seqMismatchCountRcpp", envir=asNamespace("alakazam"), inherits=FALSE) &&
+            exists("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"), inherits=FALSE),
+        "Alakazam Rcpp mismatch functions are not installed"
+    )
+
+    samples <- c("ACGT", "ACNT", "AC-T", "acgt", "AC.T")
+    germlines <- c(g1="ACGA", g2="ACGT", g3="TCGT")
+    fallback <- sapply(germlines, function(x) {
+        sapply(getMutatedPositions(samples, x, ignored_regex="[\\.N-]",
+                                   match_instead=FALSE), length)
+    })
+    rcpp <- get("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"))(
+        samples, germlines, ignore=c(".", "N", "-"))
+    expect_equal(unname(rcpp), unname(fallback))
+
+    data_trim <- data.frame(
+        sequence_alignment=c("GGAAAT", "TTACGT"),
+        v_germline_start=c(3, 3),
+        v_germline_end=c(6, 6),
+        stringsAsFactors=FALSE
+    )
+    samples_trim <- substr(data_trim$sequence_alignment,
+                           data_trim$v_germline_start,
+                           data_trim$v_germline_end)
+    germlines_trim <- c(g1="GGAAAA", g2="TTACGT", g3="CCAAAT")
+    fallback_trim <- sapply(germlines_trim, function(x) {
+        ref <- substr(rep(x, nrow(data_trim)), data_trim$v_germline_start,
+                      data_trim$v_germline_end)
+        sapply(getMutatedPositions(samples_trim, ref,
+                                   ignored_regex="[\\.N-]",
+                                   match_instead=FALSE), length)
+    })
+    rcpp_trim <- sapply(germlines_trim, function(x) {
+        ref <- substr(rep(x, nrow(data_trim)), data_trim$v_germline_start,
+                      data_trim$v_germline_end)
+        get("seqMismatchCountRcpp", envir=asNamespace("alakazam"))(
+            samples_trim, ref, ignore=c(".", "N", "-"))
+    })
+    expect_equal(unname(rcpp_trim), unname(fallback_trim))
+
+    db <- data.frame(
+        v_call=c("IGHV1-1*01", "IGHV1-1*01", "IGHV1-1*01"),
+        sequence_alignment=c("AAAT", "AAGT", "AAAC"),
+        stringsAsFactors=FALSE
+    )
+    genotype_db <- c("IGHV1-1*01"="AAAA", "IGHV1-1*02"="AAAT")
+    old_opt <- getOption("tigger.use_alakazam_rcpp_mismatch")
+    on.exit(options(tigger.use_alakazam_rcpp_mismatch=old_opt), add=TRUE)
+
+    options(tigger.use_alakazam_rcpp_mismatch=FALSE)
+    fallback_db <- reassignAlleles(db, genotype_db,
+                                   v_call="v_call",
+                                   seq="sequence_alignment")
+    options(tigger.use_alakazam_rcpp_mismatch=TRUE)
+    rcpp_db <- reassignAlleles(db, genotype_db,
+                               v_call="v_call",
+                               seq="sequence_alignment")
+    expect_equal(rcpp_db$v_call_genotyped, fallback_db$v_call_genotyped)
+
+    db_trim <- data.frame(
+        v_call=c("IGHV1-1*01", "IGHV1-1*01"),
+        sequence_alignment=c("GGAAAT", "TTAAAA"),
+        v_germline_start=c(3, 3),
+        v_germline_end=c(6, 6),
+        stringsAsFactors=FALSE
+    )
+    genotype_trim <- c("IGHV1-1*01"="GGAAAA", "IGHV1-1*02"="CCAAAT")
+    options(tigger.use_alakazam_rcpp_mismatch=FALSE)
+    fallback_trim_db <- reassignAlleles(db_trim, genotype_trim,
+                                        v_call="v_call",
+                                        seq="sequence_alignment",
+                                        trim_seq=TRUE)
+    options(tigger.use_alakazam_rcpp_mismatch=TRUE)
+    rcpp_trim_db <- reassignAlleles(db_trim, genotype_trim,
+                                    v_call="v_call",
+                                    seq="sequence_alignment",
+                                    trim_seq=TRUE)
+    expect_equal(rcpp_trim_db$v_call_genotyped,
+                 fallback_trim_db$v_call_genotyped)
 })
