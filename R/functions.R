@@ -1178,6 +1178,10 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
 #'
 #' @param    genotype     \code{data.frame} of alleles denoting a genotype,
 #'                        as returned by \link{inferGenotype}.
+#' @param    allele_col   name of the column in \code{genotype} holding the
+#'                        comma-separated alleles to plot. Defaults to
+#'                        \code{"alleles"}; set to \code{"genotyped_alleles"} to plot
+#'                        the most likely alleles from \link{inferGenotypeBayesian}.
 #' @param    facet_by     column name in \code{genotype} to facet the plot by.
 #'                        if \code{NULL}, then do not facet the plot.
 #' @param    gene_sort    string defining the method to use when sorting alleles.
@@ -1187,23 +1191,11 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
 #' @param    text_size    point size of the plotted text.
 #' @param    silent       if \code{TRUE} do not draw the plot and just return the ggplot
 #'                        object; if \code{FALSE} draw the plot.
-#' @param    confidence_col    name of a column in \code{genotype} holding a per-gene
-#'                        confidence value to display as evidence, e.g. \code{"k_diff"}
-#'                        from \link{inferGenotypeBayesian}. If \code{NULL} (default),
-#'                        no confidence panel is drawn. The value is binned and shown on a
-#'                        blue color scale, with the column name as the legend title.
-#' @param    confidence_breaks    numeric vector of breaks used to bin the confidence
-#'                        value into color groups. The default
-#'                        \code{c(0, 1, 2, 3, 4, 5, 10, 20, 50, Inf)} matches the binning
-#'                        used by RAbHIT for the haplotype lK panel.
 #' @param    ...          additional arguments to pass to ggplot2::theme.
 #'
-#' @return  A ggplot object defining the plot. If \code{confidence_col} is supplied, a
-#'          \code{gridExtra} grob is returned instead, placing the confidence panel
-#'          next to the genotype. \code{confidence_col} is not combined with
-#'          \code{facet_by}; if both are given, \code{facet_by} is ignored.
+#' @return  A ggplot object defining the plot.
 #'
-#' @seealso \link{inferGenotype}, \link{inferGenotypeBayesian}
+#' @seealso \link{inferGenotype}, \link{plotGenotypeConfidence}
 #'
 #' @examples
 #' # Plot genotype
@@ -1216,46 +1208,34 @@ inferGenotype <- function(data, germline_db=NA, novel=NA, v_call="v_call",
 #' geno_sub <- rbind(genotype_a, genotype_b)
 #' plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 #'
-#' # Add a confidence evidence panel from a per-gene confidence column
-#' geno_conf <- SampleGenotype
-#' geno_conf$k_diff <- seq(0, 20, length.out=nrow(geno_conf))
-#' plotGenotype(geno_conf, confidence_col="k_diff")
-#'
 #' @export
 plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"),
-                         text_size=12, silent=FALSE, confidence_col=NULL,
-                         confidence_breaks=c(0, 1, 2, 3, 4, 5, 10, 20, 50, Inf), ...) {
+                         text_size=12, silent=FALSE, allele_col="alleles", ...) {
     # Check arguments
     gene_sort <- match.arg(gene_sort)
-    if (!is.null(confidence_col)) {
-        if (!confidence_col %in% colnames(genotype)) {
-            stop("confidence_col '", confidence_col, "' not found in genotype.")
-        }
-        if (!is.null(facet_by)) {
-            warning("confidence_col is not supported together with facet_by; ignoring facet_by.")
-            facet_by = NULL
-        }
+    if (!allele_col %in% colnames(genotype)) {
+        stop("allele_col '", allele_col, "' not found in genotype.")
     }
 
     # Split genes' alleles into their own rows
-    alleles = strsplit(genotype$alleles, ",")
+    alleles = strsplit(genotype[[allele_col]], ",")
     geno2 = genotype
     r = 1
     for (g in 1:nrow(genotype)){
         for(a in 1:length(alleles[[g]])) {
             geno2[r, ] = genotype[g, ]
-            geno2[r, ]$alleles = alleles[[g]][a]
+            geno2[[allele_col]][r] = alleles[[g]][a]
             r = r + 1
         }
     }
 
     # Set the gene order
-    gene_levels = rev(sortAlleles(unique(geno2$gene), method=gene_sort))
-    geno2$gene = factor(geno2$gene, levels=gene_levels)
+    geno2$gene = factor(geno2$gene,
+                        levels=rev(sortAlleles(unique(geno2$gene), method=gene_sort)))
 
     # Create the base plot
     p = ggplot(geno2, aes(x=!!rlang::sym("gene"),
-                          fill=!!rlang::sym("alleles"))) +
+                          fill=!!rlang::sym(allele_col))) +
         theme_bw() +
         theme(axis.ticks=element_blank(),
               axis.text.x=element_blank(),
@@ -1276,14 +1256,71 @@ plotGenotype <- function(genotype, facet_by=NULL, gene_sort=c("name", "position"
     # Add additional theme elements
     p = p + do.call(theme, list(...))
 
-    # Without a confidence column, return the genotype plot as is
-    if (is.null(confidence_col)) {
-        if (!silent) { plot(p) }
-        return(invisible(p))
+    # Plot
+    if (!silent) { plot(p) }
+
+    invisible(p)
+}
+
+
+#' Show a genotype with a confidence evidence panel
+#'
+#' \code{plotGenotypeConfidence} draws a genotype with \link{plotGenotype} and adds a
+#' color panel beside it showing a per-gene confidence value, such as the \code{k_diff}
+#' produced by \link{inferGenotypeBayesian}.
+#'
+#' @param    genotype     \code{data.frame} of alleles denoting a genotype, as
+#'                        returned by \link{inferGenotypeBayesian}.
+#' @param    confidence_col    name of the column in \code{genotype} holding the per-gene
+#'                        confidence value, e.g. \code{"k_diff"}. The value is binned and
+#'                        shown on a blue color scale, with the column name as the legend
+#'                        title; white marks genes with no value.
+#' @param    allele_col   name of the column in \code{genotype} holding the alleles to
+#'                        plot, passed to \link{plotGenotype}. Set to
+#'                        \code{"genotyped_alleles"} to plot the most likely alleles.
+#' @param    gene_sort    string defining the method to use when sorting alleles, passed
+#'                        to \link{plotGenotype}.
+#' @param    text_size    point size of the plotted text.
+#' @param    confidence_breaks    numeric vector of breaks used to bin the confidence
+#'                        value into color groups. The default
+#'                        \code{c(0, 1, 2, 3, 4, 5, 10, 20, 50, Inf)} matches the binning
+#'                        used by RAbHIT for the haplotype lK panel.
+#' @param    silent       if \code{TRUE} do not draw the plot and just return the grob;
+#'                        if \code{FALSE} draw the plot.
+#' @param    ...          additional arguments to pass to ggplot2::theme of the
+#'                        genotype panel.
+#'
+#' @return  A \code{gridExtra} grob combining the genotype plot with the confidence panel.
+#'
+#' @seealso \link{plotGenotype}, \link{inferGenotypeBayesian}
+#'
+#' @examples
+#' # The Bayesian genotype carries a per-gene confidence (k_diff) and, optionally,
+#' # a genotyped_alleles column
+#' geno_bayesian <- inferGenotypeBayesian(AIRRDb, germline_db=SampleGermlineIGHV,
+#'                                        novel=SampleNovel, genotyped_alleles=TRUE)
+#' plotGenotypeConfidence(geno_bayesian, confidence_col="k_diff",
+#'                        allele_col="genotyped_alleles")
+#'
+#' @export
+plotGenotypeConfidence <- function(genotype, confidence_col, allele_col="alleles",
+                                   gene_sort=c("name", "position"), text_size=12,
+                                   confidence_breaks=c(0, 1, 2, 3, 4, 5, 10, 20, 50, Inf),
+                                   silent=FALSE, ...) {
+    # Check arguments
+    gene_sort <- match.arg(gene_sort)
+    if (!confidence_col %in% colnames(genotype)) {
+        stop("confidence_col '", confidence_col, "' not found in genotype.")
     }
 
+    # Base genotype plot
+    p = plotGenotype(genotype, gene_sort=gene_sort, text_size=text_size,
+                     allele_col=allele_col, silent=TRUE, ...)
+
     # Bin the per-gene confidence value and draw it as a blue color panel beside the
-    # genotype. White marks NA/unscored genes; drop=FALSE keeps the full scale.
+    # genotype. White marks NA/unscored genes; drop=FALSE keeps the full scale. The
+    # gene order matches plotGenotype so the rows align.
+    gene_levels = rev(sortAlleles(unique(genotype$gene), method=gene_sort))
     blues = c("#FFFFFF", "#F7FBFF", "#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6",
               "#4292C6", "#2171B5", "#08519C", "#08306B")
     bins = cut(suppressWarnings(as.numeric(genotype[[confidence_col]])),
