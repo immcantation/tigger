@@ -1317,20 +1317,21 @@ plotGenotypeConfidence <- function(genotype, confidence_col, allele_col="alleles
     p = plotGenotype(genotype, gene_sort=gene_sort, text_size=text_size,
                      allele_col=allele_col, silent=TRUE, ...)
 
-    # Bin the per-gene confidence value and draw it as a blue color panel beside the
-    # genotype. White marks NA/unscored genes; drop=FALSE keeps the full scale. The
-    # gene order matches plotGenotype so the rows align.
+    # Confidence plot
     gene_levels = rev(sortAlleles(unique(genotype$gene), method=gene_sort))
     blues = c("#FFFFFF", "#F7FBFF", "#DEEBF7", "#C6DBEF", "#9ECAE1", "#6BAED6",
               "#4292C6", "#2171B5", "#08519C", "#08306B")
     bins = cut(suppressWarnings(as.numeric(genotype[[confidence_col]])),
                confidence_breaks, include.lowest=TRUE, right=FALSE)
     bin_levels = gsub(",", ", ", levels(bins))
+    bins_chr = gsub(",", ", ", as.character(bins), fixed=TRUE)  
     conf_levels = c("NA", bin_levels)
+    conf_colors = setNames(blues[seq_along(conf_levels)], conf_levels)
     conf = data.frame(gene=factor(genotype$gene, levels=gene_levels),
-                      confidence=factor(ifelse(is.na(bins), "NA", bin_levels[bins]),
-                                        levels=conf_levels))
-    pc = ggplot(conf, aes(x=!!rlang::sym("gene"),
+        confidence=factor(ifelse(is.na(bins_chr), "NA", bins_chr),
+                          levels=conf_levels))
+
+    pc = ggplot(conf, aes(x = 1, y=!!rlang::sym("gene"),
                           fill=!!rlang::sym("confidence"))) +
         theme_bw() +
         theme(axis.ticks=element_blank(),
@@ -1338,10 +1339,15 @@ plotGenotypeConfidence <- function(genotype, confidence_col, allele_col="alleles
               panel.grid.major=element_blank(),
               panel.grid.minor=element_blank(),
               text=element_text(size=text_size)) +
-        geom_bar(position="fill") +
-        coord_flip() + xlab("") + ylab("") +
-        scale_fill_manual(name=confidence_col,
-                          values=setNames(blues[seq_along(conf_levels)], conf_levels),
+        geom_tile(width=1, height=0.9, show.legend=TRUE) +
+        scale_x_continuous(expand=c(0, 0)) +
+        scale_y_discrete(drop=FALSE) +
+        xlab("") + ylab("") +
+        scale_fill_manual(name=confidence_col, values=conf_colors,
+                          limits=conf_levels, breaks=conf_levels,
+                          guide=guide_legend(override.aes=list(
+                            fill=unname(conf_colors),
+                            colour=NA,alpha=1)),
                           drop=FALSE)
 
     # Align the gene rows and place the confidence panel beside the genotype, with
