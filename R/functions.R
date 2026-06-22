@@ -1379,6 +1379,10 @@ plotGenotypeConfidence <- function(genotype, confidence_col, allele_col="alleles
 #'                        genes that are not present in \code{genotype}. For
 #'                        genes present in \code{genotype}, include only the
 #'                        genotyped alleles.
+#' @param    strip_d      if \code{TRUE} (default) remove the "D" from the end of
+#'                        gene annotations (denoting a duplicate gene in the locus)
+#'                        when matching genotype alleles to \code{germline_db}. If
+#'                        \code{FALSE}, alleles are matched exactly.
 #'
 #' @return   A named vector of strings containing the germline nucleotide
 #'           sequences of the alleles in the provided genotype.
@@ -1390,7 +1394,8 @@ plotGenotypeConfidence <- function(genotype, confidence_col, allele_col="alleles
 #' genotype_db <- genotypeFasta(SampleGenotype, SampleGermlineIGHV, SampleNovel)
 #'
 #' @export
-genotypeFasta <- function(genotype, germline_db, novel=NA, include_unseen=FALSE){
+genotypeFasta <- function(genotype, germline_db, novel=NA, include_unseen=FALSE,
+                          strip_d=TRUE){
     if(!is.null(nrow(novel))){
         # Extract novel alleles if any and add them to germline_db
         novel <- filter(novel, !is.na(!!rlang::sym("polymorphism_call"))) %>%
@@ -1402,9 +1407,9 @@ genotypeFasta <- function(genotype, germline_db, novel=NA, include_unseen=FALSE)
         }
     }
 
-    genotype$gene <- getGene(genotype$gene, first = T, strip_d = T)
+    genotype$gene <- getGene(genotype$gene, first = T, strip_d = strip_d)
     g_names <- names(germline_db)
-    names(g_names) <- getAllele(names(germline_db), first = T, strip_d = T)
+    names(g_names) <- getAllele(names(germline_db), first = T, strip_d = strip_d)
 
     allele_values <- genotype$alleles
     if ("genotyped_alleles" %in% colnames(genotype)) {
@@ -1425,7 +1430,7 @@ genotypeFasta <- function(genotype, germline_db, novel=NA, include_unseen=FALSE)
     }
 
     if (include_unseen) {
-        germline_genes <- getGene(names(germline_db), first=TRUE, strip_d=TRUE)
+        germline_genes <- getGene(names(germline_db), first=TRUE, strip_d=strip_d)
         seqs <- c(germline_db[!germline_genes %in% genotype$gene], seqs)
     }
 
@@ -1488,6 +1493,15 @@ genotypeFasta <- function(genotype, germline_db, novel=NA, include_unseen=FALSE)
 #'                         are equally close. \code{"alphabetical"} keeps the
 #'                         first \code{top_k} by name; \code{"mutation_count"}
 #'                         keeps all ties.
+#' @param    strip_d       if \code{TRUE} (default) remove the "D" from the end of
+#'                         gene annotations (denoting a duplicate gene in the locus)
+#'                         when grouping the \code{genotype_db} alleles by gene. If
+#'                         \code{FALSE}, the "D" is kept, so the genotype grouping
+#'                         and the sequence calls are matched consistently (use
+#'                         together with \code{genotypeFasta(strip_d=FALSE)}).
+#' @param    reassign_uncalled if \code{TRUE} (default), sequences whose call is
+#'                         empty or \code{NA} are also realigned against the whole
+#'                         genotype. If \code{FALSE}, they are left unassigned.
 #'
 #' @return   A modified input \code{data.frame} containing the best allele call from
 #'           among the sequences listed in \code{genotype_db} in the
@@ -1510,7 +1524,8 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
                             trim_seq=FALSE, overwrite=FALSE,
                             ignored_regex="[\\.N-]",
                             treat_multigene_as_uncalled=FALSE,
-                            top_k=NULL, top_by=c("alphabetical", "mutation_count")){
+                            top_k=NULL, top_by=c("alphabetical", "mutation_count"),
+                            strip_d=TRUE, reassign_uncalled=TRUE){
     # Check arguments
     keep_gene <- match.arg(keep_gene)
     top_by <- match.arg(top_by)
@@ -1604,11 +1619,11 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
 
     if (keep_gene == "gene") {
         v = getGene(uniq_alleles, first = TRUE, strip_d=FALSE)[uniq_idx]
-        geno = getGene(names(genotype_db),strip_d=TRUE)
+        geno = getGene(names(genotype_db),strip_d=strip_d)
         names(geno) = names(genotype_db)
     } else if (keep_gene == "family") {
         v <- getFamily(uniq_alleles, first = TRUE, strip_d = FALSE)[uniq_idx]
-        geno = getFamily(names(genotype_db),strip_d=TRUE)
+        geno = getFamily(names(genotype_db),strip_d=strip_d)
         names(geno) = names(genotype_db)
     } else if (keep_gene == "repertoire") {
         v <- rep(v_call, length(v_calls))
@@ -1674,9 +1689,12 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
         }
     }
 
-    # Now realign the gene-not-in-genotype calls to every genotype allele
+    # Now realign the gene-not-in-genotype calls to every genotype allele.
+    # By default only sequences that carry a call are realigned; set
+    # reassign_uncalled=TRUE to also realign empty/NA-call sequences (legacy).
     hetero_calls_i = which(v %in% hetero & !is_multigene & has_call)
-    not_called = setdiff(which(has_call), c(homo_calls_i, hetero_calls_i))
+    candidate_rows = if (reassign_uncalled) seq_along(v) else which(has_call)
+    not_called = setdiff(candidate_rows, c(homo_calls_i, hetero_calls_i))
     if(length(not_called)>0){
         if(method ==  "hamming"){
             dist_mat <- mismatch_matrix(v_sequences[not_called], genotype_db, not_called)
