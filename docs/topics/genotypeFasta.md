@@ -10,7 +10,13 @@ sequences.
 Usage
 --------------------
 ```
-genotypeFasta(genotype, germline_db, novel = NA)
+genotypeFasta(
+genotype,
+germline_db,
+novel = NA,
+include_unseen = FALSE,
+strip_d = TRUE
+)
 ```
 
 Arguments
@@ -28,6 +34,18 @@ novel
 :   an optional `data.frame` containing putative
 novel alleles of the type returned by
 [findNovelAlleles](findNovelAlleles.md).
+
+include_unseen
+:   if `TRUE`, include germline database alleles for
+genes that are not present in `genotype`. For
+genes present in `genotype`, include only the
+genotyped alleles.
+
+strip_d
+:   if `TRUE` (default) remove the "D" from the end of
+gene annotations (denoting a duplicate gene in the locus)
+when matching genotype alleles to `germline_db`. If
+`FALSE`, alleles are matched exactly.
 
 
 

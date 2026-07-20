@@ -15,6 +15,7 @@ facet_by = NULL,
 gene_sort = c("name", "position"),
 text_size = 12,
 silent = FALSE,
+allele_col = "alleles",
 ...
 )
 ```
@@ -42,6 +43,12 @@ text_size
 silent
 :   if `TRUE` do not draw the plot and just return the ggplot
 object; if `FALSE` draw the plot.
+
+allele_col
+:   name of the column in `genotype` holding the
+comma-separated alleles to plot. Defaults to
+`"alleles"`; set to `"genotyped_alleles"` to plot
+the most likely alleles from [inferGenotypeBayesian](inferGenotypeBayesian.md).
 
 ...
 :   additional arguments to pass to ggplot2::theme.
@@ -84,7 +91,7 @@ plotGenotype(geno_sub, facet_by="SUBJECT", gene_sort="pos")
 See also
 -------------------
 
-[inferGenotype](inferGenotype.md)
+[inferGenotype](inferGenotype.md), [plotGenotypeConfidence](plotGenotypeConfidence.md)
 
 
 

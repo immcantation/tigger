@@ -33,6 +33,7 @@ Author
 
 Authors:
 
++  Susanna Marquez [susanna.marquez@yale.edu](susanna.marquez@yale.edu)
 +  Daniel Gadala-Maria [daniel.gadala-maria@yale.edu](daniel.gadala-maria@yale.edu)
 +  Moriah Cohen [moriah.cohen@biu.ac.il](moriah.cohen@biu.ac.il)
 +  Ayelet Peres [ayelet.peres@yale.edu](ayelet.peres@yale.edu)

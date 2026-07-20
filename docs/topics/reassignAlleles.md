@@ -18,7 +18,15 @@ v_call = "v_call",
 seq = "sequence_alignment",
 method = "hamming",
 path = NA,
-keep_gene = c("gene", "family", "repertoire")
+keep_gene = c("gene", "family", "repertoire"),
+trim_seq = FALSE,
+overwrite = FALSE,
+ignored_regex = "[\\.N-]",
+treat_multigene_as_uncalled = FALSE,
+top_k = NULL,
+top_by = c("alphabetical", "mutation_count"),
+strip_d = TRUE,
+reassign_uncalled = TRUE
 )
 ```
 
@@ -61,6 +69,54 @@ family (`"family"`) or complete repertoire
 Use of `"gene"` increases speed by minimizing required number of
 alignments, as gene level assignments will be maintained when possible.
 
+trim_seq
+:   if `TRUE`, trim sample and germline sequences
+to the segment boundaries before calculating Hamming
+distance. Boundaries are determined from the segment
+prefix of `v_call`, such as `v_*`,
+`d_*`, or `j_*` columns.
+
+overwrite
+:   if `TRUE`, replace `v_call` with reassigned
+calls instead of writing a `*_call_genotyped`
+column.
+
+ignored_regex
+:   regular expression indicating characters to ignore
+when comparing sequences. May also be `TRUE` to
+ignore nothing (every position counts), as used for
+D and J segments.
+
+treat_multigene_as_uncalled
+:   if `TRUE`, sequences whose call
+spans more than one gene are treated as uncalled and
+realigned against the whole genotype rather than kept
+at their first gene. Only applies when `keep_gene`
+is `"gene"` or `"repertoire"`.
+
+top_k
+:   maximum number of equally-best alleles to report per
+sequence. `NULL` (default) keeps all ties.
+
+top_by
+:   how to break ties when more than `top_k` alleles
+are equally close. `"alphabetical"` keeps the
+first `top_k` by name; `"mutation_count"`
+keeps all ties.
+
+strip_d
+:   if `TRUE` (default) remove the "D" from the end of
+gene annotations (denoting a duplicate gene in the locus)
+when grouping the `genotype_db` alleles by gene. If
+`FALSE`, the "D" is kept, so the genotype grouping
+and the sequence calls are matched consistently (use
+together with `genotypeFasta(strip_d=FALSE)`).
+
+reassign_uncalled
+:   if `TRUE` (default), sequences whose call is
+empty or `NA` are also realigned against the whole
+genotype. If `FALSE`, they are left unassigned.
+
 
 
 
@@ -69,7 +125,8 @@ Value
 
 A modified input `data.frame` containing the best allele call from
 among the sequences listed in `genotype_db` in the
-`v_call_genotyped` column.
+`*_call_genotyped` column, or in `v_call` when
+`overwrite=TRUE`.
 
 
 Details

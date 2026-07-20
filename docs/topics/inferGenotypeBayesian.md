@@ -23,7 +23,8 @@ novel = NA,
 v_call = "v_call",
 seq = "sequence_alignment",
 find_unmutated = TRUE,
-priors = c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25)
+priors = c(0.6, 0.4, 0.4, 0.35, 0.25, 0.25, 0.25, 0.25, 0.25),
+genotyped_alleles = FALSE
 )
 ```
 
@@ -77,6 +78,12 @@ assigned to `0`; e.g., the heterozygous case is
 `c(priors[1], priors[2], 0, 0)`. The prior for the
 homozygous distribution is fixed at `c(1, 0, 0, 0)`.
 
+genotyped_alleles
+:   if `TRUE`, add a `genotyped_alleles`
+column containing the most likely alleles based on
+the highest Bayesian zygosity likelihood. Default
+is `FALSE`.
+
 
 
 
@@ -99,6 +106,8 @@ corresponding allele in the `alleles` list.
 +  `kt`: log10 likelihood that the `gene` is trizygous
 +  `kq`: log10 likelihood that the `gene` is quadrozygous.
 +  `k_diff`: log10 ratio of the highest to second-highest zygosity likelihoods.
++  `genotyped_alleles`: If requested, comma separated list of
+alleles in the most likely genotype for the given `gene`.
 
 
 
