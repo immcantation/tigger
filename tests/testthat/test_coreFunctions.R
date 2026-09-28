@@ -303,19 +303,13 @@ test_that("reassignAlleles supports segment output, overwrite, and trimming", {
 })
 
 test_that("reassignAlleles Rcpp mismatch path matches fallback results", {
-    skip_if_not(
-        exists("seqMismatchCountRcpp", envir=asNamespace("alakazam"), inherits=FALSE) &&
-            exists("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"), inherits=FALSE),
-        "Alakazam Rcpp mismatch functions are not installed"
-    )
-
     samples <- c("ACGT", "ACNT", "AC-T", "acgt", "AC.T")
     germlines <- c(g1="ACGA", g2="ACGT", g3="TCGT")
     fallback <- sapply(germlines, function(x) {
         sapply(getMutatedPositions(samples, x, ignored_regex="[\\.N-]",
                                    match_instead=FALSE), length)
     })
-    rcpp <- get("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"))(
+    rcpp <- alakazam::seqMismatchMatrix(
         samples, germlines, ignore=c(".", "N", "-"))
     expect_equal(unname(rcpp), unname(fallback))
 
@@ -339,7 +333,7 @@ test_that("reassignAlleles Rcpp mismatch path matches fallback results", {
     rcpp_trim <- sapply(germlines_trim, function(x) {
         ref <- substr(rep(x, nrow(data_trim)), data_trim$v_germline_start,
                       data_trim$v_germline_end)
-        get("seqMismatchCountRcpp", envir=asNamespace("alakazam"))(
+        alakazam::seqMismatchCount(
             samples_trim, ref, ignore=c(".", "N", "-"))
     })
     expect_equal(unname(rcpp_trim), unname(fallback_trim))
