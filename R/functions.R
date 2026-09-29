@@ -1574,53 +1574,29 @@ reassignAlleles <- function(data, genotype_db, v_call="v_call",
     }
 
     mismatch_matrix <- function(samples, germlines, indices) {
-        # Map the ignored_regex to the equivalent alakazam Rcpp ignore-set
+        # Map the ignored_regex to the equivalent alakazam ignore-set
         # (verified to reproduce getMutatedPositions bit-for-bit):
         #   "[\\.N-]" -> ignore gaps/N (V segments)
         #   TRUE      -> ignore nothing (D/J, where ignored_regex is a logical
         #                and gregexpr("TRUE", ...) never matches a DNA sequence)
-        # Anything else falls back to the pure-R path below.
-        rcpp_ignore <- if (identical(ignored_regex, "[\\.N-]")) {
+        ignore <- if (identical(ignored_regex, "[\\.N-]")) {
             c(".", "N", "-")
         } else if (isTRUE(ignored_regex)) {
             character(0)
         } else {
-            NULL
+            stop("ignored_regex must be \"[\\\\.N-]\" or TRUE.")
         }
-        use_rcpp <- !is.null(rcpp_ignore) &&
-            isTRUE(getOption("tigger.use_alakazam_rcpp_mismatch", TRUE)) &&
-            exists("seqMismatchCountRcpp", envir=asNamespace("alakazam"), inherits=FALSE) && # this will be removed once alakazam updates
-            exists("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"), inherits=FALSE) # this will be removed once alakazam updates
-        if (use_rcpp) {
-            ignore <- rcpp_ignore
-            if (!trim_seq) {
-                dist_mat <- get("seqMismatchMatrixRcpp", envir=asNamespace("alakazam"))(
-                    samples, germlines, ignore=ignore)
-            } else {
-                dist_mat <- sapply(germlines, function(x) {
-                    germline_seqs <- substr(rep(x, length(indices)),
-                                            data[[germline_cols[1]]][indices],
-                                            data[[germline_cols[2]]][indices])
-                    get("seqMismatchCountRcpp", envir=asNamespace("alakazam"))(
-                        samples, germline_seqs, ignore=ignore)
-                })
-            }
-            return(matrix(as.integer(dist_mat), nrow=length(samples),
-                          ncol=length(germlines)))
+        if (!trim_seq) {
+            dist_mat <- alakazam::seqMismatchMatrix(samples, germlines, ignore=ignore)
+        } else {
+            dist_mat <- sapply(germlines, function(x) {
+                germline_seqs <- substr(rep(x, length(indices)),
+                                        data[[germline_cols[1]]][indices],
+                                        data[[germline_cols[2]]][indices])
+                alakazam::seqMismatchCount(samples, germline_seqs, ignore=ignore)
+            })
         }
-
-        dists <- lapply(germlines, function(x) {
-            germline_seqs <- if (trim_seq) {
-                substr(rep(x, length(indices)), data[[germline_cols[1]]][indices],
-                       data[[germline_cols[2]]][indices])
-            } else {
-                x
-            }
-            sapply(getMutatedPositions(samples, germline_seqs,
-                                       ignored_regex=ignored_regex,
-                                       match_instead=FALSE), length)
-        })
-        matrix(unlist(dists), ncol=length(germlines))
+        matrix(as.integer(dist_mat), nrow=length(samples), ncol=length(germlines))
     }
 
     if (keep_gene == "gene") {
