@@ -1,4 +1,57 @@
 
+Version 1.2.0: September 30, 2026
+-------------------------------------------------------------------------------
+
+General:
+
++ Updated dependencies to alakazam >= 1.5.0.
+
+New Features:
+
++ Added the function `plotGenotypeConfidence`, which draws a genotype next to a 
+  color panel showing a per-gene confidence value, such as the `k_diff` returned 
+  by `inferGenotypeBayesian`.
+
++ Added the `genotyped_alleles` argument to `inferGenotypeBayesian`. When `TRUE`,
+  a `genotyped_alleles` column is added with the most likely alleles based on 
+  the highest Bayesian zygosity likelihood.
+
++ Added the `allele_col` argument to `plotGenotype` to choose the column of 
+  alleles to plot (e.g., `allele_col="genotyped_alleles"`).
+
++ Added the `include_unseen` and `strip_d` arguments to `genotypeFasta`. With 
+  `include_unseen=TRUE`, germline alleles of genes absent from the genotype are 
+  also returned. `genotypeFasta` now uses the `genotyped_alleles` column, when 
+  present, instead of `alleles`.
+
++ Added the `trim_seq`, `overwrite`, `ignored_regex`, 
+  `treat_multigene_as_uncalled`, `top_k`, `top_by`, `strip_d` and 
+  `reassign_uncalled` arguments to `reassignAlleles`.
+
++ `reassignAlleles` now supports D and J calls. The segment is determined from 
+  the prefix of the `v_call` argument, and the result is written to the 
+  `v_call_genotyped`, `d_call_genotyped` or `j_call_genotyped` column accordingly.
+  The `v_call` column name must now begin with `v`, `d` or `j`.
+
+Backwards Incompatible Changes:
+
++ When `gene_cutoff` is a fraction, `inferGenotype` now computes the cutoff from 
+  the number of sequences of the gene's locus instead of the whole repertoire.
+  `inferGenotype` and `inferGenotypeBayesian` warn when calls from more than one
+  locus are detected.
+
+Bug Fixes:
+
++ Fixed `reassignAlleles` not realigning sequences when only one sequence had a 
+  gene absent from the genotype.
+
+Performance:
+
++ `reassignAlleles` now uses `alakazam::seqMismatchMatrix` and 
+  `alakazam::seqMismatchCount` to compute Hamming distances, and parses allele 
+  calls only once per unique call.
+
+
 Version 1.1.3: April 13, 2026
 -------------------------------------------------------------------------------
 
