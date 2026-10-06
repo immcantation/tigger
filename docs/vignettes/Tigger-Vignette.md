@@ -337,8 +337,8 @@ of them unmutated.
 
 1. [Alamyar *et al.* (2010)](https://www.imgt.org/HighV-QUEST/)
 2. [Munshaw and Kepler (2010)](https://doi.org/10.1093/bioinformatics/btq056)
-3. [Lefranc *et al.* (2003)](https://pubmed.ncbi.nlm.nih.gov/12477501)
+3. [Lefranc *et al.* (2003)](https://doi.org/10.1016/s0145-305x(02)00039-3)
 
 [1]: https://www.imgt.org/HighV-QUEST/ "Alamyar et al. (2010)" 
 [2]: https://doi.org/10.1093/bioinformatics/btq056 "Munshaw and Kepler (2010)" 
-[3]: https://pubmed.ncbi.nlm.nih.gov/12477501 "Lefranc et al. (2003)"
+[3]: https://doi.org/10.1016/s0145-305x(02)00039-3 "Lefranc et al. (2003)"
