@@ -2400,7 +2400,7 @@ superSubstring = function(string, positions){
 
 # Layout multiple ggplots
 #
-# \code{multiplot} is a function provided by http://www.cookbook-r.com/ which
+# \code{multiplot} is a function provided by https://www.cookbook-r.com/ which
 # allows for plotting multiple ggplot objects in one panel.
 #
 # @param    ...       ggplot2 object(s).

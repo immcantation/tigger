@@ -1,5 +1,5 @@
 [![](https://www.r-pkg.org/badges/version/tigger)](https://cran.r-project.org/package=tigger)
-[![](http://cranlogs.r-pkg.org/badges/grand-total/tigger)](https://www.r-pkg.org/pkg/tigger)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/tigger)](https://www.r-pkg.org/pkg/tigger)
 [![](https://cranlogs.r-pkg.org/badges/tigger)](https://www.r-pkg.org/pkg/tigger)
 [![](https://img.shields.io/static/v1?label=AIRR-C%20sw-tools%20v1&message=compliant&color=008AFF&labelColor=000000&style=plastic)](https://docs.airr-community.org/en/stable/swtools/airr_swtools_standard.html)
 [![](https://img.shields.io/badge/github-repo-blue?logo=github&link=https://github.com/immcantation/tigger)](https://github.com/immcantation/tigger)
@@ -30,7 +30,7 @@ Required Input
     * Length of the junction region
 * Germline Ig sequences in IMGT-gapped fasta format (e.g., as those downloaded from [IMGT/GENE-DB](https://www.imgt.org/genedb/)
 
-The former can be created through the use of [IMGT/HighV-QUEST](https://www.imgt.org) and [Change-O](http://changeo.readthedocs.io).
+The former can be created through the use of [IMGT/HighV-QUEST](https://www.imgt.org) and [Change-O](https://changeo.readthedocs.io).
 
 Contact
 -------------------------------------------------------------------------------

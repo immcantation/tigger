@@ -56,7 +56,7 @@ Additional information about the methods used by TIgGER is available in:
 [Gadala-Maria D, Yaari G, Uduman M, Kleinstein SH (2015) Automated analysis of 
 high-throughput B cell sequencing data reveals a high frequency of novel 
 immunoglobulin V gene segment alleles. *PNAS* 
-112(8):E862-70](http://www.pnas.org/content/early/2015/02/05/1417683112).
+112(8):E862-70](https://www.pnas.org/content/early/2015/02/05/1417683112).
 
 ## Input
 
