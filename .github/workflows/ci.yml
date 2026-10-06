@@ -40,9 +40,24 @@ jobs:
           options(crayon.enabled=TRUE)
           rcmdcheck::rcmdcheck(args = c("--as-cran", "--run-donttest", "--timings"), error_on="warning", check_dir="check")
         shell: Rscript {0}
+      - name: Show testthat output
+        if: always()
+        run: find check -name 'testthat.Rout*' -exec cat '{}' \; || true
+        shell: bash
+      - name: Build package tarball without tests
+        run: |
+          echo -e '\n^test' >> .Rbuildignore
+          R CMD build .
+        shell: bash
+      - name: Upload package tarball artifact
+        if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/master' && !env.ACT }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: package-tarball
+          path: ./*.tar.gz
       - name: Check usage
         run: |
-          devtools::install()
+          devtools::install(upgrade = FALSE)
           pkg_name <- read.dcf("DESCRIPTION")[1, "Package"]
           library(pkg_name, character.only=T)
           usage_out <- capture.output(codetools::checkUsagePackage(pack=pkg_name))
