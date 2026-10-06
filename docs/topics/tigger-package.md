@@ -19,7 +19,7 @@ See also
 
 Useful links:
 
-+  [http://tigger.readthedocs.io](http://tigger.readthedocs.io)
++  [https://tigger.readthedocs.io](https://tigger.readthedocs.io)
 +  Report bugs at [https://github.com/immcantation/tigger/issues](https://github.com/immcantation/tigger/issues)
 
 
